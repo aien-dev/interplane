@@ -14,7 +14,7 @@ hand out) and nothing is consumed. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@bdcb2d4fb631df7777b2ce9fbda41088a2abcd7e` (head of PR #203,
+`aien-dev/aien-sovereign-core@2a968bfc2770c012b4d53cfb1669f97594d2ff31` (main after PR #203 merged,
 `0.2/aien-mcp-authority`, which adds the production authority seam; TEMPORARY, re-pin to the merge
 commit once #203 lands). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path

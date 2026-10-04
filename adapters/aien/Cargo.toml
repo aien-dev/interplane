@@ -22,8 +22,8 @@ serde_json = "1"
 sha2 = "0.10"
 tokio = { version = "1", features = ["rt"] }
 # Pinned AIEN sources: aien-dev/aien-sovereign-core PR #203 branch head (TEMPORARY; re-pin to the merge commit).
-aien-capability = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "bdcb2d4fb631df7777b2ce9fbda41088a2abcd7e" }
-aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "bdcb2d4fb631df7777b2ce9fbda41088a2abcd7e" }
+aien-capability = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "2a968bfc2770c012b4d53cfb1669f97594d2ff31" }
+aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "2a968bfc2770c012b4d53cfb1669f97594d2ff31" }
 # aegis-runtime cannot be a git dependency: its own Cargo.toml reaches a sibling checkout
 # (`../aien-protocols/crates/*`). Layout required (see README): next to this repository,
 # `interplane-audit/aegis-runtime` at f4e870953a466bb1cf68f1d88285929024cf1ba9 and

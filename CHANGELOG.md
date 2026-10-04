@@ -2,6 +2,11 @@
 
 ## Unreleased (0.2, CrossAxis lane)
 
+- 0.2 report: `docs/REPORT-0.2.md`. Pre-registered gate verdict FAIL (O1 0.865, O2 0/5; T 0.877 and S pass).
+- Qwen3.5-9B qualified on llama.cpp b11398 and SGLang 0.5.20 (both probes 14/14); Rust probe aligned with the Python probe.
+- Benchmark corpus (44 tasks), protocol, paired runner and analyzer; run `qual-20261004T2207Z`.
+- AIEN adapter on the real `EffectAuthority` path (sovereign-core #203, #204, pinned 6554aac), single-use approval tests.
+
 - `selection.measure`: `rendered_bytes` and an optional unit-disciplined `tokens` block (`bytes`, `tokens_model_reported`, `tokens_endpoint_tokenizer`, `tokens_estimated`); `TokenCounter` with `BytesOnly` and `EstimatedTokens` (estimator v1) in both languages.
 - Bounded capability expansion: `expand` and `discover` (pure Core functions), `selection.expansions[]`, `parent_digest`, `selection_digest`, `selector.expansion` bounds. Expansion never grants authority.
 - Receipt normalization (additive, no existing conformance expectation changed): both languages now omit empty `always_include`, empty `selected[].domains`, a null `selector.max_capabilities` and null legacy token fields; the Rust mock catalog omits an empty `required`, so both mock catalogs have one digest.

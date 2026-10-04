@@ -1,0 +1,48 @@
+{
+  "dialect": "aien_legacy",
+  "name": "fenced_json_fallback",
+  "note": "With no <tool_call> marker anywhere, a fenced block holding a name+arguments object is accepted (client.rs:399-416).",
+  "input": "I will run it.\n\n```json\n{\"name\": \"run_command\", \"arguments\": {\"command\": \"git status\"}}\n```\n",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "I will run it.",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "name": "run_command",
+          "namespace": null
+        },
+        "arguments": {
+          "command": "git status"
+        },
+        "provenance": {
+          "dialect": "aien_legacy",
+          "dialect_version": "1",
+          "model": "aien-cli/legacy",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "run_command",
+          "coercion": "none",
+          "form": "fenced_json"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

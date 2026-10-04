@@ -147,7 +147,8 @@ for p in sorted(glob.glob(os.path.join(ROOT, "dialects", "fixtures", "*", "*.jso
     if V_INTENT.is_valid({**e["intents"][0], "kind": "result"}) if e.get("intents") else False:
         fail("negative control: wrong kind validated")
 req = {"openai": {"single","multiple","arguments_not_json","arguments_not_object","missing_name","reasoning_content_present","plain_answer","legacy_function_call"},
-       "qwen35": {"valid_single_call","multiple_calls","malformed_unclosed_function","reasoning_plus_call","plain_answer","unknown_tool_name","partial_truncated_call","multiline_parameter","json_typed_parameter","hermes_json"}}
+       "qwen35": {"valid_single_call","multiple_calls","malformed_unclosed_function","reasoning_plus_call","plain_answer","unknown_tool_name","partial_truncated_call","multiline_parameter","json_typed_parameter","hermes_json"},
+       "aien_legacy": {"valid_single_call","multiple_calls","reasoning_plus_call","repaired_bracket","repaired_missing_braces","trailing_comma_rejected","single_quotes_rejected","unterminated_rejected","fenced_json_fallback","placeholder_name_rejected","missing_arguments","arguments_not_object","plain_answer"}}
 for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))

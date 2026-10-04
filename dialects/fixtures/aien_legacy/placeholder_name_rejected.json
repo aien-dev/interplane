@@ -1,0 +1,28 @@
+{
+  "dialect": "aien_legacy",
+  "name": "placeholder_name_rejected",
+  "note": "aien-cli silently drops the prompt placeholder tool_name (client.rs:391); Lenshift rejects it visibly.",
+  "input": "<tool_call>\n{\"name\": \"tool_name\", \"arguments\": {}}\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "placeholder tool name"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

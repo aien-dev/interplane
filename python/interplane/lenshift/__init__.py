@@ -43,7 +43,8 @@ register = default_registry.register
 get = default_registry.get
 names = default_registry.names
 
-from . import openai, qwen35  # noqa: E402  (registered below; ajax is reserved, not registered)
+from . import aien_legacy, openai, qwen35  # noqa: E402  (registered below; ajax is reserved, not registered)
 
+register("aien_legacy", aien_legacy)
 register("openai", openai)
 register("qwen35", qwen35)

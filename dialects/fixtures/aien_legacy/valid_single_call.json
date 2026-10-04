@@ -1,0 +1,47 @@
+{
+  "dialect": "aien_legacy",
+  "name": "valid_single_call",
+  "note": "One call in the canonical layout aien-cli's system prompt asks for (client.rs:383 regex).",
+  "input": "Let me check.\n\n<tool_call>\n{\"name\": \"run_command\", \"arguments\": {\"command\": \"git status\"}}\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "Let me check.",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "name": "run_command",
+          "namespace": null
+        },
+        "arguments": {
+          "command": "git status"
+        },
+        "provenance": {
+          "dialect": "aien_legacy",
+          "dialect_version": "1",
+          "model": "aien-cli/legacy",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "run_command",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "dialect": "aien_legacy",
+  "name": "single_quotes_rejected",
+  "note": "aien-cli has no single-quote repair; the call is rejected, not guessed.",
+  "input": "<tool_call>\n{'name': 'run_command', 'arguments': {'command': 'ls'}}\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "tool call body is not valid JSON"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

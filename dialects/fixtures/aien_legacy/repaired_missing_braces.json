@@ -1,0 +1,50 @@
+{
+  "dialect": "aien_legacy",
+  "name": "repaired_missing_braces",
+  "note": "Missing closing braces before a present closing tag are balanced (client.rs:363-377).",
+  "input": "<tool_call>\n{\"name\": \"run_command\", \"arguments\": {\"command\": \"ls\"\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "name": "run_command",
+          "namespace": null
+        },
+        "arguments": {
+          "command": "ls"
+        },
+        "provenance": {
+          "dialect": "aien_legacy",
+          "dialect_version": "1",
+          "model": "aien-cli/legacy",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "run_command",
+          "coercion": "none",
+          "repairs": [
+            "close_braces"
+          ]
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

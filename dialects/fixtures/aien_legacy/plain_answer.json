@@ -1,0 +1,22 @@
+{
+  "dialect": "aien_legacy",
+  "name": "plain_answer",
+  "note": "No tool call: the whole text is the answer.",
+  "input": "The capital of France is Paris.",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "The capital of France is Paris.",
+    "intents": [],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

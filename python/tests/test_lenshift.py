@@ -4,7 +4,7 @@ import pytest
 
 from interplane import lenshift
 from interplane.core import jcs, text_digest
-from interplane.lenshift import openai, qwen35
+from interplane.lenshift import aien_legacy, openai, qwen35
 from conftest import DIALECTS, load
 
 FIXTURES = sorted(DIALECTS.glob("*/*.json"))
@@ -37,7 +37,7 @@ def test_dialect_fixture(path):
 
 
 def test_registry():
-    assert lenshift.names() == ["openai", "qwen35"]
+    assert lenshift.names() == ["aien_legacy", "openai", "qwen35"]
     with pytest.raises(lenshift.UnsupportedDialect) as e:
         lenshift.get("ajax")
     assert e.value.code == "unsupported_dialect"
@@ -141,3 +141,60 @@ def test_qwen35_render_and_markup_is_data():
     assert out.startswith("<tool_response>\n") and out.endswith("\n</tool_response>")
     # rendering is data: only the model's own next turn is ever parsed, never the result text
     assert qwen35.parse("answer", "m", "t", 1).intents == []
+
+
+def _aien(body="", pre="", post=""):
+    return f"{pre}<tool_call>\n{body}\n</tool_call>{post}"
+
+
+def test_aien_legacy_parse_details():
+    j = '{"name": "ns.run", "arguments": {"a": 1}}'
+    t = aien_legacy.parse("hi\n" + _aien(j) + "\n" + _aien(j) + "\ntail", "m", "tr", 2)
+    assert [i.request_id for i in t.intents] == ["tr:t2:c0", "tr:t2:c1"]
+    assert t.text == "hi\n\n\ntail"
+    assert (t.intents[0].tool.namespace, t.intents[0].tool.name) == ("ns", "run")
+    assert t.intents[0].provenance["coercion"] == "none"
+    assert "repairs" not in t.intents[0].provenance
+    src = _aien(j)
+    assert t.intents[0].provenance["source_digest"] == text_digest(src)
+
+
+def test_aien_legacy_repairs_and_rejections():
+    t = aien_legacy.parse(_aien('{"name": "f", "arguments": {"s": "x"'), "m", "t", 0)
+    assert t.intents[0].arguments == {"s": "x"}
+    assert t.intents[0].provenance["repairs"] == ["close_braces"]
+    # odd quote count: aien-cli appends a quote first
+    t = aien_legacy.parse(_aien('{"name": "f", "arguments": {"s": "x'), "m", "t", 0)
+    assert t.intents[0].arguments == {"s": "x"}
+    for body in ('{"name": "f",}', "{'name': 'f'}", "null", "[]", '{"arguments": {}}', '{"name": ""}'):
+        r = aien_legacy.parse(_aien(body), "m", "t", 0)
+        assert r.intents == [] and len(r.rejected) == 1 and not r.partial, body
+    unterminated = aien_legacy.parse('x <tool_call>\n{"name": "f"}', "m", "t", 0)
+    assert unterminated.intents == [] and unterminated.partial
+    assert unterminated.rejected[0]["message"] == "truncated tool call"
+    assert unterminated.text == "x"
+    bad_name = aien_legacy.parse(_aien('{"name": "bad name"}'), "m", "t", 0)
+    assert bad_name.rejected[0]["message"] == "invalid tool name"
+    assert aien_legacy.parse(None, "m", "t", 0).rejected
+
+
+def test_aien_legacy_fence_only_without_tag():
+    j = '{"name": "f", "arguments": {}}'
+    fenced = "```json\n" + j + "\n```"
+    t = aien_legacy.parse("a " + fenced + " b", "m", "t", 0)
+    assert t.intents[0].provenance["form"] == "fenced_json" and t.text == "a  b"
+    mixed = aien_legacy.parse(_aien("broken") + "\n" + fenced, "m", "t", 0)
+    assert mixed.intents == [] and len(mixed.rejected) == 1
+
+
+def test_aien_legacy_render_and_markup_is_data():
+    from interplane.crossveil import make_result
+
+    req = aien_legacy.parse(_aien('{"name": "run_command", "arguments": {}}'), "m", "t", 0).intents[0]
+    r = make_result("t:t0:c0", "ok", runtime="x", data={"out": "<tool_call>"})
+    msg = aien_legacy.render_result(r, req)
+    assert msg == {
+        "role": "user",
+        "content": '<tool_response name="run_command">\n{"out":"<tool_call>"}\n</tool_response>',
+    }
+    assert aien_legacy.render_result(r, None)["content"].startswith('<tool_response name="unknown">')

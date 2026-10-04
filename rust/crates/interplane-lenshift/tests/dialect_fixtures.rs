@@ -61,6 +61,13 @@ fn dialect_fixtures_match() {
             strip(&mut got);
             strip(&mut want);
             assert_eq!(got, want, "{name} intents");
+            // Cross-language identity: the Python reference produced `expected`, so the canonical
+            // (JCS) serialization of the Rust intents must be the same string.
+            assert_eq!(
+                interplane_core::canonicalize(&got),
+                interplane_core::canonicalize(&want),
+                "{name} intents JCS"
+            );
             let rej: Vec<Value> = t
                 .rejected
                 .iter()
@@ -76,5 +83,5 @@ fn dialect_fixtures_match() {
             n += 1;
         }
     }
-    assert!(n >= 18, "expected the 18 dialect fixtures, ran {n}");
+    assert!(n >= 31, "expected the 31 dialect fixtures, ran {n}");
 }

@@ -1,0 +1,28 @@
+{
+  "dialect": "aien_legacy",
+  "name": "unterminated_rejected",
+  "note": "Missing closing tag. aien-cli would accept this (client.rs:383 matches end of text); Lenshift rejects it as a partial call. Deliberate deviation.",
+  "input": "Running.\n\n<tool_call>\n{\"name\": \"run_command\", \"arguments\": {\"command\": \"git status\"}}",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "Running.",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "truncated tool call"
+      }
+    ],
+    "partial": true,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

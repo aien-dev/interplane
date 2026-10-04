@@ -1,0 +1,28 @@
+{
+  "dialect": "aien_legacy",
+  "name": "arguments_not_object",
+  "note": "aien-cli forwards any arguments value; Lenshift rejects a non-object.",
+  "input": "<tool_call>\n{\"name\": \"run_command\", \"arguments\": \"ls\"}\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "arguments is not an object"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

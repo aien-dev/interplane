@@ -8,6 +8,7 @@ use interplane_core::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
 
+pub mod aien_legacy;
 pub mod ajax;
 pub mod openai;
 pub mod qwen35;
@@ -71,9 +72,10 @@ impl DialectRegistry {
     pub fn new() -> Self {
         Self::default()
     }
-    /// `openai` and `qwen35`. `ajax` is reserved and deliberately absent.
+    /// `aien_legacy`, `openai` and `qwen35`. `ajax` is reserved and deliberately absent.
     pub fn with_defaults() -> Self {
         let mut r = Self::new();
+        r.register(Box::new(aien_legacy::AienLegacy));
         r.register(Box::new(openai::OpenAi));
         r.register(Box::new(qwen35::Qwen35));
         r
@@ -218,7 +220,7 @@ mod tests {
     #[test]
     fn unknown_dialect_is_unsupported() {
         let r = DialectRegistry::with_defaults();
-        assert_eq!(r.names(), vec!["openai", "qwen35"]);
+        assert_eq!(r.names(), vec!["aien_legacy", "openai", "qwen35"]);
         assert!(r.get("openai").is_ok());
         assert_eq!(
             r.get("frobnicate").err(),

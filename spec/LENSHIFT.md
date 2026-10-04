@@ -82,6 +82,69 @@ Both forms of a Qwen3.5 tool call are real inputs: raw XML when the caller reads
 and OpenAI `tool_calls` when a serving engine's parser converted it. The `openai` dialect handles
 the second; qualification runs both.
 
+## Dialect `aien_legacy` (version 1)
+
+The textual protocol of `aien-cli` (aien-sovereign-core 7580039). Ground truth, all under
+`crates/aien-cli/src/`: parser `client.rs:350-419` (`parse_tool_call_json`, `extract_tool_calls`),
+prompt-side format `client.rs:100-160`, result reinjection `main.rs:330-340` (the same shape
+repeats at `main.rs:414-421` and `:537-553`). Input: the assistant turn as text.
+
+aien-cli streams reasoning in a separate `reasoning` / `reasoning_content` delta and keeps it out of
+the text it parses (`client.rs:297-325`); it never looks for `<think>` in the text.
+
+- Tool calls: each `<tool_call>` ... `</tool_call>` block, body trimmed, whose body is JSON
+  `{"name": string, "arguments": object}` (Hermes style). aien-cli's regex is
+  `(?s)<tool_call>\s*(.*?)\s*(?:</tool_call>|$)` (`client.rs:383`). Blocks are parsed in order and
+  every one is dispatched (`main.rs:330-340`); there is no per-turn cap.
+- Repairs aien-cli applies, tried in this order only after a strict parse fails (`client.rs:350-379`):
+  1. `bracket_to_brace`: a body ending in `]` has it replaced by `}` (`:355-362`).
+  2. `close_braces`: when `{` outnumbers `}` (counted over every character, strings included), a `"`
+     is appended if the body has an odd number of `"`, then the missing `}` are appended
+     (`:363-377`).
+  3. Otherwise the call is dropped without a trace.
+  There is **no** trailing-comma repair and **no** single-quote repair; those inputs are rejected.
+  A repaired intent carries `provenance.repairs` (a list of the names above); `coercion = "none"`.
+- Missing `arguments` means `{}` (`client.rs:392`). aien-cli forwards any other value unchecked.
+- Name `tool_name` (the placeholder in aien-cli's system prompt) is dropped silently (`:391`).
+- Fenced fallback: only when the `<tool_call>` pass produced no call, aien-cli scans for
+  `` ```(?:json|tool_call)?\s*(\{\s*"name"\s*:\s*"[^"]+".*?\})\s*``` `` (`:399-416`) and parses each
+  match with the same repairs.
+- Result rendering (`main.rs:338`): a **user-role** message
+  `{"role":"user","content":"<tool_response name=\"NAME\">\n<json>\n</tool_response>"}`. The
+  attribute is `name` (the tool name as the model wrote it, unescaped); there is no call id.
+
+Lenshift's rules (differences from aien-cli are marked **deviation**):
+
+- Reasoning: a leading `<think>...</think>` block is removed and digested, as in `qwen35`.
+  Lenshift addition: aien-cli never sees it in text.
+- Blocks are parsed in emission order; `index` counts every block, rejected ones included.
+- Whitespace in trimming, the fence pattern and the think prefix is ASCII (` \t\n\r\v\f`) in both
+  implementations, so they stay byte-identical. aien-cli's `\s`/`trim` also match other Unicode
+  whitespace.
+- **deviation** Unterminated `<tool_call>` (no `</tool_call>`): `partial = true`, `rejected`
+  "truncated tool call", never guessed. aien-cli accepts it to end of text (`client.rs:383`, test
+  at `:448-454`). Repair 2 therefore applies only to a block the model closed itself.
+- **deviation** Rejected with `malformed_tool_call` instead of dropped silently: body not JSON after
+  repairs ("tool call body is not valid JSON"), JSON that is not an object with a non-empty string
+  `name` ("tool call JSON has no name"), name `tool_name` ("placeholder tool name"), `arguments`
+  present but not an object ("arguments is not an object"), illegal tool name ("invalid tool name").
+- **deviation** The fenced fallback runs only when the text contains no `<tool_call>` marker at all,
+  so a malformed or truncated tagged call is never replaced by an unrelated fenced block. Fenced
+  intents carry `provenance.form = "fenced_json"`. Fenced blocks are removed from `text`.
+- `source_digest` is of the exact block (`<tool_call>` through `</tool_call>`, or the whole fence).
+  `source_call_id` is null. `dialect_version = "1"`.
+- `text` is everything outside think, tool_call and matched fence blocks, trimmed.
+
+Render result -> `{"role":"user","content":"<tool_response name=\"NAME\">\n<serialized>\n</tool_response>"}`
+with the shared serialization of the openai dialect. NAME is the intent's `raw_name`; without an
+intent (for example a rejected call) it is `unknown`. aien-cli serializes its own result object with
+`serde_json::to_string`; Lenshift does not reproduce that shape, only the envelope.
+
+Versus `qwen35`'s `hermes_json` variant: the JSON body grammar is the same, but aien_legacy adds the
+two repairs, the placeholder-name rule, the fenced fallback and the user-role rendering, and
+`qwen35` accepts the XML `<function=...>` form which aien-cli does not. They are separate dialects
+with separate parsers.
+
 ## Dialect `ajax` — reserved, not implemented
 
 Ajax (announced 2026-10-02 as a Qwen3.5-9B fine-tune for Odysseus) had no published weights,
@@ -95,7 +158,7 @@ the abstraction test for that.
 `dialects/fixtures/<dialect>/<name>.json`: `{"input": ..., "model": ..., "expected": LenshiftTurn-without-digests, "expected_digests": {...}}`.
 Required qwen35 fixtures: valid single call; multiple calls; malformed (unclosed function);
 reasoning plus call; plain answer with no tool; unknown tool name (parses fine); partial/truncated
-call; multi-line parameter value; JSON-typed parameter; hermes_json form. Required openai fixtures:
+call; multi-line parameter value; JSON-typed parameter; hermes_json form. Required aien_legacy fixtures: valid single call; multiple calls; reasoning plus call; repaired bracket; repaired missing braces; trailing comma (rejected); single quotes (rejected); unterminated (rejected, partial); fenced json fallback; placeholder name (rejected); missing arguments; arguments not object; plain answer. Required openai fixtures:
 single; multiple; arguments not JSON; arguments not object; missing name; reasoning_content present;
 plain answer; legacy function_call.
 

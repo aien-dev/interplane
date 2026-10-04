@@ -1,0 +1,51 @@
+{
+  "dialect": "aien_legacy",
+  "name": "repaired_bracket",
+  "note": "Trailing ] where } belongs is repaired (client.rs:355-362). Recorded in provenance.repairs.",
+  "input": "<tool_call>\n{\"name\": \"invoke_subagent\", \"arguments\": {\"role\": \"Auditor\", \"prompt\": \"check crates\"}]\n</tool_call>",
+  "model": "aien-cli/legacy",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "name": "invoke_subagent",
+          "namespace": null
+        },
+        "arguments": {
+          "role": "Auditor",
+          "prompt": "check crates"
+        },
+        "provenance": {
+          "dialect": "aien_legacy",
+          "dialect_version": "1",
+          "model": "aien-cli/legacy",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "invoke_subagent",
+          "coercion": "none",
+          "repairs": [
+            "bracket_to_brace"
+          ]
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

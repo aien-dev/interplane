@@ -594,8 +594,35 @@ pub struct SelectorInfo {
     pub version: String,
     #[serde(default, skip_serializing_if = "is_none")]
     pub max_capabilities: Option<u64>,
+    /// Expansion bounds, recorded by the first `expand` (spec/CROSSAXIS.md).
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub expansion: Option<ExpansionBounds>,
     #[serde(flatten)]
     pub extensions: Extensions,
+}
+
+/// Bounds recorded in `selector.expansion`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExpansionBounds {
+    pub max_expansions: u64,
+    pub max_added_per_expansion: u64,
+}
+
+/// A capability refused by an expansion, and why.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RefusedEntry {
+    pub name: String,
+    pub reason: String,
+}
+
+/// One entry of `selection.expansions[]`.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ExpansionEntry {
+    pub round: u64,
+    pub reason: String,
+    pub evidence_digest: String,
+    pub added: Vec<String>,
+    pub refused: Vec<RefusedEntry>,
 }
 
 /// A selected capability.
@@ -618,6 +645,28 @@ pub struct ExcludedEntry {
     pub extensions: Extensions,
 }
 
+/// A `{full, selected}` pair of non-negative integers.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub struct FullSelected {
+    pub full: u64,
+    pub selected: u64,
+}
+
+/// `measure.tokens`: every number is in `unit`; units are never mixed in one block.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TokenMeasure {
+    /// `bytes`, `tokens_model_reported`, `tokens_endpoint_tokenizer` or `tokens_estimated`.
+    pub unit: String,
+    pub source: String,
+    pub base_context: u64,
+    pub tool_schema: FullSelected,
+    pub first_turn_prompt: FullSelected,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub all_rounds_prompt: Option<FullSelected>,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub completion: Option<FullSelected>,
+}
+
 /// Before/after size of the rendered tool surface.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Measure {
@@ -635,6 +684,10 @@ pub struct Measure {
     pub selected_tokens: Option<u64>,
     #[serde(default, skip_serializing_if = "is_none")]
     pub tokenizer: Option<String>,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub rendered_bytes: Option<FullSelected>,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub tokens: Option<TokenMeasure>,
     #[serde(flatten)]
     pub extensions: Extensions,
 }
@@ -653,6 +706,12 @@ pub struct Selection {
     pub excluded: Vec<ExcludedEntry>,
     #[serde(default, skip_serializing_if = "is_none")]
     pub measure: Option<Measure>,
+    #[serde(default, skip_serializing_if = "is_empty_vec")]
+    pub expansions: Vec<ExpansionEntry>,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub parent_digest: Option<String>,
+    #[serde(default, skip_serializing_if = "is_none")]
+    pub selection_digest: Option<String>,
     #[serde(flatten)]
     pub extensions: Extensions,
 }

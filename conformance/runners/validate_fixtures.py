@@ -4,7 +4,7 @@
 Exit status is non-zero on any failure. Checks:
   * every explicit envelope step validates against envelope.schema.json
   * every intent in dialects/fixtures validates against intent.schema.json
-  * fixture shape, 18 required cases, filename == case slug
+  * fixture shape, 25 required cases, filename == case slug
   * expected.runtime counts agree with the observed records
   * the JCS digest fixture recomputes
   * negative control: a mutated envelope MUST fail validation
@@ -32,6 +32,7 @@ def validator(name):
     Draft202012Validator.check_schema(schemas[name])
     return Draft202012Validator(schemas[name], registry=registry, format_checker=FormatChecker())
 V_ENV, V_INTENT = validator("envelope.schema.json"), validator("intent.schema.json")
+V_SEL = validator("selection.schema.json")
 
 def check(v, inst, where):
     errs = sorted(v.iter_errors(inst), key=lambda e: list(e.absolute_path))
@@ -66,7 +67,8 @@ REQUIRED = {
  "05-policy-denial","06-explicit-approval","07-successful-execution","08-execution-error","09-timeout",
  "10-multiple-sequential-calls","11-model-continuation","12-unsupported-dialect","13-unsupported-version",
  "14-unknown-fields","15-oversized-arguments","16-duplicate-request-ids","17-replay","18-model-retry-after-denial",
- "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result"}
+ "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result",
+ "24-expansion-requested-excluded","25-expansion-refused-by-bound"}
 OBS_KEYS = ["request_id","stage","decision","status","error_code","decide_invoked","execute_invoked","result_digest"]
 n_env = n_cases = 0
 neg_done = False
@@ -94,10 +96,24 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
                 if V_ENV.is_valid(bad): fail("negative control: envelope without trace_id unexpectedly valid")
                 neg_done = True
         elif "dialect" in s and "input" in s: pass
+        elif "expand" in s:
+            if "selection" not in f: fail("%s: expand step without a selection block" % name)
+            ev = s["expand"].get("evidence", {})
+            if ev.get("kind") not in ("requested_excluded", "discovery_hit"): fail("%s: bad evidence kind" % name)
         else: fail("%s: step %s has neither envelope nor dialect+input" % (name, s.get("turn")))
     for c in exp.get("result_checks", []):
         if set(c) != {"request_id", "path", "equals"} or c["request_id"] not in {o["request_id"] for o in obs}:
             fail("%s: malformed result_check %s" % (name, c))
+    if ("selection" in f) != (name[:2] in ("24", "25")): fail("%s: selection block only in cases 24-25" % name)
+    if "selection" in f:
+        n_exp = sum(1 for s in f["steps"] if "expand" in s)
+        sels = exp.get("selections", [])
+        if len(sels) != n_exp: fail("%s: expected.selections must have one entry per expand step" % name)
+        for i, sel in enumerate(sels):
+            check(V_SEL, sel, "%s selections[%d]" % (name, i))
+            if sel.get("selection_digest") != "sha256:" + hashlib.sha256(jcs({k: v for k, v in sel.items() if k not in ("selection_digest", "measure")}).encode()).hexdigest():
+                fail("%s: selections[%d] selection_digest does not recompute" % (name, i))
+            if i and sel.get("parent_digest") != sels[i - 1].get("selection_digest"): fail("%s: parent_digest chain broken at %d" % (name, i))
     if ("mapping_table" in f) != name.startswith("21"): fail("%s: mapping_table present only in case 21" % name)
     if name.startswith("21") and f.get("mapping_table") != "mock-table-stale": fail("21: mapping_table must be mock-table-stale")
     if name[:2] in ("19", "22", "23", "20", "21"):

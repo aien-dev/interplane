@@ -1,0 +1,266 @@
+{
+  "case": "25-expansion-refused-by-bound",
+  "description": "CrossAxis expansion v1 bounds. max_capabilities=2 with one email capability selected leaves room for one; max_expansions=1. Round 1 (requested_excluded write_file with domain siblings) adds write_file and refuses its four domain siblings with max_capabilities. Round 2 (discovery_hit) is refused in full: web_fetch with max_expansions, nope with not_in_catalog (checked first), send_email with already_selected. Refused rounds are still recorded and count in round numbering, not toward max_expansions.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-25",
+  "selection": {
+    "requested_domains": [
+      "email"
+    ],
+    "max_capabilities": 2,
+    "always_include": []
+  },
+  "steps": [
+    {
+      "turn": 0,
+      "expand": {
+        "evidence": {
+          "kind": "requested_excluded",
+          "name": "write_file",
+          "include_domain_siblings": true
+        },
+        "max_expansions": 1
+      }
+    },
+    {
+      "turn": 1,
+      "expand": {
+        "evidence": {
+          "kind": "discovery_hit",
+          "query": "fetch",
+          "names": [
+            "web_fetch",
+            "nope",
+            "send_email"
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "observed": [],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    },
+    "selections": [
+      {
+        "catalog_digest": "sha256:58b8ce6dd694fd20945e69dc56fd93cf1e4a1b561afa763cd96a7c2608ac68fc",
+        "excluded": [
+          {
+            "name": "append_note",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "delete_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "fail_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "list_dir",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "read_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "recall_memory",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "slow_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "web_fetch",
+            "reason": "domain_mismatch"
+          }
+        ],
+        "expansions": [
+          {
+            "added": [
+              "write_file"
+            ],
+            "evidence_digest": "sha256:cb902800bea47dc15333a9d7fb5d4c8e77185ddd14e28301d0a4bebf005adb76",
+            "reason": "requested_excluded",
+            "refused": [
+              {
+                "name": "append_note",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "delete_file",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "list_dir",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "read_file",
+                "reason": "max_capabilities"
+              }
+            ],
+            "round": 1
+          }
+        ],
+        "kind": "selection",
+        "parent_digest": "sha256:0ddd0a049dbeb187d16e82cd8c9d67caddefc5edca9c6a610bd23ded2e2329de",
+        "requested_domains": [
+          "email"
+        ],
+        "runtime": "mock",
+        "selected": [
+          {
+            "domains": [
+              "email"
+            ],
+            "name": "send_email",
+            "rule_id": "domain:email"
+          },
+          {
+            "domains": [
+              "filesystem"
+            ],
+            "name": "write_file",
+            "rule_id": "expansion:1"
+          }
+        ],
+        "selection_digest": "sha256:776f329424ed07229b7cc4e040045a89a79fdfaefd75df94d9fc42af5050391f",
+        "selector": {
+          "expansion": {
+            "max_added_per_expansion": 8,
+            "max_expansions": 1
+          },
+          "max_capabilities": 2,
+          "name": "domain_match",
+          "version": "1"
+        }
+      },
+      {
+        "catalog_digest": "sha256:58b8ce6dd694fd20945e69dc56fd93cf1e4a1b561afa763cd96a7c2608ac68fc",
+        "excluded": [
+          {
+            "name": "append_note",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "delete_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "fail_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "list_dir",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "read_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "recall_memory",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "slow_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "web_fetch",
+            "reason": "domain_mismatch"
+          }
+        ],
+        "expansions": [
+          {
+            "added": [
+              "write_file"
+            ],
+            "evidence_digest": "sha256:cb902800bea47dc15333a9d7fb5d4c8e77185ddd14e28301d0a4bebf005adb76",
+            "reason": "requested_excluded",
+            "refused": [
+              {
+                "name": "append_note",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "delete_file",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "list_dir",
+                "reason": "max_capabilities"
+              },
+              {
+                "name": "read_file",
+                "reason": "max_capabilities"
+              }
+            ],
+            "round": 1
+          },
+          {
+            "added": [],
+            "evidence_digest": "sha256:430a70415cbed34d539256799f7647366f08f93b7e2e298daf630885b32df093",
+            "reason": "discovery_hit",
+            "refused": [
+              {
+                "name": "web_fetch",
+                "reason": "max_expansions"
+              },
+              {
+                "name": "nope",
+                "reason": "not_in_catalog"
+              },
+              {
+                "name": "send_email",
+                "reason": "already_selected"
+              }
+            ],
+            "round": 2
+          }
+        ],
+        "kind": "selection",
+        "parent_digest": "sha256:776f329424ed07229b7cc4e040045a89a79fdfaefd75df94d9fc42af5050391f",
+        "requested_domains": [
+          "email"
+        ],
+        "runtime": "mock",
+        "selected": [
+          {
+            "domains": [
+              "email"
+            ],
+            "name": "send_email",
+            "rule_id": "domain:email"
+          },
+          {
+            "domains": [
+              "filesystem"
+            ],
+            "name": "write_file",
+            "rule_id": "expansion:1"
+          }
+        ],
+        "selection_digest": "sha256:02c309510e03f5dd560005b7926f148128672328286c5d719812f3d2f8c02c8d",
+        "selector": {
+          "expansion": {
+            "max_added_per_expansion": 8,
+            "max_expansions": 1
+          },
+          "max_capabilities": 2,
+          "name": "domain_match",
+          "version": "1"
+        }
+      }
+    ]
+  }
+}

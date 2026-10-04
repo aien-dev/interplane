@@ -1,0 +1,160 @@
+{
+  "case": "24-expansion-requested-excluded",
+  "description": "CrossAxis expansion v1. The selection exposes only email capabilities; the model called write_file, which exists in the catalog but was excluded (an unknown_capability at the selected view, supplied by the harness: the reference pipeline has no selected-view mapping). Evidence requested_excluded adds exactly that capability, the receipt records the round, the evidence digest and parent_digest. Expansion changes only what is rendered: the call still crosses Crossveil and the mock policy denies it.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-24",
+  "selection": {
+    "requested_domains": [
+      "email"
+    ],
+    "max_capabilities": null,
+    "always_include": []
+  },
+  "steps": [
+    {
+      "turn": 0,
+      "expand": {
+        "evidence": {
+          "kind": "requested_excluded",
+          "name": "write_file"
+        }
+      }
+    },
+    {
+      "turn": 1,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_24a",
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "arguments": "{\"path\": \"/tmp/out.txt\", \"content\": \"hello\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_24a",
+        "stage": "DENIED",
+        "decision": "denied",
+        "status": "denied",
+        "error_code": "policy_denied",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 1,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 0
+    },
+    "result_checks": [
+      {
+        "request_id": "call_24a",
+        "path": "decision.reason",
+        "equals": "mock policy: writes are denied"
+      }
+    ],
+    "selections": [
+      {
+        "catalog_digest": "sha256:58b8ce6dd694fd20945e69dc56fd93cf1e4a1b561afa763cd96a7c2608ac68fc",
+        "excluded": [
+          {
+            "name": "append_note",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "delete_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "fail_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "list_dir",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "read_file",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "recall_memory",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "slow_tool",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "web_fetch",
+            "reason": "domain_mismatch"
+          }
+        ],
+        "expansions": [
+          {
+            "added": [
+              "write_file"
+            ],
+            "evidence_digest": "sha256:cd01d654288526d06d827984daebedf1a0a6bb3898f387ffda64cb1c2e425117",
+            "reason": "requested_excluded",
+            "refused": [],
+            "round": 1
+          }
+        ],
+        "kind": "selection",
+        "parent_digest": "sha256:be25d914921cb453ae85ebe80aae2e07df1c0b13f33c80b34c5e177efe812061",
+        "requested_domains": [
+          "email"
+        ],
+        "runtime": "mock",
+        "selected": [
+          {
+            "domains": [
+              "email"
+            ],
+            "name": "send_email",
+            "rule_id": "domain:email"
+          },
+          {
+            "domains": [
+              "filesystem"
+            ],
+            "name": "write_file",
+            "rule_id": "expansion:1"
+          }
+        ],
+        "selection_digest": "sha256:57624fe0189cc34b61029c26ac291a27d032e0b6d8f65904f0dc77f9ab3c33e5",
+        "selector": {
+          "expansion": {
+            "max_added_per_expansion": 8,
+            "max_expansions": 2
+          },
+          "name": "domain_match",
+          "version": "1"
+        }
+      }
+    ]
+  }
+}

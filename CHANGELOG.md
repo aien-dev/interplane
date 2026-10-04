@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased (0.1.0)
+## Unreleased (0.2, CrossAxis lane)
+
+- `selection.measure`: `rendered_bytes` and an optional unit-disciplined `tokens` block (`bytes`, `tokens_model_reported`, `tokens_endpoint_tokenizer`, `tokens_estimated`); `TokenCounter` with `BytesOnly` and `EstimatedTokens` (estimator v1) in both languages.
+- Bounded capability expansion: `expand` and `discover` (pure Core functions), `selection.expansions[]`, `parent_digest`, `selection_digest`, `selector.expansion` bounds. Expansion never grants authority.
+- Receipt normalization (additive, no existing conformance expectation changed): both languages now omit empty `always_include`, empty `selected[].domains`, a null `selector.max_capabilities` and null legacy token fields; the Rust mock catalog omits an empty `required`, so both mock catalogs have one digest.
+- Conformance: cases 24 (expansion by requested_excluded, call still denied) and 25 (expansion refused by bounds); 25/25 byte-identical.
+
+## 0.1.0 (unreleased)
 
 - Phase 0 audit (`CURRENT_STATE.md`).
 - Core schemas, specs for Core, Lenshift, Crossveil, CrossAxis, Probe, Vectorveil, RelayLine, versioning.

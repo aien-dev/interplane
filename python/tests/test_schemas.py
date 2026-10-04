@@ -29,6 +29,8 @@ def run_cases():
         pipe = default_pipeline()
         results = []
         for step in case["steps"]:
+            if "expand" in step:
+                continue
             if "envelope" in step:
                 results.append(pipe.admit_envelope(step["envelope"])[0])
             else:
@@ -104,6 +106,31 @@ def test_decisions_capability_requests_catalog_selection_validate():
     cat = rt.catalog()
     validate("catalog", cat.to_dict())
     validate("selection", select(cat, ["filesystem"], 3, ["fail_tool"])[0].to_dict())
+
+
+def test_expansion_receipts_and_measure_validate():
+    from interplane.crossaxis import EstimatedTokens, expand, openai_tools_renderer
+
+    cat = default_pipeline().runtime.catalog()
+    sel, caps = select(cat, ["email"], 3, ["fail_tool"], renderer=openai_tools_renderer)
+    validate("selection", sel.to_dict())
+    from interplane.crossaxis import measure
+
+    msgs = [{"role": "user", "content": "hi"}]
+    sel.measure = measure(cat.capabilities, caps, openai_tools_renderer, EstimatedTokens(), msgs)
+    validate("selection", sel.to_dict())
+    out = expand(sel, cat, {"kind": "requested_excluded", "name": "read_file"})
+    out = expand(out, cat, {"kind": "discovery_hit", "names": ["web_fetch", "nope"]})
+    validate("selection", out.to_dict())
+    for path in sorted(CONF.glob("2[45]-*.json")):
+        for s in load(path)["expected"]["selections"]:
+            validate("selection", s)
+    bad = out.to_dict()
+    bad["expansions"][0]["refused"] = [{"name": "x"}]
+    assert errors("selection", bad)
+    bad = sel.to_dict()
+    bad["measure"]["tokens"]["unit"] = "tokens"
+    assert errors("selection", bad)
 
 
 def test_envelopes_from_pipeline_validate():

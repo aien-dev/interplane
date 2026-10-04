@@ -6,8 +6,8 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from .core import Limits
-from .crossveil import default_pipeline
+from .core import Limits, jcs
+from .crossveil import canonical_result_payload, default_pipeline
 
 
 def _dig(obj: Any, path: str) -> Any:
@@ -82,6 +82,7 @@ def run_case(case: dict) -> dict:
         "turns": turns,
         "runtime": runtime,
         "problems": problems,
+        "results": [canonical_result_payload(r) for r in results],
     }
 
 
@@ -89,12 +90,19 @@ def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="interplane-conformance")
     ap.add_argument("fixtures_dir")
     ap.add_argument("--out", required=True)
+    ap.add_argument("--dump", help="directory for per-case canonical result payloads")
     args = ap.parse_args(argv)
     verdicts: dict = {}
     for path in sorted(Path(args.fixtures_dir).glob("*.json")):
         case = json.loads(path.read_text(encoding="utf-8"))
         verdict = run_case(case)
         verdicts[case["case"]] = verdict
+        if args.dump:
+            d = Path(args.dump)
+            d.mkdir(parents=True, exist_ok=True)
+            (d / f"{case['case']}.results.json").write_text(
+                jcs(verdict["results"]) + "\n", encoding="utf-8"
+            )
     failed = 0
     for name, v in sorted(verdicts.items()):
         print(f"{'PASS' if v['pass'] else 'FAIL'}  {name}")
@@ -105,9 +113,7 @@ def main(argv: Optional[list] = None) -> int:
     out = {
         k: {f: v[f] for f in ("pass", "observed", "turns", "runtime")} for k, v in verdicts.items()
     }
-    Path(args.out).write_text(
-        json.dumps(out, sort_keys=True, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    Path(args.out).write_text(jcs(out) + "\n", encoding="utf-8")
     return 1 if failed else 0
 
 

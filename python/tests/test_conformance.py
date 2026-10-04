@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from interplane.core import jcs
 from interplane.conformance import main, run_case
 from conftest import CONF, load
 
@@ -25,7 +26,7 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
     assert all(
         v["pass"] and set(v) == {"pass", "observed", "runtime", "turns"} for v in data.values()
     )
-    assert text == json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
+    assert text == jcs(data) + "\n"
     assert all(o["result_digest"] for v in data.values() for o in v["observed"])
     assert "18/18" in capsys.readouterr().out or len(CASES) != 18
 

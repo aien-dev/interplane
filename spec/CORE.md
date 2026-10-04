@@ -94,7 +94,11 @@ A `result` payload produced by a reference pipeline is emitted with exactly thes
 empty), `decision`, `kind`, `reason`, `request_id`, `runtime_state` (null or RuntimeExtension).
 `result_digest` in an ObservedRecord is the digest of that payload with `provenance.duration_ms`
 forced to `null`. Before the runtime is reached, `provenance.runtime` and `capability` are `null`,
-`content_kind` and `trust` are `null`, `trusted` is `null`.
+`content_kind` and `trust` are `null`, `trusted` is `null`. When the runtime decided but did not
+execute (denied, requires_approval, not_found, invalid, unknown decision, decide fault),
+`provenance.runtime` and `capability` are set and `content_kind`, `trust` and `trusted` are `null`:
+no data was produced, so there is no content to classify. The defaults `tool_result` / `unknown`
+apply only to executed results whose runtime said nothing about their content.
 
 Error messages (pinned; `<x>` substituted; no other text):
 

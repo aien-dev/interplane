@@ -1,0 +1,807 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 199,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:ec475570ad561b17f6d65c14e722fc3202f50cd98580b972c94a30db4d0db3c8",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_r36husif",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:f5a15996b7ddc10e5b898dce9ab5935afd27630184d51ae4f31661f926581aa0",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:44a5d8b5a6bf83438fb78cfa89aac4c073cc7fce4dd7511a11602786b93127a6",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_rtk1m9sj",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:77fb5fcb6fb1c5cc8419aa08fe1e10dfe05df888eea21b86b55ef6b0f7a64db5",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:73b00f1e79eb2e3fade126468633f07e98cccda55c88bcab879086d68cd70d56",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_g4h3ishs",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:818394fd26044831c788f482c383e3139d6a815c2c217696a3f6222666856077",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:25f7b6c16a127eab058cc6f9b748ef226ba88bf1ba60fe61d8be76442da10720",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_la7yj9po",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:bd789a4980a1a12517f418428adf02667bb9bf663438fc2399fe29d670058abd",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:1cb973bfc472dc0a5fccff91e50ee44ef01c4a9d8511f47851884e3f95735d31",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 2,
+      "request_id": "call_o8rf716s",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:2b822c52559441efba6536f9a7f6227739250c1f52f259870f59c91ecc0941b4",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B",
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "apply_patch",
+    "edit_file",
+    "get_workspace",
+    "glob",
+    "grep",
+    "ls",
+    "read_file",
+    "write_file"
+  ],
+  "fixture": {
+    "digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+    "name": "fixtures/lanternfish"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {
+    "full_count": 71,
+    "full_rendered_bytes": 59024,
+    "rendered_bytes": {
+      "full": 59024,
+      "selected": 6134
+    },
+    "selected_count": 9,
+    "selected_rendered_bytes": 6134,
+    "tokens": {
+      "all_rounds_prompt": {
+        "full": 64778,
+        "selected": 8532
+      },
+      "base_context": 199,
+      "completion": {
+        "full": 468,
+        "selected": 455
+      },
+      "first_turn_prompt": {
+        "full": 15991,
+        "selected": 1929
+      },
+      "source": "backend usage.prompt_tokens of a max_tokens=1 request (openai-compatible endpoint)",
+      "tool_schema": {
+        "full": 15792,
+        "selected": 1730
+      },
+      "unit": "tokens_model_reported"
+    }
+  },
+  "metrics": {
+    "base_context_tokens": 199,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 9,
+    "exposed_capabilities_max": 9,
+    "exposed_tools_first": 10,
+    "exposed_tools_max": 10,
+    "first_turn_prompt_tokens": 1929,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 13184,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 4,
+    "tool_schema_bytes_per_round_mean": 6134.0,
+    "tool_schema_tokens_first": 1730,
+    "tool_schema_tokens_per_round_mean": 1730.0,
+    "tool_schema_tokens_sum": 6920,
+    "total_completion_tokens": 455,
+    "total_prompt_tokens": 8532,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 13211
+  },
+  "prior_infra_failures": [],
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 88,
+      "exposed_caps_count": 9,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 10,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3077,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 1929,
+      "reasoning_present": true,
+      "request_digest": "sha256:dca6f8a6f13e99f575da0e479f453095177248d3d512e3ed7b46855dc45ecdaa",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 6134,
+      "tools_digest": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+    },
+    {
+      "completion_tokens": 52,
+      "exposed_caps_count": 9,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 10,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1476,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2013,
+      "reasoning_present": true,
+      "request_digest": "sha256:18fa2935f87d3d58b4849ff6737e20e058192c798f34265d4129ab68e099e918",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 6134,
+      "tools_digest": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+    },
+    {
+      "completion_tokens": 121,
+      "exposed_caps_count": 9,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 10,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3300,
+      "n_tool_calls": 3,
+      "outcome": "tool_request",
+      "prompt_tokens": 2119,
+      "reasoning_present": true,
+      "request_digest": "sha256:c473640c65c39acfcfe632711d22abc9f2c15b041d2f2f1283a2427d8399daea",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 6134,
+      "tools_digest": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+    },
+    {
+      "completion_tokens": 194,
+      "exposed_caps_count": 9,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 10,
+      "finish_reason": "stop",
+      "latency_ms": 5331,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 2471,
+      "reasoning_present": true,
+      "request_digest": "sha256:d24b60da47a5b11a7a8c276a86d167cb17ad4ed7c96c9bfc99d5f60f424e402f",
+      "round": 4,
+      "text_digest": "sha256:0764b97c49df17b9dbeebff2fecaf322339417a1559395018feb08a65f9eaa57",
+      "tools_bytes": 6134,
+      "tools_digest": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+    }
+  ],
+  "run_id": "qual-20261004T2207Z",
+  "selection": {
+    "final_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+    "final_selected": [
+      "ask_user",
+      "apply_patch",
+      "edit_file",
+      "get_workspace",
+      "glob",
+      "grep",
+      "ls",
+      "read_file",
+      "write_file"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "todowrite",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 5664
+        },
+        "selected_count": 9,
+        "selected_rendered_bytes": 5664
+      },
+      "requested_domains": [
+        "filesystem"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "apply_patch",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "edit_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "get_workspace",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "glob",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "code",
+            "filesystem"
+          ],
+          "name": "grep",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "ls",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "read_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "write_file",
+          "rule_id": "domain:filesystem"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "sequential",
+    "digest": "sha256:a99278d6ef4b98b5b9cd35a946ef812eb04b6ff775bbd0fc5835d7606dfb0cf1",
+    "id": "sequential-002",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 13184,
+    "wall_ms": 13211
+  },
+  "tool_schema_tokens_per_round": [
+    1730,
+    1730,
+    1730,
+    1730
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The data directory set in `config/app.toml` is `data/stations`. It contains three station files:\n- brest.json (224 B)\n- cherbourg.json (116 B)\n- roscoff.json (76 B)\n\nThe largest station file is `brest.json`, which has a tide range of **7.2 meters**."
+  },
+  "user_request_digest": "sha256:06c575812f962294ceae9ed53847ab23a7046d87000bf21fffc3095fa2cb47dd"
+}

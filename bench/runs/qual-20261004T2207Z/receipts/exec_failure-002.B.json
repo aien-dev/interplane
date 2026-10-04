@@ -1,0 +1,917 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 186,
+  "calls": [
+    {
+      "argument_keys": [
+        "path",
+        "pattern"
+      ],
+      "arguments_digest": "sha256:aeb51101e91370fbd7d6fe7a54e2b0c89db585f9d1141a162e48aea320c97cb6",
+      "capability": "grep",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_uzibxbpx",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:256247a3c335f802aec509298581fc2bf1fdd3068adfc968e2f98a5c811618a6",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "error",
+      "synthetic": "fault",
+      "tool": "grep",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:bd2181a2f9425fe9caa4475d8dd7b8f3de857244e787ff5cbec926b19d23d29a",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_4kp87rxt",
+      "result_content_kind": null,
+      "result_digest": "sha256:d2d90d99577a9406792d42d8daac13deb95965270fdffe3d47ca907c2d706ce6",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:bd2181a2f9425fe9caa4475d8dd7b8f3de857244e787ff5cbec926b19d23d29a",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_cftsxbac",
+      "result_content_kind": null,
+      "result_digest": "sha256:b9aaf7ddfd9c512e70a148d80bd1cb3803f152200853e6712e6c42620c7d791b",
+      "result_trust": null,
+      "round": 3,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:e5b5287825ea8c78edc6b7c462a4efe6eb868527aea9f8bfef4b7d81d0ce57bf",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_v7srrqcv",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:4515a5e63445498d21bfe5923d15dbcca875bc7bff347342fe19981adfdffced",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:096c702aa2b9a87a3838163ac58804b447ceddec09b61e9860fa13cc5553b4e6",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_wa9bix21",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:fb1ad2f7b6b3c1f048b29c4f9e09bc7b9d30ade28eec82c316f4360ed828ff1b",
+      "result_trust": "workspace_untrusted",
+      "round": 5,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B",
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "apply_patch",
+    "bash",
+    "edit_file",
+    "get_workspace",
+    "glob",
+    "grep",
+    "ls",
+    "python",
+    "read_file",
+    "todowrite",
+    "write_file"
+  ],
+  "fixture": {
+    "digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+    "name": "fixtures/lanternfish"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "error, later ok, final answer",
+        "kind": "recovered_after_error",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {
+    "full_count": 71,
+    "full_rendered_bytes": 59024,
+    "rendered_bytes": {
+      "full": 59024,
+      "selected": 7769
+    },
+    "selected_count": 12,
+    "selected_rendered_bytes": 7769,
+    "tokens": {
+      "all_rounds_prompt": {
+        "full": 97310,
+        "selected": 15235
+      },
+      "base_context": 186,
+      "completion": {
+        "full": 461,
+        "selected": 401
+      },
+      "first_turn_prompt": {
+        "full": 15978,
+        "selected": 2325
+      },
+      "source": "backend usage.prompt_tokens of a max_tokens=1 request (openai-compatible endpoint)",
+      "tool_schema": {
+        "full": 15792,
+        "selected": 2139
+      },
+      "unit": "tokens_model_reported"
+    }
+  },
+  "metrics": {
+    "base_context_tokens": 186,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 3,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 2
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 12,
+    "exposed_capabilities_max": 12,
+    "exposed_tools_first": 13,
+    "exposed_tools_max": 13,
+    "first_turn_prompt_tokens": 2325,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 12152,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 6,
+    "tool_schema_bytes_per_round_mean": 7769.0,
+    "tool_schema_tokens_first": 2139,
+    "tool_schema_tokens_per_round_mean": 2139.0,
+    "tool_schema_tokens_sum": 12834,
+    "total_completion_tokens": 401,
+    "total_prompt_tokens": 15235,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 12196
+  },
+  "prior_infra_failures": [],
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 110,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3936,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2325,
+      "reasoning_present": true,
+      "request_digest": "sha256:1339fb6c2112c06e0f8cb9e7174dac43c9b3b5a2eb6e4e5f462a5fc08a059de0",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    },
+    {
+      "completion_tokens": 61,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1723,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2406,
+      "reasoning_present": true,
+      "request_digest": "sha256:82fb54a1589b7d5e5abb891952a560ca15af02bab665315dd3c8f2c4b4396566",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    },
+    {
+      "completion_tokens": 60,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1698,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2490,
+      "reasoning_present": true,
+      "request_digest": "sha256:9b4087bc7040f9a15a3378c0ef0bfab14acbd041041db4beb1c858b563d6fbc1",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    },
+    {
+      "completion_tokens": 88,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2432,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2571,
+      "reasoning_present": true,
+      "request_digest": "sha256:e9f3b65ff1f0cdb10d2aae24359eedef34193f8bb24f2c2e0f39c6aeb6e5d2ff",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    },
+    {
+      "completion_tokens": 45,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1288,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2670,
+      "reasoning_present": true,
+      "request_digest": "sha256:433cfdc02ec924295d2526cf4e92a0ee4dd3adaa11e64bc7a5b6f04c421f1233",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    },
+    {
+      "completion_tokens": 37,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "bash",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "python",
+        "read_file",
+        "todowrite",
+        "write_file"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "stop",
+      "latency_ms": 1075,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 2773,
+      "reasoning_present": true,
+      "request_digest": "sha256:633cfcdcd04689936e8719ed1cbff3c861c248441d9ca0b783ef35c43f475e9a",
+      "round": 6,
+      "text_digest": "sha256:5f61eba394f53d744a245137772484d185abccf4a73dee61c45661eeac4bdd28",
+      "tools_bytes": 7769,
+      "tools_digest": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+    }
+  ],
+  "run_id": "qual-20261004T2207Z",
+  "selection": {
+    "final_digest": "sha256:7ac460d2d0ce3fa94da5ddf163cec2b7c9f15e7792e434f3fadf05a48fecd231",
+    "final_selected": [
+      "ask_user",
+      "apply_patch",
+      "bash",
+      "edit_file",
+      "get_workspace",
+      "glob",
+      "grep",
+      "ls",
+      "python",
+      "read_file",
+      "todowrite",
+      "write_file"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 7299
+        },
+        "selected_count": 12,
+        "selected_rendered_bytes": 7299
+      },
+      "requested_domains": [
+        "code",
+        "filesystem"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "apply_patch",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "process",
+            "code"
+          ],
+          "name": "bash",
+          "rule_id": "domain:code"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "edit_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "get_workspace",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "glob",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "code",
+            "filesystem"
+          ],
+          "name": "grep",
+          "rule_id": "domain:code"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "ls",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "process",
+            "code"
+          ],
+          "name": "python",
+          "rule_id": "domain:code"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "read_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "tasks",
+            "code"
+          ],
+          "name": "todowrite",
+          "rule_id": "domain:code"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "write_file",
+          "rule_id": "domain:filesystem"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:7ac460d2d0ce3fa94da5ddf163cec2b7c9f15e7792e434f3fadf05a48fecd231"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "exec_failure",
+    "digest": "sha256:3632250e5da317501ef2e1adfe17236b46c6ef601da908c068810e5e4ab47e4c",
+    "id": "exec_failure-002",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 12152,
+    "wall_ms": 12196
+  },
+  "tool_schema_tokens_per_round": [
+    2139,
+    2139,
+    2139,
+    2139,
+    2139,
+    2139
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "grep",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "grep"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 3,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 5,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The file that defines `moon_phase` is **`src/moon.rs`**."
+  },
+  "user_request_digest": "sha256:368a1ba1905fb5f8afc627db78f9fddea7dcaa8b246950d51afa6f1ca1ec252d"
+}

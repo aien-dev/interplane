@@ -12,15 +12,284 @@
     "digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3"
   },
   "concurrent_load": {
-    "at_prepare": {
-      "gpu_util_percent": 96,
+    "at_end": {
+      "gpu_util_percent": 69,
       "other_inference_processes": [
-        "llama-server:18081",
-        "llama-server:43501",
-        "sglang:18082"
+        "llama-server:34495"
       ],
-      "time": "2026-10-04T22:07:22Z"
-    }
+      "time": "2026-10-04T22:51:38Z"
+    },
+    "at_start": {
+      "gpu_util_percent": 0,
+      "other_inference_processes": [],
+      "time": "2026-10-04T22:35:28Z"
+    },
+    "gpu_util_percent_max_sampled_at_pair_starts": 96,
+    "note": "sampled at start, before each pair, and at end; wall-clock is a reported metric and is affected by other GPU users",
+    "other_inference_processes_seen": [
+      "llama-server:34495"
+    ],
+    "samples": [
+      {
+        "gpu_util_percent": 94,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:35:45Z"
+      },
+      {
+        "gpu_util_percent": 32,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:36:27Z"
+      },
+      {
+        "gpu_util_percent": 66,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:37:09Z"
+      },
+      {
+        "gpu_util_percent": 14,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:37:31Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:01Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:36Z"
+      },
+      {
+        "gpu_util_percent": 14,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:54Z"
+      },
+      {
+        "gpu_util_percent": 81,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:39:09Z"
+      },
+      {
+        "gpu_util_percent": 79,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:39:42Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:12Z"
+      },
+      {
+        "gpu_util_percent": 64,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:32Z"
+      },
+      {
+        "gpu_util_percent": 42,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:58Z"
+      },
+      {
+        "gpu_util_percent": 39,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:41:35Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:42:12Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:42:29Z"
+      },
+      {
+        "gpu_util_percent": 13,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:28Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:40Z"
+      },
+      {
+        "gpu_util_percent": 42,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:49Z"
+      },
+      {
+        "gpu_util_percent": 13,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:59Z"
+      },
+      {
+        "gpu_util_percent": 12,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:44:12Z"
+      },
+      {
+        "gpu_util_percent": 74,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:44:43Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:08Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:25Z"
+      },
+      {
+        "gpu_util_percent": 16,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:34Z"
+      },
+      {
+        "gpu_util_percent": 56,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:08Z"
+      },
+      {
+        "gpu_util_percent": 86,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:36Z"
+      },
+      {
+        "gpu_util_percent": 77,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:57Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:12Z"
+      },
+      {
+        "gpu_util_percent": 53,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:26Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:37Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:58Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:48:28Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:48:45Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:49:27Z"
+      },
+      {
+        "gpu_util_percent": 89,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:50:26Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:50:50Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:51:09Z"
+      }
+    ]
   },
   "conditions": [
     "A",
@@ -1491,8 +1760,24 @@
     "version": "1"
   },
   "stochastic_execution": {
+    "counter_requests_in_last_process": 113,
+    "finished_at": "2026-10-04T22:51:38Z",
     "note": "manifest written before the first model request",
-    "prepared_at": "2026-10-04T22:07:22Z"
+    "prepared_at": "2026-10-04T22:07:22Z",
+    "started_at": "2026-10-04T22:35:28Z",
+    "token_stability": {
+      "base_context": 185,
+      "stable": true,
+      "task": "ambiguous-002",
+      "tools_count_1": 15977,
+      "tools_count_2": 15977
+    },
+    "warmup": {
+      "condition": "B",
+      "task": "filesystem-001",
+      "timed": false,
+      "wall_ms": 4733
+    }
   },
   "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
   "task_ids": [

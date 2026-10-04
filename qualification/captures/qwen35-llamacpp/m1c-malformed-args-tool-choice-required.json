@@ -1,0 +1,42 @@
+{
+  "name": "m1c-malformed-args-tool-choice-required",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 4096,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "set_volume",
+          "description": "Set the speaker volume using a named preset such as 'quiet', 'normal' or 'loud'.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "Preset name, e.g. loud"
+              }
+            },
+            "required": [
+              "level"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Set the volume to the loud preset."
+      }
+    ],
+    "tool_choice": "required"
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"tool_calls\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning_content\":\"The user wants me to set the volume to the \\\"loud\\\" preset. I need to use the set_volume function with the level parameter set to \\\"loud\\\" as specified in the user's request.\\n\",\"tool_calls\":[{\"type\":\"function\",\"function\":{\"name\":\"set_volume\",\"arguments\":\"{\\\"level\\\":1}\"},\"id\":\"A6evFKQXuzQ2yHKnHTGUIhb8iml9Dglh\"}]}}],\"created\":1791150550,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":69,\"prompt_tokens\":303,\"total_tokens\":372,\"prompt_tokens_details\":{\"cached_tokens\":299}},\"id\":\"chatcmpl-Vf4oHS7RtSGbs8bhbDo5p3OoK5nuofOq\",\"timings\":{\"cache_n\":299,\"prompt_n\":4,\"prompt_ms\":126.038,\"prompt_per_token_ms\":31.5095,\"prompt_per_second\":31.736460432567956,\"predicted_n\":69,\"predicted_ms\":5311.206,\"predicted_per_token_ms\":78.1059705882353,\"predicted_per_second\":12.803118538426112}}",
+  "sha256_response": "5445c2fad5bafc6c2714c33bbba98c9fec1b29cfc706d1bb26753bbfaeeae983"
+}

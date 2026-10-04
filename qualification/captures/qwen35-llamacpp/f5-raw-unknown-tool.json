@@ -1,0 +1,24 @@
+{
+  "name": "f5-raw-unknown-tool",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT>"
+      },
+      {
+        "role": "user",
+        "content": "Use the compile_project tool to build the project in /srv/app."
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I don't have access to a \\\"compile_project\\\" tool in my current environment. The tools available to me are:\\n\\n1. **read_file** - Read text files\\n2. **list_dir** - List directory contents\\n3. **write_file** - Write text content to files\\n4. **send_email** - Send emails\\n\\nNone of these tools can compile or build projects. If you need to build a project in /srv/app, you might need to:\\n\\n- Use a command-line build tool directly (like `make`, `npm install`, `cargo build`, etc.)\\n- Or if you have a build script, I could help read and execute it using the available tools\\n\\nWould you like me to help you with something else, such as reading the project files in /srv/app to understand what build system is being used?\",\"reasoning_content\":\"The user is asking me to use a \\\"compile_project tool\\\" to build a project in /srv/app. However, looking at the available tools I have access to, I don't see a \\\"compile_project\\\" tool. The available tools are:\\n\\n1. read_file - Read a text file and return its contents\\n2. list_dir - List the entries of a directory\\n3. write_file - Write text content to a file, replacing it\\n4. send_email - Send an email\\n\\nNone of these tools are for compiling or building projects. The user might be mistaken about what tools are available, or they might be referring to a tool that doesn't exist in my current environment.\\n\\nI should let the user know that I don't have access to a compile_project tool, and explain what tools I do have available.\\n\"}}],\"created\":1791150525,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":345,\"prompt_tokens\":493,\"total_tokens\":838,\"prompt_tokens_details\":{\"cached_tokens\":489}},\"id\":\"chatcmpl-nRpY2BWMK2tln2D3ryUfEK64wD9s3PSF\",\"timings\":{\"cache_n\":489,\"prompt_n\":4,\"prompt_ms\":277.318,\"prompt_per_token_ms\":69.3295,\"prompt_per_second\":14.423874396901752,\"predicted_n\":345,\"predicted_ms\":29660.204,\"predicted_per_token_ms\":86.22152325581396,\"predicted_per_second\":11.598032164579854}}",
+  "sha256_response": "4c96cca4a61c4921ccc542f076fd61abea47d80a32cbdc0fedecd48668d62e0f"
+}

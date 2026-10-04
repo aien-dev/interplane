@@ -1,0 +1,104 @@
+{
+  "name": "02-native-multi",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Read both /etc/hostname and /etc/os-release, then summarize them."
+      }
+    ],
+    "max_tokens": 4096
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"tool_calls\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning_content\":\"The user wants me to read two files: /etc/hostname and /etc/os-release, then summarize their contents. I'll need to use the read_file function twice to get the contents of both files.\\n\",\"tool_calls\":[{\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"/etc/hostname\\\"}\"},\"id\":\"GkPCgOIpttc318e5rEWEuwqodz3xJ4Gl\"},{\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"/etc/os-release\\\"}\"},\"id\":\"X0IgEfXp50jiOKTd2OeLU2cGtAKkr4zi\"}]}}],\"created\":1791150469,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":99,\"prompt_tokens\":495,\"total_tokens\":594,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"id\":\"chatcmpl-JOp0pXD0oLEGjav45WfGVTieGsQBcQ00\",\"timings\":{\"cache_n\":0,\"prompt_n\":495,\"prompt_ms\":2231.778,\"prompt_per_token_ms\":4.5086424242424235,\"prompt_per_second\":221.79625392848214,\"predicted_n\":99,\"predicted_ms\":8850.939,\"predicted_per_token_ms\":90.31570408163266,\"predicted_per_second\":11.072271540906563}}",
+  "sha256_response": "63b03746223fe44c87bf50b4e3f7f99ee21959250feab0a1257b737d9f0282b3"
+}

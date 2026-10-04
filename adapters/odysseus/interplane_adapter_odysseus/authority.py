@@ -1,0 +1,345 @@
+"""OdysseusAuthority: a Crossveil runtime adapter that translates, and never decides.
+
+Every ``decide`` outcome below comes from Odysseus's own code (cited per branch). This module only
+maps Odysseus's answers onto INTERPLANE's five decision values. If Odysseus cannot be imported the
+adapter fails closed (``denied``); it never authorizes on its own.
+
+Reused from Odysseus (commit 2992bf6), by call:
+  * ``src.agent_tools.TOOL_TAGS``                       name known?       (tool_schemas.py:1411 rule)
+  * ``src.tool_schemas.function_call_to_tool_block``    argument validity (tool_schemas.py:1370)
+  * ``src.tool_capabilities.ToolRunSecurityContext.decision_for`` + ``observe_tool_result`` +
+    ``capabilities_for_action``                         untrusted-context gate (:569, :654-684)
+  * ``src.tool_security.NON_ADMIN_BLOCKED_TOOLS`` / ``is_public_blocked_tool`` and
+    ``src.tool_execution._ADMIN_TOOLS``                 admin gates (tool_execution.py:1064-1080)
+  * ``src.tool_execution._resolve_tool_path_in_workspace`` / ``vet_workspace`` /
+    ``_active_workspace`` + ``src.agent_tools.TOOL_HANDLERS`` (ReadFileTool, LsTool, GlobTool,
+    GrepTool)                                           confinement and execution
+Gate order follows ``execute_tool_block`` (tool_execution.py:915-926 then :1064-1080): the
+untrusted-context gate first, then the admin gates, then (in Odysseus: inside the tool) path
+confinement. Confinement is also run in ``decide`` so that an escape is refused BEFORE execution.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import copy
+import json
+import logging
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Iterable, Optional
+
+from interplane.core import Catalog, CapabilityRequest, Decision, ToolResult
+from interplane.crossveil import RuntimeAuthority, make_result
+
+from . import _odysseus
+from .domains import catalog_with_domains
+
+RUNTIME_ID = "odysseus"
+POLICY_ENGINE = "odysseus.tool_capabilities"
+NOT_AVAILABLE = "odysseus runtime not available"
+NOT_EXECUTED = "not executed by the reference adapter"
+EXECUTABLE = frozenset({"read_file", "ls", "glob", "grep"})
+_PATH_TOOLS = EXECUTABLE
+_UNTRUSTED = frozenset({"external_untrusted", "workspace_untrusted"})
+_MAX_REASON = 4096
+
+
+class OdysseusAuthority(RuntimeAuthority):
+    """Translate Odysseus's authority into Crossveil decisions; execute four read-only tools.
+
+    Args:
+      workspace: root the read-only tools are confined to (None: those tools are refused).
+      admin: whether the caller counts as an Odysseus admin. Default False (fail closed): the
+        real check, ``owner_is_admin_or_single_user``, needs Odysseus's auth state, which the
+        adapter does not construct. Pass the answer your Odysseus deployment gives.
+      workspace_trusted: label file reads ``trusted_runtime`` instead of Odysseus's own
+        ``workspace_untrusted``.
+      external_context_seen: start every trace with the untrusted-context gate already armed.
+      delegated_credential: the caller is an API-token client (Odysseus refuses privileged tools).
+      odysseus: an already loaded ``_odysseus.Odysseus`` (default: ``_odysseus.load()``; pass
+        ``False`` to force the not-available path).
+    """
+
+    runtime_id = RUNTIME_ID
+    policy_engine = POLICY_ENGINE
+
+    def __init__(
+        self,
+        workspace: Optional[str] = None,
+        *,
+        admin: bool = False,
+        workspace_trusted: bool = False,
+        external_context_seen: bool = False,
+        delegated_credential: bool = False,
+        odysseus: Any = None,
+    ) -> None:
+        if odysseus is False:
+            self._ody = None
+        else:
+            self._ody = odysseus if odysseus is not None else _odysseus.load()
+        self.admin = admin
+        self.workspace_trusted = workspace_trusted
+        self.external_context_seen = external_context_seen
+        self.delegated_credential = delegated_credential
+        self.workspace: Optional[str] = None
+        if workspace is not None and self._ody is not None:
+            self.workspace = self._ody.tool_execution.vet_workspace(workspace)
+            if self.workspace is None:
+                raise ValueError("workspace is not a usable directory by Odysseus's own rules")
+        self._catalog = catalog_with_domains()
+        self._contexts: dict = {}
+        self._lock = threading.Lock()
+        self.decisions: dict = {}  # request_id -> last Decision (observability, never reused)
+
+    # -- catalog --------------------------------------------------------------------------------
+
+    def catalog(self) -> Catalog:
+        return copy.deepcopy(self._catalog)
+
+    @property
+    def available(self) -> bool:
+        return self._ody is not None
+
+    # -- helpers --------------------------------------------------------------------------------
+
+    def _decision(
+        self,
+        req: CapabilityRequest,
+        value: str,
+        reason: Optional[str] = None,
+        approval: Optional[dict] = None,
+        runtime_state: Optional[dict] = None,
+    ) -> Decision:
+        if reason is not None:
+            reason = self._redact(reason)[:_MAX_REASON]
+        return Decision(
+            request_id=req.request_id,
+            decision=value,
+            capability=req.capability,
+            authority={"runtime": RUNTIME_ID, "policy_engine": POLICY_ENGINE, "decision_id": None},
+            reason=reason,
+            approval=approval,
+            runtime_state=runtime_state,
+        )
+
+    def _redact(self, text: str) -> str:
+        """Decision reasons must not leak local paths: show the workspace as ``<workspace>``."""
+        if self.workspace:
+            text = text.replace(self.workspace, "<workspace>")
+        return text
+
+    def _context_for(self, trace_id: str, ctx: dict):
+        """One Odysseus ToolRunSecurityContext per trace (the pipeline carries no prior results)."""
+        tc = self._ody.tool_capabilities
+        with self._lock:
+            sc = self._contexts.get(trace_id)
+            if sc is None:
+                sc = tc.ToolRunSecurityContext(
+                    external_untrusted_context_seen=self.external_context_seen,
+                    delegated_credential=self.delegated_credential,
+                )
+                self._contexts[trace_id] = sc
+            if _ctx_reports_untrusted(ctx):
+                sc.external_untrusted_context_seen = True  # monotonic: never disarmed
+            return sc
+
+    def forget_trace(self, trace_id: str) -> None:
+        with self._lock:
+            self._contexts.pop(trace_id, None)
+
+    def _block(self, name: str, args: dict):
+        """Odysseus's own validity check. Returns ``(block, message)``."""
+        schemas = self._ody.tool_schemas
+        records: list = []
+        handler = _Capture(records)
+        log = logging.getLogger(schemas.__name__)
+        with self._lock:
+            log.addHandler(handler)
+            try:
+                try:
+                    block = schemas.function_call_to_tool_block(name, json.dumps(args))
+                except (ValueError, TypeError) as err:
+                    return None, str(err) or "odysseus rejected the tool call"
+            finally:
+                log.removeHandler(handler)
+        if block is None:
+            return None, (records[-1] if records else "odysseus rejected the tool call")
+        return block, None
+
+    # -- Crossveil: decide ------------------------------------------------------------------------
+
+    def decide(self, req: CapabilityRequest, ctx: dict) -> Decision:
+        decision = self._decide(req, ctx or {})
+        self.decisions[req.request_id] = decision
+        return decision
+
+    def _decide(self, req: CapabilityRequest, ctx: dict) -> Decision:
+        if self._ody is None:
+            return self._decision(req, "denied", NOT_AVAILABLE)
+        ody = self._ody
+        name = req.capability
+        if name not in ody.tool_tags:
+            return self._decision(req, "not_found", f"unknown capability: {name}")
+        block, message = self._block(name, req.arguments)
+        if block is None:
+            return self._decision(req, "invalid", message)
+
+        # 1. untrusted-context gate (tool_execution.py:915-926; tool_capabilities.py:654-684)
+        sc = self._context_for(str(ctx.get("trace_id")), ctx)
+        gate = sc.decision_for(name, block.content)
+        if not gate.allowed and self.delegated_credential and ody.tool_security.is_public_blocked_tool(name):
+            # tool_capabilities.py:654-662: "no approval can lift that"; the agent loop also adds
+            # these tools to its policy blocklist (agent_loop.py:3498-3501). A refusal, not a prompt.
+            return self._denied(req, "delegated_credential", gate.reason or "refused for API-token callers")
+        if not gate.allowed:
+            reason = gate.reason or "tool blocked by the untrusted-context gate"
+            return self._decision(
+                req,
+                "requires_approval",
+                reason,
+                approval={
+                    "approval_id": f"odysseus-pending-{req.request_id}",
+                    "scope": "single_action",
+                },
+                runtime_state={"vocabulary": "odysseus.tool_gate", "values": [reason]},
+            )
+
+        # 2. admin gates (tool_execution.py:1064-1080)
+        if not self.admin:
+            if name in ody.tool_execution._ADMIN_TOOLS:
+                return self._denied(req, "admin_tool", f"Tool '{name}' requires an admin user.")
+            if ody.tool_security.is_public_blocked_tool(name):
+                return self._denied(
+                    req,
+                    "non_admin_blocked_tool",
+                    f"Tool '{name}' is restricted to admin users on this deployment.",
+                )
+
+        # 3. workspace confinement (Odysseus runs it inside the tool; we also run it here)
+        if name in _PATH_TOOLS:
+            refusal = self._confine(name, req.arguments)
+            if refusal is not None:
+                return self._denied(req, "workspace_confinement", refusal)
+
+        effects = sorted(
+            e.value for e in ody.tool_capabilities.capabilities_for_action(name, block.content).effects
+        )
+        return self._decision(
+            req,
+            "authorized",
+            runtime_state={"vocabulary": "odysseus.tool_effect", "values": effects},
+        )
+
+    def _denied(self, req: CapabilityRequest, why: str, reason: str) -> Decision:
+        return self._decision(
+            req,
+            "denied",
+            reason,
+            runtime_state={"vocabulary": "odysseus.tool_policy", "values": [why]},
+        )
+
+    def _confine(self, name: str, args: dict) -> Optional[str]:
+        """None when Odysseus's own resolver accepts the path; else its refusal message."""
+        if self.workspace is None:
+            return "no workspace configured for this adapter"
+        raw = args.get("path")
+        raw = raw if isinstance(raw, str) else ""
+        if name != "read_file":
+            raw = raw.strip() or self.workspace  # same default as _resolve_search_root (:513)
+        try:
+            self._ody.tool_execution._resolve_tool_path_in_workspace(self.workspace, raw)
+        except ValueError as err:
+            return str(err)
+        return None
+
+    # -- Crossveil: execute -----------------------------------------------------------------------
+
+    def execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
+        name, rid = req.capability, req.request_id
+        if self._ody is None:
+            return self._error(rid, name, NOT_AVAILABLE)
+        if name not in EXECUTABLE:
+            return self._error(rid, name, NOT_EXECUTED)
+        if self.workspace is None:
+            return self._error(rid, name, "no workspace configured for this adapter")
+        block, message = self._block(name, req.arguments)
+        if block is None:
+            return self._error(rid, name, message or "odysseus rejected the tool call")
+        started = time.monotonic()
+        try:
+            raw = self._run_handler(name, block.content)
+        except Exception as err:  # noqa: BLE001 - reported as an execution error, not raised
+            return self._error(rid, name, f"{name}: {type(err).__name__}")
+        ms = int((time.monotonic() - started) * 1000)
+        trust = "trusted_runtime" if self.workspace_trusted else self._integrity(name, block.content)
+        sc = self._context_for(str(ctx.get("trace_id")), {})
+        sc.observe_tool_result(name, raw, block.content)  # Odysseus decides what arms the gate
+        ok = isinstance(raw, dict) and not raw.get("error") and raw.get("exit_code") in (None, 0)
+        if ok:
+            return make_result(
+                rid, "ok", runtime=RUNTIME_ID, capability=name, data=raw,
+                content_kind="workspace_content", trust=trust, duration_ms=ms,
+            )
+        text = str(raw.get("error")) if isinstance(raw, dict) and raw.get("error") else "execution failed"
+        return make_result(
+            rid, "error", runtime=RUNTIME_ID, capability=name, code="execution_error",
+            message=self._redact(text)[:_MAX_REASON], content_kind="workspace_content",
+            trust=trust, duration_ms=ms,
+        )
+
+    def _integrity(self, name: str, content: str) -> str:
+        caps = self._ody.tool_capabilities.capabilities_for_action(name, content)
+        return caps.result_integrity.value  # system | workspace_untrusted | external_untrusted
+
+    def _error(self, rid: str, name: str, message: str) -> ToolResult:
+        return make_result(
+            rid, "error", runtime=RUNTIME_ID, capability=name, code="execution_error",
+            message=message, content_kind="tool_result", trust="trusted_runtime",
+        )
+
+    def _run_handler(self, name: str, content: str) -> dict:
+        """Run Odysseus's own tool handler with the workspace bound the way Odysseus binds it."""
+        te = self._ody.tool_execution
+        handler = self._ody.tool_handlers[name]
+        workspace = self.workspace
+
+        async def run() -> dict:
+            token = te._active_workspace.set(workspace)
+            try:
+                return await handler(content, {"progress_cb": None, "session_id": None, "owner": None})
+            finally:
+                te._active_workspace.reset(token)
+
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(run())
+        with ThreadPoolExecutor(max_workers=1) as pool:  # called from inside a running loop
+            return pool.submit(lambda: asyncio.run(run())).result()
+
+
+class _Capture(logging.Handler):
+    def __init__(self, sink: list) -> None:
+        super().__init__(level=logging.WARNING)
+        self.sink = sink
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.sink.append(record.getMessage())
+
+
+def _ctx_reports_untrusted(ctx: dict) -> bool:
+    """True when the CallContext says a prior result in the trace was untrusted.
+
+    The reference pipeline's context has no such field; a caller that tracks results itself may
+    pass ``trust`` (one level) or ``prior_trust`` (an iterable of levels).
+    """
+    levels: list = []
+    one = ctx.get("trust")
+    if isinstance(one, str):
+        levels.append(one)
+    many = ctx.get("prior_trust")
+    if isinstance(many, Iterable) and not isinstance(many, (str, bytes)):
+        levels.extend(x for x in many if isinstance(x, str))
+    return any(level in _UNTRUSTED for level in levels)

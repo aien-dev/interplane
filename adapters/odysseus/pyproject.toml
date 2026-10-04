@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "interplane-adapter-odysseus"
+version = "0.1.0"
+description = "INTERPLANE reference adapter for the Odysseus agent runtime (Odysseus keeps all authority)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "AGPL-3.0-or-later" }
+# `interplane` is the sibling Core package at ../../python. Install it by path first:
+#   pip install -e ../../python -e .
+# The recorded catalog JSON sits next to this file, so use an in-tree (editable) install.
+# Odysseus itself is NOT a pip dependency: point ODYSSEUS_SRC at a checkout (see README.md).
+dependencies = ["interplane"]
+
+[tool.setuptools.packages.find]
+include = ["interplane_adapter_odysseus*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

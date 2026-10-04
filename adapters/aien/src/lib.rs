@@ -17,9 +17,9 @@ use aien_capability::{
 };
 use aien_mcp::memory::MemoryWire;
 use aien_mcp::{
-    AuthorityOutcome, AuthorizedEffect, CallOutcome, EffectClassAuthority, EffectIntent,
-    EffectLane, EffectScope, Error as McpError, SessionManager, SpeculativeLane,
-    SpeculativeToolCall,
+    ApprovalDesk, ApprovalError, ApprovalGrant, AuthorityOutcome, AuthorizedEffect, CallOutcome,
+    EffectClassAuthority, EffectIntent, EffectLane, EffectReceipt, EffectScope, Error as McpError,
+    SessionManager, SpeculativeLane, SpeculativeToolCall,
 };
 use interplane_core::*;
 use interplane_crossaxis::MappingTable;
@@ -118,6 +118,12 @@ pub struct AienAuthority {
     effect_lane: EffectLane,
     /// Effects AIEN minted in `decide`, waiting for `execute`. The adapter only holds them.
     authorized: HashMap<String, AuthorizedEffect<EffectIntent>>,
+    /// AIEN's approver handle for the enrolled broker.
+    desk: Option<ApprovalDesk>,
+    /// Grants presented per request id (with the host-supplied `now`), spent by `decide`.
+    grants: HashMap<String, (ApprovalGrant, u64)>,
+    /// Receipts AIEN's ledger returned for a replayed request, handed back by `execute`.
+    replayed: HashMap<String, EffectReceipt>,
     provider: ProviderId,
     runtime: tokio::runtime::Runtime,
     wire_calls: Arc<AtomicUsize>,
@@ -164,6 +170,9 @@ impl AienAuthority {
             lane: SpeculativeLane::new(aien_mcp::McpBroker::new()),
             effect_lane: EffectLane::new(aien_mcp::McpBroker::new()),
             authorized: HashMap::new(),
+            desk: None,
+            grants: HashMap::new(),
+            replayed: HashMap::new(),
             provider: ProviderId::new("interplane-reference"),
             runtime,
             wire_calls: Arc::new(AtomicUsize::new(0)),
@@ -184,6 +193,7 @@ impl AienAuthority {
             .map_err(|e| e.to_string())?;
         self.lane = mgr.speculative_lane();
         self.effect_lane = mgr.effect_lane();
+        self.desk = Some(mgr.approval_desk());
         Ok(())
     }
 
@@ -249,19 +259,12 @@ impl AienAuthority {
         }
     }
 
-    /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`).
-    /// The adapter translates the answer and never builds the authorized value itself.
-    fn decide_effect(&mut self, req: &CapabilityRequest, effects: ToolEffects) -> Decision {
-        if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
-            if let Err(why) = self.confine(path) {
-                return self.decision(
-                    req,
-                    DecisionKind::Denied,
-                    Some(&why),
-                    "adapter.workspace_confinement",
-                );
-            }
-        }
+    /// Stage the intent for an effect request and build its scope. The idempotency key is the
+    /// request id, so one logical request is one effect identity (and one ledger entry).
+    fn stage(
+        &mut self,
+        req: &CapabilityRequest,
+    ) -> Result<(EffectIntent, EffectScope), Box<Decision>> {
         let args = Value::Object(req.arguments.clone());
         let staged = self.runtime.block_on(self.lane.stage_effect_intent(
             &self.provider,
@@ -280,7 +283,12 @@ impl AienAuthority {
             },
             Err(e) => {
                 let r = e.to_string();
-                return self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT);
+                return Err(Box::new(self.decision(
+                    req,
+                    DecisionKind::Denied,
+                    Some(&r),
+                    ENGINE_EFFECT,
+                )));
             }
         };
         let scope = EffectScope {
@@ -288,11 +296,99 @@ impl AienAuthority {
             winning_jnode: JNodeId(1),
             idempotency_key: EffectId::from_label(req.request_id.as_str()),
         };
+        Ok((intent, scope))
+    }
+
+    /// The approver's handle (AIEN's `ApprovalDesk`), once a workspace is enrolled. Hand it only
+    /// to the host's approval service; the adapter itself never issues a grant on its own.
+    pub fn approval_desk(&self) -> Option<&ApprovalDesk> {
+        self.desk.as_ref()
+    }
+
+    /// Issue one single-use grant, through AIEN's desk, for exactly the effect `req` names
+    /// (intent, idempotency key, world, J-node). Valid while `now < expires_at`.
+    pub fn issue_approval(
+        &mut self,
+        req: &CapabilityRequest,
+        expires_at: u64,
+    ) -> Result<ApprovalGrant, String> {
+        let (intent, scope) = self
+            .stage(req)
+            .map_err(|d| d.reason.clone().unwrap_or_default())?;
+        let desk = self.desk.as_ref().ok_or(UNAVAILABLE)?;
+        Ok(desk.issue(&intent, scope, expires_at))
+    }
+
+    /// Present a grant for `request_id`; the next `decide` for that request spends it through
+    /// `EffectLane::authorize_approved`. `now` is host-supplied (aien-mcp reads no clock).
+    pub fn present_approval(&mut self, request_id: &str, grant: ApprovalGrant, now: u64) {
+        self.grants.insert(request_id.to_string(), (grant, now));
+    }
+
+    /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`,
+    /// or `authorize_approved` when a grant was presented for this request).
+    /// The adapter translates the answer and never builds the authorized value itself.
+    fn decide_effect(&mut self, req: &CapabilityRequest, effects: ToolEffects) -> Decision {
+        if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
+            if let Err(why) = self.confine(path) {
+                return self.decision(
+                    req,
+                    DecisionKind::Denied,
+                    Some(&why),
+                    "adapter.workspace_confinement",
+                );
+            }
+        }
+        let (intent, scope) = match self.stage(req) {
+            Ok(x) => x,
+            Err(d) => return *d,
+        };
         let mut values = vec![format!("effect_class={:?}", routing_class(effects))];
-        match self
-            .effect_lane
-            .authorize(intent, scope, &EffectClassAuthority)
-        {
+        let grant = self.grants.get(req.request_id.as_str()).cloned();
+        let outcome = match &grant {
+            Some((g, now)) => self.effect_lane.authorize_approved(
+                intent.clone(),
+                scope,
+                &EffectClassAuthority,
+                g,
+                *now,
+            ),
+            None => self
+                .effect_lane
+                .authorize(intent.clone(), scope, &EffectClassAuthority),
+        };
+        // A spent grant presented again for the effect it was spent on is a replay of a finished
+        // request: AIEN's ledger returns the existing receipt and nothing is minted or run.
+        let outcome = match (outcome, &grant) {
+            (Err(AuthorityOutcome::Approval(ApprovalError::Consumed)), Some((g, now))) => {
+                match self
+                    .runtime
+                    .block_on(self.effect_lane.authorize_and_execute_approved(
+                        intent,
+                        scope,
+                        &EffectClassAuthority,
+                        g,
+                        *now,
+                    )) {
+                    Ok(receipt) => {
+                        self.replayed
+                            .insert(req.request_id.as_str().to_string(), receipt);
+                        values.push("replay=true".into());
+                        let mut d =
+                            self.decision(req, DecisionKind::Authorized, None, ENGINE_EFFECT);
+                        d.runtime_state = Some(RuntimeExtension {
+                            vocabulary: "aien.effects".into(),
+                            values,
+                            extensions: Map::new(),
+                        });
+                        return d;
+                    }
+                    Err(other) => Err(other),
+                }
+            }
+            (o, _) => o,
+        };
+        match outcome {
             Ok(effect) => {
                 self.authorized
                     .insert(req.request_id.as_str().to_string(), effect);
@@ -310,7 +406,7 @@ impl AienAuthority {
             }) => {
                 values.push("staged=true".into());
                 values.push(format!("intent_digest={}", hex(&intent_digest)));
-                // AIEN has no approval record for this; none is invented or consumed here.
+                // No grant presented: none is invented or consumed here.
                 let mut d = self.decision(
                     req,
                     DecisionKind::RequiresApproval,
@@ -323,6 +419,10 @@ impl AienAuthority {
                     extensions: Map::new(),
                 });
                 d
+            }
+            Err(AuthorityOutcome::Approval(e)) => {
+                let r = format!("approval refused: {e:?}");
+                self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT)
             }
             Err(AuthorityOutcome::Denied(r)) | Err(AuthorityOutcome::Contained(r)) => {
                 self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT)
@@ -553,11 +653,21 @@ impl RuntimeAuthority for AienAuthority {
         } else {
             None
         };
-        let mut r = if let Some(effect) = effect {
-            match self
-                .runtime
-                .block_on(self.effect_lane.execute_effect(effect))
-            {
+        let replay = if decision.is_authorized() {
+            self.replayed.remove(rid)
+        } else {
+            None
+        };
+        let receipt = match (effect, replay) {
+            (Some(effect), _) => Some(
+                self.runtime
+                    .block_on(self.effect_lane.execute_effect(effect)),
+            ),
+            (None, Some(rc)) => Some(Ok(rc)),
+            (None, None) => None,
+        };
+        let mut r = if let Some(receipt) = receipt {
+            match receipt {
                 Ok(rc) => ToolResult::ok(
                     rid,
                     json!({"output": rc.output, "receipt": {

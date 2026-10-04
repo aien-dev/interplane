@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/catalog.schema.json",
+  "title": "INTERPLANE Capability catalog",
+  "description": "What one runtime exposes, in its own names, with optional canonical aliases and domain tags. Published by the runtime. Describes capabilities; grants nothing.",
+  "type": "object",
+  "required": ["kind", "runtime", "catalog_version", "capabilities"],
+  "properties": {
+    "kind": {"const": "catalog"},
+    "runtime": {"type": "string", "minLength": 1, "maxLength": 256},
+    "catalog_version": {"type": "string", "minLength": 1},
+    "catalog_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}], "description": "Order-independent SHA-256 over capability names and schema digests."},
+    "capabilities": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/CapabilityDescriptor"}},
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/envelope.schema.json",
+  "title": "INTERPLANE Envelope (Vectorveil v0.1)",
+  "description": "The transport-neutral wrapper for every INTERPLANE message. A valid envelope means the message is structurally understandable. It never means the action is authorized.",
+  "type": "object",
+  "required": [
+    "interplane_version",
+    "message_id",
+    "trace_id",
+    "timestamp",
+    "source",
+    "destination",
+    "payload"
+  ],
+  "properties": {
+    "interplane_version": {
+      "$ref": "common.schema.json#/$defs/ProtocolVersion"
+    },
+    "message_id": {
+      "$ref": "common.schema.json#/$defs/Id",
+      "description": "Unique per message within a trace. A repeated message_id is a replay."
+    },
+    "trace_id": {
+      "$ref": "common.schema.json#/$defs/Id",
+      "description": "Correlates every message of one model/runtime exchange."
+    },
+    "parent_id": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Id"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "timestamp": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "source": {
+      "$ref": "common.schema.json#/$defs/Party"
+    },
+    "destination": {
+      "$ref": "common.schema.json#/$defs/Party"
+    },
+    "payload": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "tool_request",
+            "capability_request",
+            "decision",
+            "result",
+            "event",
+            "catalog",
+            "selection",
+            "probe_report"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "$ref": "intent.schema.json"
+        },
+        {
+          "$ref": "capability.schema.json"
+        },
+        {
+          "$ref": "decision.schema.json"
+        },
+        {
+          "$ref": "result.schema.json"
+        },
+        {
+          "$ref": "event.schema.json"
+        },
+        {
+          "$ref": "catalog.schema.json"
+        },
+        {
+          "$ref": "selection.schema.json"
+        },
+        {
+          "$ref": "probe.schema.json"
+        }
+      ]
+    },
+    "digest": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Digest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Optional SHA-256 of the canonical (RFC 8785) payload bytes."
+    },
+    "signature": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Reserved for a future signing extension. A signature proves origin, never authorization.",
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

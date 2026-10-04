@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/intent.schema.json",
+  "title": "INTERPLANE Intent: tool_request",
+  "description": "Canonical model intent produced by Lenshift. Expresses what a model asked for. Carries no authority.",
+  "type": "object",
+  "required": ["kind", "request_id", "tool", "arguments", "provenance"],
+  "properties": {
+    "kind": {"const": "tool_request"},
+    "request_id": {"$ref": "common.schema.json#/$defs/Id", "description": "Unique per trace. Duplicates are rejected."},
+    "tool": {"$ref": "common.schema.json#/$defs/ToolRef"},
+    "arguments": {"type": "object", "additionalProperties": true, "description": "Always a JSON object. Non-object arguments are a malformed_tool_call."},
+    "provenance": {
+      "type": "object",
+      "required": ["dialect", "parser_version"],
+      "properties": {
+        "dialect": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "dialect_version": {"type": ["string", "null"]},
+        "model": {"type": ["string", "null"], "maxLength": 256},
+        "parser_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "source_turn": {"type": ["integer", "null"], "minimum": 0},
+        "source_call_id": {"type": ["string", "null"], "maxLength": 256, "description": "The dialect-native call id if the dialect has one (e.g. OpenAI tool_call.id)."},
+        "source_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}], "description": "SHA-256 of the original dialect-native representation. Raw text is not persisted by default."},
+        "raw_name": {"type": ["string", "null"], "description": "Exactly what the model emitted as the tool name before canonicalization."},
+        "coercion": {"type": ["string", "null"], "enum": ["none", "json_guess", null], "description": "How untyped dialect values were typed."}
+      },
+      "additionalProperties": true
+    },
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/probe.schema.json",
+  "title": "INTERPLANE Probe report",
+  "description": "Measured capabilities of one model+backend endpoint. Every verdict is backed by an actual request. UNSUPPORTED means the probe ran and the feature is not there; SKIPPED means the probe did not run. A profile claim is only compatible when all of its required probes PASS.",
+  "type": "object",
+  "required": ["kind", "probe_version", "endpoint", "model", "started_at", "probes", "profiles"],
+  "properties": {
+    "kind": {"const": "probe_report"},
+    "probe_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "endpoint": {"type": "string", "description": "Redacted base URL (no credentials, no query string)."},
+    "backend": {"type": ["string", "null"], "description": "Detected or declared serving engine (llama.cpp, vllm, ollama, max, unknown)."},
+    "backend_version": {"type": ["string", "null"]},
+    "model": {"type": "string"},
+    "model_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}], "description": "Digest of the served model identity string plus any reported checkpoint hash."},
+    "started_at": {"$ref": "common.schema.json#/$defs/Timestamp"},
+    "finished_at": {"oneOf": [{"$ref": "common.schema.json#/$defs/Timestamp"}, {"type": "null"}]},
+    "probes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "verdict"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z][a-z0-9_.]*$"},
+          "verdict": {"type": "string", "enum": ["PASS", "FAIL", "DEGRADED", "UNSUPPORTED", "SKIPPED"]},
+          "detail": {"type": ["string", "null"], "maxLength": 4096},
+          "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+          "attempts": {"type": ["integer", "null"], "minimum": 1},
+          "request_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}]},
+          "response_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status", "required_probes"],
+        "properties": {
+          "name": {"type": "string", "description": "e.g. interplane.core.0.1, lenshift.qwen35.1, lenshift.openai.1, relayline.tool_replay.1"},
+          "status": {"type": "string", "enum": ["compatible", "incompatible", "untested"]},
+          "required_probes": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

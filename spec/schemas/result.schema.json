@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/result.schema.json",
+  "title": "INTERPLANE Result",
+  "description": "What returns to the model side for one request_id: a successful execution, an execution failure, or a canonical non-execution (denied, approval required, rejected, not found).",
+  "type": "object",
+  "required": [
+    "kind",
+    "request_id",
+    "status"
+  ],
+  "properties": {
+    "kind": {
+      "const": "result"
+    },
+    "request_id": {
+      "$ref": "common.schema.json#/$defs/Id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ok",
+        "error",
+        "timed_out",
+        "denied",
+        "requires_approval",
+        "rejected",
+        "not_found"
+      ]
+    },
+    "data": {
+      "description": "Runtime output. null unless status is ok."
+    },
+    "error": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Error"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "decision": {
+      "oneOf": [
+        {
+          "$ref": "decision.schema.json"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "The authority decision that produced a non-executed status, when one exists."
+    },
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "runtime": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "capability": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "duration_ms": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "result_digest": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trusted": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Runtime's trust marking of the data (e.g. false for web content)."
+        },
+        "trust": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/TrustClass"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Runtime-assigned trust class of data. Results of a capability the runtime executed are trusted_runtime_result; content from web, email, documents, memory or MCP is the matching untrusted_* class."
+        },
+        "origin": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Origin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "ok"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "error": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "not": {
+              "const": "ok"
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "common.schema.json#/$defs/Error"
+          },
+          "data": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": true
+}

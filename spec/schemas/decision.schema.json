@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/decision.schema.json",
+  "title": "INTERPLANE Decision (Crossveil)",
+  "description": "The runtime's explicit authority decision about one capability request. Only a runtime produces this. A receiver that sees a decision value it does not know MUST treat it as denied.",
+  "type": "object",
+  "required": ["kind", "request_id", "decision", "authority"],
+  "properties": {
+    "kind": {"const": "decision"},
+    "request_id": {"$ref": "common.schema.json#/$defs/Id"},
+    "decision": {"type": "string", "enum": ["authorized", "denied", "requires_approval", "not_found", "invalid"]},
+    "capability": {"type": ["string", "null"], "maxLength": 256},
+    "authority": {
+      "type": "object",
+      "required": ["runtime", "policy_engine"],
+      "properties": {
+        "runtime": {"type": "string", "minLength": 1, "maxLength": 256},
+        "policy_engine": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Name of the runtime component that decided (e.g. odysseus.tool_capabilities, aien.safety_engine)."},
+        "decision_id": {"type": ["string", "null"], "maxLength": 256, "description": "Runtime-local id of the decision record, if any."}
+      },
+      "additionalProperties": true
+    },
+    "reason": {"type": ["string", "null"], "maxLength": 4096, "description": "Human-readable, redacted. Must not leak policy internals or secrets."},
+    "constraints": {"type": "array", "items": {"type": "string"}, "description": "Restrictions attached to an authorization (e.g. AIEN AllowRestricted). Informational to the model; binding on the runtime."},
+    "approval": {
+      "type": ["object", "null"],
+      "description": "Present only with requires_approval. The approval_id is minted by the runtime and only the runtime can honour it.",
+      "required": ["approval_id"],
+      "properties": {
+        "approval_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "scope": {"type": ["string", "null"], "maxLength": 128},
+        "expires_at": {"oneOf": [{"$ref": "common.schema.json#/$defs/Timestamp"}, {"type": "null"}]}
+      },
+      "additionalProperties": true
+    },
+    "runtime_state": {"oneOf": [{"$ref": "common.schema.json#/$defs/RuntimeExtension"}, {"type": "null"}], "description": "Runtime-native decision detail (e.g. odysseus.tool_gate, aien.doctrine_decision)."},
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

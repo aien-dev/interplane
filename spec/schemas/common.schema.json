@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/common.schema.json",
+  "title": "INTERPLANE common definitions",
+  "$defs": {
+    "ProtocolVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "MAJOR.MINOR. Receivers reject any MAJOR they do not implement."
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+      "description": "Opaque identifier. Uniqueness scope is stated per field."
+    },
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp, UTC recommended."
+    },
+    "Digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Lower-case hex SHA-256 with an algorithm prefix."
+    },
+    "Party": {
+      "type": "object",
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "model",
+            "runtime",
+            "adapter",
+            "operator",
+            "other"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "trust": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/TrustClass"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "origin": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Origin"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "ToolRef": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "namespace": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Canonical namespace when the model used one (e.g. filesystem). null when the model emitted a bare runtime-native name."
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "unsupported_version",
+        "unsupported_dialect",
+        "malformed_envelope",
+        "malformed_tool_call",
+        "invalid_arguments",
+        "oversized_arguments",
+        "duplicate_request_id",
+        "replayed_message",
+        "unknown_capability",
+        "capability_not_found",
+        "policy_denied",
+        "approval_required",
+        "execution_error",
+        "execution_timeout",
+        "unknown_decision",
+        "runtime_unavailable"
+      ]
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "retryable": {
+          "type": "boolean",
+          "default": false
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "RuntimeExtension": {
+      "type": "object",
+      "description": "Typed runtime-specific metadata. The vocabulary names the runtime's own meaning; INTERPLANE never interprets the values.",
+      "required": [
+        "vocabulary",
+        "values"
+      ],
+      "properties": {
+        "vocabulary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "TrustClass": {
+      "type": "string",
+      "enum": [
+        "runtime_instruction",
+        "user_request",
+        "model_proposal",
+        "trusted_runtime_result",
+        "untrusted_tool_content",
+        "untrusted_memory",
+        "untrusted_document",
+        "untrusted_web_content",
+        "authorization_decision"
+      ],
+      "description": "Who authored a piece of content and how the runtime trusts it. Only the runtime assigns a class; a model cannot promote content. Unknown values are treated as untrusted_tool_content."
+    },
+    "Origin": {
+      "type": "string",
+      "enum": [
+        "operator",
+        "runtime",
+        "model",
+        "filesystem",
+        "workspace",
+        "web",
+        "email",
+        "memory",
+        "document",
+        "mcp",
+        "other"
+      ],
+      "description": "Where content came from, for provenance and injection analysis."
+    },
+    "CapabilityDescriptor": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "parameters"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$",
+          "description": "Runtime-native capability name."
+        },
+        "canonical": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ToolRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Canonical INTERPLANE tool this capability realizes, if the runtime declares one."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "parameters": {
+          "type": "object",
+          "description": "JSON Schema (2020-12 or draft-07 subset) for arguments.",
+          "additionalProperties": true
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.]*$"
+          },
+          "description": "Coarse selection tags such as filesystem, code, email, calendar, web, image, admin."
+        },
+        "runtime_effects": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/RuntimeExtension"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema_digest": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Digest"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

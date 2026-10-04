@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/selection.schema.json",
+  "title": "INTERPLANE Selection receipt (CrossAxis Select)",
+  "description": "Which subset of a runtime's catalog was exposed to a model for one turn, and why. Deterministic for a given catalog, request domains and selector version. Selection never grants authority: an excluded capability is simply not rendered; an included one still crosses Crossveil.",
+  "type": "object",
+  "required": ["kind", "runtime", "catalog_digest", "selector", "requested_domains", "selected", "excluded"],
+  "properties": {
+    "kind": {"const": "selection"},
+    "runtime": {"type": "string", "minLength": 1},
+    "catalog_digest": {"$ref": "common.schema.json#/$defs/Digest"},
+    "selector": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {"name": {"type": "string"}, "version": {"type": "string"}, "max_capabilities": {"type": ["integer", "null"], "minimum": 1}},
+      "additionalProperties": true
+    },
+    "requested_domains": {"type": "array", "items": {"type": "string"}},
+    "always_include": {"type": "array", "items": {"type": "string"}, "description": "Capabilities the runtime pinned regardless of domain."},
+    "selected": {"type": "array", "items": {"type": "object", "required": ["name", "rule_id"], "properties": {"name": {"type": "string"}, "rule_id": {"type": "string"}, "domains": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": true}},
+    "excluded": {"type": "array", "items": {"type": "object", "required": ["name", "reason"], "properties": {"name": {"type": "string"}, "reason": {"type": "string", "enum": ["domain_mismatch", "max_capabilities", "runtime_disabled", "no_domains"]}}, "additionalProperties": true}},
+    "measure": {
+      "type": "object",
+      "description": "Before/after size of the rendered tool surface, measured on the same renderer.",
+      "properties": {
+        "full_count": {"type": "integer", "minimum": 0},
+        "selected_count": {"type": "integer", "minimum": 0},
+        "full_rendered_bytes": {"type": "integer", "minimum": 0},
+        "selected_rendered_bytes": {"type": "integer", "minimum": 0},
+        "full_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "selected_tokens": {"type": ["integer", "null"], "minimum": 0},
+        "tokenizer": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

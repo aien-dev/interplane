@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/capability.schema.json",
+  "title": "INTERPLANE Capability request (CrossAxis output)",
+  "description": "A canonical intent expressed in one runtime's capability coordinate system. Produced by an explicit, versioned mapping. Still carries no authority.",
+  "type": "object",
+  "required": ["kind", "request_id", "runtime", "capability", "arguments", "mapping", "tool"],
+  "properties": {
+    "kind": {"const": "capability_request"},
+    "request_id": {"$ref": "common.schema.json#/$defs/Id"},
+    "runtime": {"type": "string", "minLength": 1, "maxLength": 256},
+    "capability": {"type": "string", "minLength": 1, "maxLength": 256, "description": "Runtime-native capability name (e.g. read_file)."},
+    "arguments": {"type": "object", "additionalProperties": true},
+    "tool": {"$ref": "common.schema.json#/$defs/ToolRef", "description": "The canonical tool this was mapped from."},
+    "mapping": {
+      "type": "object",
+      "required": ["table_version", "rule_id"],
+      "properties": {
+        "table_version": {"type": "string", "minLength": 1},
+        "rule_id": {"type": "string", "minLength": 1},
+        "passthrough": {"type": "boolean", "default": false, "description": "true when the rule maps a bare native name to itself."}
+      },
+      "additionalProperties": true
+    },
+    "runtime_effects": {"oneOf": [{"$ref": "common.schema.json#/$defs/RuntimeExtension"}, {"type": "null"}], "description": "The runtime's own effect classification, if its catalog declares one. Informational."},
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "additionalProperties": true
+}

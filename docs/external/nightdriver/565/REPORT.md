@@ -38,11 +38,11 @@ ESP-IDF semantics (all quoted from source; ESP-IDF v5.5.2 unless stated):
 
 ## Reproduction
 
-- [reproduced as MODEL only] Host logic test of the new helper `FreeInternalBytes8Bit()` (real project header from the fork branch) against a model of the documented capability rules. Run: `docs/external/nightdriver/565/harness/run.sh` (needs a checkout of the fork branch, default `~/workspace/external/nd565-fix`); output in `harness/results.txt`:
+- [tested, model only; not a reproduction] Host logic test of the new helper `FreeInternalBytes8Bit()` (real project header from the fork branch) against a model of the documented capability rules. Run: `docs/external/nightdriver/565/harness/run.sh` (needs a checkout of the fork branch, default `~/workspace/external/nd565-fix`); output in `harness/results.txt`:
   - Case 1, illustrative layout (160000 B of 8-bit DRAM, 90000 B of IRAM, 9000 B per buffer set): the old query (`getFreeHeap` semantics, 250000) admits 11 buffer sets and leaves 61000 B of 8-bit memory, below the 150000 B reserve; the new query (160000) refuses cleanly.
   - Case 2, 20000 deterministic layouts: invariant "after admitting, 8-bit free >= RESERVE" is violated 14018 times by the old query and 0 times by the new one. (Violations scale with IRAM free; the sizes are synthetic. This says the quantity is wrong, not how often it matters on a real board.)
   - Case 3, the issue's literal numbers as a model shape: INTERNAL free 50000, largest 34000, but the largest block is IRAM and DRAM has only fragments up to 3000. A 4096 B `INTERNAL|8BIT` allocation fails, a 4096 B `32BIT` one succeeds. [hypothesized] This is one way the issue's numbers could be true. It is not shown to be what happened.
-- [observed, weakens that hypothesis for the #562 board] In the #562 log the INTERNAL largest block fell by exactly 4096 (90100 to 86004) when the Remote thread was launched, so at that point the largest INTERNAL block was serving 8-bit allocations (task stacks), i.e. it was DRAM, not IRAM. [inferred] So the M5StickC Plus numbers in #562 are not explained by IRAM counting; the later "47K free, 31K largest, web server fails" is real shortage for a larger allocation, not a 4K one.
+- [observed] In the #562 log the INTERNAL largest block fell by exactly 4096 (90100 at the Audio launch line, 86004 at the Remote launch line). Between those two lines the Audio Sampler task is created with `AUDIO_STACK_SIZE` 4096 (`taskmgr.h:55,315` at `960daf50`). [inferred] The largest INTERNAL block was therefore the one a task stack was carved from; task stacks need byte access, so it was DRAM, not IRAM (the port code that allocates stacks was not read). That weakens the IRAM hypothesis for the #562 board. [inferred] So the M5StickC Plus numbers in #562 are not explained by IRAM counting; the later "47K free, 31K largest, web server fails" is real shortage for a larger allocation, not a 4K one.
 - [BLOCKED] True fragmentation behaviour cannot be reproduced on this host: it depends on the TLSF multi_heap, the real task and WiFi allocation order, and the chip's actual region sizes. No claim of "reproduced" is made for the original failure.
 
 ## Root Cause
@@ -51,14 +51,14 @@ Not proven. What is established (observed, from source): the project sizes its L
 
 ## Fix
 
-Branch `interplane/565-capability-qualified-buffer-budget` on `aien-dev/NightDriverStrip` (fork), commit `8e3d3515c36bebea464467b7834c8ca95afe8925`, based on `4d79c290`. Two files: new `include/heapbudget.h` (`FreeInternalBytes8Bit()`, one `heap_caps_get_free_size(INTERNAL|8BIT)` call) and a 3-line change in `SystemContainer::SetupBufferManagers` for the non-PSRAM branch. PSRAM builds unchanged.
-- [fixed, model-level] The invariant above holds for the new query in the model.
+Branch `fix/565-buffer-budget-8bit` on `aien-dev/NightDriverStrip` (fork), commit `8e3d3515c36bebea464467b7834c8ca95afe8925`, based on `4d79c290`. Two files: new `include/heapbudget.h` (`FreeInternalBytes8Bit()`, one `heap_caps_get_free_size(INTERNAL|8BIT)` call) and a 3-line change in `SystemContainer::SetupBufferManagers` for the non-PSRAM branch. PSRAM builds unchanged.
+- [tested, model-level; not fixed on a device] The invariant above holds for the new query in the model.
 - [not tested] Not compiled for an ESP32 target (no PlatformIO toolchain here); not run on a device. Behaviour change: on classic ESP32 without PSRAM the buffer count can drop by about (IRAM free / bytes per set), so a few boards may need MAX_BUFFERS or MIN_BUFFERS review. That cost is the point: the old count was too high by that amount.
 - It does not claim to fix #565. See `upstream-pr-draft.md` for the wording.
 
 ## Regression
 
-`harness/run.sh` (above), 3 cases. Red/green: the old query's numbers appear in the same run (old violations 14018) and the new helper's 0; the test would fail if `FreeInternalBytes8Bit()` returned the `INTERNAL`-only total. Limits: the arithmetic from `systemcontainer.cpp` is copied into the test, not compiled from source; the heap is a model.
+`harness/run.sh` (above), 3 cases. Red/green: the old query violates the invariant 14018 times and the new helper 0 times in the same run; negative control [tested]: the same test against a copy of the helper that queries `INTERNAL` only prints `RESULT FAIL (3)` (both recorded in `harness/results.txt`). Limits: the arithmetic from `systemcontainer.cpp` is copied into the test, not compiled from source; the heap is a model.
 
 ## Instrumentation proposal (device run; nothing applied)
 
@@ -66,7 +66,7 @@ The decisive missing datum is the failing allocation's size and caps. IDF alread
 1. At boot, `heap_caps_register_failed_alloc_callback(cb)`. The callback only stores `size`, `caps`, `function_name`, a failure counter and a snapshot of `heap_caps_get_free_size` and `heap_caps_get_largest_free_block` for `INTERNAL`, `INTERNAL|8BIT`, `DMA`, `SPIRAM|8BIT` into a static struct. No printing, no allocation, no locks in the callback (it runs inside the allocator; `esp_heap_caps.h:68-77` warns about the neighbouring hook for the same reason).
 2. Print that struct from the existing periodic status line (`main.cpp:861` area) next to `LargestBlk`, plus `heap_caps_get_minimum_free_size(INTERNAL|8BIT)` and `uxTaskGetStackHighWaterMark` per task where `taskmgr.cpp:156` already logs thread launches.
 3. Replace `ESP.getMaxAllocHeap()` in those lines (or add beside it) with the `INTERNAL|8BIT` largest block so the logged number is the one an 8-bit allocation can use.
-4. `CONFIG_HEAP_ABORT_WHEN_ALLOCATION_FAILS` is an sdkconfig option of the precompiled Arduino libraries and is not available from PlatformIO builds here.
+4. `CONFIG_HEAP_ABORT_WHEN_ALLOCATION_FAILS` (`heap_caps.c:29,55`) is an sdkconfig option. Not checked whether pioarduino 55.03.37 can set it for the Arduino libraries; the callback does not need it.
 
 ## Scope
 

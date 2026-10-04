@@ -1,0 +1,1474 @@
+{
+  "bootstrap": {
+    "method": "percentile, resampling task pairs, mean of B minus A",
+    "resamples": 10000,
+    "seed": 20261004
+  },
+  "dev": {
+    "A": {
+      "base_context_tokens": {
+        "max": 400,
+        "mean": 400.0,
+        "median": 400,
+        "min": 400,
+        "n": 1,
+        "p25": 400,
+        "p75": 400
+      },
+      "calls_total": {
+        "max": 1,
+        "mean": 1.0,
+        "median": 1,
+        "min": 1,
+        "n": 1,
+        "p25": 1,
+        "p75": 1,
+        "sum": 1
+      },
+      "decisions": {
+        "authorized": 1,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 0
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0
+      },
+      "empty_final_answers": 0,
+      "execution_errors": 0,
+      "expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0
+      },
+      "exposed_capabilities_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71,
+        "min": 71,
+        "n": 1,
+        "p25": 71,
+        "p75": 71
+      },
+      "exposed_tools_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71,
+        "min": 71,
+        "n": 1,
+        "p25": 71,
+        "p75": 71
+      },
+      "exposed_tools_max": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71,
+        "min": 71,
+        "n": 1,
+        "p25": 71,
+        "p75": 71
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 15800,
+        "mean": 15800.0,
+        "median": 15800,
+        "min": 15800,
+        "n": 1,
+        "p25": 15800,
+        "p75": 15800
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": null,
+        "runs": 0
+      },
+      "missing_required_final": {
+        "count": 1,
+        "of": 1
+      },
+      "missing_required_first": {
+        "count": 0,
+        "of": 1
+      },
+      "model_ms": {
+        "max": 8902,
+        "mean": 8902.0,
+        "median": 8902,
+        "min": 8902,
+        "n": 1,
+        "p25": 8902,
+        "p50": 8902,
+        "p75": 8902,
+        "p95": 8902
+      },
+      "n_runs": 1,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": null,
+        "recovered": 0,
+        "runs_with_error": 0
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "n": 0
+      },
+      "rounds": {
+        "max": 3,
+        "mean": 3.0,
+        "median": 3,
+        "min": 3,
+        "n": 1,
+        "p25": 3,
+        "p75": 3
+      },
+      "success": {
+        "count": 1,
+        "rate": 1.0
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 59000.0,
+        "mean": 59000.0,
+        "median": 59000.0,
+        "min": 59000.0,
+        "n": 1,
+        "p25": 59000.0,
+        "p75": 59000.0
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 9400.0,
+        "mean": 9400.0,
+        "median": 9400.0,
+        "min": 9400.0,
+        "n": 1,
+        "p25": 9400.0,
+        "p75": 9400.0
+      },
+      "tool_schema_tokens_sum": {
+        "max": 28200,
+        "mean": 28200.0,
+        "median": 28200,
+        "min": 28200,
+        "n": 1,
+        "p25": 28200,
+        "p75": 28200
+      },
+      "total_completion_tokens": {
+        "max": 207,
+        "mean": 207.0,
+        "median": 207,
+        "min": 207,
+        "n": 1,
+        "p25": 207,
+        "p75": 207
+      },
+      "total_prompt_tokens": {
+        "max": 47850,
+        "mean": 47850.0,
+        "median": 47850,
+        "min": 47850,
+        "n": 1,
+        "p25": 47850,
+        "p75": 47850
+      },
+      "unexposed_calls": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0,
+        "sum": 0
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 1,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 1,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "wall_ms": {
+        "max": 8952,
+        "mean": 8952.0,
+        "median": 8952,
+        "min": 8952,
+        "n": 1,
+        "p25": 8952,
+        "p50": 8952,
+        "p75": 8952,
+        "p95": 8952
+      }
+    },
+    "B": {
+      "base_context_tokens": {
+        "max": 400,
+        "mean": 400.0,
+        "median": 400,
+        "min": 400,
+        "n": 1,
+        "p25": 400,
+        "p75": 400
+      },
+      "calls_total": {
+        "max": 1,
+        "mean": 1.0,
+        "median": 1,
+        "min": 1,
+        "n": 1,
+        "p25": 1,
+        "p75": 1,
+        "sum": 1
+      },
+      "decisions": {
+        "authorized": 1,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 0
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0
+      },
+      "empty_final_answers": 0,
+      "execution_errors": 0,
+      "expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0
+      },
+      "exposed_capabilities_first": {
+        "max": 9,
+        "mean": 9.0,
+        "median": 9,
+        "min": 9,
+        "n": 1,
+        "p25": 9,
+        "p75": 9
+      },
+      "exposed_tools_first": {
+        "max": 10,
+        "mean": 10.0,
+        "median": 10,
+        "min": 10,
+        "n": 1,
+        "p25": 10,
+        "p75": 10
+      },
+      "exposed_tools_max": {
+        "max": 10,
+        "mean": 10.0,
+        "median": 10,
+        "min": 10,
+        "n": 1,
+        "p25": 10,
+        "p75": 10
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 1700,
+        "mean": 1700.0,
+        "median": 1700,
+        "min": 1700,
+        "n": 1,
+        "p25": 1700,
+        "p75": 1700
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": null,
+        "runs": 0
+      },
+      "missing_required_final": {
+        "count": 0,
+        "of": 1
+      },
+      "missing_required_first": {
+        "count": 0,
+        "of": 1
+      },
+      "model_ms": {
+        "max": 4124,
+        "mean": 4124.0,
+        "median": 4124,
+        "min": 4124,
+        "n": 1,
+        "p25": 4124,
+        "p50": 4124,
+        "p75": 4124,
+        "p95": 4124
+      },
+      "n_runs": 1,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": null,
+        "recovered": 0,
+        "runs_with_error": 0
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "n": 0
+      },
+      "rounds": {
+        "max": 2,
+        "mean": 2.0,
+        "median": 2,
+        "min": 2,
+        "n": 1,
+        "p25": 2,
+        "p75": 2
+      },
+      "success": {
+        "count": 1,
+        "rate": 1.0
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 6000.0,
+        "mean": 6000.0,
+        "median": 6000.0,
+        "min": 6000.0,
+        "n": 1,
+        "p25": 6000.0,
+        "p75": 6000.0
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 800.0,
+        "mean": 800.0,
+        "median": 800.0,
+        "min": 800.0,
+        "n": 1,
+        "p25": 800.0,
+        "p75": 800.0
+      },
+      "tool_schema_tokens_sum": {
+        "max": 1600,
+        "mean": 1600.0,
+        "median": 1600,
+        "min": 1600,
+        "n": 1,
+        "p25": 1600,
+        "p75": 1600
+      },
+      "total_completion_tokens": {
+        "max": 82,
+        "mean": 82.0,
+        "median": 82,
+        "min": 82,
+        "n": 1,
+        "p25": 82,
+        "p75": 82
+      },
+      "total_prompt_tokens": {
+        "max": 3550,
+        "mean": 3550.0,
+        "median": 3550,
+        "min": 3550,
+        "n": 1,
+        "p25": 3550,
+        "p75": 3550
+      },
+      "unexposed_calls": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0,
+        "min": 0,
+        "n": 1,
+        "p25": 0,
+        "p75": 0,
+        "sum": 0
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 1,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 1,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "wall_ms": {
+        "max": 4174,
+        "mean": 4174.0,
+        "median": 4174,
+        "min": 4174,
+        "n": 1,
+        "p25": 4174,
+        "p50": 4174,
+        "p75": 4174,
+        "p95": 4174
+      }
+    },
+    "by_category": {
+      "filesystem": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      }
+    },
+    "note": "dev tasks are excluded from every gate statistic",
+    "paired": {
+      "contingency": {
+        "A_only": 0,
+        "B_only": 0,
+        "both": 1,
+        "neither": 0
+      },
+      "n_pairs": 1,
+      "paired_deltas_B_minus_A": {
+        "calls_total": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "median": 0,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "first_turn_prompt_tokens": {
+          "ci95": [
+            -14100.0,
+            -14100.0
+          ],
+          "mean": -14100.0,
+          "median": -14100,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "model_ms": {
+          "ci95": [
+            -4778.0,
+            -4778.0
+          ],
+          "mean": -4778.0,
+          "median": -4778,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "rounds": {
+          "ci95": [
+            -1.0,
+            -1.0
+          ],
+          "mean": -1.0,
+          "median": -1,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "ci95": [
+            -8600.0,
+            -8600.0
+          ],
+          "mean": -8600.0,
+          "median": -8600.0,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_completion_tokens": {
+          "ci95": [
+            -125.0,
+            -125.0
+          ],
+          "mean": -125.0,
+          "median": -125,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_prompt_tokens": {
+          "ci95": [
+            -44300.0,
+            -44300.0
+          ],
+          "mean": -44300.0,
+          "median": -44300,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "unnecessary_calls": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "median": 0,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "wall_ms": {
+          "ci95": [
+            -4778.0,
+            -4778.0
+          ],
+          "mean": -4778.0,
+          "median": -4778,
+          "n": 1,
+          "resamples": 10000,
+          "seed": 20261004
+        }
+      },
+      "reductions_1_minus_B_over_A": {
+        "exposed_capabilities_first": {
+          "max": 0.873239,
+          "mean": 0.873239,
+          "median": 0.873239,
+          "min": 0.873239,
+          "n": 1,
+          "p25": 0.873239,
+          "p75": 0.873239
+        },
+        "exposed_tools_first": {
+          "max": 0.859155,
+          "mean": 0.859155,
+          "median": 0.859155,
+          "min": 0.859155,
+          "n": 1,
+          "p25": 0.859155,
+          "p75": 0.859155
+        },
+        "first_turn_prompt_tokens": {
+          "max": 0.892405,
+          "mean": 0.892405,
+          "median": 0.892405,
+          "min": 0.892405,
+          "n": 1,
+          "p25": 0.892405,
+          "p75": 0.892405
+        },
+        "tool_schema_bytes_per_round_mean": {
+          "max": 0.898305,
+          "mean": 0.898305,
+          "median": 0.898305,
+          "min": 0.898305,
+          "n": 1,
+          "p25": 0.898305,
+          "p75": 0.898305
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "max": 0.914894,
+          "mean": 0.914894,
+          "median": 0.914894,
+          "min": 0.914894,
+          "n": 1,
+          "p25": 0.914894,
+          "p75": 0.914894
+        },
+        "total_prompt_tokens": {
+          "max": 0.92581,
+          "mean": 0.92581,
+          "median": 0.92581,
+          "min": 0.92581,
+          "n": 1,
+          "p25": 0.92581,
+          "p75": 0.92581
+        }
+      },
+      "success_delta": {
+        "ci95_newcombe10": [
+          -0.793451,
+          0.793451
+        ],
+        "equivalent": false,
+        "margin": 0.1,
+        "mcnemar_exact_p": 1.0,
+        "non_inferior": false,
+        "theta": 0.0
+      }
+    },
+    "tasks": [
+      "filesystem-001"
+    ]
+  },
+  "diagnostics": {
+    "concurrent_load_other_processes": [],
+    "first_turn_real_vs_measured_mismatch": [],
+    "rejudge_mismatches": [],
+    "rounds_where_prompt_tokens_did_not_grow_round2": [],
+    "tasks_without_both_conditions": [],
+    "token_stability": {
+      "stable": true,
+      "tools_count_1": 1,
+      "tools_count_2": 1
+    },
+    "unknown_split_tasks": []
+  },
+  "failures": [
+    {
+      "condition": "A",
+      "failed_checks": [
+        "answer_contains_all"
+      ],
+      "split": "qual",
+      "task": "expansion-001"
+    },
+    {
+      "condition": "B",
+      "failed_checks": [
+        "answer_contains_all",
+        "answer_regex"
+      ],
+      "split": "qual",
+      "task": "rare-002"
+    },
+    {
+      "condition": "A",
+      "failed_checks": [
+        "answer_regex"
+      ],
+      "split": "qual",
+      "task": "wrong_first_tool-001"
+    },
+    {
+      "condition": "B",
+      "failed_checks": [
+        "answer_regex"
+      ],
+      "split": "qual",
+      "task": "wrong_first_tool-001"
+    }
+  ],
+  "kind": "interplane_bench_summary",
+  "manifest_identity_digest": "sha256:synthetic",
+  "model": "synthetic",
+  "qual": {
+    "A": {
+      "base_context_tokens": {
+        "max": 400,
+        "mean": 400.0,
+        "median": 400.0,
+        "min": 400,
+        "n": 8,
+        "p25": 400.0,
+        "p75": 400.0
+      },
+      "calls_total": {
+        "max": 1,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1,
+        "n": 8,
+        "p25": 1.0,
+        "p75": 1.0,
+        "sum": 8
+      },
+      "decisions": {
+        "authorized": 8,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 0
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "empty_final_answers": 0,
+      "execution_errors": 0,
+      "expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "exposed_capabilities_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 8,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "exposed_tools_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 8,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "exposed_tools_max": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 8,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 15800,
+        "mean": 15800.0,
+        "median": 15800.0,
+        "min": 15800,
+        "n": 8,
+        "p25": 15800.0,
+        "p75": 15800.0
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": null,
+        "runs": 0
+      },
+      "missing_required_final": {
+        "count": 8,
+        "of": 8
+      },
+      "missing_required_first": {
+        "count": 0,
+        "of": 8
+      },
+      "model_ms": {
+        "max": 8779,
+        "mean": 5697.125,
+        "median": 6285.5,
+        "min": 2612,
+        "n": 8,
+        "p25": 3441.5,
+        "p50": 6285.5,
+        "p75": 7536.75,
+        "p95": 8450.0
+      },
+      "n_runs": 8,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": null,
+        "recovered": 0,
+        "runs_with_error": 0
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "n": 0
+      },
+      "rounds": {
+        "max": 3,
+        "mean": 2.25,
+        "median": 2.5,
+        "min": 1,
+        "n": 8,
+        "p25": 1.75,
+        "p75": 3.0
+      },
+      "success": {
+        "count": 6,
+        "rate": 0.75
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 59000.0,
+        "mean": 59000.0,
+        "median": 59000.0,
+        "min": 59000.0,
+        "n": 8,
+        "p25": 59000.0,
+        "p75": 59000.0
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 9400.0,
+        "mean": 9400.0,
+        "median": 9400.0,
+        "min": 9400.0,
+        "n": 8,
+        "p25": 9400.0,
+        "p75": 9400.0
+      },
+      "tool_schema_tokens_sum": {
+        "max": 28200,
+        "mean": 21150.0,
+        "median": 23500.0,
+        "min": 9400,
+        "n": 8,
+        "p25": 16450.0,
+        "p75": 28200.0
+      },
+      "total_completion_tokens": {
+        "max": 226,
+        "mean": 122.375,
+        "median": 93.0,
+        "min": 65,
+        "n": 8,
+        "p25": 74.5,
+        "p75": 156.5
+      },
+      "total_prompt_tokens": {
+        "max": 47850,
+        "mean": 35812.5,
+        "median": 39800.0,
+        "min": 15800,
+        "n": 8,
+        "p25": 27762.5,
+        "p75": 47850.0
+      },
+      "unexposed_calls": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.0,
+        "sum": 0
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 8,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 8,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "wall_ms": {
+        "max": 8829,
+        "mean": 5747.125,
+        "median": 6335.5,
+        "min": 2662,
+        "n": 8,
+        "p25": 3491.5,
+        "p50": 6335.5,
+        "p75": 7586.75,
+        "p95": 8500.0
+      }
+    },
+    "B": {
+      "base_context_tokens": {
+        "max": 400,
+        "mean": 400.0,
+        "median": 400.0,
+        "min": 400,
+        "n": 8,
+        "p25": 400.0,
+        "p75": 400.0
+      },
+      "calls_total": {
+        "max": 1,
+        "mean": 1.0,
+        "median": 1.0,
+        "min": 1,
+        "n": 8,
+        "p25": 1.0,
+        "p75": 1.0,
+        "sum": 8
+      },
+      "decisions": {
+        "authorized": 8,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 0
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 1,
+        "mean": 0.25,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.25
+      },
+      "empty_final_answers": 0,
+      "execution_errors": 0,
+      "expansions_per_run": {
+        "max": 1,
+        "mean": 0.25,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.25
+      },
+      "exposed_capabilities_first": {
+        "max": 9,
+        "mean": 9.0,
+        "median": 9.0,
+        "min": 9,
+        "n": 8,
+        "p25": 9.0,
+        "p75": 9.0
+      },
+      "exposed_tools_first": {
+        "max": 10,
+        "mean": 10.0,
+        "median": 10.0,
+        "min": 10,
+        "n": 8,
+        "p25": 10.0,
+        "p75": 10.0
+      },
+      "exposed_tools_max": {
+        "max": 11,
+        "mean": 10.25,
+        "median": 10.0,
+        "min": 10,
+        "n": 8,
+        "p25": 10.0,
+        "p75": 10.25
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 1700,
+        "mean": 1700.0,
+        "median": 1700.0,
+        "min": 1700,
+        "n": 8,
+        "p25": 1700.0,
+        "p75": 1700.0
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": null,
+        "runs": 0
+      },
+      "missing_required_final": {
+        "count": 0,
+        "of": 8
+      },
+      "missing_required_first": {
+        "count": 2,
+        "of": 8
+      },
+      "model_ms": {
+        "max": 6428,
+        "mean": 4401.75,
+        "median": 4397.5,
+        "min": 1271,
+        "n": 8,
+        "p25": 3106.5,
+        "p50": 4397.5,
+        "p75": 6314.0,
+        "p95": 6407.0
+      },
+      "n_runs": 8,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": null,
+        "recovered": 0,
+        "runs_with_error": 0
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "max": 2,
+        "mean": 2.0,
+        "median": 2.0,
+        "min": 2,
+        "n": 2,
+        "p25": 2.0,
+        "p75": 2.0
+      },
+      "rounds": {
+        "max": 3,
+        "mean": 2.125,
+        "median": 2.0,
+        "min": 1,
+        "n": 8,
+        "p25": 1.75,
+        "p75": 3.0
+      },
+      "success": {
+        "count": 6,
+        "rate": 0.75
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 6000.0,
+        "mean": 6000.0,
+        "median": 6000.0,
+        "min": 6000.0,
+        "n": 8,
+        "p25": 6000.0,
+        "p75": 6000.0
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 820.0,
+        "mean": 802.5,
+        "median": 800.0,
+        "min": 780.0,
+        "n": 8,
+        "p25": 795.0,
+        "p75": 820.0
+      },
+      "tool_schema_tokens_sum": {
+        "max": 2460,
+        "mean": 1717.5,
+        "median": 1600.0,
+        "min": 780,
+        "n": 8,
+        "p25": 1395.0,
+        "p75": 2460.0
+      },
+      "total_completion_tokens": {
+        "max": 155,
+        "mean": 96.5,
+        "median": 102.0,
+        "min": 29,
+        "n": 8,
+        "p25": 67.25,
+        "p75": 118.25
+      },
+      "total_prompt_tokens": {
+        "max": 5550,
+        "mean": 3837.5,
+        "median": 3550.0,
+        "min": 1700,
+        "n": 8,
+        "p25": 3087.5,
+        "p75": 5550.0
+      },
+      "unexposed_calls": {
+        "max": 1,
+        "mean": 0.25,
+        "median": 0.0,
+        "min": 0,
+        "n": 8,
+        "p25": 0.0,
+        "p75": 0.25,
+        "sum": 2
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 8,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 8,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "wall_ms": {
+        "max": 6478,
+        "mean": 4451.75,
+        "median": 4447.5,
+        "min": 1321,
+        "n": 8,
+        "p25": 3156.5,
+        "p50": 4447.5,
+        "p75": 6364.0,
+        "p95": 6457.0
+      }
+    },
+    "by_category": {
+      "ambiguous": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "expansion": {
+        "A": {
+          "n": 2,
+          "success": 1
+        },
+        "B": {
+          "n": 2,
+          "success": 2
+        }
+      },
+      "filesystem": {
+        "A": {
+          "n": 2,
+          "success": 2
+        },
+        "B": {
+          "n": 2,
+          "success": 2
+        }
+      },
+      "rare": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 0
+        }
+      },
+      "unknown_tool": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "wrong_first_tool": {
+        "A": {
+          "n": 1,
+          "success": 0
+        },
+        "B": {
+          "n": 1,
+          "success": 0
+        }
+      }
+    },
+    "gates": {
+      "O1": {
+        "pass": true,
+        "rate_covered": 1.0,
+        "tasks_with_requirements": 8,
+        "threshold": 0.95,
+        "uncovered_final": 0,
+        "uncovered_tasks": []
+      },
+      "O2": {
+        "covered_within_1_expansion": 2,
+        "not_recovered_tasks": [],
+        "note": "",
+        "pass": true,
+        "rate": 1.0,
+        "threshold": 0.9,
+        "uncovered_on_round1": 2
+      },
+      "S": {
+        "ci95": [
+          -0.384659,
+          0.384659
+        ],
+        "equivalence_two_sided": false,
+        "margin": -0.1,
+        "mcnemar_p": 1.0,
+        "pass": false,
+        "table": {
+          "e": 5,
+          "f": 1,
+          "g": 1,
+          "h": 1
+        },
+        "theta": 0.0
+      },
+      "T": {
+        "n": 8,
+        "pass": true,
+        "statistic": "median(1 - B/A per-round mean tool-schema tokens)",
+        "threshold": 0.7,
+        "value": 0.914894
+      },
+      "complete": false,
+      "expected_qual_pairs": 37,
+      "n_pairs": 8,
+      "overall": "INCOMPLETE"
+    },
+    "paired": {
+      "contingency": {
+        "A_only": 1,
+        "B_only": 1,
+        "both": 5,
+        "neither": 1
+      },
+      "n_pairs": 8,
+      "paired_deltas_B_minus_A": {
+        "calls_total": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "median": 0.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "first_turn_prompt_tokens": {
+          "ci95": [
+            -14100.0,
+            -14100.0
+          ],
+          "mean": -14100.0,
+          "median": -14100.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "model_ms": {
+          "ci95": [
+            -2698.75,
+            198.0
+          ],
+          "mean": -1295.375,
+          "median": -1588.5,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "rounds": {
+          "ci95": [
+            -0.5,
+            0.25
+          ],
+          "mean": -0.125,
+          "median": 0.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "ci95": [
+            -8607.5,
+            -8587.5
+          ],
+          "mean": -8597.5,
+          "median": -8600.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_completion_tokens": {
+          "ci95": [
+            -62.75,
+            8.5
+          ],
+          "mean": -25.875,
+          "median": -28.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_prompt_tokens": {
+          "ci95": [
+            -39775.0,
+            -23162.5
+          ],
+          "mean": -31975.0,
+          "median": -35250.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "unnecessary_calls": {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "mean": 0.0,
+          "median": 0.0,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "wall_ms": {
+          "ci95": [
+            -2698.75,
+            198.0
+          ],
+          "mean": -1295.375,
+          "median": -1588.5,
+          "n": 8,
+          "resamples": 10000,
+          "seed": 20261004
+        }
+      },
+      "reductions_1_minus_B_over_A": {
+        "exposed_capabilities_first": {
+          "max": 0.873239,
+          "mean": 0.873239,
+          "median": 0.873239,
+          "min": 0.873239,
+          "n": 8,
+          "p25": 0.873239,
+          "p75": 0.873239
+        },
+        "exposed_tools_first": {
+          "max": 0.859155,
+          "mean": 0.859155,
+          "median": 0.859155,
+          "min": 0.859155,
+          "n": 8,
+          "p25": 0.859155,
+          "p75": 0.859155
+        },
+        "first_turn_prompt_tokens": {
+          "max": 0.892405,
+          "mean": 0.892405,
+          "median": 0.892405,
+          "min": 0.892405,
+          "n": 8,
+          "p25": 0.892405,
+          "p75": 0.892405
+        },
+        "tool_schema_bytes_per_round_mean": {
+          "max": 0.898305,
+          "mean": 0.898305,
+          "median": 0.898305,
+          "min": 0.898305,
+          "n": 8,
+          "p25": 0.898305,
+          "p75": 0.898305
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "max": 0.917021,
+          "mean": 0.914628,
+          "median": 0.914894,
+          "min": 0.912766,
+          "n": 8,
+          "p25": 0.912766,
+          "p75": 0.915426
+        },
+        "total_prompt_tokens": {
+          "max": 0.92581,
+          "mean": 0.88973,
+          "median": 0.890297,
+          "min": 0.825197,
+          "n": 8,
+          "p25": 0.884013,
+          "p75": 0.900756
+        }
+      },
+      "success_delta": {
+        "ci95_newcombe10": [
+          -0.384659,
+          0.384659
+        ],
+        "equivalent": false,
+        "margin": 0.1,
+        "mcnemar_exact_p": 1.0,
+        "non_inferior": false,
+        "theta": 0.0
+      }
+    },
+    "tasks": [
+      "ambiguous-002",
+      "expansion-001",
+      "expansion-002",
+      "filesystem-002",
+      "filesystem-003",
+      "rare-002",
+      "unknown_tool-001",
+      "wrong_first_tool-001"
+    ]
+  },
+  "run_id": "synthetic-run"
+}

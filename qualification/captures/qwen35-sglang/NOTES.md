@@ -41,3 +41,12 @@ Python: 14/14 PASS, all four profiles compatible. Rust: 12 PASS, `chat.basic` FA
 - Only `qwen3_coder` was tested for tool parsing; not the `qwen`/`qwen25`/`hermes`/`auto` names.
 - bf16 weights, not the Q4_K_M of the Ollama capture, so differences vs Ollama mix engine and quantization effects.
 - Server left running: container `sglang-qwen35`, host port 127.0.0.1:18082 (container PID 290206 at the time of writing, with `--tool-call-parser qwen3_coder`).
+
+## Update 2026-10-04: Rust probe after alignment is 14/14
+The Rust 12/14 result in "Probe results" and the two Rust FAIL cells in the matrix above describe
+the run made before the probes were aligned. After alignment (identical request bodies in the Rust
+and Python probes), the Rust probe was rerun against the same SGLang server and passed 14/14, all
+profiles compatible. That report is `qualification/reports/qwen35-9b-sglang-0.5.20.probe.rust.json`,
+merged to main in e34160f. The earlier 12/14 report is kept as
+`qualification/reports/qwen35-9b-sglang-0.5.20.probe.rust.pre-alignment.json`. Rust and Python
+now agree on this backend (`STATUS.md`).

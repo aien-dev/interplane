@@ -1,0 +1,591 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 184,
+  "calls": [
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:fe4a79c9b49becf60b66f2480c409c8946409dbaba0e51b438330eb8af2d161f",
+      "capability": "manage_calendar",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_2t9kz24g",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:16595a9c5ca43841ced6170d845ecbe6a39962aedf842459b3d8c0be193f3906",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "manage_calendar",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B",
+  "coverage_trace": [
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "manage_calendar",
+    "manage_tasks",
+    "todowrite",
+    "update_plan"
+  ],
+  "fixture": {
+    "digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+    "name": "fixtures/lanternfish"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: 2026-11-16",
+        "kind": "answer_contains_all",
+        "passed": false
+      },
+      {
+        "applies": true,
+        "detail": "no expansion",
+        "kind": "expansion_occurred",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all",
+      "expansion_occurred"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {
+    "full_count": 71,
+    "full_rendered_bytes": 59024,
+    "rendered_bytes": {
+      "full": 59024,
+      "selected": 8994
+    },
+    "selected_count": 5,
+    "selected_rendered_bytes": 8994,
+    "tokens": {
+      "all_rounds_prompt": {
+        "full": 64413,
+        "selected": 5422
+      },
+      "base_context": 184,
+      "completion": {
+        "full": 250,
+        "selected": 204
+      },
+      "first_turn_prompt": {
+        "full": 15976,
+        "selected": 2678
+      },
+      "source": "backend usage.prompt_tokens of a max_tokens=1 request (openai-compatible endpoint)",
+      "tool_schema": {
+        "full": 15792,
+        "selected": 2494
+      },
+      "unit": "tokens_model_reported"
+    }
+  },
+  "metrics": {
+    "base_context_tokens": 184,
+    "calls_total": 1,
+    "covered_after_effective_expansions": null,
+    "covered_at_round": null,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 5,
+    "exposed_capabilities_max": 5,
+    "exposed_tools_first": 6,
+    "exposed_tools_max": 6,
+    "first_turn_prompt_tokens": 2678,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": true,
+    "missing_required_first": true,
+    "model_ms": 6615,
+    "recovered_after_error": false,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 8994.0,
+    "tool_schema_tokens_first": 2494,
+    "tool_schema_tokens_per_round_mean": 2494.0,
+    "tool_schema_tokens_sum": 4988,
+    "total_completion_tokens": 204,
+    "total_prompt_tokens": 5422,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 6625
+  },
+  "prior_infra_failures": [],
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 98,
+      "exposed_caps_count": 5,
+      "exposed_names": [
+        "ask_user",
+        "manage_calendar",
+        "manage_tasks",
+        "todowrite",
+        "update_plan"
+      ],
+      "exposed_tools_count": 6,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3708,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2678,
+      "reasoning_present": true,
+      "request_digest": "sha256:1a41deb186bc34314eafcff9fe1801e8f585245f3c3bcb798eb8c97d9fd99de4",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 8994,
+      "tools_digest": "sha256:83ea320f2dfb9bf7dbac0348249a5103378864b5a8c10c42f8ec11c2fdfc2481"
+    },
+    {
+      "completion_tokens": 106,
+      "exposed_caps_count": 5,
+      "exposed_names": [
+        "ask_user",
+        "manage_calendar",
+        "manage_tasks",
+        "todowrite",
+        "update_plan"
+      ],
+      "exposed_tools_count": 6,
+      "finish_reason": "stop",
+      "latency_ms": 2907,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 2744,
+      "reasoning_present": false,
+      "request_digest": "sha256:63d9c45e85c1c62b80e95f0817cab707d2af02ee63cc95a75b8523310a9cb710",
+      "round": 2,
+      "text_digest": "sha256:29409ca70b469cd41dbdef55db8c6c52abe078ad351252118592a85c0fa18934",
+      "tools_bytes": 8994,
+      "tools_digest": "sha256:83ea320f2dfb9bf7dbac0348249a5103378864b5a8c10c42f8ec11c2fdfc2481"
+    }
+  ],
+  "run_id": "qual-20261004T2207Z",
+  "selection": {
+    "final_digest": "sha256:d207b2e8f369a324d9bc0ccc24d9f18877bae47766aee6dc8f7cc34a49117d52",
+    "final_selected": [
+      "ask_user",
+      "manage_calendar",
+      "manage_tasks",
+      "todowrite",
+      "update_plan"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "apply_patch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "get_workspace",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "glob",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "grep",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ls",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "write_file",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 8524
+        },
+        "selected_count": 5,
+        "selected_rendered_bytes": 8524
+      },
+      "requested_domains": [
+        "calendar",
+        "tasks"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "calendar"
+          ],
+          "name": "manage_calendar",
+          "rule_id": "domain:calendar"
+        },
+        {
+          "domains": [
+            "tasks"
+          ],
+          "name": "manage_tasks",
+          "rule_id": "domain:tasks"
+        },
+        {
+          "domains": [
+            "tasks",
+            "code"
+          ],
+          "name": "todowrite",
+          "rule_id": "domain:tasks"
+        },
+        {
+          "domains": [
+            "tasks",
+            "user"
+          ],
+          "name": "update_plan",
+          "rule_id": "domain:tasks"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:d207b2e8f369a324d9bc0ccc24d9f18877bae47766aee6dc8f7cc34a49117d52"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "expansion",
+    "digest": "sha256:3dba17c2447a9f202582d3295bedb1b726099730aa54bbfc64c98e65bf3262f8",
+    "id": "expansion-004",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 6615,
+    "wall_ms": 6625
+  },
+  "tool_schema_tokens_per_round": [
+    2494,
+    2494
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "manage_calendar",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "manage_calendar"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "I apologize, but I don't have access to a release plan document or calendar events in this workspace. The calendar tool returned an error, and I don't see any release plan files that would contain launch event information.\n\nCould you please:\n1. Share the release plan document with me, or\n2. Tell me where the release plan is located (file path), or\n3. Provide more context about what project we're discussing?\n\nThis will help me find the launch event date for you."
+  },
+  "user_request_digest": "sha256:be45d7e1c82900aeb2e0a85ff72a79ec5c4bc316bb0aa49185f6023d81bbc0c9"
+}

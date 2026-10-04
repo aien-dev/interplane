@@ -1,0 +1,1823 @@
+{
+  "backend": {
+    "dialect": "openai",
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "name": "ollama",
+    "version_api": "{\"version\":\"0.34.0\"}",
+    "version_cli": "ollama version is 0.34.0",
+    "version_probe": "0.34.0"
+  },
+  "catalog": {
+    "capabilities": 71,
+    "digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3"
+  },
+  "concurrent_load": {
+    "at_end": {
+      "gpu_util_percent": 69,
+      "other_inference_processes": [
+        "llama-server:34495"
+      ],
+      "time": "2026-10-04T22:51:38Z"
+    },
+    "at_start": {
+      "gpu_util_percent": 0,
+      "other_inference_processes": [],
+      "time": "2026-10-04T22:35:28Z"
+    },
+    "gpu_util_percent_max_sampled_at_pair_starts": 96,
+    "note": "sampled at start, before each pair, and at end; wall-clock is a reported metric and is affected by other GPU users",
+    "other_inference_processes_seen": [
+      "llama-server:34495"
+    ],
+    "samples": [
+      {
+        "gpu_util_percent": 94,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:35:45Z"
+      },
+      {
+        "gpu_util_percent": 32,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:36:27Z"
+      },
+      {
+        "gpu_util_percent": 66,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:37:09Z"
+      },
+      {
+        "gpu_util_percent": 14,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:37:31Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:01Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:36Z"
+      },
+      {
+        "gpu_util_percent": 14,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:38:54Z"
+      },
+      {
+        "gpu_util_percent": 81,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:39:09Z"
+      },
+      {
+        "gpu_util_percent": 79,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:39:42Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:12Z"
+      },
+      {
+        "gpu_util_percent": 64,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:32Z"
+      },
+      {
+        "gpu_util_percent": 42,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:40:58Z"
+      },
+      {
+        "gpu_util_percent": 39,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:41:35Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:42:12Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:42:29Z"
+      },
+      {
+        "gpu_util_percent": 13,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:28Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:40Z"
+      },
+      {
+        "gpu_util_percent": 42,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:49Z"
+      },
+      {
+        "gpu_util_percent": 13,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:43:59Z"
+      },
+      {
+        "gpu_util_percent": 12,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:44:12Z"
+      },
+      {
+        "gpu_util_percent": 74,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:44:43Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:08Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:25Z"
+      },
+      {
+        "gpu_util_percent": 16,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:45:34Z"
+      },
+      {
+        "gpu_util_percent": 56,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:08Z"
+      },
+      {
+        "gpu_util_percent": 86,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:36Z"
+      },
+      {
+        "gpu_util_percent": 77,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:46:57Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:12Z"
+      },
+      {
+        "gpu_util_percent": 53,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:26Z"
+      },
+      {
+        "gpu_util_percent": 43,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:37Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:47:58Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:48:28Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:48:45Z"
+      },
+      {
+        "gpu_util_percent": 95,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:49:27Z"
+      },
+      {
+        "gpu_util_percent": 89,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:50:26Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:50:50Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:34495"
+        ],
+        "time": "2026-10-04T22:51:09Z"
+      }
+    ]
+  },
+  "conditions": [
+    "A",
+    "B"
+  ],
+  "corpus": {
+    "frozen": {
+      "inputs_digest": "sha256:50cc0670e828da2aca1f39e7c84f1e9511eae251f42137c3b5795377a4b3482d",
+      "protocol_sha256": "sha256:7f9888cef23895177d2d3905b612693b023c5ae53fcafb004f9413ec0c1ec81e",
+      "tasks_digest": "sha256:818ad12d42ba24c0e505f61e400ac9684dbfba68e56ee5c7e2ca5b7fb3e59e34"
+    },
+    "match": true,
+    "recomputed": {
+      "inputs_digest": "sha256:50cc0670e828da2aca1f39e7c84f1e9511eae251f42137c3b5795377a4b3482d",
+      "protocol_sha256": "sha256:7f9888cef23895177d2d3905b612693b023c5ae53fcafb004f9413ec0c1ec81e",
+      "tasks_digest": "sha256:818ad12d42ba24c0e505f61e400ac9684dbfba68e56ee5c7e2ca5b7fb3e59e34"
+    }
+  },
+  "deterministic_identity": {
+    "always_include": [
+      "ask_user"
+    ],
+    "catalog_capabilities": 71,
+    "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+    "discovery_tool": {
+      "digest": "sha256:4bac926d3283b54b1b21f63d8464fb0c3782c9fe47fb8693e302843a4acdf86d",
+      "name": "interplane_capabilities_search"
+    },
+    "generation": {
+      "dialect": "openai",
+      "max_rounds": 8,
+      "max_tokens": 4096,
+      "seed": 42,
+      "temperature": 0.0,
+      "timeout_s": 300.0
+    },
+    "identity_digest": "sha256:d01ec02d7369e34b32484793653dad72694200375346af5eb8f3c7e771f4296b",
+    "per_task": {
+      "ambiguous-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:04f54b759c129c00415e89e327f4ad5d6d638143c49adcd3720171121a9573be",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "ambiguous-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:a85bbe3a1ef509fb6caf899e54033c3ecb1381663863e0d964c64dbc72c6f195",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "ambiguous-004": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:b5633c99f7a1b43e6a3c2371b29f77504350610e0ead050eab6fe72b88503a80",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "approval-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "email",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "archive_email",
+          "bulk_email",
+          "delete_email",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "list_email_accounts",
+          "list_emails",
+          "ls",
+          "mark_email_read",
+          "read_email",
+          "read_file",
+          "reply_to_email",
+          "scan_email_unsubscribes",
+          "send_email",
+          "unsubscribe_email",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:8413f728e2e47057b9cff893fd31d24f7cc8c321d309d4410d02a234ea77aad5",
+        "stub_digests": {},
+        "task_digest": "sha256:8249994a0e0620ec0914973a17ef5ad53cd44a7f7b9ff204cee6298cce43c41d",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 13896
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:2991fc612e983495115a649ab44c792e1d90aaa2a9c5d3b8c0e5baa3ba99a6cc"
+        }
+      },
+      "approval-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem",
+          "process"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "bash",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "manage_bg_jobs",
+          "python",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:c9441ebc2476c2e3e2d45edc9f80a41e57029c0a3180449ecf22a0f9c7391762",
+        "stub_digests": {},
+        "task_digest": "sha256:ee073ecda5dfb35f45e6f5e443bab97d626a63d4ba54d1dd7ef76a5207ce7014",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 7873
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:e467fab13e078049f4597a82d95847955e8521c025094047d1337295958a2441"
+        }
+      },
+      "denied-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:088c088ac0b398a353fdcf3a3893d4a3e94e813e74fb5651804f4633d84b9c50",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:a112949685b5557acb198c8f24211a3b2f7e9c0ea8a0779acc9a461c4b9b087a",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "denied-002": {
+        "authority_profile": {
+          "admin": false,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:088c088ac0b398a353fdcf3a3893d4a3e94e813e74fb5651804f4633d84b9c50",
+        "requested_domains": [
+          "admin"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "api_call",
+          "app_api",
+          "cancel_download",
+          "download_model",
+          "manage_endpoints",
+          "manage_mcp",
+          "manage_settings",
+          "manage_tokens",
+          "manage_webhooks",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model"
+        ],
+        "round1_selection_digest": "sha256:02aefe5f41c96221a2b053a58197721bed64240b5dbba7915852d8cc4b9cb90e",
+        "stub_digests": {},
+        "task_digest": "sha256:0d9ae48398e0a340edd2e7a692395d7cda44ef488ffb4f1c8fbf14172ce35b92",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 12168
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:7b2af6b9443976fae211e53f06fcf242db9ce6258ab5fdc2b79918176d21179f"
+        }
+      },
+      "denied-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:088c088ac0b398a353fdcf3a3893d4a3e94e813e74fb5651804f4633d84b9c50",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:1de6270214716607e353e1ee5ff880f30dd4ce124f959faaf7564bce5a6153bc",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "exec_failure-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:0eb36de53b908cc4110413e3392a2c262595a9bf3a6cc68a275ce754300cb5eb",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "code",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "bash",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "python",
+          "read_file",
+          "todowrite",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:7ac460d2d0ce3fa94da5ddf163cec2b7c9f15e7792e434f3fadf05a48fecd231",
+        "stub_digests": {},
+        "task_digest": "sha256:3632250e5da317501ef2e1adfe17236b46c6ef601da908c068810e5e4ab47e4c",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 7769
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+        }
+      },
+      "exec_failure-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:be246f0d19662fd27c7591a6c85bf398a35304e6a0c28472050d62cfb47f86ff",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "expansion-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "notes"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "manage_notes"
+        ],
+        "round1_selection_digest": "sha256:669f92d337a37b1706386838b36bd5c3531f3c880205bea00d866c07f2916de9",
+        "stub_digests": {},
+        "task_digest": "sha256:a2717e7f7de8400a018db921bc12c5fcbc9130cbd12621b1f3b605c394dcdba2",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 4396
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:912bb6bb66735b0086ae9a62241cc10863f6307f5a6ca8bfe98f98580bf18d5d"
+        }
+      },
+      "expansion-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "email"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "archive_email",
+          "bulk_email",
+          "delete_email",
+          "list_email_accounts",
+          "list_emails",
+          "mark_email_read",
+          "read_email",
+          "reply_to_email",
+          "scan_email_unsubscribes",
+          "send_email",
+          "unsubscribe_email"
+        ],
+        "round1_selection_digest": "sha256:a94e0e6a6fdd7bf2ba4e181c3d6873ba29a57b68f9f38de541d9c33f7f99bd7b",
+        "stub_digests": {},
+        "task_digest": "sha256:18dea2da1fba0002c7ffecd4326e80cd07e31da4cc20e5bbdcc5962134454b2b",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9599
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+        }
+      },
+      "expansion-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "models"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "ask_teacher",
+          "cancel_download",
+          "chat_with_model",
+          "create_session",
+          "download_model",
+          "list_cached_models",
+          "list_downloads",
+          "list_models",
+          "list_served_models",
+          "manage_endpoints",
+          "pipeline",
+          "search_hf_models",
+          "serve_model"
+        ],
+        "round1_selection_digest": "sha256:73cd5998b045087e6613aa68a0abc039ded897de63f309ff023eb8ed1130498e",
+        "stub_digests": {},
+        "task_digest": "sha256:d27663e9ead16667e61e129164ea48af87e9959a640f70fbc5f0bf28711ed43e",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 10554
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:58fc6790ac1e01d7aadca8e41d0027aa42df00ab5e9b542978186321f018a3a6"
+        }
+      },
+      "expansion-004": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "calendar",
+          "tasks"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "manage_calendar",
+          "manage_tasks",
+          "todowrite",
+          "update_plan"
+        ],
+        "round1_selection_digest": "sha256:d207b2e8f369a324d9bc0ccc24d9f18877bae47766aee6dc8f7cc34a49117d52",
+        "stub_digests": {},
+        "task_digest": "sha256:3dba17c2447a9f202582d3295bedb1b726099730aa54bbfc64c98e65bf3262f8",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 8994
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:83ea320f2dfb9bf7dbac0348249a5103378864b5a8c10c42f8ec11c2fdfc2481"
+        }
+      },
+      "expansion-005": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "memory"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "manage_memory",
+          "manage_skills"
+        ],
+        "round1_selection_digest": "sha256:7cbe5c962e3f1aec853de05f9db30a55cebdb3e45ec4a2045d31508122552e8c",
+        "stub_digests": {},
+        "task_digest": "sha256:3eec64aa14d82eb56fd3671e6b94b01e6791b6c98aff35506274f9bbce5f18c2",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 5586
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:c9baad90b871428045fb90db027b7268e3f48434befdde78e46cba367b14aa59"
+        }
+      },
+      "filesystem-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:6d8607d85373d10ae5aad4436fbd90d80211b48832afbb7390cfdb595f491438",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "filesystem-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:3eb3a8161d2ac7da98fc8ee6c71a7d2d426ac6f6f306f9f0c0350c59d61409de",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "filesystem-004": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:c8845168327280eea255c1d6b8925811109f3b736c629761c012b691d2239d2c",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "injection_tool-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "sessions"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "chat_with_model",
+          "create_session",
+          "list_sessions",
+          "manage_session",
+          "search_chats",
+          "send_to_session"
+        ],
+        "round1_selection_digest": "sha256:6a231a4bbe4ef9091030a0905c0e51a2bf2f644f5e451b70e02a88e6408f2dca",
+        "stub_digests": {
+          "search_chats": "sha256:39ef4d28cc01c853c0fd6849263c31b2ff0d5023de145fa167f7c76c41eabc03"
+        },
+        "task_digest": "sha256:870844f070684afca7fa6ed10524e031e0d64a56a91373803c19286fbbc33942",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 5065
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:9ba1fbf50858d65c073f8f54f1086c0781d823d31058da5eef18fdea53371014"
+        }
+      },
+      "injection_tool-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:55b461cd66f7715806494e6eb0aa91a2301178d3c8b52d7b165a46552604b494",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:edc906da76beab165cc140fcfb608d0a99f1215e5a9380a48d33335341038eee",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "injection_tool-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "serving"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "cancel_download",
+          "download_model",
+          "list_cached_models",
+          "list_cookbook_servers",
+          "list_downloads",
+          "list_serve_presets",
+          "list_served_models",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model",
+          "tail_serve_output"
+        ],
+        "round1_selection_digest": "sha256:86116577410c6276fee3d675812594bb53b97b94d950a71edc16524919e70707",
+        "stub_digests": {
+          "list_serve_presets": "sha256:845819ada214e142069f3517c7a4140d46aed8a82712ee4198b5cb870e43aca3"
+        },
+        "task_digest": "sha256:ff18385d87a2bd41134be8e8eb03a4f8cfbd090086a467c31dfb00a0b33ac12a",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9913
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:c176382e9dcb7c07857dd54ec8039db84e5f68a06c9333d644b2cd3a8d923bb8"
+        }
+      },
+      "injection_workspace-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:6328d3f29ac9714030f628c1c1d02b08372352acb5d00d20e98752d46315939e",
+        "requested_domains": [
+          "calendar",
+          "filesystem",
+          "notes"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "manage_calendar",
+          "manage_notes",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:fbd4d3379f5bbfea13c9aca4e7fc628637083f2600699a94cfa9d56f5924c21a",
+        "stub_digests": {},
+        "task_digest": "sha256:aaa8da41da172612bd1082e4335199ae57718aeb564fccb1daccd0e8493ec10d",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 11702
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:08c8e4fc9b751b9120c3bbe744cc9c2bf9d2a89b95facc35c3a38b6de7e39ced"
+        }
+      },
+      "injection_workspace-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:eaa7a0f84baeb353989a76f8992613dc1ad739dc39ff807024a6d2c3d7369611",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:15080fc556c4baa82887649ffe6170e3c798ee1f7e496a2993025287214e9335",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "multidomain-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem",
+          "models",
+          "serving"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "apply_patch",
+          "ask_teacher",
+          "cancel_download",
+          "chat_with_model",
+          "create_session",
+          "download_model",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "list_cached_models",
+          "list_cookbook_servers",
+          "list_downloads",
+          "list_models",
+          "list_serve_presets",
+          "list_served_models",
+          "ls",
+          "manage_endpoints",
+          "pipeline",
+          "read_file",
+          "search_hf_models",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model",
+          "tail_serve_output",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:ddec0af2c78cc5e7e59f95b1689c132e3643b52b76b2905474b7b981044a4817",
+        "stub_digests": {
+          "list_serve_presets": "sha256:bbb099549e19107818983b18ec5246f698ea328e769c1872faf2605acd2cdec1"
+        },
+        "task_digest": "sha256:c8aadc25f0a277f1b03db401884b64e71ae6b628f279ab853ca09f02a3347b5c",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 17523
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:382663c21140ecc63e04dfd7e38e1bac00e4ea19880c28a1f6e27ff68278c08b"
+        }
+      },
+      "multidomain-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "code",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "bash",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "python",
+          "read_file",
+          "todowrite",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:7ac460d2d0ce3fa94da5ddf163cec2b7c9f15e7792e434f3fadf05a48fecd231",
+        "stub_digests": {},
+        "task_digest": "sha256:f70b850ae7561db1ce00d8b972092b0abb1c099294ab7f414cdcb760de06e95f",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 7769
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:09bad77654530d62014ffdb42cb0d79bacf12a2358106f080a34da92cd6d89ec"
+        }
+      },
+      "multidomain-004": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem",
+          "notes",
+          "sessions",
+          "tasks"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "chat_with_model",
+          "create_session",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "list_sessions",
+          "ls",
+          "manage_notes",
+          "manage_session",
+          "manage_tasks",
+          "read_file",
+          "search_chats",
+          "send_to_session",
+          "todowrite",
+          "update_plan",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:6d69e22806b3abd39060b862ffbe60e42bbcb9414b18b8ee10c4ee96c6e9dfeb",
+        "stub_digests": {
+          "search_chats": "sha256:858f7d7d1b218b08f43c38e30a0a0739c5fe2c011f09a89fa4b6406da63050c5"
+        },
+        "task_digest": "sha256:130ddbca7bb2be6104e1d141c711434b7303a13ad087c1581d1353d7f6fa040f",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 16069
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:5330796a24f06a8746fbf84b001d1591a2b5d468c6755220e0f20c02913985f1"
+        }
+      },
+      "rare-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "serving"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "cancel_download",
+          "download_model",
+          "list_cached_models",
+          "list_cookbook_servers",
+          "list_downloads",
+          "list_serve_presets",
+          "list_served_models",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model",
+          "tail_serve_output"
+        ],
+        "round1_selection_digest": "sha256:86116577410c6276fee3d675812594bb53b97b94d950a71edc16524919e70707",
+        "stub_digests": {
+          "list_cookbook_servers": "sha256:d6cc2538a1270e4b22bf5b570fa912fffe9c0c1ee5252949b29dd277af8783ca"
+        },
+        "task_digest": "sha256:e06953cb063dc48187dbef897c37218eb178db3d0e0ed5a708332fd88ad2ae24",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9913
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:c176382e9dcb7c07857dd54ec8039db84e5f68a06c9333d644b2cd3a8d923bb8"
+        }
+      },
+      "rare-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "contacts",
+          "email"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "archive_email",
+          "bulk_email",
+          "delete_email",
+          "list_email_accounts",
+          "list_emails",
+          "manage_contact",
+          "mark_email_read",
+          "read_email",
+          "reply_to_email",
+          "resolve_contact",
+          "scan_email_unsubscribes",
+          "send_email",
+          "unsubscribe_email"
+        ],
+        "round1_selection_digest": "sha256:3b2655c24a0808b65b894ed90da1b274a4dc115f985df67e2a4d7a9169436f39",
+        "stub_digests": {
+          "resolve_contact": "sha256:feadad0d5020950d255fb022986903c391ccdbe47e569b23744aebb6645e9602"
+        },
+        "task_digest": "sha256:68dc9fcb9e1c44c5c5e7c502bce2b0506eb74b6c057eeb1d4c397b752df953e1",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 11426
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:87dc38245381f5af3f39e33e5380015436dd218950f5a93bff0eff1364faff55"
+        }
+      },
+      "rare-004": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "email"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "archive_email",
+          "bulk_email",
+          "delete_email",
+          "list_email_accounts",
+          "list_emails",
+          "mark_email_read",
+          "read_email",
+          "reply_to_email",
+          "scan_email_unsubscribes",
+          "send_email",
+          "unsubscribe_email"
+        ],
+        "round1_selection_digest": "sha256:a94e0e6a6fdd7bf2ba4e181c3d6873ba29a57b68f9f38de541d9c33f7f99bd7b",
+        "stub_digests": {
+          "list_email_accounts": "sha256:db193e641fdf18b2b2d5b15d456c5766944d542644be29375ea55125cd35713f"
+        },
+        "task_digest": "sha256:61e10e2c49b96544b220aef56d7651d6fc8431e99b23728037e8af39803aa3f7",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9599
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+        }
+      },
+      "sequential-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:6698d586d9c4e7958ddac667c6494f19d3c92885365f65ecd9a22562d8a12ea6",
+        "requested_domains": [
+          "admin",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "api_call",
+          "app_api",
+          "apply_patch",
+          "cancel_download",
+          "download_model",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "manage_endpoints",
+          "manage_mcp",
+          "manage_settings",
+          "manage_tokens",
+          "manage_webhooks",
+          "read_file",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:406c71c8ee51d647078200881d6e44bdb9bbe3ae4cb5621cfcf99110d21beefd",
+        "stub_digests": {},
+        "task_digest": "sha256:73e772b04bbf5c13df6118050d3db7507d820f9988000898ef41f8e1c2a5842b",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 16465
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:71178f5fbd12c30dc01986d2706258fe98e727b4f95c93fca4e0a11721ff9d3e"
+        }
+      },
+      "sequential-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:a99278d6ef4b98b5b9cd35a946ef812eb04b6ff775bbd0fc5835d7606dfb0cf1",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "sequential-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:5c11caae98a22f127569756a31935f9b731f7ce490da725417234b34ca28e550",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:ddc1ae7c0f3b46e074c7ac4089c4879c6d949e7a5c51576b5ecfdeba78c74026",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "unknown_tool-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:6c17d257f0344489b09a0c1093e8c38f8c0793e980e1d00aad72c122a621c33f",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "unknown_tool-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:5147067d20ba5f694c50875f2b6d8754d161d98487c5d0e09c99eaa15d2f3d65",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "wrong_first_tool-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem",
+          "process"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "bash",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "manage_bg_jobs",
+          "python",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:c9441ebc2476c2e3e2d45edc9f80a41e57029c0a3180449ecf22a0f9c7391762",
+        "stub_digests": {},
+        "task_digest": "sha256:8c33c0a748378ddfa68b88f3807c8b19beb4e3f50020de76016ed1a0472cdbdf",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 7873
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:e467fab13e078049f4597a82d95847955e8521c025094047d1337295958a2441"
+        }
+      },
+      "wrong_first_tool-002": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "documents",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "create_document",
+          "edit_document",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "manage_documents",
+          "read_file",
+          "suggest_document",
+          "update_document",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:923e358a188b1ccb31c5dd02e73e4eaa0a30f925e0a297b250cf81ad51065c8d",
+        "stub_digests": {},
+        "task_digest": "sha256:05b60022cce2847916ea83e30cc79eb88172d9ea8cc1ee01a208ed3d934ddd3b",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9636
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:51fa5b3f792dbe86783a31208886fa9ec7c9abdfde9c90b4eeff520ae7ee5fa7"
+        }
+      },
+      "wrong_first_tool-003": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "code"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "bash",
+          "edit_file",
+          "glob",
+          "grep",
+          "python",
+          "read_file",
+          "todowrite",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:800b3b5558f5622e19153e071f6d5d28cef99d13ffd5cb7dd9c10f3099733393",
+        "stub_digests": {},
+        "task_digest": "sha256:7a989a38b7ed487d529e4afc3950e0cc2d4a3aa0ce0d95c190eb44ee313c28cb",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6986
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:fa822beacbd06e5a8c5c3237c46e89f648e953f532654d7c038dc4842c859027"
+        }
+      }
+    },
+    "selector": {
+      "name": "domain_match",
+      "version": "1"
+    },
+    "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
+  },
+  "expansion": {
+    "discover_limit": 8,
+    "evidence": [
+      "requested_excluded",
+      "discovery_hit"
+    ],
+    "max_added_per_expansion": 8,
+    "max_expansions": 2,
+    "mechanism": "interplane.crossaxis.expand (spec/CROSSAXIS.md Bounded expansion, v0.2)"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "hardware": {
+    "free_g": [
+      "total        used        free      shared  buff/cache   available",
+      "Mem:             121         107          10           1           6          14",
+      "Swap:              0           0           0"
+    ],
+    "gpu": "NVIDIA GB10",
+    "lscpu_head": [
+      "Architecture:                            aarch64",
+      "CPU op-mode(s):                          64-bit",
+      "Byte Order:                              Little Endian",
+      "CPU(s):                                  20",
+      "On-line CPU(s) list:                     0-19",
+      "Vendor ID:                               ARM",
+      "Model name:                              Cortex-X925",
+      "Model:                                   1",
+      "Thread(s) per core:                      1",
+      "Core(s) per socket:                      10",
+      "Socket(s):                               1",
+      "Stepping:                                r0p1"
+    ]
+  },
+  "interplane": {
+    "commit": "661ea669e0e8742f5556251440cd4fc7c88e5bfe",
+    "dirty": false
+  },
+  "kind": "interplane_bench_manifest",
+  "manifest_version": "0.2.0",
+  "model": {
+    "blob_digest_from_ollama": "sha256:02d45dc1cf451ba2475ac33b301c2dd8f985abe4c182ce04a1f2f5bf0260278d",
+    "digest": "sha256:56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+    "id": "qwen3.5:9b",
+    "ollama_list_row": "qwen3.5:9b 56671c2ab938 6.6 GB 2 hours ago"
+  },
+  "odysseus": {
+    "commit": "2992bf6d368a11472323e47d3bfed91e79cefc6b",
+    "src": "/home/drakestapleton/.claude/jobs/f3c074e9/tmp/odysseus-2992bf6"
+  },
+  "order_rule": "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)",
+  "os": {
+    "os_release": [
+      "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"",
+      "NAME=\"Ubuntu\"",
+      "VERSION_ID=\"24.04\"",
+      "VERSION=\"24.04.5 LTS (Noble Numbat)\"",
+      "VERSION_CODENAME=noble",
+      "ID=ubuntu",
+      "ID_LIKE=debian",
+      "HOME_URL=\"https://www.ubuntu.com/\"",
+      "SUPPORT_URL=\"https://help.ubuntu.com/\"",
+      "BUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"",
+      "PRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"",
+      "UBUNTU_CODENAME=noble",
+      "LOGO=ubuntu-logo"
+    ],
+    "uname": "Linux spark-b87b 7.0.0-1019-nvidia #19~24.04.2-Ubuntu SMP PREEMPT_DYNAMIC Sun Sep  6 18:35:11 UTC 2 aarch64 aarch64 aarch64 GNU/Linux"
+  },
+  "probe_report": {
+    "digest": "sha256:9552bbb7f62a34e3b1704eebc93dc37b50dea85cc4305621f336019067a4a889",
+    "file_sha256": "sha256:d82cab87001d4501b7798318d0aa97000b2f1682a840e48df89450bac4f1d9f1",
+    "path": "qualification/reports/qwen35-9b-ollama-0.34.0.probe.json"
+  },
+  "run_id": "qual-20261004T2207Z",
+  "runner": {
+    "bench_eval_sha256": "sha256:d69a819de38ae96e8835d8cf8f72c1bbea1657662afa77c8d306534d4232d9cc",
+    "run_bench_sha256": "sha256:1bb2ce322809a1044298ab42bab496e8662a4f20328898fcdca9d98e9abf1851"
+  },
+  "selector": {
+    "name": "domain_match",
+    "version": "1"
+  },
+  "stochastic_execution": {
+    "counter_requests_in_last_process": 113,
+    "finished_at": "2026-10-04T22:51:38Z",
+    "note": "manifest written before the first model request",
+    "prepared_at": "2026-10-04T22:07:22Z",
+    "started_at": "2026-10-04T22:35:28Z",
+    "token_stability": {
+      "base_context": 185,
+      "stable": true,
+      "task": "ambiguous-002",
+      "tools_count_1": 15977,
+      "tools_count_2": 15977
+    },
+    "warmup": {
+      "condition": "B",
+      "task": "filesystem-001",
+      "timed": false,
+      "wall_ms": 4733
+    }
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task_ids": [
+    "ambiguous-002",
+    "ambiguous-003",
+    "ambiguous-004",
+    "approval-002",
+    "approval-003",
+    "denied-001",
+    "denied-002",
+    "denied-003",
+    "exec_failure-002",
+    "exec_failure-003",
+    "expansion-001",
+    "expansion-002",
+    "expansion-003",
+    "expansion-004",
+    "expansion-005",
+    "filesystem-002",
+    "filesystem-003",
+    "filesystem-004",
+    "injection_tool-001",
+    "injection_tool-002",
+    "injection_tool-003",
+    "injection_workspace-002",
+    "injection_workspace-003",
+    "multidomain-002",
+    "multidomain-003",
+    "multidomain-004",
+    "rare-002",
+    "rare-003",
+    "rare-004",
+    "sequential-001",
+    "sequential-002",
+    "sequential-003",
+    "unknown_tool-001",
+    "unknown_tool-002",
+    "wrong_first_tool-001",
+    "wrong_first_tool-002",
+    "wrong_first_tool-003"
+  ],
+  "tasks": "qual"
+}

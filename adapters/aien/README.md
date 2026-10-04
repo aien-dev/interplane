@@ -7,15 +7,15 @@ authority machinery. License: AGPL-3.0-or-later (see `LICENSE`). Design: `docs/a
 could mistake for its own decision: no `AuthorizedEffect`, no `DoctrineDecision`, no
 `SafetyDecision`. `authorized` appears only when AIEN's own gate returned `Ok` for a read, or when AIEN's
 `EffectLane::authorize` minted an `AuthorizedEffect` after AIEN's `EffectClassAuthority` said Allow.
-`requires_approval` and `denied` carry AIEN's reason. No approval id is invented (AIEN has none to
-hand out) and nothing is consumed. Nothing under `rust/`, `spec/`, `python/` or
+`requires_approval` and `denied` carry AIEN's reason. No approval id is invented: grants come only from AIEN's `ApprovalDesk` and are
+spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 `conformance/` and no AIEN repository is modified.
 
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@2a968bfc2770c012b4d53cfb1669f97594d2ff31` (main after PR #203 merged,
-which adds the production authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
+`aien-dev/aien-sovereign-core@6554aac7d81b04c91202e6bb0c90d258c8a07f04` (main after PR #204 merged,
+which adds single-use approvals on top of the PR #203 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
 (`../aien-protocols/crates/*`). The build therefore expects this layout next to the INTERPLANE
 checkout:
@@ -65,9 +65,17 @@ stage intent (a speculation-safe local-ephemeral tool cannot be staged by AIEN, 
 | Deny (EXTERNAL_IRREVERSIBLE, unknown tool or bits, stale intent) | `denied` with AIEN's reason | no |
 | Contain | `denied` with AIEN's reason | no |
 
-Not implemented: approval consumption. `requires_approval` is a pending handle (the intent digest);
-aien-mcp has no approval store wired, so there is no way yet to approve and then execute. The
-stock `write_file` and `bash_eval` descriptors are WORLD_MUTATION, so they stay pending.
+Approvals (aien-mcp single-use grants, PR #204): `requires_approval` is a pending handle (the
+intent digest). The host's approver calls `AienAuthority::issue_approval(req, expires_at)`, which
+issues a grant through AIEN's own `ApprovalDesk` bound to that exact effect, then
+`present_approval(request_id, grant, now)`; the next `decide` spends it through
+`EffectLane::authorize_approved`. Refusals (`Unknown`, `Mismatch`, `Consumed`, `Expired`) come
+back as `denied` with `approval refused: <variant>`. A spent grant presented again for the same
+completed request is a replay: AIEN's ledger returns the existing receipt (via
+`authorize_and_execute_approved`) and nothing re-executes. Limit: the interplane `Pipeline` has no
+field that carries a grant, so grants are presented on the adapter, not on the wire, and the tests
+drive `decide`/`execute` directly. The stock `write_file` and `bash_eval` descriptors are
+WORLD_MUTATION, so they stay pending until a grant is presented.
 `with_effects(name, bits)` re-declares a stock capability's `ToolEffects` (used by tests with a
 LOCAL_EPHEMERAL temp-dir write and an EXTERNAL_IRREVERSIBLE deny); AIEN's authority decides from
 the new bits.

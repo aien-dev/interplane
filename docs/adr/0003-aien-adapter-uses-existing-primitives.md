@@ -33,3 +33,15 @@ effect" are both satisfied by AIEN's current machinery; "approval flow to execut
 `requires_approval` until AIEN ships a production `AuthorizedEffect` mint (its own ADR 0016 R8 says
 only the AIENOS root does that). The adapter depends on `aien-sovereign-core` crates by git
 revision 7580039 and never the reverse.
+
+## Addendum 2026-10-04 (INTERPLANE 0.2): AIEN now owns a production mint; the adapter still mints nothing
+
+aien-sovereign-core PR #203 adds `aien_mcp::EffectLane::authorize(intent, scope, &dyn EffectAuthority)`
+and `EffectClassAuthority` (AIEN, from `ToolEffects`). Items 2 and 3 above change as follows: effects are
+no longer stopped at `stage_effect_intent`. The adapter stages, calls `EffectLane::authorize` with AIEN's
+`EffectClassAuthority`, and translates the answer: Allow executes through `EffectLane` and returns the
+receipt, RequireApproval is `requires_approval` with the intent digest, Deny and Contain are `denied`
+with AIEN's reason. Item 4 holds: the adapter never constructs `AuthorizedEffect` (the mint is
+crate-private in aien-mcp; a test greps the adapter source), and it adds no policy of its own beyond
+the existing deny-only workspace confinement. Approval consumption is still unimplemented: a pending
+intent cannot yet be approved and executed.

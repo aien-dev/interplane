@@ -2,19 +2,25 @@
 //!
 //! The adapter composes AIEN's existing primitives and mints nothing. It never constructs an
 //! `AuthorizedEffect`, a `DoctrineDecision` or a `SafetyDecision`. `authorized` is only ever the
-//! translation of an `Ok` that AIEN's own gate returned, for a capability AIEN classifies as
-//! speculation-safe.
+//! translation of an answer AIEN produced: an `Ok` from AIEN's gate for a read, or an
+//! `AuthorizedEffect` that `aien_mcp::EffectLane::authorize` minted after AIEN's own
+//! `EffectClassAuthority` said Allow. `requires_approval` and `denied` carry AIEN's reason.
+use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
 use aien_capability::{
-    catalog_digest, routing_class, speculation_safe, Digest32, EffectClass, ProviderId,
-    ToolDescriptor, ToolEffects,
+    catalog_digest, routing_class, speculation_safe, Digest32, EffectClass, EffectId, JNodeId,
+    ProviderId, ToolDescriptor, ToolEffects, WorldId,
 };
 use aien_mcp::memory::MemoryWire;
-use aien_mcp::{CallOutcome, SessionManager, SpeculativeLane, SpeculativeToolCall};
+use aien_mcp::{
+    AuthorityOutcome, AuthorizedEffect, CallOutcome, EffectClassAuthority, EffectIntent,
+    EffectLane, EffectScope, Error as McpError, SessionManager, SpeculativeLane,
+    SpeculativeToolCall,
+};
 use interplane_core::*;
 use interplane_crossaxis::MappingTable;
 use interplane_crossveil::{CallContext, RuntimeAuthority};
@@ -22,13 +28,13 @@ use serde_json::{json, Map, Value};
 
 /// Runtime id carried in every decision, result and catalog.
 pub const RUNTIME_ID: &str = "aien";
-/// Pinned reply for any effectful capability (ADR 0003 item 2).
-pub const APPROVAL_REASON: &str =
-    "AIEN production cannot mint AuthorizedEffect; approval must come from AIEN";
 /// Pinned reply for everything the reference adapter does not run.
 pub const NOT_EXECUTED: &str = "not executed by the reference adapter";
 /// Pinned reply when the AIEN gate is not linked or the adapter was built unavailable.
 pub const UNAVAILABLE: &str = "aien runtime not available";
+
+/// `authority.policy_engine` of every effect decision: AIEN's own authority.
+pub const ENGINE_EFFECT: &str = "aien-mcp.EffectClassAuthority";
 
 const MAX_READ_BYTES: u64 = 1 << 20;
 
@@ -82,17 +88,21 @@ fn hex(d: &Digest32) -> String {
     d.0.iter().map(|b| format!("{b:02x}")).collect()
 }
 
-fn descriptors() -> Vec<ToolDescriptor> {
+fn descriptors(overrides: &BTreeMap<String, ToolEffects>) -> Vec<ToolDescriptor> {
     SPECS
         .iter()
         .map(|s| {
+            let effects = overrides
+                .get(s.name)
+                .copied()
+                .unwrap_or_else(|| (s.effects)());
             let sd = interplane_core::digest(&Value::Object(schema_for(s)));
             let raw = sd.trim_start_matches("sha256:");
             let mut bytes = [0u8; 32];
             for (i, b) in bytes.iter_mut().enumerate() {
                 *b = u8::from_str_radix(&raw[2 * i..2 * i + 2], 16).unwrap_or(0);
             }
-            ToolDescriptor::new(s.name, (s.effects)(), Digest32(bytes))
+            ToolDescriptor::new(s.name, effects, Digest32(bytes))
         })
         .collect()
 }
@@ -103,7 +113,11 @@ pub struct AienAuthority {
     trust_workspace: bool,
     available: bool,
     descriptors: Vec<ToolDescriptor>,
+    overrides: BTreeMap<String, ToolEffects>,
     lane: SpeculativeLane,
+    effect_lane: EffectLane,
+    /// Effects AIEN minted in `decide`, waiting for `execute`. The adapter only holds them.
+    authorized: HashMap<String, AuthorizedEffect<EffectIntent>>,
     provider: ProviderId,
     runtime: tokio::runtime::Runtime,
     wire_calls: Arc<AtomicUsize>,
@@ -145,8 +159,11 @@ impl AienAuthority {
             workspace,
             trust_workspace: false,
             available: available && cfg!(feature = "aegis-gate"),
-            descriptors: descriptors(),
+            descriptors: descriptors(&BTreeMap::new()),
+            overrides: BTreeMap::new(),
             lane: SpeculativeLane::new(aien_mcp::McpBroker::new()),
+            effect_lane: EffectLane::new(aien_mcp::McpBroker::new()),
+            authorized: HashMap::new(),
             provider: ProviderId::new("interplane-reference"),
             runtime,
             wire_calls: Arc::new(AtomicUsize::new(0)),
@@ -159,14 +176,29 @@ impl AienAuthority {
         let counter = self.wire_calls.clone();
         let wire = MemoryWire::new(self.descriptors.clone(), move |name, args| {
             counter.fetch_add(1, Ordering::SeqCst);
-            read_handler(&root, name, args)
+            wire_handler(&root, name, args)
         });
         let mgr = SessionManager::new();
         self.runtime
             .block_on(mgr.enroll(self.provider.clone(), Arc::new(wire)))
             .map_err(|e| e.to_string())?;
         self.lane = mgr.speculative_lane();
+        self.effect_lane = mgr.effect_lane();
         Ok(())
+    }
+
+    /// Re-declare the `ToolEffects` of a stock capability (a fixture or a stricter enrollment)
+    /// and re-enroll. AIEN's authority then decides from the new bits; the adapter decides nothing.
+    pub fn with_effects(mut self, name: &str, effects: ToolEffects) -> Result<Self, String> {
+        if !SPECS.iter().any(|s| s.name == name) {
+            return Err(format!("unknown capability: {name}"));
+        }
+        self.overrides.insert(name.to_string(), effects);
+        self.descriptors = descriptors(&self.overrides);
+        if let Some(root) = self.workspace.clone() {
+            self.enroll(root)?;
+        }
+        Ok(self)
     }
 
     fn spec(&self, name: &str) -> Option<(&Spec, &ToolDescriptor)> {
@@ -217,6 +249,91 @@ impl AienAuthority {
         }
     }
 
+    /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`).
+    /// The adapter translates the answer and never builds the authorized value itself.
+    fn decide_effect(&mut self, req: &CapabilityRequest, effects: ToolEffects) -> Decision {
+        if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
+            if let Err(why) = self.confine(path) {
+                return self.decision(
+                    req,
+                    DecisionKind::Denied,
+                    Some(&why),
+                    "adapter.workspace_confinement",
+                );
+            }
+        }
+        let args = Value::Object(req.arguments.clone());
+        let staged = self.runtime.block_on(self.lane.stage_effect_intent(
+            &self.provider,
+            &req.capability,
+            args.clone(),
+        ));
+        let intent = match staged {
+            Ok(i) => i,
+            // Speculation-safe but not read-only (local ephemeral): still goes through AIEN's
+            // authority. An intent is plain data and carries no authority.
+            Err(McpError::SpeculationSafe) => EffectIntent {
+                provider: self.provider.clone(),
+                tool_name: req.capability.clone(),
+                arguments: args,
+                capability_digest: catalog_digest(&self.descriptors),
+            },
+            Err(e) => {
+                let r = e.to_string();
+                return self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT);
+            }
+        };
+        let scope = EffectScope {
+            world_id: WorldId(1),
+            winning_jnode: JNodeId(1),
+            idempotency_key: EffectId::from_label(req.request_id.as_str()),
+        };
+        let mut values = vec![format!("effect_class={:?}", routing_class(effects))];
+        match self
+            .effect_lane
+            .authorize(intent, scope, &EffectClassAuthority)
+        {
+            Ok(effect) => {
+                self.authorized
+                    .insert(req.request_id.as_str().to_string(), effect);
+                let mut d = self.decision(req, DecisionKind::Authorized, None, ENGINE_EFFECT);
+                d.runtime_state = Some(RuntimeExtension {
+                    vocabulary: "aien.effects".into(),
+                    values,
+                    extensions: Map::new(),
+                });
+                d
+            }
+            Err(AuthorityOutcome::Pending {
+                intent_digest,
+                reason,
+            }) => {
+                values.push("staged=true".into());
+                values.push(format!("intent_digest={}", hex(&intent_digest)));
+                // AIEN has no approval record for this; none is invented or consumed here.
+                let mut d = self.decision(
+                    req,
+                    DecisionKind::RequiresApproval,
+                    Some(&reason),
+                    ENGINE_EFFECT,
+                );
+                d.runtime_state = Some(RuntimeExtension {
+                    vocabulary: "aien.effect_intent".into(),
+                    values,
+                    extensions: Map::new(),
+                });
+                d
+            }
+            Err(AuthorityOutcome::Denied(r)) | Err(AuthorityOutcome::Contained(r)) => {
+                self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT)
+            }
+            Err(AuthorityOutcome::Execution(e)) => {
+                let r = e.to_string();
+                self.decision(req, DecisionKind::Denied, Some(&r), ENGINE_EFFECT)
+            }
+        }
+    }
+
     fn confine(&self, path: &str) -> Result<(), String> {
         let root = self.workspace.as_ref().ok_or(UNAVAILABLE)?;
         let p = Path::new(path);
@@ -239,8 +356,46 @@ impl AienAuthority {
     }
 }
 
-/// Reimplemented: the in-process provider body (AIEN ships `MemoryWire` but no filesystem tools
-/// in aien-mcp). Runs only behind `SpeculativeLane::invoke_speculative`.
+/// In-process provider body. Reads run behind `SpeculativeLane::invoke_speculative`; `write_file`
+/// runs only behind `EffectLane::execute_effect`, i.e. only with an AIEN-minted `AuthorizedEffect`.
+fn wire_handler(root: &Path, name: &str, args: &Value) -> CallOutcome {
+    if name == "write_file" {
+        return write_handler(root, args);
+    }
+    read_handler(root, name, args)
+}
+
+fn write_handler(root: &Path, args: &Value) -> CallOutcome {
+    let (Some(path), Some(content)) = (
+        args.get("path").and_then(Value::as_str),
+        args.get("content").and_then(Value::as_str),
+    ) else {
+        return CallOutcome::Rejected("missing required argument".into());
+    };
+    let p = Path::new(path);
+    let full = if p.is_absolute() {
+        p.to_path_buf()
+    } else {
+        root.join(p)
+    };
+    if full.components().any(|c| c == Component::ParentDir) {
+        return CallOutcome::Rejected(format!("path is outside the workspace: {path}"));
+    }
+    let parent_ok = full
+        .parent()
+        .and_then(|d| fs::canonicalize(d).ok())
+        .is_some_and(|d| d.starts_with(root));
+    if !parent_ok {
+        return CallOutcome::Rejected(format!("path is outside the workspace: {path}"));
+    }
+    match fs::write(&full, content) {
+        Ok(()) => CallOutcome::Finished(json!({"path": path, "bytes": content.len()})),
+        Err(e) => CallOutcome::Rejected(format!("cannot write {path}: {e}")),
+    }
+}
+
+/// Reimplemented: the read provider body (AIEN ships `MemoryWire` but no filesystem tools
+/// in aien-mcp).
 fn read_handler(root: &Path, name: &str, args: &Value) -> CallOutcome {
     let Some(path) = args.get("path").and_then(Value::as_str) else {
         return CallOutcome::Rejected("missing required argument: path".into());
@@ -344,36 +499,9 @@ impl RuntimeAuthority for AienAuthority {
                 "aegis.enforcement.pre_dispatch_check",
             );
         }
-        if !speculation_safe(desc.effects()) {
-            let mut d = self.decision(
-                req,
-                DecisionKind::RequiresApproval,
-                Some(APPROVAL_REASON),
-                "aien-mcp.speculation_safe",
-            );
-            let mut values = vec![format!("effect_class={:?}", routing_class(desc.effects()))];
-            // AIEN records the intent without executing it. No approval id exists until AIEN gives one.
-            let staged = self.runtime.block_on(self.lane.stage_effect_intent(
-                &self.provider,
-                &req.capability,
-                Value::Object(req.arguments.clone()),
-            ));
-            match staged {
-                Ok(intent) => {
-                    values.push("staged=true".into());
-                    values.push(format!(
-                        "capability_digest={}",
-                        hex(&intent.capability_digest)
-                    ));
-                }
-                Err(e) => values.push(format!("staged=false: {e}")),
-            }
-            d.runtime_state = Some(RuntimeExtension {
-                vocabulary: "aien.effect_intent".into(),
-                values,
-                extensions: Map::new(),
-            });
-            return d;
+        let class = routing_class(desc.effects());
+        if !matches!(class, EffectClass::Pure | EffectClass::ReadOnly) {
+            return self.decide_effect(req, desc.effects());
         }
         // Adapter restriction (can only deny): confine reads to the workspace root.
         if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
@@ -420,7 +548,29 @@ impl RuntimeAuthority for AienAuthority {
             .spec(&req.capability)
             .map(|(_, d)| routing_class(d.effects()) == EffectClass::ReadOnly)
             .unwrap_or(false);
-        let mut r = if !decision.is_authorized() || !readable {
+        let effect = if decision.is_authorized() {
+            self.authorized.remove(rid)
+        } else {
+            None
+        };
+        let mut r = if let Some(effect) = effect {
+            match self
+                .runtime
+                .block_on(self.effect_lane.execute_effect(effect))
+            {
+                Ok(rc) => ToolResult::ok(
+                    rid,
+                    json!({"output": rc.output, "receipt": {
+                        "effect_id": rc.effect_id.0.iter().map(|b| format!("{b:02x}")).collect::<String>(),
+                        "policy_digest": hex(&rc.policy_digest),
+                        "tool_name": rc.tool_name}}),
+                ),
+                Err(e) => fail(&match e {
+                    McpError::Rejected(why) => why,
+                    other => other.to_string(),
+                }),
+            }
+        } else if !decision.is_authorized() || !readable {
             fail(NOT_EXECUTED)
         } else {
             let call = SpeculativeToolCall {
@@ -432,7 +582,7 @@ impl RuntimeAuthority for AienAuthority {
             match self.runtime.block_on(self.lane.invoke_speculative(call)) {
                 Ok(out) => ToolResult::ok(rid, out.output),
                 Err(e) => fail(&match e {
-                    aien_mcp::Error::Rejected(why) => why,
+                    McpError::Rejected(why) => why,
                     other => other.to_string(),
                 }),
             }

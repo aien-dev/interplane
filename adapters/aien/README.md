@@ -5,17 +5,17 @@ authority machinery. License: AGPL-3.0-or-later (see `LICENSE`). Design: `docs/a
 
 **This adapter never changes AIEN and AIEN keeps all authority.** It builds nothing that AIEN
 could mistake for its own decision: no `AuthorizedEffect`, no `DoctrineDecision`, no
-`SafetyDecision`. `authorized` appears only when AIEN's own gate returned `Ok` for a capability
-AIEN's own classifier calls speculation-safe. Any effectful capability is `requires_approval`
-with the reason `AIEN production cannot mint AuthorizedEffect; approval must come from AIEN`
-and no approval id (AIEN has none to hand out). Nothing under `rust/`, `spec/`, `python/` or
+`SafetyDecision`. `authorized` appears only when AIEN's own gate returned `Ok` for a read, or when AIEN's
+`EffectLane::authorize` minted an `AuthorizedEffect` after AIEN's `EffectClassAuthority` said Allow.
+`requires_approval` and `denied` carry AIEN's reason. No approval id is invented (AIEN has none to
+hand out) and nothing is consumed. Nothing under `rust/`, `spec/`, `python/` or
 `conformance/` and no AIEN repository is modified.
 
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@75800398eb53646444d4c12e5a27fdc26cd14e04` (the commit the Phase 0
-audit read). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
+`aien-dev/aien-sovereign-core@2a968bfc2770c012b4d53cfb1669f97594d2ff31` (main after PR #203 merged,
+which adds the production authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
 (`../aien-protocols/crates/*`). The build therefore expects this layout next to the INTERPLANE
 checkout:
@@ -45,8 +45,32 @@ All paths relative to the pinned clones.
 | `MemoryWire` (in-process `McpWire`) | `aien-mcp/src/memory.rs:11` |
 | `aegis::pre_dispatch_check` (live allowlist gate) | `aegis-runtime/src/enforcement.rs:31` (`ALLOWED_SKILLS` at `:14`) |
 
-`AuthorizedEffect` (`aien-mcp/src/effect.rs:40`) is never touched; its only constructor is
-`#[cfg(test)]` (`effect.rs:77`).
+`AuthorizedEffect` is never constructed here. The only production mint is crate-private inside
+`aien-mcp`, reached through `EffectLane::authorize(intent, scope, &dyn EffectAuthority)`; the adapter
+passes AIEN's own `EffectClassAuthority`. A test (`adapter_source_never_constructs_authorized_effect`)
+greps `src/lib.rs` for struct-literal construction, `authorize_for_test`, `mint(` and any local
+`EffectAuthority` impl.
+
+## Effect path (0.2)
+
+Reads are unchanged (speculative lane). Everything else (`routing_class` not Pure/ReadOnly) goes:
+stage intent (a speculation-safe local-ephemeral tool cannot be staged by AIEN, so a plain
+`EffectIntent` is used; it carries no authority) -> `EffectLane::authorize` with
+`EffectClassAuthority` -> in `decide`:
+
+| AIEN decision | Crossveil decision | Executes |
+|---|---|---|
+| Allow / AllowRestricted (PURE, READ_*, LOCAL_EPHEMERAL) | `authorized`; the minted effect is held until `execute` | yes, via `EffectLane::execute_effect`; result carries the `EffectReceipt` |
+| RequireApproval (EXTERNAL_WRITE, WORLD_MUTATION, SECRET_BEARING, SPAWN_PROCESS) | `requires_approval`, `runtime_state` has `staged=true` and `intent_digest=...` | no |
+| Deny (EXTERNAL_IRREVERSIBLE, unknown tool or bits, stale intent) | `denied` with AIEN's reason | no |
+| Contain | `denied` with AIEN's reason | no |
+
+Not implemented: approval consumption. `requires_approval` is a pending handle (the intent digest);
+aien-mcp has no approval store wired, so there is no way yet to approve and then execute. The
+stock `write_file` and `bash_eval` descriptors are WORLD_MUTATION, so they stay pending.
+`with_effects(name, bits)` re-declares a stock capability's `ToolEffects` (used by tests with a
+LOCAL_EPHEMERAL temp-dir write and an EXTERNAL_IRREVERSIBLE deny); AIEN's authority decides from
+the new bits.
 
 ## Reimplemented, and why
 
@@ -74,11 +98,9 @@ operator-side process.
 
 ## Not executed
 
-Everything that is not a read: `write_file`, `bash_eval` and any unknown name return
-`status: error`, `code: execution_error`, message `not executed by the reference adapter` if
-`execute()` is ever called on them (the pipeline never does: those decisions are
-`requires_approval`). Approval-to-execution stays `requires_approval` until AIEN ships a
-production mint (its ADR 0016 R8).
+`bash_eval` has no provider body, and any call whose decision is not authorized
+returns `status: error`, `code: execution_error`, message `not executed by the reference adapter`
+if `execute()` is ever called on it. `write_file` executes only with an AIEN-minted effect.
 
 ## Fail closed
 

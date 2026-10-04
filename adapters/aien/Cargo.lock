@@ -83,7 +83,7 @@ dependencies = [
 [[package]]
 name = "aien-capability"
 version = "0.1.0"
-source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=75800398eb53646444d4c12e5a27fdc26cd14e04#75800398eb53646444d4c12e5a27fdc26cd14e04"
+source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=2a968bfc2770c012b4d53cfb1669f97594d2ff31#2a968bfc2770c012b4d53cfb1669f97594d2ff31"
 dependencies = [
  "sha2 0.10.9",
 ]
@@ -134,7 +134,7 @@ dependencies = [
 [[package]]
 name = "aien-mcp"
 version = "0.1.0"
-source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=75800398eb53646444d4c12e5a27fdc26cd14e04#75800398eb53646444d4c12e5a27fdc26cd14e04"
+source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=2a968bfc2770c012b4d53cfb1669f97594d2ff31#2a968bfc2770c012b4d53cfb1669f97594d2ff31"
 dependencies = [
  "aien-capability",
  "async-trait",
@@ -761,7 +761,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1671,7 +1671,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1941,7 +1941,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2300,7 +2300,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

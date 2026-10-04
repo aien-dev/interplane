@@ -48,17 +48,17 @@
         "trust": {
           "oneOf": [
             {
-              "$ref": "#/$defs/TrustClass"
+              "$ref": "#/$defs/TrustLevel"
             },
             {
               "type": "null"
             }
           ]
         },
-        "origin": {
+        "content_kind": {
           "oneOf": [
             {
-              "$ref": "#/$defs/Origin"
+              "$ref": "#/$defs/ContentKind"
             },
             {
               "type": "null"
@@ -107,7 +107,8 @@
         "execution_error",
         "execution_timeout",
         "unknown_decision",
-        "runtime_unavailable"
+        "runtime_unavailable",
+        "stale_capability"
       ]
     },
     "Error": {
@@ -156,38 +157,6 @@
         }
       },
       "additionalProperties": true
-    },
-    "TrustClass": {
-      "type": "string",
-      "enum": [
-        "runtime_instruction",
-        "user_request",
-        "model_proposal",
-        "trusted_runtime_result",
-        "untrusted_tool_content",
-        "untrusted_memory",
-        "untrusted_document",
-        "untrusted_web_content",
-        "authorization_decision"
-      ],
-      "description": "Who authored a piece of content and how the runtime trusts it. Only the runtime assigns a class; a model cannot promote content. Unknown values are treated as untrusted_tool_content."
-    },
-    "Origin": {
-      "type": "string",
-      "enum": [
-        "operator",
-        "runtime",
-        "model",
-        "filesystem",
-        "workspace",
-        "web",
-        "email",
-        "memory",
-        "document",
-        "mcp",
-        "other"
-      ],
-      "description": "Where content came from, for provenance and injection analysis."
     },
     "CapabilityDescriptor": {
       "type": "object",
@@ -252,6 +221,35 @@
         }
       },
       "additionalProperties": true
+    },
+    "ContentKind": {
+      "type": "string",
+      "enum": [
+        "runtime_instruction",
+        "user_request",
+        "model_generated",
+        "tool_result",
+        "workspace_content",
+        "memory",
+        "web_content",
+        "document",
+        "email",
+        "skill",
+        "external_provider",
+        "unknown"
+      ],
+      "description": "What a piece of model-visible material is. Unknown values are treated as unknown."
+    },
+    "TrustLevel": {
+      "type": "string",
+      "enum": [
+        "trusted_runtime",
+        "user_supplied",
+        "workspace_untrusted",
+        "external_untrusted",
+        "unknown"
+      ],
+      "description": "How much the runtime trusts the material. Only the runtime assigns it; a model cannot raise it. Inability to determine trust is `unknown`, never silently trusted. Unknown enum values are treated as external_untrusted."
     }
   }
 }

@@ -2,32 +2,134 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://interplane.dev/schemas/0.1/probe.schema.json",
   "title": "INTERPLANE Probe report",
-  "description": "Measured capabilities of one model+backend endpoint. Every verdict is backed by an actual request. UNSUPPORTED means the probe ran and the feature is not there; SKIPPED means the probe did not run. A profile claim is only compatible when all of its required probes PASS.",
+  "description": "Measured capabilities of one model+backend endpoint. Every verdict is backed by an actual request. PASS (= supported), FAIL (the feature is claimed or expected but the request errored or returned wrong output), DEGRADED (works partially), UNSUPPORTED (the probe ran and the feature is absent), UNKNOWN (the probe ran but support could not be determined; never converted to false), SKIPPED (the probe did not run). A profile is compatible only when all its required probes PASS.",
   "type": "object",
-  "required": ["kind", "probe_version", "endpoint", "model", "started_at", "probes", "profiles"],
+  "required": [
+    "kind",
+    "probe_version",
+    "endpoint",
+    "model",
+    "started_at",
+    "probes",
+    "profiles"
+  ],
   "properties": {
-    "kind": {"const": "probe_report"},
-    "probe_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
-    "endpoint": {"type": "string", "description": "Redacted base URL (no credentials, no query string)."},
-    "backend": {"type": ["string", "null"], "description": "Detected or declared serving engine (llama.cpp, vllm, ollama, max, unknown)."},
-    "backend_version": {"type": ["string", "null"]},
-    "model": {"type": "string"},
-    "model_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}], "description": "Digest of the served model identity string plus any reported checkpoint hash."},
-    "started_at": {"$ref": "common.schema.json#/$defs/Timestamp"},
-    "finished_at": {"oneOf": [{"$ref": "common.schema.json#/$defs/Timestamp"}, {"type": "null"}]},
+    "kind": {
+      "const": "probe_report"
+    },
+    "probe_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "endpoint": {
+      "type": "string",
+      "description": "Redacted base URL (no credentials, no query string)."
+    },
+    "backend": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Detected or declared serving engine (llama.cpp, vllm, ollama, max, unknown)."
+    },
+    "backend_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "model": {
+      "type": "string"
+    },
+    "model_digest": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Digest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Digest of the served model identity string plus any reported checkpoint hash."
+    },
+    "started_at": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "finished_at": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "probes": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "verdict"],
+        "required": [
+          "name",
+          "verdict"
+        ],
         "properties": {
-          "name": {"type": "string", "pattern": "^[a-z][a-z0-9_.]*$"},
-          "verdict": {"type": "string", "enum": ["PASS", "FAIL", "DEGRADED", "UNSUPPORTED", "SKIPPED"]},
-          "detail": {"type": ["string", "null"], "maxLength": 4096},
-          "duration_ms": {"type": ["integer", "null"], "minimum": 0},
-          "attempts": {"type": ["integer", "null"], "minimum": 1},
-          "request_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}]},
-          "response_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}]}
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.]*$"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "DEGRADED",
+              "UNSUPPORTED",
+              "UNKNOWN",
+              "SKIPPED"
+            ]
+          },
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 4096
+          },
+          "duration_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "attempts": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "request_digest": {
+            "oneOf": [
+              {
+                "$ref": "common.schema.json#/$defs/Digest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response_digest": {
+            "oneOf": [
+              {
+                "$ref": "common.schema.json#/$defs/Digest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
         },
         "additionalProperties": true
       }
@@ -36,16 +138,83 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "status", "required_probes"],
+        "required": [
+          "name",
+          "status",
+          "required_probes"
+        ],
         "properties": {
-          "name": {"type": "string", "description": "e.g. interplane.core.0.1, lenshift.qwen35.1, lenshift.openai.1, relayline.tool_replay.1"},
-          "status": {"type": "string", "enum": ["compatible", "incompatible", "untested"]},
-          "required_probes": {"type": "array", "items": {"type": "string"}}
+          "name": {
+            "type": "string",
+            "description": "e.g. interplane.core.0.1, lenshift.qwen35.1, lenshift.openai.1, relayline.tool_replay.1"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "compatible",
+              "incompatible",
+              "untested"
+            ]
+          },
+          "required_probes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
         "additionalProperties": true
       }
     },
-    "extensions": {"type": "object", "additionalProperties": true}
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "environment": {
+      "type": "object",
+      "description": "Enough to reproduce the probe.",
+      "properties": {
+        "hardware": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "os": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "endpoint_type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "openai_compatible, ollama_native, ..."
+        },
+        "interplane_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fixture_revision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "git commit of the probe fixtures used"
+        },
+        "model_revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true
 }

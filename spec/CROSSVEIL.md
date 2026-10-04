@@ -32,22 +32,30 @@ an `ObservedRecord`. It is a log, not a lock: the runtime remains free to keep i
 
 ## Crossveil Trust
 
-Content crossing the boundary carries a `TrustClass`:
+Model-visible material carries two axes of provenance, both assigned by the runtime, never by the
+model:
 
-| Class | Who authored it | Example |
-|---|---|---|
-| `runtime_instruction` | the runtime or operator | system prompt, selected tool catalog, approval card |
-| `user_request` | the human | the task text |
-| `model_proposal` | the model | tool_request, final answer |
-| `trusted_runtime_result` | the runtime, from a capability it executed on trusted state | file content from the workspace |
-| `untrusted_tool_content` `untrusted_web_content` `untrusted_document` `untrusted_memory` | something outside the runtime's control | fetched web page, inbound email, document, memory written by earlier untrusted content |
-| `authorization_decision` | the runtime's policy engine | a decision payload |
+| `content_kind` (what it is) | `trust` (how far the runtime trusts it) |
+|---|---|
+| runtime_instruction, user_request, model_generated, tool_result, workspace_content, memory, web_content, document, email, skill, external_provider, unknown | trusted_runtime, user_supplied, workspace_untrusted, external_untrusted, unknown |
 
-Only the runtime assigns a class. A model cannot promote content. Adapters mark results from
-origins `web`, `email`, `document`, `memory`, `mcp` as the matching `untrusted_*` class unless the runtime says
-otherwise. (Odysseus already does this with `metadata.trusted`; AIEN's aegis-runtime does not yet.)
-Conformance includes a fixture where a tool result containing tool-call markup is rendered back:
-the markup must come back as data, never be parsed as a new intent.
+Trust metadata does not block anything by itself; it tells the runtime and the model adapter what
+the material is so that a system instruction, a web page, a tool output, a memory hit and a model
+proposal are never flattened into indistinguishable text. Rules:
+
+1. Absent or unparseable trust is `unknown`, which receivers treat like `external_untrusted`.
+   Inability to determine trust is never converted into trust.
+2. Adapters set `result.provenance.content_kind` and `trust` on every result. Defaults when the
+   runtime says nothing: `tool_result` + `unknown`.
+3. Results are rendered back to the model as data. The pipeline never parses tool-call markup inside
+   a result into a new intent (conformance cases 22 and 23 carry such markup as an injection probe).
+4. Odysseus's `metadata.trusted`/`source` and its `untrusted_context_message` map onto these axes;
+   AIEN's aegis-runtime has no equivalent today and the adapter fills in `unknown` honestly.
+
+Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
+`invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose
+`mapping.catalog_digest` differs from the runtime's live catalog digest is rejected with
+`stale_capability` before the authority callback is invoked.
 
 ## Mapping to the two real runtimes
 

@@ -94,23 +94,24 @@
         "trust": {
           "oneOf": [
             {
-              "$ref": "common.schema.json#/$defs/TrustClass"
+              "$ref": "common.schema.json#/$defs/TrustLevel"
             },
             {
               "type": "null"
             }
           ],
-          "description": "Runtime-assigned trust class of data. Results of a capability the runtime executed are trusted_runtime_result; content from web, email, documents, memory or MCP is the matching untrusted_* class."
+          "description": "Runtime-assigned trust level of the data. Absent or null is read as unknown, never as trusted."
         },
-        "origin": {
+        "content_kind": {
           "oneOf": [
             {
-              "$ref": "common.schema.json#/$defs/Origin"
+              "$ref": "common.schema.json#/$defs/ContentKind"
             },
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "What the returned data is (tool_result, web_content, memory, document, email...)."
         }
       },
       "additionalProperties": true

@@ -4,15 +4,61 @@
   "title": "INTERPLANE Event (RelayLine v0.1 contract)",
   "description": "One step of a multi-round exchange. v0.1 defines the event vocabulary and ordering only; streaming transport is out of scope.",
   "type": "object",
-  "required": ["kind", "event", "seq"],
+  "required": [
+    "kind",
+    "event",
+    "seq"
+  ],
   "properties": {
-    "kind": {"const": "event"},
-    "event": {"type": "string", "enum": ["turn_started", "tool_requested", "mapped", "decided", "execution_started", "result", "model_continuation", "final", "cancelled", "error"]},
-    "seq": {"type": "integer", "minimum": 0, "description": "Monotonic per trace."},
-    "request_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/Id"}, {"type": "null"}]},
-    "turn": {"type": ["integer", "null"], "minimum": 0},
-    "payload": {"type": "object", "additionalProperties": true},
-    "extensions": {"type": "object", "additionalProperties": true}
+    "kind": {
+      "const": "event"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "model_delta",
+        "reasoning_delta",
+        "tool_request",
+        "tool_mapped",
+        "tool_decision",
+        "tool_execution_started",
+        "tool_result",
+        "tool_error",
+        "continue",
+        "complete",
+        "cancelled"
+      ]
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic per trace."
+    },
+    "request_id": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "turn": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true
 }

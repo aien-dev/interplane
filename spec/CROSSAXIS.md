@@ -24,10 +24,12 @@ the schema declares) happens here, using the catalog's `parameters`, and is reco
 Input: a runtime `catalog`, a list of requested domains, a `max_capabilities`, an `always_include`
 list. Output: a `selection` receipt and the selected `CapabilityDescriptor[]` for Lenshift to render.
 
-Selector `domain_match` version 1: a capability is selected when any of its `domains` is in the
-requested set or its name is in `always_include`; capabilities with no domains are excluded with
-`no_domains`; the result is sorted by name and truncated to `max_capabilities` (excess excluded with
-`max_capabilities`). Deterministic by construction.
+Selector `domain_match` version 1: capabilities named in `always_include` are selected first (rule id
+`always_include`, in catalog order, never truncated); then capabilities with any domain in the
+requested set are selected sorted by name (rule id `domain:<matched domain>`); capabilities with no
+domains are excluded with `no_domains`, the rest with `domain_mismatch`; when the total exceeds
+`max_capabilities`, domain-selected entries are dropped from the end (sorted by name) with reason
+`max_capabilities`. Deterministic by construction.
 
 Domain resolution (what the user asked -> requested domains) is **not** in v0.1 Core; the reference
 runner takes domains as input. Selecting domains with a classifier or the model itself is a runtime

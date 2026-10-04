@@ -1,4 +1,5 @@
 //! Every test drives the real interplane `Pipeline` with `AienAuthority`.
+use aien_capability::ToolEffects;
 use interplane_adapter_aien::*;
 use interplane_core::*;
 use interplane_crossaxis::MappingTable;
@@ -59,7 +60,7 @@ fn list_dir_ok_and_trusted_flag_is_honoured() {
 }
 
 #[test]
-fn effectful_capability_requires_approval_and_never_executes() {
+fn world_mutation_requires_approval_and_never_executes() {
     let ws = workspace();
     let mut rt = AienAuthority::new(ws.path()).unwrap();
     let table = rt.mapping_table(false);
@@ -73,12 +74,132 @@ fn effectful_capability_requires_approval_and_never_executes() {
     assert_eq!(res.status, ResultStatus::RequiresApproval);
     assert!(rec.decide_invoked && !rec.execute_invoked);
     let d = res.decision.as_ref().unwrap();
-    assert_eq!(d.reason.as_deref(), Some(APPROVAL_REASON));
+    assert!(
+        d.reason.as_deref().unwrap().contains("needs approval"),
+        "{d:?}"
+    );
+    assert_eq!(d.authority.policy_engine, ENGINE_EFFECT);
+    // No approval id exists, so none is invented and nothing is consumed.
     assert!(d.approval.is_none());
     let rs = d.runtime_state.as_ref().unwrap();
     assert!(rs.values.contains(&"staged=true".to_string()), "{rs:?}");
+    assert!(
+        rs.values
+            .iter()
+            .any(|v| v.starts_with("intent_digest=sha256") || v.starts_with("intent_digest=")),
+        "{rs:?}"
+    );
     assert_eq!((rt.execute_calls, rt.wire_calls()), (0, 0));
     assert!(!ws.path().join("x.txt").exists());
+}
+
+#[test]
+fn local_ephemeral_effect_is_authorized_by_aien_and_executes_with_receipt() {
+    let ws = workspace();
+    let mut rt = AienAuthority::new(ws.path())
+        .unwrap()
+        .with_effects("write_file", ToolEffects::LOCAL_EPHEMERAL)
+        .unwrap();
+    let table = rt.mapping_table(true);
+    let out = run(
+        &mut rt,
+        table,
+        "write_file",
+        json!({"path": "scratch.txt", "content": "ephemeral"}),
+    );
+    let (rec, res) = (&out.records[0], &out.results[0]);
+    assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    assert!(rec.decide_invoked && rec.execute_invoked);
+    assert_eq!(res.data["output"]["bytes"], 9);
+    assert_eq!(res.data["receipt"]["tool_name"], "write_file");
+    assert!(res.data["receipt"]["effect_id"].as_str().unwrap().len() == 32);
+    assert_eq!(rec.decision.as_deref(), Some("authorized"));
+    let f = ws.path().join("scratch.txt");
+    assert_eq!(std::fs::read_to_string(&f).unwrap(), "ephemeral");
+    assert_eq!(rt.wire_calls(), 1);
+    std::fs::remove_file(f).unwrap();
+}
+
+#[test]
+fn irreversible_effect_is_denied_with_aiens_reason_and_never_executes() {
+    let ws = workspace();
+    let mut rt = AienAuthority::new(ws.path())
+        .unwrap()
+        .with_effects("write_file", ToolEffects::EXTERNAL_IRREVERSIBLE)
+        .unwrap();
+    let table = rt.mapping_table(false);
+    let out = run(
+        &mut rt,
+        table,
+        "write_file",
+        json!({"path": "x.txt", "content": "y"}),
+    );
+    let (rec, res) = (&out.records[0], &out.results[0]);
+    assert_eq!(res.status, ResultStatus::Denied, "{res:?}");
+    assert!(res
+        .error
+        .as_ref()
+        .unwrap()
+        .message
+        .contains("irreversible external effects are intents only"));
+    assert!(!rec.execute_invoked);
+    assert_eq!((rt.execute_calls, rt.wire_calls()), (0, 0));
+    assert!(!ws.path().join("x.txt").exists());
+}
+
+#[test]
+fn effect_replay_does_not_execute_twice() {
+    let ws = workspace();
+    let mut rt = AienAuthority::new(ws.path())
+        .unwrap()
+        .with_effects("write_file", ToolEffects::LOCAL_EPHEMERAL)
+        .unwrap();
+    let table = rt.mapping_table(false);
+    let mut p = Pipeline::new(
+        DialectRegistry::with_defaults(),
+        table,
+        &mut rt,
+        Limits::default(),
+        RequestLedger::new(),
+    );
+    let call = json!({"id": "c1", "type": "function", "function": {"name": "write_file",
+        "arguments": json!({"path": "r.txt", "content": "once"}).to_string()}});
+    let turn = json!({"role": "assistant", "content": null, "tool_calls": [call]});
+    let first = p.run_turn("openai", "m", &turn, "t", 0);
+    let second = p.run_turn("openai", "m", &turn, "t", 0);
+    assert_eq!(first.results[0].status, ResultStatus::Ok);
+    assert_ne!(
+        second.results[0].status,
+        ResultStatus::Ok,
+        "{:?}",
+        second.results[0]
+    );
+    assert!(!second.records[0].execute_invoked);
+    drop(p);
+    assert_eq!(rt.wire_calls(), 1);
+}
+
+#[test]
+fn adapter_source_never_constructs_authorized_effect() {
+    let src = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/src/lib.rs")).unwrap();
+    let code: String = src
+        .lines()
+        .filter(|l| !l.trim_start().starts_with("//"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    for forbidden in [
+        "AuthorizedEffect {",
+        "AuthorizedEffect{",
+        "authorize_for_test",
+        "mint(",
+        "impl EffectAuthority",
+        "AuthorityDecision::Allow",
+    ] {
+        assert!(
+            !code.contains(forbidden),
+            "adapter must not contain `{forbidden}`"
+        );
+    }
 }
 
 #[test]

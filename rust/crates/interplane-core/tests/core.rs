@@ -387,6 +387,48 @@ fn lifecycle_approval_needs_new_decision_with_approval_id() {
     );
 }
 #[test]
+fn lifecycle_continuation_must_cite_the_minted_approval_id() {
+    // Mirrors python/tests/test_core.py test_requires_approval_needs_new_decision_citing_id.
+    let mut l = Lifecycle::new("r1");
+    l.map().unwrap();
+    l.apply_decision(&decision("requires_approval", Some("A1")))
+        .unwrap();
+    for bad in [Some("forged"), Some(""), Some("mock-approval-r2"), None] {
+        assert_eq!(
+            l.apply_decision(&decision("authorized", bad)),
+            Err(LifecycleError::MissingApproval),
+            "{bad:?} must be refused"
+        );
+        assert_eq!(l.state(), State::RequiresApproval);
+    }
+    assert_eq!(
+        l.apply_decision(&decision("authorized", Some("A1")))
+            .unwrap(),
+        State::Authorized
+    );
+    // A request whose requires_approval decision minted no id can never be continued.
+    let mut l = Lifecycle::new("r1");
+    l.map().unwrap();
+    l.apply_decision(&decision("requires_approval", None))
+        .unwrap();
+    assert_eq!(
+        l.apply_decision(&decision("authorized", Some("A1"))),
+        Err(LifecycleError::MissingApproval)
+    );
+    // With the minted id, every value but authorized is DENIED.
+    for kind in ["requires_approval", "not_found", "invalid", "weird"] {
+        let mut l = Lifecycle::new("r1");
+        l.map().unwrap();
+        l.apply_decision(&decision("requires_approval", Some("A1")))
+            .unwrap();
+        assert_eq!(
+            l.apply_decision(&decision(kind, Some("A1"))).unwrap(),
+            State::Denied,
+            "{kind}"
+        );
+    }
+}
+#[test]
 fn lifecycle_rejections_and_wrong_request() {
     let mut l = Lifecycle::new("r1");
     assert_eq!(l.reject().unwrap(), State::Rejected);

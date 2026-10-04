@@ -31,7 +31,7 @@ repository or a command whose output is recorded there; nothing planned is descr
   ajax reserved), `CROSSVEIL.md`, `CROSSAXIS.md`, `PROBE.md`, `VECTORVEIL.md`, `RELAYLINE.md`,
   `VERSIONING.md`; ADRs 0001 (scope), 0002 (licensing), 0003 (AIEN adapter mints nothing).
 - Conformance corpus: 23 cases plus a JCS digest fixture; 31 dialect fixtures across three dialects.
-- Reference implementations: Rust (6 crates,  tests) and Python (stdlib-only package, 175
+- Reference implementations: Rust (6 crates, 84 tests) and Python (stdlib-only package, 175
   tests), each with a conformance runner and a probe.
 - Adapters: Odysseus (Python, 55 tests against odysseus@2992bf6) and AIEN (Rust, 10 pipeline tests
   against aien-sovereign-core@7580039 + aegis-runtime@f4e8709).

@@ -1,0 +1,92 @@
+{
+  "condition": "A",
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 400,
+    "calls_total": 1,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15800,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": true,
+    "missing_required_first": false,
+    "model_ms": 2627,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 1,
+    "tool_schema_bytes_per_round_mean": 59000.0,
+    "tool_schema_tokens_first": 9400,
+    "tool_schema_tokens_per_round_mean": 9400.0,
+    "tool_schema_tokens_sum": 9400,
+    "total_completion_tokens": 82,
+    "total_prompt_tokens": 15800,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 2677
+  },
+  "rounds": [
+    {
+      "completion_tokens": 82,
+      "exposed_caps_count": 71,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 2627,
+      "prompt_tokens": 15800,
+      "round": 1,
+      "tools_bytes": 59000
+    }
+  ],
+  "task": {
+    "category": "ambiguous",
+    "id": "ambiguous-002",
+    "split": "qual"
+  },
+  "tool_schema_tokens_per_round": [
+    9400
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "config/app.toml, port 8417"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "concurrent_load": {
+    "other_inference_processes_seen": []
+  },
+  "deterministic_identity": {
+    "identity_digest": "sha256:synthetic"
+  },
+  "kind": "interplane_bench_manifest",
+  "model": {
+    "id": "synthetic"
+  },
+  "run_id": "synthetic-run",
+  "stochastic_execution": {
+    "token_stability": {
+      "stable": true,
+      "tools_count_1": 1,
+      "tools_count_2": 1
+    }
+  }
+}

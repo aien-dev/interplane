@@ -32,6 +32,11 @@ jobs:
         run: python bench/tools/validate.py --require-jsonschema
       - name: pre-registered statistics reproduce Newcombe 1998 Table III
         run: python bench/tools/stats.py
+      - name: analyzer tests and synthetic-run fixture (no model, no GPU)
+        run: |
+          python bench/tools/test_analyze.py
+          python bench/tools/analyze.py bench/tools/testdata/synthetic-run --out /tmp/analyze-out
+          diff -r /tmp/analyze-out bench/tools/testdata/synthetic-expected
   rust:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: rust}}

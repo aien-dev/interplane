@@ -1,0 +1,183 @@
+{
+  "backend": "sglang",
+  "backend_version": "0.5.20",
+  "endpoint": "http://127.0.0.1:18082/v1",
+  "environment": {
+    "backend": "sglang",
+    "backend_version": "0.5.20",
+    "endpoint_type": "openai_compatible_http",
+    "hardware": "aarch64",
+    "interplane_version": "0.1",
+    "os": "Linux 7.0.0-1019-nvidia",
+    "probe_version": "0.1.0",
+    "python": "3.12.3"
+  },
+  "finished_at": "2026-10-04T21:49:12Z",
+  "kind": "probe_report",
+  "model": "Qwen/Qwen3.5-9B",
+  "model_digest": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+  "probe_version": "0.1.0",
+  "probes": [
+    {
+      "attempts": 1,
+      "detail": "model listed among 1 entries",
+      "duration_ms": 15,
+      "name": "models.list",
+      "request_digest": "sha256:046ee19a9e9ec85e5b5fd60a15b6bd8b21c201beb86115312c40c598c171fa38",
+      "response_digest": "sha256:7a984ce7318ceb1e21b67264959f5eb6879b2c7aecc334c3a97b4b064348b29f",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": null,
+      "duration_ms": 21774,
+      "name": "chat.basic",
+      "request_digest": "sha256:fa1501465f2462aa9dcabbd32adad483f667ed1aaeddc3c272f7b0527b8e78dc",
+      "response_digest": "sha256:a143a32e4715c531e8b64feab9cc886496eaff58b52e71971d1a7a21587193a2",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "150 chunks",
+      "duration_ms": 23459,
+      "name": "chat.streaming",
+      "request_digest": "sha256:85fcfb7002013efd9672aef63dc572ca60398c2e57fd8def2c58052ea889101d",
+      "response_digest": "sha256:e1e6b5d9241f68319bc5f379856731e744e5bd49f8f8aabd4f6a570fcd8e2912",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "tool_calls[0] = read_file with object arguments",
+      "duration_ms": 8754,
+      "name": "tools.native",
+      "request_digest": "sha256:ee0a2be675e3b38c5444c10cc06fabd887dfadf4447e8b796547e090d951fd89",
+      "response_digest": "sha256:88ae254379f091d6c2f0a5fae55e3a0b3e514feff2f8edb47cb76f59e22bc93e",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "content holds a parseable <tool_call><function=read_file> block",
+      "duration_ms": 9043,
+      "name": "tools.text_qwen35",
+      "request_digest": "sha256:34cea7509f7214f1b1aa9af9d65a5eb2ffe5cd522ef703e875dfbe584d7bbf2c",
+      "response_digest": "sha256:2e56be57632690be28eb96b58a793403f2fd43adb817c2ad81b9134098725eda",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "2 tool_calls in one turn",
+      "duration_ms": 12490,
+      "name": "tools.parallel",
+      "request_digest": "sha256:6822d6c6f3e32c054435995e510f6837bfdd421d9f84422394d2b98ab6c3de12",
+      "response_digest": "sha256:ee0c61d0f231c27f76d3803046eac7b9f35f57294fcb183626a00de6751fb90f",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "final answer quotes the injected result",
+      "duration_ms": 13438,
+      "name": "tools.result_replay",
+      "request_digest": "sha256:55d74278ef43f21aea8832a827c002d64a7b91cd0f8b3dd0ae849b7814f0ae8e",
+      "response_digest": "sha256:127b28535d41599467aab0c674afd3a42723ec81d240baba7b58ade8dc1ede86",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "no tool call for the nonexistent tool",
+      "duration_ms": 34944,
+      "name": "tools.unknown_refusal",
+      "request_digest": "sha256:be63f1035b8a5cc1df76c21711836629c6a40c8749389157a8451ee9c3809618",
+      "response_digest": "sha256:7c9da8b015b8b8cc666c3d125b0a0cb8487b4a3f9e3ba547b0fa8c41fd4eb371",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "reasoning present as message.reasoning_content",
+      "duration_ms": 32784,
+      "name": "reasoning.channel",
+      "request_digest": "sha256:bb82e087a89e1672d6830c75c91834ec7487c9c93152cb35eb6cf7df02bb356b",
+      "response_digest": "sha256:9f981c6b3736e209e094307def5f6e26da06e5c5759117156d1ab2510fce2c74",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": "reasoning absent with chat_template_kwargs.enable_thinking=false",
+      "duration_ms": 744,
+      "name": "reasoning.disable",
+      "request_digest": "sha256:b35a416d5a371e1d5ddc76e2d89a1db9b87f216098de2dc0633948a27cac7008",
+      "response_digest": "sha256:9d3845b3fdd7f260565c0dd8af60e8a20704f8d3e4be22ba87facb9e85c51009",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": null,
+      "duration_ms": 60801,
+      "name": "json.structured",
+      "request_digest": "sha256:9f0cfd7aad3f033af46d50d2bf2607ca89bfbda5f53f07bddb4c844a6af107cb",
+      "response_digest": "sha256:f2618d857a272a5e3b64776a933cfc543b814ea7e1412fc21631c34cdea22787",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": null,
+      "duration_ms": 88992,
+      "name": "context.8k",
+      "request_digest": "sha256:cb12b4062fb82492a8474e0c57dd2f4fbbd327853412c77391b2c392fb7be337",
+      "response_digest": "sha256:5b452835169599249aadfd92b4ff3c4dff9e30a5892d9c87e3d72d69ab8ea128",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": null,
+      "duration_ms": 52079,
+      "name": "context.16k",
+      "request_digest": "sha256:89dd85bfa942511860410f2e9de026953438adc86fac41e53d4a75d7a8dea2bd",
+      "response_digest": "sha256:d8ecf4a4175008f3471525147e50293491ad29fdff132f41c0e95476e94dc88f",
+      "verdict": "PASS"
+    },
+    {
+      "attempts": 1,
+      "detail": null,
+      "duration_ms": 58292,
+      "name": "context.32k",
+      "request_digest": "sha256:3b5154efb5825f9ced7ed604f209d3474938b80ce9c353c0b74fb6775b64fa6a",
+      "response_digest": "sha256:0dc0ae00e183b0e7f1e34009a22df97ae2b548362529bbf535ca730f8e872051",
+      "verdict": "PASS"
+    }
+  ],
+  "profiles": [
+    {
+      "name": "interplane.core.0.1",
+      "required_probes": [
+        "chat.basic",
+        "models.list"
+      ],
+      "status": "compatible"
+    },
+    {
+      "name": "lenshift.openai.1",
+      "required_probes": [
+        "tools.native",
+        "tools.result_replay"
+      ],
+      "status": "compatible"
+    },
+    {
+      "name": "lenshift.qwen35.1",
+      "required_probes": [
+        "tools.text_qwen35",
+        "tools.result_replay"
+      ],
+      "status": "compatible"
+    },
+    {
+      "name": "relayline.tool_replay.1",
+      "required_probes": [
+        "tools.result_replay",
+        "chat.streaming"
+      ],
+      "status": "compatible"
+    }
+  ],
+  "started_at": "2026-10-04T21:42:15Z"
+}

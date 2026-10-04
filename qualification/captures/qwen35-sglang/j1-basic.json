@@ -1,0 +1,18 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "messages": [
+   {
+    "role": "user",
+    "content": "Say hello in one short line."
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 200,
+ "response": "{\"id\":\"261a166267e34a19b40696eada80e206\",\"object\":\"chat.completion\",\"created\":1791149975,\"model\":\"Qwen/Qwen3.5-9B\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\nHello!\",\"reasoning_content\":\"Thinking Process:\\n\\n1.  **Analyze the Request:**\\n    *   Task: Say hello.\\n    *   Constraint: One short line.\\n\\n2.  **Determine the Content:**\\n    *   Greeting: \\\"Hello\\\", \\\"Hi\\\", \\\"Hey there\\\", etc.\\n    *   Length: Short, single line.\\n\\n3.  **Draft Options:**\\n    *   Hello!\\n    *   Hi there!\\n    *   Hello, how are you? (Maybe too long)\\n    *   Hello! How can I help? (Maybe too long)\\n    *   Hello!\\n\\n4.  **Select the Best Option:**\\n    *   \\\"Hello!\\\" is simple, direct, and fits the constraint perfectly.\\n\\n5.  **Final Output Generation:**\\n    *   Hello!\\n\",\"tool_calls\":null},\"logprobs\":null,\"finish_reason\":\"stop\",\"matched_stop\":248046}],\"usage\":{\"prompt_tokens\":17,\"total_tokens\":196,\"completion_tokens\":179,\"prompt_tokens_details\":null,\"reasoning_tokens\":175},\"metadata\":{\"weight_version\":\"default\",\"weight_versions\":[{\"version\":\"default\",\"start\":0,\"end\":179}]}}",
+ "sha256_response": "08899c36fc0eaf298d58b7472179497a44615ecb9bcdfb0e7f05e29e0b54177b"
+}

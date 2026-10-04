@@ -1,0 +1,102 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "tools": [
+   {
+    "type": "function",
+    "function": {
+     "name": "read_file",
+     "description": "Read a text file and return its contents.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "File path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "list_dir",
+     "description": "List the entries of a directory.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "Directory path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "write_file",
+     "description": "Write text content to a file, replacing it.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string"
+       },
+       "content": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "path",
+       "content"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "send_email",
+     "description": "Send an email.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "to": {
+        "type": "string"
+       },
+       "body": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "to",
+       "body"
+      ]
+     }
+    }
+   }
+  ],
+  "messages": [
+   {
+    "role": "user",
+    "content": "What is the capital of France? Answer in one sentence."
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 200,
+ "response": "{\"id\":\"f6f67238ef144c39ad11ef1e99a8a5da\",\"object\":\"chat.completion\",\"created\":1791149853,\"model\":\"Qwen/Qwen3.5-9B\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\nThe capital of France is Paris.\",\"reasoning_content\":\"The user is asking a simple factual question about the capital of France. This is general knowledge that I can answer directly without needing to use any of the available tools (read_file, list_dir, write_file, send_email).\\n\\nThe capital of France is Paris. I should answer in one sentence as requested.\\n\",\"tool_calls\":null},\"logprobs\":null,\"finish_reason\":\"stop\",\"matched_stop\":248046}],\"usage\":{\"prompt_tokens\":535,\"total_tokens\":608,\"completion_tokens\":73,\"prompt_tokens_details\":null,\"reasoning_tokens\":64},\"metadata\":{\"weight_version\":\"default\",\"weight_versions\":[{\"version\":\"default\",\"start\":0,\"end\":73}]}}",
+ "sha256_response": "794480a8d819f320cfc0e52fef199560d17f3d43ca1fff82279df99371adf03c"
+}

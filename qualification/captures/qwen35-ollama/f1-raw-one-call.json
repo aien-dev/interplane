@@ -1,0 +1,16 @@
+{
+  "name": "f1-raw-one-call",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "<|im_start|>system\n# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT><|im_end|>\n<|im_start|>user\nPlease read the file README.md and tell me what it says.<|im_end|>\n<|im_start|>assistant\n",
+    "raw": true,
+    "stream": false,
+    "options": {
+      "temperature": 0,
+      "seed": 42
+    }
+  },
+  "endpoint": "/api/generate",
+  "response": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-04T20:30:40.190107446Z\",\"response\":\"\\u003cthink\\u003e\\n\\n\\u003c/think\\u003e\\n\\n\\u003ctool_call\\u003e\\n\\u003cfunction=read_file\\u003e\\n\\u003cparameter=path\\u003e\\nREADME.md\\n\\u003c/parameter\\u003e\\n\\u003c/function\\u003e\\n\\u003c/tool_call\\u003e\",\"done\":true,\"done_reason\":\"stop\",\"total_duration\":1014970588,\"load_duration\":660617,\"prompt_eval_count\":490,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":221038000,\"eval_count\":30,\"eval_duration\":750244000}",
+  "sha256_response": "9a28bddd2225b8d582e80b7e4a0ffe111b623c222e25512db9596a41260203c0"
+}

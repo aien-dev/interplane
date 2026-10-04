@@ -1,0 +1,101 @@
+{
+  "name": "04-native-unknown",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Use the compile_project tool to build the project in /srv/app."
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "response": "{\"id\":\"chatcmpl-983\",\"object\":\"chat.completion\",\"created\":1791145820,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I don't have access to a \\\"compile_project\\\" tool in my current environment. The tools available to me are:\\n\\n1. **read_file** - Read text files\\n2. **list_dir** - List directory contents\\n3. **write_file** - Write text content to files\\n4. **send_email** - Send emails\\n\\nNone of these tools can compile or build projects. If you need to compile a project, you might need to:\\n\\n- Use a command-line compiler directly (like `gcc`, `make`, etc.)\\n- Use a different tool that has compilation capabilities\\n- Or provide more details about what kind of project you're trying to build so I can suggest alternative approaches\\n\\nWould you like me to help with something else, such as reading files in the /srv/app directory or listing its contents?\",\"reasoning\":\"The user is asking me to use a \\\"compile_project\\\" tool to build a project in /srv/app. However, looking at the available tools I have access to, I don't see any tool called \\\"compile_project\\\". \\n\\nThe available tools are:\\n1. read_file - Read a text file and return its contents\\n2. list_dir - List the entries of a directory\\n3. write_file - Write text content to a file, replacing it\\n4. send_email - Send an email\\n\\nNone of these tools can compile or build a project. The user might be mistaken about what tools are available, or they might be referring to a tool that doesn't exist in my current environment.\\n\\nI should inform the user that I don't have access to a compile_project tool and explain what tools I actually have available.\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":489,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":340,\"total_tokens\":829}}\n",
+  "sha256_response": "407a3c50bee3d8948117a66c3da5413e48f4f468b788d1ee03ee97e2608e39d5"
+}

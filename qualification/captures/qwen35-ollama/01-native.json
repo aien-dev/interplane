@@ -1,0 +1,101 @@
+{
+  "name": "01-native",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Please read the file README.md and tell me what it says."
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "response": "{\"id\":\"chatcmpl-880\",\"object\":\"chat.completion\",\"created\":1791145802,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\",\"reasoning\":\"The user wants me to read a file called README.md. I need to use the read_file function with the path parameter set to \\\"README.md\\\".\",\"tool_calls\":[{\"id\":\"call_gg88yton\",\"index\":0,\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":488,\"prompt_tokens_details\":{\"cached_tokens\":0},\"completion_tokens\":59,\"total_tokens\":547}}\n",
+  "sha256_response": "cdf2ffc222d3a1658e185bfeea885d2a45a2ff0859220eb72e5c67ccde4b796c"
+}

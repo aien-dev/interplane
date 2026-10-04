@@ -1,0 +1,120 @@
+{
+  "name": "g1-native-result-replay",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Please read the file README.md and tell me what it says."
+      },
+      {
+        "role": "assistant",
+        "content": "",
+        "tool_calls": [
+          {
+            "id": "call_gg88yton",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\":\"README.md\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "tool_call_id": "call_gg88yton",
+        "content": "{\"path\":\"README.md\",\"content\":\"INTERPLANE is a protocol.\"}"
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "response": "{\"id\":\"chatcmpl-46\",\"object\":\"chat.completion\",\"created\":1791145856,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The file `README.md` says:\\n\\n\\\"INTERPLANE is a protocol.\\\"\",\"reasoning\":\"The file README.md contains the text \\\"INTERPLANE is a protocol.\\\" I should report this to the user.\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":547,\"prompt_tokens_details\":{\"cached_tokens\":515},\"completion_tokens\":44,\"total_tokens\":591}}\n",
+  "sha256_response": "ed6a41830ea864091a47f5c904dadfa43a120bf064c55fca938374615445db0c"
+}

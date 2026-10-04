@@ -1,0 +1,16 @@
+{
+  "name": "f3-raw-multiline-param",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "<|im_start|>system\n# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT><|im_end|>\n<|im_start|>user\nWrite a 3-line poem about the sea to the file poem.txt using write_file.<|im_end|>\n<|im_start|>assistant\n",
+    "raw": true,
+    "stream": false,
+    "options": {
+      "temperature": 0,
+      "seed": 42
+    }
+  },
+  "endpoint": "/api/generate",
+  "response": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-04T20:30:46.612935227Z\",\"response\":\"\\u003cthink\\u003e\\n\\n\\u003c/think\\u003e\\n\\n\\u003ctool_call\\u003e\\n\\u003cfunction=write_file\\u003e\\n\\u003cparameter=path\\u003e\\npoem.txt\\n\\u003c/parameter\\u003e\\n\\u003cparameter=content\\u003e\\nThe waves crash on the shore,\\nA salty breeze blows through my hair,\\nThe ocean sings a song of power.\\n\\u003c/parameter\\u003e\\n\\u003c/function\\u003e\\n\\u003c/tool_call\\u003e\",\"done\":true,\"done_reason\":\"stop\",\"total_duration\":1943364434,\"load_duration\":585160,\"prompt_eval_count\":495,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":216008000,\"eval_count\":68,\"eval_duration\":1724794000}",
+  "sha256_response": "81f6902202d7661fdbad48ba0bccdaacfbe045d1e89b1fc68904eb8947b15bb2"
+}

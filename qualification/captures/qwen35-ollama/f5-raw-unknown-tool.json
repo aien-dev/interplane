@@ -1,0 +1,16 @@
+{
+  "name": "f5-raw-unknown-tool",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "<|im_start|>system\n# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT><|im_end|>\n<|im_start|>user\nUse the compile_project tool to build the project in /srv/app.<|im_end|>\n<|im_start|>assistant\n",
+    "raw": true,
+    "stream": false,
+    "options": {
+      "temperature": 0,
+      "seed": 42
+    }
+  },
+  "endpoint": "/api/generate",
+  "response": "{\"model\":\"qwen3.5:9b\",\"created_at\":\"2026-10-04T20:30:49.32711236Z\",\"response\":\"\\u003cthink\\u003e\\n\\n\\u003c/think\\u003e\\n\\nI am sorry, but I do not have access to a `compile_project` tool. I can only use the tools provided: `read_file`, `list_dir`, `write_file`, and `send_email`.\\n\\nHowever, if you would like me to list the contents of `/srv/app` or read/write files within it, please let me know!\",\"done\":true,\"done_reason\":\"stop\",\"total_duration\":2177267836,\"load_duration\":577752,\"prompt_eval_count\":491,\"prompt_eval_cached_count\":0,\"prompt_eval_duration\":215428000,\"eval_count\":77,\"eval_duration\":1959223000}",
+  "sha256_response": "f2fe8c9d127db174335f0706fde3b26e0746e3292fb496895c3abd84f69b6217"
+}

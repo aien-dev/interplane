@@ -1,0 +1,8 @@
+{
+  "name": "i1-models",
+  "request": null,
+  "method": "GET",
+  "endpoint": "/v1/models",
+  "response": "{\"object\":\"list\",\"data\":[{\"id\":\"qwen3.5:9b\",\"object\":\"model\",\"created\":1791145188,\"owned_by\":\"library\"}]}\n",
+  "sha256_response": "cf2f09c8c5660257be995f0a586c4732f34f153b76a28c44d98c7b3e3a5ac7f9"
+}

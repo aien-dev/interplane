@@ -1,0 +1,115 @@
+{
+  "case": "lifecycle/04-runtime-minted-approval-id",
+  "description": "The runtime-minted approval_id continues its own request: authorized gives AUTHORIZED, denied gives DENIED. A second continuation of the already-authorized request is refused.",
+  "steps": [
+    {
+      "request_id": "call_L04a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L04a",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L04a",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L04a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L04a",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L04a"
+        }
+      }
+    },
+    {
+      "request_id": "call_L04b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L04b",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L04b",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L04b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L04b",
+        "decision": "denied",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L04b"
+        }
+      }
+    },
+    {
+      "request_id": "call_L04a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L04a",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L04a"
+        }
+      }
+    }
+  ],
+  "expected": [
+    {
+      "request_id": "call_L04a",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L04a",
+      "state": "AUTHORIZED",
+      "refused": false
+    },
+    {
+      "request_id": "call_L04b",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L04b",
+      "state": "DENIED",
+      "refused": false
+    },
+    {
+      "request_id": "call_L04a",
+      "state": "AUTHORIZED",
+      "refused": true
+    }
+  ]
+}

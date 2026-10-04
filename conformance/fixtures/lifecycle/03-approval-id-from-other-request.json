@@ -1,0 +1,94 @@
+{
+  "case": "lifecycle/03-approval-id-from-other-request",
+  "description": "Two requests are pending. A continuation for call_L03b that cites call_L03b but carries the approval_id minted for call_L03a is refused. The same id then authorizes call_L03a, the request it was minted for.",
+  "steps": [
+    {
+      "request_id": "call_L03a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L03a",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L03a",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L03b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L03b",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L03b",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L03b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L03b",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L03a"
+        }
+      }
+    },
+    {
+      "request_id": "call_L03a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L03a",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L03a"
+        }
+      }
+    }
+  ],
+  "expected": [
+    {
+      "request_id": "call_L03a",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L03b",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L03b",
+      "state": "REQUIRES_APPROVAL",
+      "refused": true
+    },
+    {
+      "request_id": "call_L03a",
+      "state": "AUTHORIZED",
+      "refused": false
+    }
+  ]
+}

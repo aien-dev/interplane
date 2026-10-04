@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from .core import Limits, jcs
+from .core import Decision, Lifecycle, LifecycleError, Limits, ProtocolError, jcs
 from .crossaxis import expand, select
 from .crossveil import canonical_result_payload, default_pipeline
 
@@ -112,6 +112,28 @@ def run_case(case: dict) -> dict:
     }
 
 
+def run_lifecycle_case(case: dict) -> dict:
+    """Drive the Crossveil lifecycle directly (no pipeline). For each step, the lifecycle of
+    ``request_id`` (created and mapped on first sight) receives ``decision``; the step records the
+    state after the call and whether the call was refused."""
+    lifecycles: dict = {}
+    steps: list = []
+    for step in case["steps"]:
+        rid = step["request_id"]
+        life = lifecycles.get(rid)
+        if life is None:
+            life = lifecycles[rid] = Lifecycle(rid)
+            life.map()
+        try:
+            life.apply_decision(Decision.from_dict(step["decision"]))
+            refused = False
+        except (LifecycleError, ProtocolError):
+            refused = True
+        steps.append({"request_id": rid, "state": life.state.value, "refused": refused})
+    problems = [] if steps == case["expected"] else [f"steps {steps!r} != {case['expected']!r}"]
+    return {"pass": not problems, "steps": steps, "problems": problems}
+
+
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="interplane-conformance")
     ap.add_argument("fixtures_dir")
@@ -129,13 +151,18 @@ def main(argv: Optional[list] = None) -> int:
             (d / f"{case['case']}.results.json").write_text(
                 jcs(verdict["results"]) + "\n", encoding="utf-8"
             )
+    lifecycle: dict = {}
+    for path in sorted(Path(args.fixtures_dir, "lifecycle").glob("*.json")):
+        case = json.loads(path.read_text(encoding="utf-8"))
+        lifecycle[case["case"]] = run_lifecycle_case(case)
     failed = 0
-    for name, v in sorted(verdicts.items()):
+    for name, v in sorted({**verdicts, **lifecycle}.items()):
         print(f"{'PASS' if v['pass'] else 'FAIL'}  {name}")
         for p in v["problems"]:
             print(f"      {p}")
         failed += not v["pass"]
-    print(f"{len(verdicts) - failed}/{len(verdicts)} passed")
+    total = len(verdicts) + len(lifecycle)
+    print(f"{total - failed}/{total} passed")
     out = {
         k: {f: v[f] for f in ("pass", "observed", "turns", "runtime", "selections") if f in v}
         for k, v in verdicts.items()
@@ -143,6 +170,7 @@ def main(argv: Optional[list] = None) -> int:
     for v in out.values():
         if not v.get("selections"):
             v.pop("selections", None)
+    out.update({k: {"pass": v["pass"], "steps": v["steps"]} for k, v in lifecycle.items()})
     Path(args.out).write_text(jcs(out) + "\n", encoding="utf-8")
     return 1 if failed else 0
 

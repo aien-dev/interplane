@@ -2,7 +2,7 @@
 //! mock runtime per case and compares the result with `expected`.
 use std::path::Path;
 
-use interplane_core::{canonicalize, digest, Limits, RequestLedger};
+use interplane_core::{canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger};
 use interplane_crossaxis::{expand, select};
 use interplane_crossveil::{
     mock_mapping_table, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,
@@ -266,4 +266,54 @@ pub fn verdicts(rows: Vec<(String, Value)>) -> Value {
         m.insert(k, v);
     }
     Value::Object(m)
+}
+
+/// Load `lifecycle/NN-*.json` fixtures, sorted by file name. Absent directory = none.
+pub fn load_lifecycle_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
+    let sub = dir.join("lifecycle");
+    if !sub.is_dir() {
+        return Ok(vec![]);
+    }
+    load_fixtures(&sub)
+}
+
+/// Drive the Crossveil lifecycle directly (no pipeline): for each step, the lifecycle of
+/// `request_id` (created and mapped on first sight) receives `decision`. Each step yields the
+/// state after the call and whether the call was refused. Returns `(rows, disagreements)`.
+pub fn run_lifecycle_case(fx: &Value) -> (Vec<Value>, Vec<String>) {
+    let mut lcs: Vec<Lifecycle> = vec![];
+    let mut rows = vec![];
+    for step in fx["steps"].as_array().cloned().unwrap_or_default() {
+        let rid = step["request_id"].as_str().unwrap_or("").to_string();
+        let idx = match lcs.iter().position(|l| l.request_id() == rid) {
+            Some(i) => i,
+            None => {
+                let mut l = Lifecycle::new(&rid);
+                let _ = l.map();
+                lcs.push(l);
+                lcs.len() - 1
+            }
+        };
+        let lc = &mut lcs[idx];
+        let refused = match serde_json::from_value::<Decision>(step["decision"].clone()) {
+            Ok(d) => lc.apply_decision(&d).is_err(),
+            Err(_) => true,
+        };
+        rows.push(json!({"request_id": rid, "state": lc.state().name(), "refused": refused}));
+    }
+    let want = fx["expected"].as_array().cloned().unwrap_or_default();
+    let mut errs = vec![];
+    if want != rows {
+        errs.push(format!(
+            "steps: expected {}, got {}",
+            canonicalize(&Value::Array(want)),
+            canonicalize(&Value::Array(rows.clone()))
+        ));
+    }
+    (rows, errs)
+}
+
+/// One row of the verdict file for a lifecycle case.
+pub fn lifecycle_verdict(rows: &[Value], errs: &[String]) -> Value {
+    json!({"pass": errs.is_empty(), "steps": rows})
 }

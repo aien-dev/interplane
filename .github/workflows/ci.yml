@@ -7,10 +7,10 @@ jobs:
   schemas-and-fixtures:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: pip install jsonschema
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - run: pip install -c constraints/ci-python.txt jsonschema
       - name: schema self-check
         run: |
           python - <<'PY'
@@ -24,10 +24,10 @@ jobs:
   bench-structural:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: pip install jsonschema
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - run: pip install -c constraints/ci-python.txt jsonschema
       - name: bench corpus structure, domain rule, coverage, digests (no model, no GPU)
         run: python bench/tools/validate.py --require-jsonschema
       - name: pre-registered statistics reproduce Newcombe 1998 Table III
@@ -41,36 +41,36 @@ jobs:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: rust}}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with: {components: "rustfmt, clippy"}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
       - run: cargo fmt --all --check
       - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test --all
       - name: conformance (rust)
         run: cargo run -q -p interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: rust-verdicts, path: rust-verdicts.json}
   python:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
-      - run: pip install pytest jsonschema pyflakes -e python
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - run: pip install -c constraints/ci-python.txt pytest jsonschema pyflakes -e python
       - run: python -m pyflakes python/interplane python/tests
       - run: python -m pytest python/tests -q
       - name: conformance (python)
         run: python -m interplane.conformance conformance/fixtures --out py-verdicts.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: py-verdicts, path: py-verdicts.json}
   cross-language:
     needs: [rust, python]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with: {name: rust-verdicts}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with: {name: py-verdicts}
       - name: verdicts must be identical
         run: |
@@ -83,17 +83,13 @@ jobs:
   adapter-aien:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with: {path: interplane}
-      - name: pinned AIEN sibling checkouts (aegis-runtime reaches ../aien-protocols by path)
+      - name: pinned AIEN sibling checkouts from adapters/aien/PINS (aegis-runtime reaches ../aien-protocols by path)
         run: |
-          mkdir -p interplane-audit
-          git clone -q https://github.com/aien-dev/aegis-runtime.git interplane-audit/aegis-runtime
-          git -C interplane-audit/aegis-runtime checkout -q f4e870953a466bb1cf68f1d88285929024cf1ba9
-          git clone -q https://github.com/aien-dev/aien-protocols.git interplane-audit/aien-protocols
-          git -C interplane-audit/aien-protocols checkout -q 3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
-      - uses: dtolnay/rust-toolchain@stable
-        with: {components: "rustfmt, clippy"}
+          interplane/adapters/aien/setup-siblings.sh "$PWD"
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
       - run: cargo fmt --all --check
         working-directory: interplane/adapters/aien
       - run: cargo clippy --all-targets -- -D warnings
@@ -103,14 +99,14 @@ jobs:
   adapter-odysseus:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
       - name: pinned Odysseus checkout (odysseus-dev/odysseus @ 2992bf6)
         run: |
           git clone -q https://github.com/odysseus-dev/odysseus.git ../odysseus
           git -C ../odysseus checkout -q 2992bf6
-          pip install -q -r ../odysseus/requirements.txt pytest pyflakes
+          pip install -q -c $GITHUB_WORKSPACE/constraints/ci-python.txt -r ../odysseus/requirements.txt pytest pyflakes
       - run: python -m pyflakes adapters/odysseus
       - name: adapter tests against the real Odysseus code (no skips allowed)
         run: |

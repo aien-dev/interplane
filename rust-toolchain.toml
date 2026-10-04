@@ -1,0 +1,6 @@
+# Exact toolchain CI used for the 2026-10-04 qualification runs (rustc 1.99.0, b940084d7, 2026-09-28).
+# Keep in step with `toolchain:` in .github/workflows/*.yml. Applies to rust/ and adapters/aien/.
+[toolchain]
+channel = "1.99.0"
+components = ["clippy", "rustfmt"]
+profile = "minimal"

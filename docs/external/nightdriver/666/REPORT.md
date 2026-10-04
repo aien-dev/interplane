@@ -16,14 +16,14 @@ Evidence tags: observed, reproduced, hypothesized, fixed, tested, upstreamed, ac
 Issue thread read in full (GitHub API; `gh issue view` fails here on a Projects-classic GraphQL error). Two reporters, treated separately.
 
 **Reporter 1, jmadotgg (2024-11-09): value 31202, running `samples/audioserver/audioserver.py` against the ledstrip demo.**
-- [observed] The posted `LEDSTRIP` config has `ENABLE_AUDIO 0` (issue body). The sender is `audioserver.py`, which sends command 4 (PEAKDATA), 12 bands, every ~15 ms (`samples/audioserver/audioserver.py:128-142` at `4d79c290`; the file is unchanged between `15221f20` and `4d79c290`).
+- [observed] The posted `LEDSTRIP` config has `ENABLE_AUDIO 0` (issue body). The sender is `audioserver.py`, which sends command 4 (PEAKDATA) with `num_bands` bands after each audio chunk and a 15 ms sleep (`samples/audioserver/audioserver.py:128-142` at `4d79c290`). The reporter's pasted copy has `num_bands = 12`; the repository copy has had `num_bands = 16` since commit `3146af92` (2023-02-24) and is unchanged between `15221f20` and `4d79c290`. So the reporter ran an edited or older copy. Why is unknown.
 - [observed] 31202 = 0x79E2, so on a little-endian wire the two bytes are `E2 79`. The receiver reads `command16` as a little-endian u16 from buffer offset 0 (`WORDFromMemory`).
 - [observed] In the reporter-era receiver (`src/socketserver.cpp` at `15221f20`, lines 132-169), the PEAKDATA branch with `ENABLE_AUDIO 0` compiles to nothing but `ResetReadBuffer()`. Only the 24-byte header was read from the socket; the declared 48-byte float payload stays in the stream. The next loop iteration reads 24 "header" bytes from that payload, so `command16` is the low 16 bits of `float[0]`. Anything other than 3 or 4 hits "Unknown command" (line 214), which closes the connection, matching "connection is closing and both sides keep retrying".
 - [observed] The variant one commit earlier than the fix (`d73d18db~1`) gates on runtime `g_Analyzer.Enabled()` and has the same flaw (line 135).
 - [observed] `d73d18db` adds the missing skip with the comment "Audio disabled: consume any declared payload to keep stream in sync, then ignore it". Pinned main has it at `src/socketserver.cpp:511-527`.
 - [hypothesized] The exact value 31202 equals the low 16 bits of the reporter's first band value in their first frame. This is consistent with the mechanism but cannot be checked (many floats share those low bits and their audio is gone). The mechanism, not the number, is what is reproduced.
 - [observed] Not the cause: the negative `micros` the reporter noticed (`time.perf_counter() - seconds`) is sent as a double and read as u64; it does not affect framing.
-- [reproduced on main host build] With `ENABLE_AUDIO 1` and the sample's 12 bands against `NUM_BANDS 16`, the receiver logs "Invalid peak data packet: bands=12 length=48 total=72" and closes the connection; it is not an "Unknown command" and not a desync. So a reporter who enables audio sees a different error, and the sample needs `num_bands = 16` to be accepted.
+- [reproduced] On the main host build with `ENABLE_AUDIO 1`, the reporter's 12-band frames are rejected: the receiver logs "Invalid peak data packet: bands=12 length=48 total=72" and closes the connection. That is not an "Unknown command" and not a desync. At `4d79c290` `platformio.ini` sets `-DNUM_BANDS` to 16 in nine environments, 8, 48 and 64 in one each, and `globals.h` defaults to 16; no environment uses 12. So a 12-band sender cannot be accepted by any audio-enabled build of main. The repository copy of the script (16 bands) matches the common firmware value; harness case `peak16_with_pixels` shows 16-band frames are accepted with audio on.
 
 **Reporter 2, Cyborg-Squirrel (2025-07-05): value 17735, Kotlin client opening a WebSocket to port 49152.**
 - [observed] 17735 = 0x4547; little-endian bytes `47 45` = ASCII "GE", the start of `GET /... HTTP/1.1`, the first bytes of a websocket upgrade request.
@@ -64,11 +64,11 @@ Recorded run: `harness/results.tsv`. Summary of the property cases (PASS means t
 
 Audio-on builds (`ENABLE_AUDIO=1`) of s2 and main: all property cases PASS.
 
-- [reproduced] Mechanism for reporter 1: the reporter-era real receiver source, fed `audioserver.py`-shaped frames, prints `Unknown command in packet received: 31202` when `float[0]` carries bits 0x????79E2. The test input was chosen to produce that value, so this reproduces the failure mode and its exact signature, not the reporter's audio.
+- [reproduced] Mechanism for reporter 1: the real receiver source at `15221f20` (a reporter-era snapshot; the reporter's exact firmware commit is unknown, so s0 and s1 are the two flawed endpoints we tested, not "their build"), fed `audioserver.py`-shaped frames, prints `Unknown command in packet received: 31202` when `float[0]` carries bits 0x????79E2. The test input was chosen to produce that value, so this reproduces the failure mode and its exact signature, not the reporter's audio.
 - [tested] Red then green: the same peak cases fail on s0 and s1 and pass on s2 and main. This is the negative control for the harness.
 - [reproduced] Reporter 2's 17735 from an HTTP request line.
 
-Limits, stated precisely: this is the real socket-server source, not a replica of its parsing, but it runs on Linux loopback TCP with `SO_RCVTIMEO`, not lwIP on an ESP32. Nothing here was run on a physical ESP32 and nothing is claimed about lwIP buffering, task scheduling, or PSRAM behaviour. A device test would need an ESP32 board flashed with the ledstrip demo from a pre-`d73d18db` checkout (and one from main), plus `audioserver.py` pointed at it with a serial monitor to read the log.
+Limits, stated precisely: the s1 snapshot gates on runtime `g_Analyzer.Enabled()`; the host stub models it as the compile-time `ENABLE_AUDIO` value. That is a modelling assumption. [hypothesized, untested] A real build with audio compiled in but no microphone could return false at run time and desync the same way, which would also explain reporter 1 if they had flashed audio on. this is the real socket-server source, not a replica of its parsing, but it runs on Linux loopback TCP with `SO_RCVTIMEO`, not lwIP on an ESP32. Nothing here was run on a physical ESP32 and nothing is claimed about lwIP buffering, task scheduling, or PSRAM behaviour. A device test would need an ESP32 board flashed with the ledstrip demo from a pre-`d73d18db` checkout (and one from main), plus `audioserver.py` pointed at it with a serial monitor to read the log.
 
 ## Root Cause
 
@@ -80,7 +80,7 @@ Reporter 2: no receiver defect. [observed] misdirected client.
 
 [fixed] upstream by `d73d18db` (not by us): when audio is disabled, read `STANDARD_DATA_HEADER_SIZE + length32` bytes and discard them before resetting the buffer. [tested] on main by the harness above (both audio settings). Upstream main also validates the length with `CheckedStandardPacketSize` before reading (`src/socketserver.cpp:511-527`).
 
-No fork branch and no pull request: there is no remaining defect on main to fix.
+No fork branch and no pull request: there is no remaining defect on main to fix. The 12 vs `NUM_BANDS` mismatch is in the reporter's pasted script, not in the repository sample (see Observed).
 
 ## Regression
 
@@ -89,9 +89,9 @@ No fork branch and no pull request: there is no remaining defect on main to fix.
 ## Scope (not changed)
 
 - No upstream pull request, issue comment or reaction. A suggested close-out comment is in `upstream-comment-draft.md` for the owner to post or discard.
-- Nothing about the wire format, audioserver.py, or the socket server was modified.
+- Nothing about the wire format, audioserver.py, or the socket server was modified. No fork branch or sample change is proposed: the repository sample already uses 16 bands, which matches the firmware default; the 12 in the report came from the reporter's copy.
 - [hypothesized, not run] On a 32-bit target the older size computation `STANDARD_DATA_HEADER_SIZE + length32 * LED_DATA_SIZE` can wrap (for example `length32 = 0x55555556`), so a hostile or corrupt header could be accepted with a tiny length. The host harness is 64-bit and cannot show this. Main uses an overflow-checked helper, so it looks handled; unverified on a 32-bit build.
-- [observed] Older firmware (s0) sleeps 100 ms after every frame (`delay(100)` at `15221f20` line 247), so it consumes about 10 frames per second; later snapshots sleep 1 ms. `audioserver.py` sends about 60 per second, so against s0 the sender outpaces the receiver. TCP backpressure absorbs it, with unmeasured latency. Not a framing issue.
+- [observed] Older firmware (s0) sleeps 100 ms after every frame (`delay(100)` at `15221f20` line 247), so it consumes about 10 frames per second; later snapshots sleep 1 ms. `audioserver.py` reads 512 samples at 44.1 kHz (about 11.6 ms) and sleeps 15 ms per loop, so it sends very roughly 35 to 40 frames per second [hypothesized by arithmetic, not measured]; against s0 the sender would outpace the receiver and TCP backpressure would absorb it. Not a framing issue.
 - [observed, INFO cases] zero-LED pixel frame is passed to the consumer with length 24. A client that never reads the 72-byte responses is still served on the host (about 1.3k of 4k frames consumed in 1.5 s, limited by the 1 ms per-frame sleep, no stall seen). Sender prefix-then-drop faults (`sender_short_write`) surface as one corrupted-but-well-formed packet then an Unknown command or garbage value, on every build; a framed stream cannot detect that.
 - Sender-side Outcome C (Python `send()` short write): [observed] on Linux, CPython 3.12.3, 1342 blocking `send()` calls of a 72-byte frame under receiver backpressure returned 72 every time (scratch script, not kept in the repo). Not supported as a cause of reporter 1; it is not excluded on other platforms.
 - Optional upstream polish (not proposed): the "Unknown command" message could also print the first two raw bytes as hex, and the docs could say port 49152 is raw TCP only. Either would have shortened both reporters' debugging.

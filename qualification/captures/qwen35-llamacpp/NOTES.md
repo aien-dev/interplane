@@ -39,7 +39,7 @@ Facts only. Each capture JSON holds `request`, `endpoint`, `http_status`, `respo
 ## Matrix (probe vocabulary)
 | Row | Verdict | Evidence |
 |---|---|---|
-| chat.basic | PASS (Python probe) / FAIL (Rust probe) | reports; Rust prompt at temperature 0 burns the 2048 token budget on reasoning, content empty (see Probe agreement) |
+| chat.basic | PASS (Python and Rust probes, after alignment) | reports; see Probe agreement |
 | tools.openai (native) | PASS | 01-native.json |
 | tools.text_qwen35 (raw form) | PASS, passthrough in content, not converted | f1-raw-one-call.json, f1r |
 | reasoning | PASS, field `reasoning_content` | 05a, j1 |
@@ -51,7 +51,12 @@ Facts only. Each capture JSON holds `request`, `endpoint`, `http_status`, `respo
 | parallel calls | PASS | 02-native-multi.json |
 
 ## Probe agreement (Python vs Rust)
-Reports: `qualification/reports/qwen35-9b-llamacpp-b11398.probe.json` and `.probe.rust.json`. All probes agree except `chat.basic`: Python PASS, Rust FAIL ("empty content; reasoning channel consumed the completion budget"). Cause (reproduced by hand, finish_reason length, 2048 completion tokens, 7144 reasoning chars, empty content): the two probes send different prompts. Python: "Reply with the single word: ready" (no temperature set); Rust: "Reply with one short sentence about the sea." with temperature 0. At temperature 0 the model's thinking ran past 2048 tokens on this prompt. This is a probe-prompt difference, not a backend difference between the two implementations; both verdicts are recorded unmodified. Consequence: Rust profile `interplane.core.0.1` shows incompatible, Python shows compatible. The conformance suite does not catch this because it tests evaluators, not prompts.
+Reports: `qualification/reports/qwen35-9b-llamacpp-b11398.probe.json` (Python) and `.probe.rust.json` (Rust).
+- Previous state (first Rust run): all probes agreed except `chat.basic`: Python PASS, Rust FAIL ("empty content; reasoning channel consumed the completion budget"; finish_reason length, 2048 completion tokens, 7144 reasoning chars, empty content). Rust profile `interplane.core.0.1` showed incompatible, Python compatible.
+- Cause: the two probes sent different requests. Python: "Reply with the single word: ready" (the Python endpoint helper adds temperature 0 and seed 42; the earlier note that no temperature was set was wrong). Rust: "Reply with one short sentence about the sea." at temperature 0, no seed. At temperature 0 the thinking on the Rust prompt ran past 2048 tokens. The same split existed in every other probe (Rust used a get_weather tool and other prompts, max_tokens 2048 on every request, no seed; Python used read_file/list_dir, max_tokens only on chat/streaming/context, seed 42, a different context needle and prompt builder), and the Rust `models.list` request digest hashed a JSON object where Python hashes the line "GET /models".
+- Fix: the Rust probe now builds the same bodies as the Python probe (spec/PROBE.md: both reference probes send identical request bodies per probe id). Python is unchanged and is the reference. Verdict logic is unchanged in both. Unit tests pin the chat.basic body in both languages (same JCS digest sha256:ed2eb0d6...) and the context prompt lengths.
+- Rerun (2026-10-04, llama.cpp b11398 on 127.0.0.1:18081, same server, not restarted): Rust report overwritten; the Python report is the earlier one (Python requests did not change). Result: all 14 probes agree (every verdict PASS in both), all four profiles compatible in both. Request digests are equal per probe id for 13 of 14. The one differing digest is `tools.result_replay`: its body embeds the tool call (a random id) that each run's own `tools.native` response produced, so the digests differ by construction while the body shape is the same.
+- Limit: single run per probe on a model that burns thinking tokens; at temperature 0 with seed 42 results are expected to repeat but no repeat run was made.
 
 ## Caveats
 - The tools.text_qwen35 PASS needs no engine support (it is plain text passthrough).

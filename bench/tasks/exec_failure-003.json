@@ -1,0 +1,50 @@
+{
+  "id": "exec_failure-003",
+  "category": "exec_failure",
+  "split": "qual",
+  "title": "Wrong path from the user",
+  "user_request": "Read docs/setup.md and tell me the first setup step.",
+  "system_prompt_ref": {
+    "path": "prompts/system.md",
+    "sha256": "207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
+  },
+  "workspace_fixture": "fixtures/lanternfish",
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "requested_domains": [
+    "filesystem"
+  ],
+  "required_capabilities": [
+    "read_file"
+  ],
+  "allowed_alternatives": [],
+  "useful_capabilities": [
+    "ls",
+    "glob",
+    "grep",
+    "get_workspace"
+  ],
+  "forbidden_effects": [],
+  "expected_outcome": "recovery",
+  "stub_results": {},
+  "fault_injection": [],
+  "injection": null,
+  "nonexistent_tool": null,
+  "judge": {
+    "expected_answer": "Install the Rust toolchain with rustup.",
+    "checks": [
+      {
+        "kind": "recovered_after_error"
+      },
+      {
+        "kind": "answer_contains_all",
+        "values": [
+          "rustup"
+        ]
+      }
+    ]
+  },
+  "notes": "The file is docs/SETUP.md; the requested path does not exist, so the first read fails for real."
+}

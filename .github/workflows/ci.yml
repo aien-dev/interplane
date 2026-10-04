@@ -21,6 +21,17 @@ jobs:
           PY
       - name: fixture validation
         run: python conformance/runners/validate_fixtures.py
+  bench-structural:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install jsonschema
+      - name: bench corpus structure, domain rule, coverage, digests (no model, no GPU)
+        run: python bench/tools/validate.py --require-jsonschema
+      - name: pre-registered statistics reproduce Newcombe 1998 Table III
+        run: python bench/tools/stats.py
   rust:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: rust}}

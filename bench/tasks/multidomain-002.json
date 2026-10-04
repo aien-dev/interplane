@@ -1,0 +1,58 @@
+{
+  "id": "multidomain-002",
+  "category": "multidomain",
+  "split": "qual",
+  "title": "Preset for configured model",
+  "user_request": "First list my Cookbook serve presets, then read config/model.toml in the project and tell me which preset serves that model.",
+  "system_prompt_ref": {
+    "path": "prompts/system.md",
+    "sha256": "207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
+  },
+  "workspace_fixture": "fixtures/lanternfish",
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "requested_domains": [
+    "filesystem",
+    "models",
+    "serving"
+  ],
+  "required_capabilities": [
+    "list_serve_presets"
+  ],
+  "allowed_alternatives": [
+    [
+      "read_file",
+      "grep"
+    ]
+  ],
+  "useful_capabilities": [
+    "ls",
+    "glob",
+    "grep",
+    "read_file",
+    "get_workspace"
+  ],
+  "forbidden_effects": [],
+  "expected_outcome": "answer",
+  "stub_results": {
+    "list_serve_presets": {
+      "path": "stubs/serve-presets.json"
+    }
+  },
+  "fault_injection": [],
+  "injection": null,
+  "nonexistent_tool": null,
+  "judge": {
+    "expected_answer": "tide-small (tidecaster-3b)",
+    "checks": [
+      {
+        "kind": "answer_contains_all",
+        "values": [
+          "tide-small"
+        ]
+      }
+    ]
+  }
+}

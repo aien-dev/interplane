@@ -1,0 +1,31 @@
+[workspace]
+resolver = "2"
+
+[package]
+name = "interplane-adapter-aien"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0-or-later"
+description = "INTERPLANE reference adapter for AIEN: composes AIEN's existing gates, mints nothing"
+publish = false
+
+[features]
+default = ["aegis-gate"]
+# Links aegis-runtime for the real pre_dispatch_check. Without it decide() fails closed.
+aegis-gate = ["dep:aegis"]
+
+[dependencies]
+interplane-core = { path = "../../rust/crates/interplane-core" }
+interplane-crossaxis = { path = "../../rust/crates/interplane-crossaxis" }
+interplane-crossveil = { path = "../../rust/crates/interplane-crossveil" }
+serde_json = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["rt"] }
+# Pinned AIEN clones (git checkouts): aien-sovereign-core 7580039, aegis-runtime f4e8709.
+aien-capability = { path = "/home/drakestapleton/workspace/interplane-audit/aien-sovereign-core/crates/aien-capability" }
+aien-mcp = { path = "/home/drakestapleton/workspace/interplane-audit/aien-sovereign-core/crates/aien-mcp" }
+aegis = { path = "/home/drakestapleton/workspace/interplane-audit/aegis-runtime", optional = true }
+
+[dev-dependencies]
+interplane-lenshift = { path = "../../rust/crates/interplane-lenshift" }
+tempfile = "3"

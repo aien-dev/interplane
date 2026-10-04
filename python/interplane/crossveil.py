@@ -184,13 +184,21 @@ def make_result(
 
 
 def _normalize_executed(res: ToolResult, rid: str, runtime_id: str, cap: str) -> ToolResult:
-    """Fit an adapter's execute() result to the canonical shape. Fails closed on trust."""
+    """Fit an adapter's execute() result to the canonical shape. Fails closed on trust.
+
+    content_kind: absent or null -> tool_result; unrecognized or not a string -> unknown.
+    trust: absent or null -> unknown; unrecognized or not a string -> external_untrusted.
+    The adapter's own ``trusted`` flag is never read; it is derived from ``trust``.
+    """
     prov = res.provenance or {}
     kind, trust = prov.get("content_kind"), prov.get("trust")
-    kind = kind if kind in CONTENT_KINDS else DEFAULT_CONTENT_KIND
+    if kind is None:
+        kind = DEFAULT_CONTENT_KIND
+    elif not (isinstance(kind, str) and kind in CONTENT_KINDS):
+        kind = "unknown"
     if trust is None:
         trust = DEFAULT_TRUST
-    elif trust not in TRUST_LEVELS:
+    elif not (isinstance(trust, str) and trust in TRUST_LEVELS):
         trust = "external_untrusted"
     code = res.error.code if res.error else None
     out = make_result(

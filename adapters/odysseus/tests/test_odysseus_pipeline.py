@@ -261,7 +261,7 @@ def test_importing_odysseus_does_not_write_inside_the_checkout(ody):
 def test_system_result_integrity_maps_to_a_trust_level(ody, workspace):
     # Odysseus ResultIntegrity.SYSTEM (tool_capabilities.py:37-46 at 2992bf6) is not a
     # TrustLevel. It is Odysseus's label for server-authored output, so it maps to
-    # trusted_runtime, unless Odysseus's own tool_result_should_arm_gate (:524-528) says the
+    # trusted_runtime, unless Odysseus's own tool_result_should_arm_gate (:506-528) says the
     # producer marked this result untrusted_content; then external_untrusted.
     a = OdysseusAuthority(str(workspace), admin=True)
     assert ody.tool_capabilities.capabilities_for_action("update_plan", "").result_integrity.value == "system"

@@ -1,0 +1,8 @@
+{
+ "request": null,
+ "endpoint": "/v1/models",
+ "method": "GET",
+ "status": 200,
+ "response": "{\"object\":\"list\",\"data\":[{\"id\":\"Qwen/Qwen3.5-9B\",\"object\":\"model\",\"created\":1791149993,\"owned_by\":\"sglang\",\"root\":\"Qwen/Qwen3.5-9B\",\"parent\":null,\"max_model_len\":32768}]}",
+ "sha256_response": "e71dc68b8a08e4abb2bf8da73bd984cb0fb03ea91661747a543b597a0e908344"
+}

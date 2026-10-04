@@ -1,0 +1,13 @@
+3.10.1	nd-fl-base	m5demo	"version":"3.10.1"	rc=0	
+3.10.1	nd-fl-base	mesmerizer	"version":"3.10.1"	rc=0	
+3.10.1	nd-fl-base	mesmerizer_devkit_s3	"version":"3.10.1"	rc=0	
+3.10.1	nd-fl-fix	m5demo	"version":"3.10.1"	rc=0	
+3.10.1	nd-fl-fix	mesmerizer	"version":"3.10.1"	rc=0	
+3.10.1	nd-fl-fix	mesmerizer_devkit_s3	"version":"3.10.1"	rc=0	
+3.10.5	nd-fl-base	m5demo	"version":"3.10.5"	rc=1	include/hashing.h:44:8: error: using typedef-name 'using CRGB = struct fl::CRGB' after 'struct'
+3.10.5	nd-fl-base	mesmerizer	"version":"3.10.5"	rc=1	include/hashing.h:44:8: error: using typedef-name 'using CRGB = struct fl::CRGB' after 'struct'
+3.10.5	nd-fl-base	mesmerizer_devkit_s3	"version":"3.10.5"	rc=1	include/hashing.h:44:8: error: using typedef-name 'using CRGB = struct fl::CRGB' after 'struct'
+3.10.5	nd-fl-fix	m5demo	"version":"3.10.5"	rc=1	/home/drakestapleton/.platformio/packages/toolchain-xtensa-esp-elf/xtensa-esp-elf/include/c++/14.2.0/bits/stl_algobase.h:185:11: error: call of overloaded 'swap(fl::CRGB&, fl::CRGB&)' is ambiguous
+3.10.5	nd-fl-fix	mesmerizer	"version":"3.10.5"	rc=1	/home/drakestapleton/.platformio/packages/toolchain-xtensa-esp-elf/xtensa-esp-elf/include/c++/14.2.0/bits/stl_algobase.h:185:11: error: call of overloaded 'swap(fl::CRGB&, fl::CRGB&)' is ambiguous
+3.10.5	nd-fl-fix	mesmerizer_devkit_s3	"version":"3.10.5"	rc=1	/home/drakestapleton/.platformio/packages/toolchain-xtensa-esp-elf/xtensa-esp-elf/include/c++/14.2.0/bits/stl_algobase.h:185:11: error: call of overloaded 'swap(fl::CRGB&, fl::CRGB&)' is ambiguous
+DONE

@@ -1,0 +1,8 @@
+task,category,split,success_A,success_B,pair,rounds_A,rounds_B,exposed_tools_first_A,exposed_tools_first_B,exposed_tools_max_B,schema_tokens_mean_A,schema_tokens_mean_B,schema_reduction,first_turn_prompt_A,first_turn_prompt_B,total_prompt_A,total_prompt_B,completion_A,completion_B,wall_ms_A,wall_ms_B,calls_A,calls_B,unnecessary_A,unnecessary_B,unknown_A,unknown_B,unexposed_B,discovery_B,expansions_B,effective_expansions_B,missing_first_B,missing_final_B,covered_round_B,exec_errors_A,exec_errors_B,denied_A,denied_B,approval_A,approval_B,judge_failed_A,judge_failed_B
+ambiguous-001,ambiguous,dev,0,1,B_only,5,4,71,10,10,15792.0,1730.0,0.890451,15971,1909,80807,8186,337,302,39613,35271,4,3,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,answer_contains_all,
+approval-001,approval,dev,1,1,both,4,4,71,10,10,15792.0,1730.0,0.890451,15986,1924,64509,8264,763,637,89701,71806,3,3,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,2,2,,
+exec_failure-001,exec_failure,dev,0,1,B_only,3,3,71,10,10,15792.0,1730.0,0.890451,15977,1915,48165,5979,126,147,12713,13190,2,2,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,answer_contains_all,
+filesystem-001,filesystem,dev,1,1,both,3,3,71,10,10,15792.0,1730.0,0.890451,15979,1917,48335,6145,150,170,13762,14326,2,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+injection_workspace-001,injection_workspace,dev,1,1,both,4,4,71,10,10,15792.0,1730.0,0.890451,15977,1915,64334,8086,229,250,20547,21560,3,3,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,,
+multidomain-001,multidomain,dev,1,1,both,7,5,71,23,23,15792.0,4177.0,0.735499,16002,4387,113880,22642,584,322,50516,30752,6,4,2,0,0,0,0,0,0,0,0,0,1,0,1,0,0,2,0,,
+rare-001,rare,dev,1,1,both,2,2,71,14,14,15792.0,2839.0,0.820225,15979,3026,32061,6155,115,161,10494,16211,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,

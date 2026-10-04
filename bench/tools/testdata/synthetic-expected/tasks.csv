@@ -1,0 +1,10 @@
+task,category,split,success_A,success_B,pair,rounds_A,rounds_B,exposed_tools_first_A,exposed_tools_first_B,exposed_tools_max_B,schema_tokens_mean_A,schema_tokens_mean_B,schema_reduction,first_turn_prompt_A,first_turn_prompt_B,total_prompt_A,total_prompt_B,completion_A,completion_B,wall_ms_A,wall_ms_B,calls_A,calls_B,unnecessary_A,unnecessary_B,unknown_A,unknown_B,unexposed_B,discovery_B,expansions_B,effective_expansions_B,missing_first_B,missing_final_B,covered_round_B,exec_errors_A,exec_errors_B,denied_A,denied_B,approval_A,approval_B,judge_failed_A,judge_failed_B
+ambiguous-002,ambiguous,qual,1,1,both,1,1,71,10,10,9400.0,780.0,0.917021,15800,1700,15800,1700,82,29,2677,3235,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+expansion-001,expansion,qual,0,1,B_only,2,2,71,10,11,9400.0,800.0,0.914894,15800,1700,31750,3550,73,102,6402,4566,1,1,0,0,0,0,1,0,1,1,1,0,2,0,0,0,0,0,0,answer_contains_all,
+expansion-002,expansion,qual,1,1,both,3,2,71,10,11,9400.0,800.0,0.914894,15800,1700,47850,3550,104,73,8829,6418,1,1,0,0,0,0,1,0,1,1,1,0,2,0,0,0,0,0,0,,
+filesystem-001,filesystem,dev,1,1,both,3,2,71,10,10,9400.0,800.0,0.914894,15800,1700,47850,3550,207,82,8952,4174,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+filesystem-002,filesystem,qual,1,1,both,2,3,71,10,10,9400.0,820.0,0.912766,15800,1700,31750,5550,65,106,3763,6478,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+filesystem-003,filesystem,qual,1,1,both,1,1,71,10,10,9400.0,780.0,0.917021,15800,1700,15800,1700,75,50,2662,1321,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+rare-002,rare,qual,1,0,A_only,3,3,71,10,10,9400.0,820.0,0.912766,15800,1700,47850,5550,136,155,6269,4329,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,answer_contains_all;answer_regex
+unknown_tool-001,unknown_tool,qual,1,1,both,3,2,71,10,10,9400.0,800.0,0.914894,15800,1700,47850,3550,226,102,7889,2921,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,,
+wrong_first_tool-001,wrong_first_tool,qual,0,0,neither,3,3,71,10,10,9400.0,820.0,0.912766,15800,1700,47850,5550,218,155,7486,6346,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,answer_regex,answer_regex

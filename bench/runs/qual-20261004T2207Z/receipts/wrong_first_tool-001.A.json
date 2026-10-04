@@ -1,0 +1,443 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 188,
+  "calls": [
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:25b80e1b7b985fbdabee096c02d03fd4933b9e3b0948db8c8e789cd0a5201648",
+      "capability": "bash",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_jij5wsp1",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:a478a63034b1b9ff5c6f776d71c31edf14d13641e6a0c421bd4fc90ff59ad0b6",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:46f8a09d2de20d8bd03933e988bec181d5ffbd6eb611caa16302bb6fda7f3745",
+      "capability": "bash",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_e9ixzrn9",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:ebdee5dbbac90549acb1191ce94298fa0a31a34db798bd9de44eb1434f12c0fa",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "pattern"
+      ],
+      "arguments_digest": "sha256:dd637f78a94e2a7398265c0c106ce6f4339c32811c1e991db8947bfc8878f57d",
+      "capability": "glob",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_5l5eiddi",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:589fca0aceb8b59272f29e07e582531433655e55bd04b2c6e5baccfc55769f54",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "glob",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:e266d5ca4fcd479c8ed89f8689acbdbf4a51df9f8fbedd0909dc424f763062e5",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_wth9elfy",
+      "result_content_kind": null,
+      "result_digest": "sha256:27437dddf99b5b546ae344b590cb84fc5adfcb7790a073a001c611233d7aaa49",
+      "result_trust": null,
+      "round": 4,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:e266d5ca4fcd479c8ed89f8689acbdbf4a51df9f8fbedd0909dc424f763062e5",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_dxzcoa4h",
+      "result_content_kind": null,
+      "result_digest": "sha256:fe49b59220860d24dd3d449b1cf4b6f9e450d7f20d025e009bd42b99704ed1eb",
+      "result_trust": null,
+      "round": 5,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A",
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+    "name": "fixtures/lanternfish"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {
+    "full_count": 71,
+    "full_rendered_bytes": 59024,
+    "rendered_bytes": {
+      "full": 59024,
+      "selected": 7873
+    },
+    "selected_count": 12,
+    "selected_rendered_bytes": 7873,
+    "tokens": {
+      "all_rounds_prompt": {
+        "full": 97129,
+        "selected": 12517
+      },
+      "base_context": 188,
+      "completion": {
+        "full": 370,
+        "selected": 310
+      },
+      "first_turn_prompt": {
+        "full": 15980,
+        "selected": 2350
+      },
+      "source": "backend usage.prompt_tokens of a max_tokens=1 request (openai-compatible endpoint)",
+      "tool_schema": {
+        "full": 15792,
+        "selected": 2162
+      },
+      "unit": "tokens_model_reported"
+    }
+  },
+  "metrics": {
+    "base_context_tokens": 188,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 3,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 2
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 2,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15980,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 12285,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 6,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 94752,
+    "total_completion_tokens": 370,
+    "total_prompt_tokens": 97129,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 4,
+    "wall_ms": 12380
+  },
+  "prior_infra_failures": [],
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 63,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2755,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15980,
+      "reasoning_present": true,
+      "request_digest": "sha256:b2b8250e9205100b4a8c14f9757420433f725cd378555e30b3181b064ec5b176",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 57,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1792,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16054,
+      "reasoning_present": true,
+      "request_digest": "sha256:d7c96ad41f901330400989d9682c6941e315996f090723624e063c694345bb6b",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 53,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1665,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16126,
+      "reasoning_present": true,
+      "request_digest": "sha256:df2f05340dd9313d253c97275cc49a9db82b175ad13a38382ac473ef10f8c6c6",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 56,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1752,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16239,
+      "reasoning_present": true,
+      "request_digest": "sha256:392f919dd58b2c62b97c5ca7c39450f7ba17aa530d2ae0a37b9bbbf464ffb1a7",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 71,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2161,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16323,
+      "reasoning_present": true,
+      "request_digest": "sha256:301ab8bf3430c8a38142ce57a5983d138df18ef8b4c1fd7627f7356510577abb",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 70,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 2160,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16407,
+      "reasoning_present": true,
+      "request_digest": "sha256:3c6034154b1573619af35dbb0f0b8c9273ab6c14c540757a4cf99582fb3dd01a",
+      "round": 6,
+      "text_digest": "sha256:648dc900e0330f024addfd042dff391bec92ab88b264bfbdc2ce6a98686b7acc",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "qual-20261004T2207Z",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "wrong_first_tool",
+    "digest": "sha256:8c33c0a748378ddfa68b88f3807c8b19beb4e3f50020de76016ed1a0472cdbdf",
+    "id": "wrong_first_tool-001",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 12285,
+    "wall_ms": 12380
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "bash",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "bash"
+      },
+      {
+        "capability": "glob",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "glob"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 4,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 5,
+        "status": "requires_approval",
+        "tool": "bash"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "There are **3** station files in `data/stations/`:\n- cherbourg.json\n- roscoff.json\n- brest.json"
+  },
+  "user_request_digest": "sha256:2ddac10d3c8e7efcd574901187306af852990213e03225688bc0615cbfcd8a29"
+}

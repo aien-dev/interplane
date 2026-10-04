@@ -172,7 +172,14 @@ fn ev(v: Verdict, d: &str) -> Eval {
 
 pub fn eval_chat_basic(v: &Value) -> Eval {
     if content(v).trim().is_empty() {
-        ev(Verdict::Fail, "empty content")
+        if reasoning_text(v).is_some() {
+            ev(
+                Verdict::Fail,
+                "empty content; reasoning channel consumed the completion budget",
+            )
+        } else {
+            ev(Verdict::Fail, "empty content")
+        }
     } else {
         ev(Verdict::Pass, "non-empty content")
     }
@@ -240,8 +247,23 @@ pub fn eval_text_qwen35(v: &Value, want: &str) -> Eval {
         )
     } else if turn.intents.iter().any(|i| i.tool.name == want) {
         ev(Verdict::Pass, "parseable <tool_call><function=...> block")
+    } else if !tool_calls(v).is_empty() {
+        ev(
+            Verdict::Degraded,
+            "backend parsed the text form into native tool_calls itself (content empty)",
+        )
+    } else if content(v).trim().is_empty() {
+        ev(
+            Verdict::Unsupported,
+            "empty content and no tool_calls: the backend parser consumed or suppressed the text-form call (compare a raw-completion capture)",
+        )
+    } else if content(v).contains("<tool_call>") {
+        ev(
+            Verdict::Degraded,
+            "tool_call markup present but not parseable as qwen35",
+        )
     } else {
-        ev(Verdict::Fail, "no parseable tool call block")
+        ev(Verdict::Unsupported, "no <tool_call> markup in content")
     }
 }
 pub fn eval_parallel(v: &Value) -> Eval {
@@ -417,7 +439,7 @@ impl Runner<'_> {
             .any(|s| name == s || name.starts_with(&format!("{s}.")))
     }
     fn chat(&self, messages: Value) -> Value {
-        json!({"model": self.cfg.model, "messages": messages, "temperature": 0, "max_tokens": 512})
+        json!({"model": self.cfg.model, "messages": messages, "temperature": 0, "max_tokens": 2048})
     }
     fn record(&mut self, name: &str, verdict: Eval, req: &Value, resp: Option<&str>, ms: u64) {
         self.results.push(ProbeResult {

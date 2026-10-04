@@ -88,7 +88,11 @@ fn qwen35_text_probe_uses_the_lenshift_parser() {
     );
     assert_eq!(
         eval_text_qwen35(&chat("It is sunny."), "get_weather").0,
-        Verdict::Fail
+        Verdict::Unsupported
+    );
+    assert_eq!(
+        eval_text_qwen35(&chat(""), "get_weather").0,
+        Verdict::Unsupported
     );
 }
 #[test]

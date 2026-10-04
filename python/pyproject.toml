@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "interplane"
+version = "0.1.0"
+description = "INTERPLANE 0.1 Python reference implementation (stdlib only)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+dependencies = []
+
+[project.scripts]
+interplane-conformance = "interplane.conformance:main"
+
+[tool.setuptools.packages.find]
+include = ["interplane*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

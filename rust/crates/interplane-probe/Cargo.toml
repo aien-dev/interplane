@@ -1,0 +1,21 @@
+[package]
+name = "interplane-probe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "INTERPLANE 0.1 reference implementation: probe"
+
+[[bin]]
+name = "interplane-probe"
+path = "src/main.rs"
+
+[dependencies]
+interplane-core.workspace = true
+interplane-lenshift.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+ureq.workspace = true
+
+[dev-dependencies]
+jsonschema.workspace = true
+serde_json.workspace = true

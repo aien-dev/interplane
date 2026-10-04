@@ -1,0 +1,16 @@
+[package]
+name = "interplane-crossveil"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "INTERPLANE 0.1 reference implementation: crossveil"
+
+[dependencies]
+interplane-core.workspace = true
+interplane-lenshift.workspace = true
+interplane-crossaxis.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true

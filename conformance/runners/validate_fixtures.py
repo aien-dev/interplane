@@ -5,6 +5,7 @@ Exit status is non-zero on any failure. Checks:
   * every explicit envelope step validates against envelope.schema.json
   * every intent in dialects/fixtures validates against intent.schema.json
   * fixture shape, 25 required cases, filename == case slug
+  * lifecycle/ fixtures: required set, shape, minting decisions valid against decision.schema.json
   * expected.runtime counts agree with the observed records
   * the JCS digest fixture recomputes
   * negative control: a mutated envelope MUST fail validation
@@ -33,6 +34,7 @@ def validator(name):
     return Draft202012Validator(schemas[name], registry=registry, format_checker=FormatChecker())
 V_ENV, V_INTENT = validator("envelope.schema.json"), validator("intent.schema.json")
 V_SEL = validator("selection.schema.json")
+V_DEC = validator("decision.schema.json")
 
 def check(v, inst, where):
     errs = sorted(v.iter_errors(inst), key=lambda e: list(e.absolute_path))
@@ -140,6 +142,30 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
 if seen != REQUIRED: fail("required cases missing/extra: %s" % sorted(seen ^ REQUIRED))
 if not neg_done: fail("negative control never ran")
 
+# ---- lifecycle fixtures (driven against the Lifecycle directly, no pipeline)
+LIFECYCLE = {"01-forged-approval-id", "02-empty-approval-id", "03-approval-id-from-other-request",
+             "04-runtime-minted-approval-id", "05-continuation-non-authorized-value"}
+STATES = {"PROPOSED","REJECTED","MAPPED","DENIED","REQUIRES_APPROVAL","AUTHORIZED","EXECUTING","SUCCEEDED","FAILED","TIMED_OUT"}
+n_life = 0; lseen = set()
+for p in sorted(glob.glob(os.path.join(FIX, "lifecycle", "*.json"))):
+    f = load(p); name = os.path.basename(p)[:-5]; n_life += 1; lseen.add(name)
+    if f.get("case") != "lifecycle/" + name: fail("lifecycle/%s: case slug %r != filename" % (name, f.get("case")))
+    if set(f) != {"case", "description", "steps", "expected"}: fail("lifecycle/%s: keys %s" % (name, sorted(f)))
+    steps, exp = f.get("steps", []), f.get("expected", [])
+    if len(steps) != len(exp): fail("lifecycle/%s: one expected row per step" % name)
+    minted = set()
+    for i, (s, e) in enumerate(zip(steps, exp)):
+        d = s.get("decision", {})
+        if list(e) != ["request_id", "state", "refused"] or e["state"] not in STATES or e["request_id"] != s.get("request_id"):
+            fail("lifecycle/%s: expected[%d] shape" % (name, i))
+        if s.get("request_id") not in minted:
+            # first decision on a request is the runtime's own: requires_approval with a minted id
+            check(V_DEC, d, "lifecycle/%s step %d minting decision" % (name, i))
+            if d.get("decision") != "requires_approval" or d.get("request_id") != s.get("request_id"): fail("lifecycle/%s: step %d must mint" % (name, i))
+            minted.add(s.get("request_id"))
+        elif d.get("request_id") != s.get("request_id"): fail("lifecycle/%s: step %d continuation must cite its own request_id" % (name, i))
+if lseen != LIFECYCLE: fail("lifecycle cases missing/extra: %s" % sorted(lseen ^ LIFECYCLE))
+
 # ---- digest fixture
 dp = os.path.join(FIX, "digest", "jcs-01.json")
 d = load(dp)
@@ -169,7 +195,7 @@ for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))
 
-print("conformance cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, negative controls: ok" % (n_cases, n_env, n_dial, n_int))
+print("conformance cases: %d, lifecycle cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, negative controls: ok" % (n_cases, n_life, n_env, n_dial, n_int))
 if errors:
     print("FAIL (%d)" % len(errors)); [print(" -", e) for e in errors]; sys.exit(1)
 print("PASS")

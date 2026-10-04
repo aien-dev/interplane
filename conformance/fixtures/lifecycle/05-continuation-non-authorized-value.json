@@ -1,0 +1,137 @@
+{
+  "case": "lifecycle/05-continuation-non-authorized-value",
+  "description": "With the runtime-minted approval_id, a continuation whose decision is anything but authorized ends in DENIED (CORE.md: REQUIRES_APPROVAL goes only to AUTHORIZED or DENIED): requires_approval again, not_found, and an unknown value.",
+  "steps": [
+    {
+      "request_id": "call_L05a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05a",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05a",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L05a",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05a",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05a"
+        }
+      }
+    },
+    {
+      "request_id": "call_L05b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05b",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05b",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L05b",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05b",
+        "decision": "not_found",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05b"
+        }
+      }
+    },
+    {
+      "request_id": "call_L05c",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05c",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05c",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L05c",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L05c",
+        "decision": "approve_now",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L05c"
+        }
+      }
+    }
+  ],
+  "expected": [
+    {
+      "request_id": "call_L05a",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L05a",
+      "state": "DENIED",
+      "refused": false
+    },
+    {
+      "request_id": "call_L05b",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L05b",
+      "state": "DENIED",
+      "refused": false
+    },
+    {
+      "request_id": "call_L05c",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L05c",
+      "state": "DENIED",
+      "refused": false
+    }
+  ]
+}

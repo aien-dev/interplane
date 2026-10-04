@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 25 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound). `fixtures/digest/jcs-01.json`: the JCS digest check.
+- `fixtures/NN-slug.json`: the 25 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound). `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`.
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -51,6 +51,14 @@ Absent means `mock-table`. Case 21 sets `"mapping_table": "mock-table-stale"` (s
 ## Trust note (cases 19, 22, 23)
 
 Trust is two axes (CROSSVEIL.md, `common.schema.json`): `provenance.trust` (TrustLevel) and `provenance.content_kind` (ContentKind), set by the runtime adapter and never by the model. `provenance.trusted` follows CORE.md: true only for `trusted_runtime`, false for `workspace_untrusted` and `external_untrusted`. Cases 22 and 23 return content that looks like instructions (tool-call markup, a destructive shell command); it must reach the model only as rendered data. Case 22's `continues` step is parsed from the model's own text and must add no intents or records. `result_checks` cover result fields only; a runner should additionally assert the rendered tool message contains the markup verbatim (CORE.md case 22).
+
+## Lifecycle fixtures (approval continuation)
+
+The reference pipeline has no host continuation call yet (plan cut A2), so a second decision on a
+`requires_approval` request cannot be reached through `NN-slug` fixtures. The cases under
+`fixtures/lifecycle/` exercise that transition on the lifecycle state machine itself, in both SDKs.
+Both runners load them after the `NN-slug` cases and write one verdict row each, keyed
+`lifecycle/<slug>`. Total verdict rows: 30 (25 + 5).
 
 ## Cross-language verdict comparison
 

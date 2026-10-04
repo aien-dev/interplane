@@ -48,7 +48,7 @@ MAPPED
   -> REQUIRES_APPROVAL   runtime decision = requires_approval
   -> AUTHORIZED    runtime decision = authorized
 REQUIRES_APPROVAL
-  -> AUTHORIZED | DENIED   only by a NEW runtime decision that cites the approval_id
+  -> AUTHORIZED | DENIED   only by a NEW runtime decision that cites the minted approval_id
 AUTHORIZED
   -> EXECUTING     runtime began execution
 EXECUTING
@@ -57,7 +57,12 @@ EXECUTING
 
 Terminal: REJECTED, DENIED, SUCCEEDED, FAILED, TIMED_OUT. REQUIRES_APPROVAL is terminal for the
 request as far as the model is concerned; a later authorization is a new decision on the same
-`request_id` carrying `approval.approval_id`.
+`request_id` carrying `approval.approval_id`. The lifecycle keeps the non-empty `approval_id` from
+the `requires_approval` decision that put the request in REQUIRES_APPROVAL, and accepts a
+continuation only when it cites exactly that id. A continuation with no id, an empty id, an id the
+runtime never minted, or an id minted for another request is refused and the state does not change.
+With the minted id, `authorized` gives AUTHORIZED and every other value (including unknown values)
+gives DENIED. Conformance: `conformance/fixtures/lifecycle/`.
 
 Invariants (every implementation must enforce; conformance tests check them):
 
@@ -205,6 +210,25 @@ A `step` with `dialect` is parsed by Lenshift; the runner wraps each intent in a
 `{"kind":"model","id":<model>}`, destination `{"kind":"runtime","id":"mock"}`. A step with
 `envelope` is admitted as-is. Rendered results are fed back into the next step only when the step
 declares `"continues": true`.
+
+Lifecycle fixtures live under `conformance/fixtures/lifecycle/NN-slug.json` and drive the
+lifecycle state machine directly, with no pipeline and no mock runtime:
+
+```json
+{
+  "case": "lifecycle/01-forged-approval-id",
+  "description": "...",
+  "steps": [ {"request_id": "call_L01", "decision": <decision>} ],
+  "expected": [ {"request_id": "call_L01", "state": "REQUIRES_APPROVAL", "refused": false} ]
+}
+```
+
+The runner creates and maps a lifecycle the first time it sees a `request_id`, then applies the
+step's `decision` to it. The first decision on each request is the runtime's `requires_approval`
+decision that mints the `approval_id`; later steps are continuation attempts. Each step yields the
+state after the call and `refused` (true when the lifecycle refused the decision or the decision
+did not parse). The verdict row is `{"pass", "steps"}` under the key `lifecycle/<slug>`; rows of
+the `NN-slug` cases are unchanged.
 
 ObservedRecord (deterministic, no timestamps, no durations):
 

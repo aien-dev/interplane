@@ -66,6 +66,31 @@ fn main() -> ExitCode {
         }
         rows.push((run.case.clone(), verdict(&run, &errs)));
     }
+    let lifecycle = match load_lifecycle_fixtures(&dir) {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("{e}");
+            return ExitCode::from(2);
+        }
+    };
+    for fx in &lifecycle {
+        let case = fx["case"]
+            .as_str()
+            .unwrap_or("lifecycle/unnamed")
+            .to_string();
+        let (steps, errs) = run_lifecycle_case(fx);
+        println!(
+            "{:<4} {:<34} {}",
+            "L",
+            case,
+            if errs.is_empty() { "PASS" } else { "FAIL" }
+        );
+        for e in &errs {
+            println!("       - {e}");
+        }
+        failed += usize::from(!errs.is_empty());
+        rows.push((case, lifecycle_verdict(&steps, &errs)));
+    }
     match check_digest_fixture(&dir) {
         Some(e) => {
             println!("{:<4} {:<34} FAIL\n       - {e}", "-", "digest/jcs-01");
@@ -79,7 +104,11 @@ fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     }
-    println!("{} of {} cases failed", failed, fixtures.len());
+    println!(
+        "{} of {} cases failed",
+        failed,
+        fixtures.len() + lifecycle.len()
+    );
     if failed > 0 {
         ExitCode::from(1)
     } else {

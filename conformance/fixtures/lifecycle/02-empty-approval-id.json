@@ -1,0 +1,70 @@
+{
+  "case": "lifecycle/02-empty-approval-id",
+  "description": "A continuation decision with an empty approval_id, and one with approval null, are both refused; the request stays REQUIRES_APPROVAL.",
+  "steps": [
+    {
+      "request_id": "call_L02",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L02",
+        "decision": "requires_approval",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": "mock-approval-call_L02",
+          "scope": "single_action"
+        }
+      }
+    },
+    {
+      "request_id": "call_L02",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L02",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": {
+          "approval_id": ""
+        }
+      }
+    },
+    {
+      "request_id": "call_L02",
+      "decision": {
+        "kind": "decision",
+        "request_id": "call_L02",
+        "decision": "authorized",
+        "capability": "delete_file",
+        "authority": {
+          "runtime": "mock",
+          "policy_engine": "mock.policy"
+        },
+        "approval": null
+      }
+    }
+  ],
+  "expected": [
+    {
+      "request_id": "call_L02",
+      "state": "REQUIRES_APPROVAL",
+      "refused": false
+    },
+    {
+      "request_id": "call_L02",
+      "state": "REQUIRES_APPROVAL",
+      "refused": true
+    },
+    {
+      "request_id": "call_L02",
+      "state": "REQUIRES_APPROVAL",
+      "refused": true
+    }
+  ]
+}

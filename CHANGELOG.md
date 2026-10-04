@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased (0.3, Trust lane)
+
+- Security: the Rust lifecycle now accepts an approval continuation only with the `approval_id` the runtime minted for that request, as Python already did; before, any non-empty id was accepted. A non-`authorized` continuation value with the minted id is DENIED in both SDKs. Lifecycle conformance cases `lifecycle/01-05`; 30/30 byte-identical.
+
 ## Unreleased (0.2, CrossAxis lane)
 
 - 0.2 report: `docs/REPORT-0.2.md`. Pre-registered gate verdict FAIL (O1 0.865, O2 0/5; T 0.877 and S pass).

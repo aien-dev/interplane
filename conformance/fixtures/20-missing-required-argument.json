@@ -1,0 +1,63 @@
+{
+  "case": "20-missing-required-argument",
+  "description": "read_file is called with empty arguments. The mock runtime is asked, answers invalid, and nothing executes.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-20",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_20a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_20a",
+        "stage": "REJECTED",
+        "decision": "invalid",
+        "status": "rejected",
+        "error_code": "invalid_arguments",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 0
+    },
+    "result_checks": [
+      {
+        "request_id": "call_20a",
+        "path": "error.message",
+        "equals": "missing required argument: path"
+      }
+    ]
+  }
+}

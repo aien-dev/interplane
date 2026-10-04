@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 18 required cases. `fixtures/digest/jcs-01.json`: the JCS digest check.
+- `fixtures/NN-slug.json`: the 23 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result). `fixtures/digest/jcs-01.json`: the JCS digest check.
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -31,6 +31,14 @@ was taken and is listed below.
    for the result of `request_id`.
 4. `result_digest` is `null` in fixtures: implementations compute it (digest of the canonical result payload
    with `provenance.duration_ms` null) and the cross-language comparison covers it.
+
+## Fixture-level `mapping_table`
+
+Absent means `mock-table`. Case 21 sets `"mapping_table": "mock-table-stale"` (same rules, wrong catalog digest), so CrossAxis must refuse with `stale_capability` before any runtime contact.
+
+## Trust note (cases 19, 22, 23)
+
+Trust is two axes (CROSSVEIL.md, `common.schema.json`): `provenance.trust` (TrustLevel) and `provenance.content_kind` (ContentKind), set by the runtime adapter and never by the model. `provenance.trusted` follows CORE.md: true only for `trusted_runtime`, false for `workspace_untrusted` and `external_untrusted`. Cases 22 and 23 return content that looks like instructions (tool-call markup, a destructive shell command); it must reach the model only as rendered data. Case 22's `continues` step is parsed from the model's own text and must add no intents or records. `result_checks` cover result fields only; a runner should additionally assert the rendered tool message contains the markup verbatim (CORE.md case 22).
 
 ## Cross-language verdict comparison
 
@@ -60,3 +68,7 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 18. The `trailing_text` note (LENSHIFT.md:73-74) is not exercised: the spec says "in extensions" without saying where, and no required fixture covers it.
 19. Case slugs other than 01 are derived from the CORE.md case names by hyphenating; only `01-valid-tool-request` is given verbatim.
 20. JCS: keys sort by UTF-16 code units (RFC 8785), so the emoji key sorts before U+FF5E. Floats are limited to `1.0`, `1e21`, `0.5`, `2.50`, which avoids shortest-round-trip edge cases. The digest was computed with a hand-written canonicalizer and cross-checked against Node's `JSON.stringify`.
+21. Protocol version in valid envelopes is `"0.1"` (CORE.md, Canonical result payload shape); case 13 keeps `"2.0"`, an unsupported MAJOR.
+22. Error messages are now pinned by CORE.md ("Canonical result payload shape"); cases 20 and 21 assert them with `result_checks`. `missing tool name` (item 13) is confirmed by that table.
+23. Case 20: the runtime is asked and answers `invalid`, so stage `REJECTED`, decision `invalid`, decide true (CORE.md case table row 20). Case 21: nothing reaches the runtime, so decision null, decide false.
+24. Case 22/23 `provenance.trusted` is asserted false (CORE.md: false for the two untrusted levels); case 19 true.

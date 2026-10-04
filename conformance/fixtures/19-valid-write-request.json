@@ -1,0 +1,83 @@
+{
+  "case": "19-valid-write-request",
+  "description": "append_note is authorized and executed; the result reports how many characters were appended and is trusted runtime workspace content.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-19",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_19a",
+            "type": "function",
+            "function": {
+              "name": "append_note",
+              "arguments": "{\"path\": \"/tmp/notes.md\", \"text\": \"hello note\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_19a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "result_checks": [
+      {
+        "request_id": "call_19a",
+        "path": "data.appended",
+        "equals": 10
+      },
+      {
+        "request_id": "call_19a",
+        "path": "data.path",
+        "equals": "/tmp/notes.md"
+      },
+      {
+        "request_id": "call_19a",
+        "path": "provenance.trust",
+        "equals": "trusted_runtime"
+      },
+      {
+        "request_id": "call_19a",
+        "path": "provenance.content_kind",
+        "equals": "workspace_content"
+      },
+      {
+        "request_id": "call_19a",
+        "path": "provenance.trusted",
+        "equals": true
+      }
+    ]
+  }
+}

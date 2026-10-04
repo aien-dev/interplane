@@ -1,0 +1,64 @@
+{
+  "case": "21-stale-capability-mapping",
+  "description": "The mapping table mock-table-stale was built against a different catalog digest: CrossAxis rejects with stale_capability before any runtime contact.",
+  "mapping_table": "mock-table-stale",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-21",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_21a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\": \"/tmp/a.txt\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_21a",
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "stale_capability",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    },
+    "result_checks": [
+      {
+        "request_id": "call_21a",
+        "path": "error.message",
+        "equals": "mapping table catalog digest does not match runtime catalog"
+      }
+    ]
+  }
+}

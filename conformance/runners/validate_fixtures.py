@@ -65,7 +65,8 @@ REQUIRED = {
  "01-valid-tool-request","02-malformed-arguments","03-nonexistent-tool","04-unknown-capability",
  "05-policy-denial","06-explicit-approval","07-successful-execution","08-execution-error","09-timeout",
  "10-multiple-sequential-calls","11-model-continuation","12-unsupported-dialect","13-unsupported-version",
- "14-unknown-fields","15-oversized-arguments","16-duplicate-request-ids","17-replay","18-model-retry-after-denial"}
+ "14-unknown-fields","15-oversized-arguments","16-duplicate-request-ids","17-replay","18-model-retry-after-denial",
+ "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result"}
 OBS_KEYS = ["request_id","stage","decision","status","error_code","decide_invoked","execute_invoked","result_digest"]
 n_env = n_cases = 0
 neg_done = False
@@ -94,6 +95,27 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
                 neg_done = True
         elif "dialect" in s and "input" in s: pass
         else: fail("%s: step %s has neither envelope nor dialect+input" % (name, s.get("turn")))
+    for c in exp.get("result_checks", []):
+        if set(c) != {"request_id", "path", "equals"} or c["request_id"] not in {o["request_id"] for o in obs}:
+            fail("%s: malformed result_check %s" % (name, c))
+    if ("mapping_table" in f) != name.startswith("21"): fail("%s: mapping_table present only in case 21" % name)
+    if name.startswith("21") and f.get("mapping_table") != "mock-table-stale": fail("21: mapping_table must be mock-table-stale")
+    if name[:2] in ("19", "22", "23", "20", "21"):
+        want = {"19": ("SUCCEEDED", "ok"), "20": ("REJECTED", "rejected"), "21": ("REJECTED", "rejected"),
+                "22": ("SUCCEEDED", "ok"), "23": ("SUCCEEDED", "ok")}[name[:2]]
+        if (obs[0]["stage"], obs[0]["status"]) != want: fail("%s: unexpected stage/status %s" % (name, (obs[0]["stage"], obs[0]["status"])))
+        pairs = {(c["path"], json.dumps(c["equals"])) for c in exp.get("result_checks", [])}
+        need = {"19": [("data.appended", "10")],
+                "20": [("error.message", '"missing required argument: path"')],
+                "21": [("error.message", '"mapping table catalog digest does not match runtime catalog"')],
+                "22": [("provenance.trust", '"external_untrusted"'), ("provenance.content_kind", '"web_content"')],
+                "23": [("provenance.trust", '"workspace_untrusted"'), ("provenance.content_kind", '"memory"')]}[name[:2]]
+        for n in need:
+            if n not in pairs: fail("%s: missing result_check %s" % (name, n))
+    if name.startswith("22"):
+        if not f["steps"][1].get("continues") or [t["outcome"] for t in exp["turns"]] != ["tool_request", "no_tool"]: fail("22: continuation shape")
+        if len(obs) != 1: fail("22: the continuing turn must add no records")
+        if "<tool_call>" not in next(c["equals"] for c in exp["result_checks"] if c["path"] == "data.content"): fail("22: pinned content must carry the markup")
     # size checks for the oversized case
     if name.startswith("15"):
         a = json.loads(f["steps"][0]["input"]["tool_calls"][0]["function"]["arguments"])

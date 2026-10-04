@@ -18,3 +18,18 @@ backup/restore, scheduler UX. Help for those goes to the host projects directly.
 Two tracks run in parallel: **A**, small direct contributions to the host projects (bugs reproduced,
 fixed narrowly, with regression tests); **B**, INTERPLANE itself, which turns every such bug into a
 fixture or probe. Ajax is added only from official artifacts (see `spec/LENSHIFT.md`).
+
+## 0.2 sequencing (Drake, 2026-10-04): evidence before architecture
+
+0.2 adds no new architecture. In order: (1) documentation precision fixes; (2) human-submitted
+Odysseus #6474; (3) the 30–50 task CrossAxis benchmark (easy filesystem, ambiguous, multi-domain,
+rare tool, wrong-first-tool, tool failures, denied effects, injection in workspace/tool content,
+selection that must expand after round one, unknown-tool recovery, sequential tools), reported as
+distributions: median tool reduction, median prompt-token reduction, success-rate difference,
+missing-required-tool rate, unnecessary-tool-call rate, median rounds, wall-clock; gate target
+(not tuned to): >= 70% less exposed tool-schema cost with success statistically indistinguishable
+from the full catalog and required-tool omission below a predefined threshold; (4) Qwen3.5
+qualified on llama.cpp and SGLang; (5) close the AIEN production-authority seam (adapter ->
+aien-mcp -> real authorization -> AuthorizedEffect -> EffectLane); (6) publish the 0.2 Capability
+Report; (7) only then approach Odysseus with INTERPLANE itself. The repository stays under
+`aien-dev` through 0.2; neutrality is demonstrated technically first.

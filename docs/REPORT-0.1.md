@@ -59,7 +59,8 @@ repository or a command whose output is recorded there; nothing planned is descr
   same Qwen3.5 task over the Odysseus catalog, 71 tools vs 9 selected by CrossAxis
   `domain_match`; first-turn prompt tokens 15 846 vs 1 674 (89.4% fewer); both runs reached the
   correct answer; every tool call was decided by Odysseus and executed only through Crossveil;
-  run 2 reproduced run 1's deterministic digest, answers and token counts.
+  a second independent run reproduced the same tool selection, first-turn token reduction,
+  successful answer and deterministic selection digest (round totals differed by a few tokens).
 - Probe on Qwen3.5-9B/Ollama 0.34.0: 13 PASS, 1 UNSUPPORTED (`tools.text_qwen35`), identical
   verdicts from the Rust and Python probes; profiles `interplane.core.0.1`, `lenshift.openai.1`,
   `relayline.tool_replay.1` compatible, `lenshift.qwen35.1` incompatible on that endpoint.

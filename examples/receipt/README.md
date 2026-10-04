@@ -37,11 +37,12 @@ What the receipt shows honestly:
 
 ## Reproducibility
 
-Run 2 was executed with `--verify run1`: the deterministic sections (catalog digest, selection,
-task definition, rendered tool digests, probe digest) reproduced byte-for-byte
-(`deterministic_digest` identical), and with `temperature 0, seed 42` the model's answers and
-token counts were identical too. Model output is not guaranteed stable across backends or
-versions; the receipt separates what must reproduce from what happened to.
+A second independent run (`run2.json`, started with `--verify run1`) reproduced the same tool
+selection (71 -> 9), the same first-turn token reduction (15 846 -> 1 674), the same successful
+answer, and the same deterministic selection digest. The complete executions were not
+byte-identical: totals across all rounds differed slightly (selected path: 7 077 vs 7 083 prompt
+tokens, 150 vs 152 completion tokens) and request ids and timings differ by nature. The receipt
+separates what must reproduce (`deterministic_digest`) from what happened to.
 
 ## Run it
 

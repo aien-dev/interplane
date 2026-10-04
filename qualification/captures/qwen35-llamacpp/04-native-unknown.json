@@ -1,0 +1,104 @@
+{
+  "name": "04-native-unknown",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Use the compile_project tool to build the project in /srv/app."
+      }
+    ],
+    "max_tokens": 4096
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I don't have access to a \\\"compile_project\\\" tool in my current environment. The tools available to me are:\\n\\n1. **read_file** - Read text files\\n2. **list_dir** - List directory contents\\n3. **write_file** - Write text content to files\\n4. **send_email** - Send emails\\n\\nNone of these tools can compile or build projects. If you need to build a project in /srv/app, you might need to:\\n\\n- Use a command-line build tool directly (like `make`, `npm install`, `cargo build`, etc.)\\n- Or if you have a build script, I could help read and execute it using the available tools\\n\\nWould you like me to help you with something else, such as reading the project files in /srv/app to understand what build system is being used?\",\"reasoning_content\":\"The user is asking me to use a \\\"compile_project tool\\\" to build a project in /srv/app. However, looking at the available tools I have access to, I don't see a \\\"compile_project\\\" tool. The available tools are:\\n\\n1. read_file - Read a text file and return its contents\\n2. list_dir - List the entries of a directory\\n3. write_file - Write text content to a file, replacing it\\n4. send_email - Send an email\\n\\nNone of these tools are for compiling or building projects. The user might be mistaken about what tools are available, or they might be referring to a tool that doesn't exist in my current environment.\\n\\nI should let the user know that I don't have access to a compile_project tool, and explain what tools I actually have available.\\n\"}}],\"created\":1791150493,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":345,\"prompt_tokens\":493,\"total_tokens\":838,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"id\":\"chatcmpl-kvd4v5sGiQuX3sLPqdqHnifUc7t55ozK\",\"timings\":{\"cache_n\":0,\"prompt_n\":493,\"prompt_ms\":2230.489,\"prompt_per_token_ms\":4.52431845841785,\"prompt_per_second\":221.02776566035521,\"predicted_n\":345,\"predicted_ms\":32415.932,\"predicted_per_token_ms\":94.23236046511629,\"predicted_per_second\":10.612065696584013}}",
+  "sha256_response": "f2c6a0e4313494135e1525d645f29959600bb5d6327cfae9880847fbe3b7494d"
+}

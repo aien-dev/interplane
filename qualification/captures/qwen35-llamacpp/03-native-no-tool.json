@@ -1,0 +1,104 @@
+{
+  "name": "03-native-no-tool",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "description": "Read a text file and return its contents.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "File path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "list_dir",
+          "description": "List the entries of a directory.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Directory path"
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "write_file",
+          "description": "Write text content to a file, replacing it.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "send_email",
+          "description": "Send an email.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "to": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "to",
+              "body"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the capital of France? Answer in one sentence."
+      }
+    ],
+    "max_tokens": 4096
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The capital of France is Paris.\",\"reasoning_content\":\"The user is asking a simple factual question about the capital of France. This doesn't require any of the available tools (read_file, list_dir, write_file, send_email). I can answer this directly from my knowledge.\\n\\nThe capital of France is Paris. I need to answer in one sentence as requested.\\n\"}}],\"created\":1791150467,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":74,\"prompt_tokens\":491,\"total_tokens\":565,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"id\":\"chatcmpl-a73r4EwZKwvU0zVBpUaxVcOV1pXL7Rn5\",\"timings\":{\"cache_n\":0,\"prompt_n\":491,\"prompt_ms\":2230.125,\"prompt_per_token_ms\":4.542006109979633,\"prompt_per_second\":220.1670309960204,\"predicted_n\":74,\"predicted_ms\":6444.089,\"predicted_per_token_ms\":88.27519178082191,\"predicted_per_second\":11.328211016328297}}",
+  "sha256_response": "44dc234be4173c12fc05d008dd1531601fc3028629e754fdd3ceaa94c5c0810d"
+}

@@ -1,0 +1,74 @@
+{
+  "case": "02-malformed-arguments",
+  "description": "Two calls Lenshift cannot understand: arguments that are not JSON, and arguments that are a JSON array. Both are rejected as malformed_tool_call and never reach the runtime.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-02",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_02a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{not json"
+            }
+          },
+          {
+            "id": "call_02b",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "[1, 2, 3]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_02a",
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "malformed_tool_call",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_02b",
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "malformed_tool_call",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "rejected",
+        "intents": 0,
+        "rejected": 2,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    }
+  }
+}

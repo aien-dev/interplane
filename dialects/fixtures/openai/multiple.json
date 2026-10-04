@@ -1,0 +1,90 @@
+{
+  "dialect": "openai",
+  "name": "multiple",
+  "input": {
+    "role": "assistant",
+    "content": "Reading both.",
+    "tool_calls": [
+      {
+        "id": "call_a",
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "arguments": "{\"path\": \"/tmp/a.txt\"}"
+        }
+      },
+      {
+        "id": "call_b",
+        "type": "function",
+        "function": {
+          "name": "filesystem.list",
+          "arguments": "{\"path\": \"/tmp\"}"
+        }
+      }
+    ]
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "Reading both.",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "call_a",
+        "tool": {
+          "namespace": null,
+          "name": "read_file"
+        },
+        "arguments": {
+          "path": "/tmp/a.txt"
+        },
+        "provenance": {
+          "dialect": "openai",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_a",
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      },
+      {
+        "kind": "tool_request",
+        "request_id": "call_b",
+        "tool": {
+          "namespace": "filesystem",
+          "name": "list"
+        },
+        "arguments": {
+          "path": "/tmp"
+        },
+        "provenance": {
+          "dialect": "openai",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_b",
+          "source_digest": null,
+          "raw_name": "filesystem.list",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null,
+      null
+    ]
+  }
+}

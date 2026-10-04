@@ -1,0 +1,63 @@
+{
+  "case": "05-policy-denial",
+  "description": "write_file is denied by mock policy. The runtime is asked once, execute is never called.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-05",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_05a",
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "arguments": "{\"path\": \"/tmp/out.txt\", \"content\": \"hello\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_05a",
+        "stage": "DENIED",
+        "decision": "denied",
+        "status": "denied",
+        "error_code": "policy_denied",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 0
+    },
+    "result_checks": [
+      {
+        "request_id": "call_05a",
+        "path": "decision.reason",
+        "equals": "mock policy: writes are denied"
+      }
+    ]
+  }
+}

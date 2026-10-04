@@ -1,0 +1,66 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  schemas-and-fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install jsonschema
+      - name: schema self-check
+        run: |
+          python - <<'PY'
+          import json,glob
+          from jsonschema import Draft202012Validator
+          for f in sorted(glob.glob('spec/schemas/*.json')):
+              Draft202012Validator.check_schema(json.load(open(f))); print('ok', f)
+          PY
+      - name: fixture validation
+        run: python conformance/runners/validate_fixtures.py
+  rust:
+    runs-on: ubuntu-latest
+    defaults: {run: {working-directory: rust}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: {components: "rustfmt, clippy"}
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - run: cargo test --all
+      - name: conformance (rust)
+        run: cargo run -q -p interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
+      - uses: actions/upload-artifact@v4
+        with: {name: rust-verdicts, path: rust-verdicts.json}
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pytest jsonschema pyflakes -e python
+      - run: python -m pyflakes python/interplane python/tests
+      - run: python -m pytest python/tests -q
+      - name: conformance (python)
+        run: python -m interplane.conformance conformance/fixtures --out py-verdicts.json
+      - uses: actions/upload-artifact@v4
+        with: {name: py-verdicts, path: py-verdicts.json}
+  cross-language:
+    needs: [rust, python]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: rust-verdicts}
+      - uses: actions/download-artifact@v4
+        with: {name: py-verdicts}
+      - name: verdicts must be identical
+        run: |
+          python3 - <<'PY'
+          import json,sys
+          r=json.load(open('rust-verdicts.json')); p=json.load(open('py-verdicts.json'))
+          bad=[c for c in sorted(set(r)|set(p)) if json.dumps(r.get(c),sort_keys=True)!=json.dumps(p.get(c),sort_keys=True)]
+          print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=18 else 0)
+          PY

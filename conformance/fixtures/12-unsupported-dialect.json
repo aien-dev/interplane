@@ -1,0 +1,33 @@
+{
+  "case": "12-unsupported-dialect",
+  "description": "Dialect frobnicate is not implemented: the turn is rejected with unsupported_dialect and produces no records.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-12",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "frobnicate",
+      "model": "mock-model",
+      "input": "anything at all"
+    }
+  ],
+  "expected": {
+    "observed": [],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "rejected",
+        "intents": 0,
+        "rejected": 0,
+        "text": "",
+        "error_code": "unsupported_dialect"
+      }
+    ],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    }
+  }
+}

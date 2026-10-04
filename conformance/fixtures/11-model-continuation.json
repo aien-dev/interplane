@@ -1,0 +1,57 @@
+{
+  "case": "11-model-continuation",
+  "description": "qwen35 turn 0 has a think block, prose and a read_file call. The result is rendered back as a tool_response and the model answers in turn 1 with no tool call.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-11",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "qwen35",
+      "model": "Qwen/Qwen3.5-9B",
+      "input": "<think>\nThe user wants the notes file, so I should read it.\n</think>\n\nLet me read it.\n\n<tool_call>\n<function=read_file>\n<parameter=path>\n/tmp/notes.txt\n</parameter>\n</function>\n</tool_call>"
+    },
+    {
+      "turn": 1,
+      "dialect": "qwen35",
+      "model": "Qwen/Qwen3.5-9B",
+      "continues": true,
+      "input": "The file says: mock content of /tmp/notes.txt"
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "trace-11:t0:c0",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": "Let me read it."
+      },
+      {
+        "turn": 1,
+        "outcome": "no_tool",
+        "intents": 0,
+        "rejected": 0,
+        "text": "The file says: mock content of /tmp/notes.txt"
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "case": "17-replay",
+  "description": "The same envelope (same message_id) is admitted twice. The first runs, the second is rejected as a replay and the runtime is not asked again.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-17",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "1.0",
+        "message_id": "m-17-replay-0-0",
+        "trace_id": "trace-17",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "req-17a",
+          "tool": {
+            "namespace": null,
+            "name": "read_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "read_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "turn": 1,
+      "envelope": {
+        "interplane_version": "1.0",
+        "message_id": "m-17-replay-0-0",
+        "trace_id": "trace-17",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "req-17a",
+          "tool": {
+            "namespace": null,
+            "name": "read_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "read_file",
+            "coercion": "none"
+          }
+        }
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "req-17a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "req-17a",
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "replayed_message",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    }
+  }
+}

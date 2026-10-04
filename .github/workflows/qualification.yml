@@ -1,0 +1,16 @@
+name: qualification (manual, needs a live model endpoint)
+on:
+  workflow_dispatch:
+    inputs:
+      endpoint: {description: "OpenAI-compatible base URL", required: true}
+      model: {description: "model id", required: true}
+jobs:
+  probe:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cd rust && cargo run -q -p interplane-probe -- --endpoint "${{ inputs.endpoint }}" --model "${{ inputs.model }}" --out ../probe-report.json
+        env: {INTERPLANE_PROBE_API_KEY: "${{ secrets.INTERPLANE_PROBE_API_KEY }}"}
+      - uses: actions/upload-artifact@v4
+        with: {name: probe-report, path: probe-report.json}

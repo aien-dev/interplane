@@ -1,0 +1,61 @@
+{
+  "dialect": "openai",
+  "name": "reasoning_content_present",
+  "note": "reasoning_digest must be a non-null sha256 of the reasoning channel; its exact bytes are not pinned by the spec, so the fixture records null and reasoning_present=true.",
+  "input": {
+    "role": "assistant",
+    "content": "Done thinking.",
+    "tool_calls": [
+      {
+        "id": "call_a",
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "arguments": "{\"path\": \"/tmp/a.txt\"}"
+        }
+      }
+    ],
+    "reasoning_content": "I should read the file first."
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": true,
+  "expected": {
+    "text": "Done thinking.",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "call_a",
+        "tool": {
+          "namespace": null,
+          "name": "read_file"
+        },
+        "arguments": {
+          "path": "/tmp/a.txt"
+        },
+        "provenance": {
+          "dialect": "openai",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_a",
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

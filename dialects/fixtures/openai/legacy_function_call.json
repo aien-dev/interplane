@@ -1,0 +1,54 @@
+{
+  "dialect": "openai",
+  "name": "legacy_function_call",
+  "note": "Legacy function_call has no id, so request_id falls back to <trace_id>:t<turn>:c<index> and source_call_id is null.",
+  "input": {
+    "role": "assistant",
+    "content": null,
+    "function_call": {
+      "name": "read_file",
+      "arguments": "{\"path\": \"/tmp/a.txt\"}"
+    }
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "namespace": null,
+          "name": "read_file"
+        },
+        "arguments": {
+          "path": "/tmp/a.txt"
+        },
+        "provenance": {
+          "dialect": "openai",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

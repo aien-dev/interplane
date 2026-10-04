@@ -1,0 +1,21 @@
+{
+  "dialect": "qwen35",
+  "name": "plain_answer",
+  "input": "The capital of France is Paris.",
+  "model": "Qwen/Qwen3.5-9B",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "The capital of France is Paris.",
+    "intents": [],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

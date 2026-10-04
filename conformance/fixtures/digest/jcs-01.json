@@ -1,0 +1,12 @@
+{
+  "value": {
+    "zeta": 1.0,
+    "alpha": {"big": 1e21, "int": 42, "neg": -7, "zero": 0, "half": 0.5, "two_and_half": 2.50},
+    "list": [3, [1.0, [], {}], {"b": null, "a": [true, false]}],
+    "unicode": {"é": "café", "z": "naïve ☃", "～": "fullwidth tilde", "😀": "emoji U+1F600", "日本語": "ユニコード"},
+    "escapes": "line1\nline2\t\"quoted\" back\\slash / slash \u0001 \u001f",
+    "": "empty key"
+  },
+  "expected_jcs": "{\"\":\"empty key\",\"alpha\":{\"big\":1e+21,\"half\":0.5,\"int\":42,\"neg\":-7,\"two_and_half\":2.5,\"zero\":0},\"escapes\":\"line1\\nline2\\t\\\"quoted\\\" back\\\\slash / slash \\u0001 \\u001f\",\"list\":[3,[1,[],{}],{\"a\":[true,false],\"b\":null}],\"unicode\":{\"z\":\"naïve ☃\",\"é\":\"café\",\"日本語\":\"ユニコード\",\"😀\":\"emoji U+1F600\",\"～\":\"fullwidth tilde\"},\"zeta\":1}",
+  "expected_sha256": "sha256:8c505554d60036223c3fd43bf76c070278b21d706f1869843927202d25b9e3d6"
+}

@@ -1,0 +1,47 @@
+{
+  "dialect": "qwen35",
+  "name": "reasoning_plus_call",
+  "note": "The leading think block is removed from text; reasoning_digest must be non-null (recorded as null here).",
+  "input": "<think>\nI need the file contents.\n</think>\n\nChecking.\n\n<tool_call>\n<function=read_file>\n<parameter=path>\n/tmp/a.txt\n</parameter>\n</function>\n</tool_call>",
+  "model": "Qwen/Qwen3.5-9B",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": true,
+  "expected": {
+    "text": "Checking.",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "namespace": null,
+          "name": "read_file"
+        },
+        "arguments": {
+          "path": "/tmp/a.txt"
+        },
+        "provenance": {
+          "dialect": "qwen35",
+          "dialect_version": "1",
+          "model": "Qwen/Qwen3.5-9B",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "json_guess"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

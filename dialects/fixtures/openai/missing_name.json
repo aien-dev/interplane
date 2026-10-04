@@ -1,0 +1,74 @@
+{
+  "dialect": "openai",
+  "name": "missing_name",
+  "note": "Index counts every call in the turn, rejected ones included, so the valid call is index 1. The rejection message text is this suite's choice; the spec fixes only the code.",
+  "input": {
+    "role": "assistant",
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call_a",
+        "type": "function",
+        "function": {
+          "name": "",
+          "arguments": "{}"
+        }
+      },
+      {
+        "id": "call_b",
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "arguments": "{\"path\": \"/tmp/a.txt\"}"
+        }
+      }
+    ]
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "call_b",
+        "tool": {
+          "namespace": null,
+          "name": "read_file"
+        },
+        "arguments": {
+          "path": "/tmp/a.txt"
+        },
+        "provenance": {
+          "dialect": "openai",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_b",
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "missing tool name"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

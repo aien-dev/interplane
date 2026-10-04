@@ -1,0 +1,56 @@
+{
+  "case": "04-unknown-capability",
+  "description": "nonexistent.thing has no mapping rule: CrossAxis rejects it with unknown_capability before any runtime contact.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-04",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_04a",
+            "type": "function",
+            "function": {
+              "name": "nonexistent.thing",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_04a",
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "unknown_capability",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    }
+  }
+}

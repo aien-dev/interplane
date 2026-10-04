@@ -1,0 +1,63 @@
+{
+  "case": "09-timeout",
+  "description": "slow_tool is authorized and then times out (simulated, no real wait).",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-09",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_09a",
+            "type": "function",
+            "function": {
+              "name": "slow_tool",
+              "arguments": "{}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_09a",
+        "stage": "TIMED_OUT",
+        "decision": "authorized",
+        "status": "timed_out",
+        "error_code": "execution_timeout",
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "result_checks": [
+      {
+        "request_id": "call_09a",
+        "path": "error.message",
+        "equals": "mock execution exceeded 1000 ms"
+      }
+    ]
+  }
+}

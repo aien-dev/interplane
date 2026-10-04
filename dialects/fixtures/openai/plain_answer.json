@@ -1,0 +1,24 @@
+{
+  "dialect": "openai",
+  "name": "plain_answer",
+  "input": {
+    "role": "assistant",
+    "content": "The answer is 42."
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "The answer is 42.",
+    "intents": [],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

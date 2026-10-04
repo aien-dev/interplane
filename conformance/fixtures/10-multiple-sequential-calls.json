@@ -1,0 +1,74 @@
+{
+  "case": "10-multiple-sequential-calls",
+  "description": "One turn with read_file then list_dir: two records in emission order, both ok.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-10",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_10a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\": \"/tmp/a.txt\"}"
+            }
+          },
+          {
+            "id": "call_10b",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_10a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_10b",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 2,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 2,
+      "execute_calls": 2
+    }
+  }
+}

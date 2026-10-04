@@ -1,0 +1,53 @@
+{
+  "dialect": "qwen35",
+  "name": "json_typed_parameter",
+  "note": "json_guess: a value that parses as JSON to a non-string is used as parsed (20 -> 20, {\"a\": true} -> object, 123 -> the number 123 even for a parameter named path, null -> null). A value that parses to a string (\"text\" with quotes) keeps the raw text including the quotes. Turning 123 back into a string is CrossAxis's job, not Lenshift's.",
+  "input": "<tool_call>\n<function=list_dir>\n<parameter=path>\n123\n</parameter>\n<parameter=limit>\n20\n</parameter>\n<parameter=flags>\n{\"a\": true}\n</parameter>\n<parameter=quoted>\n\"text\"\n</parameter>\n<parameter=empty_value>\nnull\n</parameter>\n</function>\n</tool_call>",
+  "model": "Qwen/Qwen3.5-9B",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "namespace": null,
+          "name": "list_dir"
+        },
+        "arguments": {
+          "path": 123,
+          "limit": 20,
+          "flags": {
+            "a": true
+          },
+          "quoted": "\"text\"",
+          "empty_value": null
+        },
+        "provenance": {
+          "dialect": "qwen35",
+          "dialect_version": "1",
+          "model": "Qwen/Qwen3.5-9B",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "list_dir",
+          "coercion": "json_guess"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

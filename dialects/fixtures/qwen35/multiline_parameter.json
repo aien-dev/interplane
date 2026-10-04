@@ -1,0 +1,48 @@
+{
+  "dialect": "qwen35",
+  "name": "multiline_parameter",
+  "note": "Exactly one leading and one trailing newline are stripped from the value; internal newlines, blank lines and indentation are preserved.",
+  "input": "<tool_call>\n<function=write_file>\n<parameter=path>\n/tmp/out.txt\n</parameter>\n<parameter=content>\nline one\nline two\n\n  indented line four\n</parameter>\n</function>\n</tool_call>",
+  "model": "Qwen/Qwen3.5-9B",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "trace-dialect:t0:c0",
+        "tool": {
+          "namespace": null,
+          "name": "write_file"
+        },
+        "arguments": {
+          "path": "/tmp/out.txt",
+          "content": "line one\nline two\n\n  indented line four"
+        },
+        "provenance": {
+          "dialect": "qwen35",
+          "dialect_version": "1",
+          "model": "Qwen/Qwen3.5-9B",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": null,
+          "source_digest": null,
+          "raw_name": "write_file",
+          "coercion": "json_guess"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      null
+    ]
+  }
+}

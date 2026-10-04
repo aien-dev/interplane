@@ -1,0 +1,88 @@
+{
+  "case": "14-unknown-fields",
+  "description": "Unknown fields on the envelope, payload and provenance are ignored. The outcome is the same as case 01.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-14",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "1.0",
+        "message_id": "m-14-unknown-fields-0-0",
+        "trace_id": "trace-14",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "req-14a",
+          "tool": {
+            "namespace": null,
+            "name": "read_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "read_file",
+            "coercion": "none",
+            "x_provenance_extra": "ignored"
+          },
+          "x_payload_extra": true
+        },
+        "x_envelope_extra": {
+          "anything": [
+            1,
+            2,
+            3
+          ]
+        },
+        "extensions": {
+          "x.unknown.key": "ignored"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "req-14a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "result_checks": [
+      {
+        "request_id": "req-14a",
+        "path": "data.content",
+        "equals": "mock content of /tmp/a.txt"
+      }
+    ]
+  }
+}

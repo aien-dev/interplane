@@ -1,0 +1,69 @@
+{
+  "case": "13-unsupported-version",
+  "description": "An envelope with interplane_version 2.0 is rejected before its payload is parsed, so the record has no request_id.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-13",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "2.0",
+        "message_id": "m-13-unsupported-version-0-0",
+        "trace_id": "trace-13",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "req-13a",
+          "tool": {
+            "namespace": null,
+            "name": "read_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "read_file",
+            "coercion": "none"
+          }
+        }
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": null,
+        "stage": "REJECTED",
+        "decision": null,
+        "status": "rejected",
+        "error_code": "unsupported_version",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 0,
+      "execute_calls": 0
+    }
+  }
+}

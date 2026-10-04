@@ -1,0 +1,71 @@
+{
+  "case": "07-successful-execution",
+  "description": "list_dir succeeds and returns the mocked entries.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-07",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_07a",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_07a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "result_checks": [
+      {
+        "request_id": "call_07a",
+        "path": "data.entries",
+        "equals": [
+          "a.txt",
+          "b.txt"
+        ]
+      },
+      {
+        "request_id": "call_07a",
+        "path": "data.path",
+        "equals": "/tmp"
+      }
+    ]
+  }
+}

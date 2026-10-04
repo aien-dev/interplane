@@ -426,10 +426,31 @@ struct Runner<'a> {
     results: Vec<ProbeResult>,
 }
 
-fn weather_tool() -> Value {
-    json!({"type": "function", "function": {"name": "get_weather", "description": "Get the current weather for a city.",
-        "parameters": {"type": "object", "properties": {"city": {"type": "string"}}, "required": ["city"]}}})
+/// Tool fixtures and prompts below mirror `python/interplane/probe.py` exactly; both reference probes
+/// must send identical request bodies per probe id (spec/PROBE.md).
+fn user_msg(s: &str) -> Value {
+    json!([{"role": "user", "content": s}])
 }
+
+fn dir_tool(name: &str, description: &str) -> Value {
+    json!({"type": "function", "function": {"name": name, "description": description,
+        "parameters": {"type": "object", "properties": {"path": {"type": "string", "description": "Relative path."}}, "required": ["path"]}}})
+}
+
+fn read_file_tool() -> Value {
+    dir_tool("read_file", "Read a UTF-8 text file from the workspace.")
+}
+
+fn list_dir_tool() -> Value {
+    dir_tool("list_dir", "List the entries of a workspace directory.")
+}
+
+const QWEN35_TOOL_INSTRUCTION: &str = "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"name\": \"read_file\", \"description\": \"Read a UTF-8 text file from the workspace.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Relative path.\"}}, \"required\": [\"path\"]}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format\n- Required parameters MUST be specified\n</IMPORTANT>";
+
+const READ_README: &str = "Read the file README.md and tell me what it says.";
+const REPLY_READY: &str = "Reply with the single word: ready";
+const SEVENTEEN: &str = "What is 17 times 23? Answer with the number.";
+const NEEDLE: &str = "PELICAN-4410";
 
 impl Runner<'_> {
     fn skipped(&self, name: &str) -> bool {
@@ -438,17 +459,34 @@ impl Runner<'_> {
             .iter()
             .any(|s| name == s || name.starts_with(&format!("{s}.")))
     }
+    /// Base body, identical to Python's `Endpoint.chat` defaults: model, temperature 0, seed 42.
+    /// `max_tokens` is added only where the Python probe adds it.
     fn chat(&self, messages: Value) -> Value {
-        json!({"model": self.cfg.model, "messages": messages, "temperature": 0, "max_tokens": 2048})
+        json!({"model": self.cfg.model, "messages": messages, "temperature": 0, "seed": 42})
+    }
+    fn chat_capped(&self, messages: Value) -> Value {
+        let mut b = self.chat(messages);
+        b["max_tokens"] = json!(2048);
+        b
     }
     fn record(&mut self, name: &str, verdict: Eval, req: &Value, resp: Option<&str>, ms: u64) {
+        self.record_digest(name, verdict, digest(req), resp, ms);
+    }
+    fn record_digest(
+        &mut self,
+        name: &str,
+        verdict: Eval,
+        req_digest: String,
+        resp: Option<&str>,
+        ms: u64,
+    ) {
         self.results.push(ProbeResult {
             name: name.into(),
             verdict: verdict.0,
             detail: Some(verdict.1.chars().take(4096).collect()),
             duration_ms: Some(ms),
             attempts: Some(1),
-            request_digest: Some(digest(req)),
+            request_digest: Some(req_digest),
             response_digest: resp.map(|r| match serde_json::from_str::<Value>(r) {
                 Ok(v) => digest(&v),
                 Err(_) => digest_bytes(r.as_bytes()),
@@ -502,7 +540,7 @@ impl Runner<'_> {
         let user = |s: &str| json!([{"role": "user", "content": s}]);
         self.post_eval(
             "chat.basic",
-            self.chat(user("Reply with one short sentence about the sea.")),
+            self.chat_capped(user(REPLY_READY)),
             false,
             eval_chat_basic,
         );
@@ -512,7 +550,7 @@ impl Runner<'_> {
         if self.skipped(name) {
             self.skip(name);
         } else {
-            let mut body = self.chat(user("Count from one to five."));
+            let mut body = self.chat_capped(user(REPLY_READY));
             body["stream"] = json!(true);
             let t0 = Instant::now();
             let r = self.t.post("/chat/completions", &body);
@@ -526,50 +564,62 @@ impl Runner<'_> {
             self.record(name, verdict, &body, raw.as_deref(), ms);
         }
 
-        let mut native = self.chat(user("What is the weather in Paris? Use the tool."));
-        native["tools"] = json!([weather_tool()]);
-        self.post_eval("tools.native", native, true, |v| {
-            eval_tools_native(v, "get_weather")
+        let mut native = self.chat(user(READ_README));
+        native["tools"] = json!([read_file_tool()]);
+        let native_resp = self.post_eval("tools.native", native, true, |v| {
+            eval_tools_native(v, "read_file")
         });
+        // Like Python, the replay probe reuses the call the backend produced when tools.native passed.
+        let native_call: Option<Value> = native_resp
+            .filter(|v| eval_tools_native(v, "read_file").0 == Verdict::Pass)
+            .and_then(|v| tool_calls(&v).first().map(|c| (*c).clone()));
 
-        let sys = "You can call functions. To call one, reply with exactly this format and nothing else:\n<tool_call>\n<function=get_weather>\n<parameter=city>\nCITY\n</parameter>\n</function>\n</tool_call>\nReplace CITY with the city name.";
-        let text_body = self.chat(json!([{"role": "system", "content": sys}, {"role": "user", "content": "What is the weather in Paris?"}]));
+        let text_body = self.chat(json!([{"role": "system", "content": QWEN35_TOOL_INSTRUCTION}, {"role": "user", "content": READ_README}]));
         self.post_eval("tools.text_qwen35", text_body, false, |v| {
-            eval_text_qwen35(v, "get_weather")
+            eval_text_qwen35(v, "read_file")
         });
 
-        let mut par = self.chat(user("Get the weather in Paris and in Tokyo. Call the tool for both cities in the same turn."));
-        par["tools"] = json!([weather_tool()]);
+        let mut par = self.chat(user(
+            "Read both README.md and LICENSE now, in one go, then summarize both.",
+        ));
+        par["tools"] = json!([read_file_tool()]);
         self.post_eval("tools.parallel", par, true, eval_parallel);
 
+        let call = native_call.unwrap_or_else(|| {
+            json!({"id": "call_probe0001", "type": "function",
+                "function": {"name": "read_file", "arguments": "{\"path\":\"README.md\"}"}})
+        });
+        let call_id = call
+            .get("id")
+            .and_then(Value::as_str)
+            .filter(|s| !s.is_empty())
+            .unwrap_or("call_probe0001")
+            .to_string();
         let mut replay = self.chat(json!([
-            {"role": "user", "content": "What is the weather in Paris?"},
-            {"role": "assistant", "content": null, "tool_calls": [{"id": "call_probe_1", "type": "function",
-                "function": {"name": "get_weather", "arguments": "{\"city\": \"Paris\"}"}}]},
-            {"role": "tool", "tool_call_id": "call_probe_1", "content": "{\"city\":\"Paris\",\"temperature_c\":4217}"}
+            {"role": "user", "content": READ_README},
+            {"role": "assistant", "content": "", "tool_calls": [call]},
+            {"role": "tool", "tool_call_id": call_id, "content": "{\"content\": \"INTERPLANE probe marker ZEBRA-7731.\"}"}
         ]));
-        replay["tools"] = json!([weather_tool()]);
+        replay["tools"] = json!([read_file_tool()]);
         self.post_eval("tools.result_replay", replay, true, |v| {
-            eval_result_replay(v, "4217")
+            eval_result_replay(v, "ZEBRA-7731")
         });
 
-        let mut unk = self.chat(user(
-            "Send an email to bob@example.com saying hello. Use the send_email tool.",
-        ));
-        unk["tools"] = json!([weather_tool()]);
+        let mut unk = self.chat(user("Use the compile_project tool to build the project."));
+        unk["tools"] = json!([read_file_tool(), list_dir_tool()]);
         self.post_eval("tools.unknown_refusal", unk, true, |v| {
-            eval_unknown_refusal(v, &["get_weather"])
+            eval_unknown_refusal(v, &["read_file", "list_dir"])
         });
 
         let chan = self.post_eval(
             "reasoning.channel",
-            self.chat(user("What is 17 times 23? Think step by step.")),
+            self.chat(user(SEVENTEEN)),
             true,
             eval_reasoning_channel,
         );
         self.reasoning_disable(chan.as_ref().is_some_and(|v| reasoning_text(v).is_some()));
 
-        let mut js = self.chat(user("Return a JSON object with the key ok set to true."));
+        let mut js = self.chat(user("Return a JSON object with key answer set to 42."));
         js["response_format"] = json!({"type": "json_object"});
         self.post_eval("json.structured", js, true, eval_json_structured);
 
@@ -578,9 +628,8 @@ impl Runner<'_> {
             ("context.16k", 16),
             ("context.32k", 32),
         ] {
-            let needle = format!("{}", 7000 + kib * 13);
-            let body = self.chat(user(&needle_prompt(kib, &needle)));
-            self.post_eval(name, body, false, |v| eval_context(v, &needle));
+            let body = self.chat_capped(user(&needle_prompt(kib, NEEDLE)));
+            self.post_eval(name, body, false, |v| eval_context(v, NEEDLE));
         }
 
         self.models_list();
@@ -592,8 +641,7 @@ impl Runner<'_> {
             self.skip(name);
             return;
         }
-        let base = self
-            .chat(json!([{"role": "user", "content": "What is 17 times 23? Think step by step."}]));
+        let base = self.chat(user_msg(SEVENTEEN));
         let mechanisms: [(&str, Value); 3] = [
             (
                 "chat_template_kwargs.enable_thinking=false",
@@ -662,10 +710,11 @@ impl Runner<'_> {
             Exchange::Verdict(v) => v,
             Exchange::Text(_) => ev(Verdict::Fail, "unexpected body"),
         };
-        self.record(
+        // Python digests the literal request line "GET /models".
+        self.record_digest(
             name,
             verdict,
-            &json!({"GET": "/models"}),
+            digest_bytes(b"GET /models"),
             raw.as_deref(),
             ms,
         );
@@ -673,11 +722,25 @@ impl Runner<'_> {
 }
 
 /// A prompt of roughly `kib` thousand tokens with the needle in the middle.
-pub fn needle_prompt(kib: usize, needle: &str) -> String {
-    let filler = "The quick brown fox jumps over the lazy dog. ";
-    let n = kib * 1024 * 4 / filler.len();
-    let half = filler.repeat(n / 2);
-    format!("{half}The secret code is {needle}. {half}\nWhat is the secret code? Answer with the number only.")
+pub fn needle_prompt(kib: usize, needle_code: &str) -> String {
+    // Port of Python `context_probe`: repeated filler lines up to ~3 bytes per token, needle in the middle.
+    let filler = format!(
+        "{}\n",
+        "The quick brown fox jumps over the lazy dog. ".repeat(8)
+    );
+    let target = kib * 1024 * 3;
+    let mut lines: Vec<String> = Vec::new();
+    let mut size = 0;
+    while size < target {
+        lines.push(filler.clone());
+        size += filler.len();
+    }
+    let mid = lines.len() / 2;
+    lines.insert(mid, format!("The secret code word is {needle_code}.\n"));
+    format!(
+        "{}\n\nWhat is the secret code word? Answer with just the code word.",
+        lines.concat()
+    )
 }
 
 /// RFC 3339 UTC timestamp for `secs` since the epoch.

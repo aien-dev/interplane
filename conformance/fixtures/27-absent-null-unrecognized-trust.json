@@ -1,0 +1,183 @@
+{
+  "case": "27-absent-null-unrecognized-trust",
+  "description": "Three executed results whose trust label the pipeline cannot take as given (harness-side mock_provenance): read_file with trust absent and the adapter claiming trusted true; list_dir with trust null and trusted true; append_note (normally trusted_runtime) relabelled with the unrecognized trust \"sorta_trusted\". Absent and null become unknown with trusted null; the unrecognized string becomes external_untrusted with trusted false; the adapter-supplied trusted flag is never read. Checked as emitted and after a JCS round trip.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-27",
+  "mock_provenance": {
+    "read_file": {
+      "trusted": true
+    },
+    "list_dir": {
+      "trust": null,
+      "trusted": true
+    },
+    "append_note": {
+      "trust": "sorta_trusted"
+    }
+  },
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_27a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\":\"/tmp/a.txt\"}"
+            }
+          },
+          {
+            "id": "call_27b",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\":\"/tmp\"}"
+            }
+          },
+          {
+            "id": "call_27c",
+            "type": "function",
+            "function": {
+              "name": "append_note",
+              "arguments": "{\"path\":\"/tmp/notes.md\",\"text\":\"hello\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_27a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_27b",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_27c",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 3,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 3,
+      "execute_calls": 3
+    },
+    "result_checks": [
+      {
+        "request_id": "call_27a",
+        "path": "provenance.trust",
+        "equals": "unknown"
+      },
+      {
+        "request_id": "call_27a",
+        "path": "provenance.trust",
+        "equals": "unknown",
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27a",
+        "path": "provenance.trusted",
+        "equals": null
+      },
+      {
+        "request_id": "call_27a",
+        "path": "provenance.trusted",
+        "equals": null,
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27b",
+        "path": "provenance.trust",
+        "equals": "unknown"
+      },
+      {
+        "request_id": "call_27b",
+        "path": "provenance.trust",
+        "equals": "unknown",
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27b",
+        "path": "provenance.trusted",
+        "equals": null
+      },
+      {
+        "request_id": "call_27b",
+        "path": "provenance.trusted",
+        "equals": null,
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.trust",
+        "equals": "external_untrusted"
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.trust",
+        "equals": "external_untrusted",
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.trusted",
+        "equals": false
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.trusted",
+        "equals": false,
+        "round_trip": true
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.content_kind",
+        "equals": "workspace_content"
+      },
+      {
+        "request_id": "call_27c",
+        "path": "provenance.content_kind",
+        "equals": "workspace_content",
+        "round_trip": true
+      }
+    ]
+  }
+}

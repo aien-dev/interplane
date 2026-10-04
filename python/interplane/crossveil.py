@@ -713,9 +713,20 @@ class MockRuntime:
     def __init__(self) -> None:
         self.decide_calls = 0
         self.execute_calls = 0
+        # Harness-only: per capability, provenance keys (content_kind, trust, trusted) reported on
+        # an executed result in place of the defaults, as a mislabelling adapter would. Set by the
+        # conformance runner from a fixture's mock_provenance; never read from model content.
+        self.provenance_overrides: dict = {}
 
     def catalog(self) -> Catalog:
         return mock_catalog()
+
+    def execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
+        res = self._execute(req, decision, ctx)
+        override = self.provenance_overrides.get(req.capability)
+        if override and res.provenance is not None:
+            res.provenance = dict(res.provenance, **override)
+        return res
 
     @staticmethod
     def _invalid_reason(args: dict, schema: dict) -> Optional[str]:
@@ -759,7 +770,7 @@ class MockRuntime:
             return self._decision(req, "requires_approval", None, approval)
         return self._decision(req, "authorized")
 
-    def execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
+    def _execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
         self.execute_calls += 1
         rid, cap, args = req.request_id, req.capability, req.arguments
 

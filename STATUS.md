@@ -17,6 +17,7 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | CrossAxis measure units (bytes, tokens_model_reported, tokens_endpoint_tokenizer, tokens_estimated) | tested | tested | schema-validated (selection.schema.json) | not yet qualified: Core ships BytesOnly + EstimatedTokens (estimator v1); live counters belong to the bench runner |
 | CrossAxis expansion v1 (expand + discover, bounded) | conformant | conformant | cases 24, 25 | selections and digests byte-identical across languages; not yet qualified against a live model; never grants authority |
 | Crossveil pipeline + mock runtime | conformant | conformant | 25 cases | fails closed on adapter faults |
+| Reproducibility pins | - | - | - | see docs/RUN-MANIFEST-COMMITS.md (toolchain, pip constraints, action SHAs, AIEN sibling pins) |
 | Conformance runner | implemented | implemented | 25/25 both (rerun 2026-10-04, verdicts byte-identical) | `--dump` writes canonical results per case |
 | Interplane Probe | qualified | qualified | - | both run live against Qwen3.5-9B/Ollama 0.34.0 with identical verdicts (reports under qualification/reports) |
 | AIEN adapter | tested (on the real EffectAuthority path, pinned sovereign-core 6554aac; was 10 pipeline tests in 0.1) | - | - | ADR 0003; real aien-mcp SpeculativeLane + aegis gate; aien-cli SafetyEngine not linkable (private); AGPL |

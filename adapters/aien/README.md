@@ -22,12 +22,22 @@ checkout:
 
 ```
 <parent>/interplane/adapters/aien           (this crate)
-<parent>/interplane-audit/aegis-runtime      aien-dev/aegis-runtime  @ f4e870953a466bb1cf68f1d88285929024cf1ba9
-<parent>/interplane-audit/aien-protocols     aien-dev/aien-protocols @ 3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
+<parent>/interplane-audit/aegis-runtime      aien-dev/aegis-runtime  @ AEGIS_RUNTIME_REV in PINS
+<parent>/interplane-audit/aien-protocols     aien-dev/aien-protocols @ AIEN_PROTOCOLS_REV in PINS
 ```
 
-CI recreates exactly that layout (`.github/workflows/ci.yml`, job `adapter-aien`). Without the
-`aegis-gate` feature the crate still builds and every `decide()` is `denied` (fail closed).
+All sibling pins live in one file, `PINS` (this directory). CI (`.github/workflows/ci.yml`, job `adapter-aien`)
+and local setup both call `setup-siblings.sh`, which reads `PINS`, so they use the same commits:
+
+```
+cd <parent>/interplane
+adapters/aien/setup-siblings.sh          # clones/checks out ../interplane-audit/{aegis-runtime,aien-protocols}
+cd adapters/aien && cargo test           # toolchain is pinned by /rust-toolchain.toml (1.99.0)
+```
+
+The script also fails if the `aien-sovereign-core` rev in `Cargo.toml` differs from `SOVEREIGN_CORE_REV` in `PINS`.
+To move a pin, change `PINS` (and `Cargo.toml` for sovereign-core) in the same PR.
+Without the `aegis-gate` feature the crate still builds and every `decide()` is `denied` (fail closed).
 Building `aegis-runtime` writes `mojo/libaegis_simd.so` inside that checkout (its `build.rs`).
 
 ## Reused from AIEN (called for real)

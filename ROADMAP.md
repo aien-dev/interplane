@@ -33,3 +33,14 @@ qualified on llama.cpp and SGLang; (5) close the AIEN production-authority seam 
 aien-mcp -> real authorization -> AuthorizedEffect -> EffectLane); (6) publish the 0.2 Capability
 Report; (7) only then approach Odysseus with INTERPLANE itself. The repository stays under
 `aien-dev` through 0.2; neutrality is demonstrated technically first.
+
+## 0.2 closed (2026-10-04): gate FAIL recorded
+
+0.2 is closed with the pre-registered CrossAxis gate FAILED (T and S passed; O1 0.865 and O2 0/5
+failed because the model never used the discovery tool). Thresholds were not changed. See
+`docs/REPORT-0.2.md`. Qwen3.5 is qualified on llama.cpp and SGLang; the AIEN authority path is real
+with listed limits.
+
+Next: **0.3 Trust**. In parallel, **0.2.x expansion follow-up** as a new pre-registered protocol
+(runtime-triggered expansion on unknown tool, failed call or approval; discovery prompting;
+reasoning off). That is planned work, not a result.

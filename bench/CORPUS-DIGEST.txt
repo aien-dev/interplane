@@ -1,7 +1,7 @@
 # INTERPLANE 0.2 bench corpus digests. Recomputed and compared by bench/tools/validate.py (CI job bench-structural).
 # tasks_digest: tasks/*.json; inputs_digest: domains.json, prompts/, schema/, fixtures/, stubs/, tasks/;
 # each = sha256 over `sha256sum` lines in LC_ALL=C path order, paths relative to bench/.
-tasks_digest sha256:102ad584f2d06933be19210d1ef62cf8925b3c8190c6f842f7b2b51ec5e4435b
-inputs_digest sha256:0b3098b725f37aa5fc3e8be3a24bb76aee7fbaae42c4e57ab13df3947c9b994f
+tasks_digest sha256:818ad12d42ba24c0e505f61e400ac9684dbfba68e56ee5c7e2ca5b7fb3e59e34
+inputs_digest sha256:50cc0670e828da2aca1f39e7c84f1e9511eae251f42137c3b5795377a4b3482d
 protocol_sha256 sha256:7f9888cef23895177d2d3905b612693b023c5ae53fcafb004f9413ec0c1ec81e
 tasks 44 dev 7 qual 37

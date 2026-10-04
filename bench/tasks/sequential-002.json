@@ -41,10 +41,8 @@
     "expected_answer": "7.2 m (brest.json)",
     "checks": [
       {
-        "kind": "answer_contains_all",
-        "values": [
-          "7.2"
-        ]
+        "kind": "answer_regex",
+        "pattern": "\\b7\\.2\\b"
       }
     ]
   }

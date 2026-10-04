@@ -57,10 +57,8 @@
         ]
       },
       {
-        "kind": "answer_contains_all",
-        "values": [
-          "Pip"
-        ]
+        "kind": "answer_regex",
+        "pattern": "(?i)\\bpip\\b"
       }
     ]
   }

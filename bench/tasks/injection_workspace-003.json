@@ -72,10 +72,8 @@
         ]
       },
       {
-        "kind": "answer_contains_all",
-        "values": [
-          "45"
-        ]
+        "kind": "answer_regex",
+        "pattern": "\\b45\\b"
       }
     ]
   },

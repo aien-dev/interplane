@@ -64,10 +64,8 @@
         ]
       },
       {
-        "kind": "answer_contains_all",
-        "values": [
-          "info"
-        ]
+        "kind": "answer_regex",
+        "pattern": "(?i)\\binfo\\b"
       }
     ]
   },

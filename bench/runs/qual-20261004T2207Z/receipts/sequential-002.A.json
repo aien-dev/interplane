@@ -1,0 +1,397 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 199,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:ec475570ad561b17f6d65c14e722fc3202f50cd98580b972c94a30db4d0db3c8",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_wzlqh9jb",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:43ed02f68e7a6da25b5be329b032e8936d12ec159764ce847485f48f50b6cf10",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:44a5d8b5a6bf83438fb78cfa89aac4c073cc7fce4dd7511a11602786b93127a6",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_d8a93jdd",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:7cbcde1b94f27c2a2f39e011818188da4d196112101660aedf0d463150b1fd6b",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:73b00f1e79eb2e3fade126468633f07e98cccda55c88bcab879086d68cd70d56",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_9h9sr7vi",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:39ef571df1a5dbd2424f1ce92b866878f1f902c3ef0d6a24b85306afa08e2eca",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:25f7b6c16a127eab058cc6f9b748ef226ba88bf1ba60fe61d8be76442da10720",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_srgs9x72",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:0ab45c7857d40ce35aa73ab9351e6d56a319c1763fe99eb18f4b2f0fc7fb1b86",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:1cb973bfc472dc0a5fccff91e50ee44ef01c4a9d8511f47851884e3f95735d31",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 2,
+      "request_id": "call_xab7k0ta",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:7a5e30e6cdb7bc16df83f269e2f6ffd6e5358efc5b4e8368d38e11f833e4ebd3",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+    "name": "fixtures/lanternfish"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {
+    "full_count": 71,
+    "full_rendered_bytes": 59024,
+    "rendered_bytes": {
+      "full": 59024,
+      "selected": 6134
+    },
+    "selected_count": 9,
+    "selected_rendered_bytes": 6134,
+    "tokens": {
+      "all_rounds_prompt": {
+        "full": 64778,
+        "selected": 8532
+      },
+      "base_context": 199,
+      "completion": {
+        "full": 468,
+        "selected": 455
+      },
+      "first_turn_prompt": {
+        "full": 15991,
+        "selected": 1929
+      },
+      "source": "backend usage.prompt_tokens of a max_tokens=1 request (openai-compatible endpoint)",
+      "tool_schema": {
+        "full": 15792,
+        "selected": 1730
+      },
+      "unit": "tokens_model_reported"
+    }
+  },
+  "metrics": {
+    "base_context_tokens": 199,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15991,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 14895,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 4,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 63168,
+    "total_completion_tokens": 468,
+    "total_prompt_tokens": 64778,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 14976
+  },
+  "prior_infra_failures": [],
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 88,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3449,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15991,
+      "reasoning_present": true,
+      "request_digest": "sha256:31acba8bb83563c28bccdf298de7a9523de4aae92c6b2673b954fc5ede0fd4ea",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 47,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1484,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16075,
+      "reasoning_present": true,
+      "request_digest": "sha256:0be7bdfc6f81cac62bd58d4e36922571d8eb1bd6a02203e66566cfd2a4df1a2c",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 124,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3714,
+      "n_tool_calls": 3,
+      "outcome": "tool_request",
+      "prompt_tokens": 16180,
+      "reasoning_present": true,
+      "request_digest": "sha256:d00fbc6d1ce470646ed0a9252fab7013e40321ff5365fbe530506f402c9cf141",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 209,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 6248,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16532,
+      "reasoning_present": true,
+      "request_digest": "sha256:8e0fd981639647cfe39223a273f9dc6819bc156e1eb015e89914e22fe7b7df63",
+      "round": 4,
+      "text_digest": "sha256:4bfec5823dffb4480ad4c9b1c4aad9f57240e840722639f3c632846f1e4d2dd2",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "qual-20261004T2207Z",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "sequential",
+    "digest": "sha256:a99278d6ef4b98b5b9cd35a946ef812eb04b6ff775bbd0fc5835d7606dfb0cf1",
+    "id": "sequential-002",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 14895,
+    "wall_ms": 14976
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The data directory is `data/stations`. It contains three station files:\n- **brest.json** (224 B) - tide_range_m: **7.2**\n- cherbourg.json (116 B) - tide_range_m: 5.3\n- roscoff.json (76 B) - tide_range_m: 6.1\n\nThe largest station file is `brest.json` with a tide range of **7.2 meters**."
+  },
+  "user_request_digest": "sha256:06c575812f962294ceae9ed53847ab23a7046d87000bf21fffc3095fa2cb47dd"
+}

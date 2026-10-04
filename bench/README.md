@@ -121,3 +121,18 @@ categories with at least 3 tasks and never from `expansion`. The 37 `qual` tasks
 
 No git repository fixture is needed: the catalog has no git tool, so `fixtures/build.sh` does not
 exist.
+
+## Running it (paired runner and analyzer)
+
+- `tools/run_bench.py` runs both conditions per task through the INTERPLANE pipeline with the real
+  `OdysseusAuthority` (Odysseus at 2992bf6, via `ODYSSEUS_SRC`), against an OpenAI-compatible
+  endpoint, and writes `runs/<run-id>/manifest.json` plus one receipt per task and condition
+  (`receipts/<task>.<A|B>.json`). `--prepare` writes only the manifest, so it can be committed
+  before the first request; `--resume` skips completed pairs. Condition B also exposes one
+  read-only discovery tool, `interplane_capabilities_search{query}`, that grants nothing and
+  executes nothing in the runtime.
+- `tools/bench_eval.py` is the deterministic judge and the per-run metrics, shared by the runner
+  and the analyzer. `tools/analyze.py <run-dir>` (stdlib only, no inference) writes
+  `summary.json`, `summary.md` and `tasks.csv`, byte-identically for the same input.
+- Offline tests: `tools/test_analyze.py` (stdlib, runs in CI against a checked-in synthetic run)
+  and `tools/test_runner_offline.py` (a scripted fake endpoint; needs the Odysseus venv).

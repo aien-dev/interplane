@@ -1,0 +1,118 @@
+{
+  "condition": "B",
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "expansion added capabilities",
+        "kind": "expansion_occurred",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 400,
+    "calls_total": 1,
+    "covered_after_effective_expansions": 1,
+    "covered_at_round": 2,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 1,
+    "execution_errors": 0,
+    "expansions": 1,
+    "exposed_capabilities_first": 9,
+    "exposed_capabilities_max": 10,
+    "exposed_tools_first": 10,
+    "exposed_tools_max": 11,
+    "first_turn_prompt_tokens": 1700,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": true,
+    "model_ms": 6368,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 6000.0,
+    "tool_schema_tokens_first": 780,
+    "tool_schema_tokens_per_round_mean": 800.0,
+    "tool_schema_tokens_sum": 1600,
+    "total_completion_tokens": 73,
+    "total_prompt_tokens": 3550,
+    "unexposed_calls": 1,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 6418
+  },
+  "rounds": [
+    {
+      "completion_tokens": 27,
+      "exposed_caps_count": 9,
+      "exposed_tools_count": 10,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3435,
+      "prompt_tokens": 1700,
+      "round": 1,
+      "tools_bytes": 6000
+    },
+    {
+      "completion_tokens": 46,
+      "exposed_caps_count": 10,
+      "exposed_tools_count": 11,
+      "finish_reason": "stop",
+      "latency_ms": 2933,
+      "prompt_tokens": 1850,
+      "round": 2,
+      "tools_bytes": 6000
+    }
+  ],
+  "task": {
+    "category": "expansion",
+    "id": "expansion-002",
+    "split": "qual"
+  },
+  "tool_schema_tokens_per_round": [
+    780,
+    820
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [
+      {
+        "added": [
+          "read_file"
+        ],
+        "reason": "requested_excluded",
+        "refused": [],
+        "round": 1
+      }
+    ],
+    "final_answer": "Ada Quill <ada.quill@lanternfish.example>"
+  }
+}

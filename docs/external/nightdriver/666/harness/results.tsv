@@ -1,0 +1,108 @@
+s0_audio0	whole_frames	PASS	3 packets, all matched
+s0_audio0	split_every_offset	PASS	53 packets, all matched
+s0_audio0	coalesced	PASS	5 packets, all matched
+s0_audio0	one_byte_writes	PASS	2 packets, all matched
+s0_audio0	peak12_with_pixels	FAIL	receiver lost frame alignment: Unknown command [31202]; packets []
+s0_audio0	peak16_with_pixels	FAIL	want 2 packets got 0; unknown-command [31202]
+s0_audio0	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+s0_audio0	disconnect_partial_then_valid	PASS	1 packets, all matched
+s0_audio0	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+s0_audio0	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+s0_audio0	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+s0_audio0	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+s0_audio0	slow_sender_within_timeout	PASS	1 packets, all matched
+s0_audio0	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+s0_audio0	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 15; unknown=[]
+s0_audio0	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+s0_audio0	reconnect_storm	PASS	5 packets, all matched
+s0_audio0	SUMMARY	fails=2
+s1_audio0	whole_frames	PASS	3 packets, all matched
+s1_audio0	split_every_offset	PASS	53 packets, all matched
+s1_audio0	coalesced	PASS	5 packets, all matched
+s1_audio0	one_byte_writes	PASS	2 packets, all matched
+s1_audio0	peak12_with_pixels	FAIL	receiver lost frame alignment: Unknown command [31202]; packets []
+s1_audio0	peak16_with_pixels	FAIL	want 2 packets got 0; unknown-command [31202]
+s1_audio0	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+s1_audio0	disconnect_partial_then_valid	PASS	1 packets, all matched
+s1_audio0	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+s1_audio0	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+s1_audio0	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+s1_audio0	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+s1_audio0	slow_sender_within_timeout	PASS	1 packets, all matched
+s1_audio0	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+s1_audio0	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 1423; unknown=[]
+s1_audio0	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+s1_audio0	reconnect_storm	PASS	5 packets, all matched
+s1_audio0	SUMMARY	fails=2
+s2_audio0	whole_frames	PASS	3 packets, all matched
+s2_audio0	split_every_offset	PASS	53 packets, all matched
+s2_audio0	coalesced	PASS	5 packets, all matched
+s2_audio0	one_byte_writes	PASS	2 packets, all matched
+s2_audio0	peak12_with_pixels	PASS	no desync; audio=0 packets seen: [(3, 54), (3, 54)]
+s2_audio0	peak16_with_pixels	PASS	audio=0 sequence consumed in order, 2 packets
+s2_audio0	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+s2_audio0	disconnect_partial_then_valid	PASS	1 packets, all matched
+s2_audio0	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+s2_audio0	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+s2_audio0	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+s2_audio0	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+s2_audio0	slow_sender_within_timeout	PASS	1 packets, all matched
+s2_audio0	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+s2_audio0	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 1419; unknown=[]
+s2_audio0	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+s2_audio0	reconnect_storm	PASS	5 packets, all matched
+s2_audio0	SUMMARY	fails=0
+s2_audio1	whole_frames	PASS	3 packets, all matched
+s2_audio1	split_every_offset	PASS	53 packets, all matched
+s2_audio1	coalesced	PASS	5 packets, all matched
+s2_audio1	one_byte_writes	PASS	2 packets, all matched
+s2_audio1	peak12_with_pixels	PASS	no desync; audio=1 packets seen: []
+s2_audio1	peak16_with_pixels	PASS	audio=1 sequence consumed in order, 4 packets
+s2_audio1	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+s2_audio1	disconnect_partial_then_valid	PASS	1 packets, all matched
+s2_audio1	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+s2_audio1	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+s2_audio1	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+s2_audio1	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+s2_audio1	slow_sender_within_timeout	PASS	1 packets, all matched
+s2_audio1	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+s2_audio1	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 1418; unknown=[]
+s2_audio1	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+s2_audio1	reconnect_storm	PASS	5 packets, all matched
+s2_audio1	SUMMARY	fails=0
+main_audio0	whole_frames	PASS	3 packets, all matched
+main_audio0	split_every_offset	PASS	53 packets, all matched
+main_audio0	coalesced	PASS	5 packets, all matched
+main_audio0	one_byte_writes	PASS	2 packets, all matched
+main_audio0	peak12_with_pixels	PASS	no desync; audio=0 packets seen: [(3, 54), (3, 54)]
+main_audio0	peak16_with_pixels	PASS	audio=0 sequence consumed in order, 2 packets
+main_audio0	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+main_audio0	disconnect_partial_then_valid	PASS	1 packets, all matched
+main_audio0	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+main_audio0	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+main_audio0	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+main_audio0	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+main_audio0	slow_sender_within_timeout	PASS	1 packets, all matched
+main_audio0	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+main_audio0	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 1335; unknown=[]
+main_audio0	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+main_audio0	reconnect_storm	PASS	5 packets, all matched
+main_audio0	SUMMARY	fails=0
+main_audio1	whole_frames	PASS	3 packets, all matched
+main_audio1	split_every_offset	PASS	53 packets, all matched
+main_audio1	coalesced	PASS	5 packets, all matched
+main_audio1	one_byte_writes	PASS	2 packets, all matched
+main_audio1	peak12_with_pixels	PASS	no desync; audio=1 packets seen: []
+main_audio1	peak16_with_pixels	PASS	audio=1 sequence consumed in order, 4 packets
+main_audio1	http_get_on_raw_port	PASS	rejected with Unknown command 17735 (= 0x4547, bytes 'G','E'), connection closed
+main_audio1	disconnect_partial_then_valid	PASS	1 packets, all matched
+main_audio1	malformed_then_valid	PASS	bad command rejected (30583), next connection clean
+main_audio1	max_and_oversize	PASS	max frame accepted, max+1 rejected and connection closed, next clean
+main_audio1	huge_length	PASS	length32=0xFFFFFFFF rejected on this 64-bit host
+main_audio1	zero_length	INFO	zero-LED pixel frame: packets=[24] response=true unknown=[]
+main_audio1	slow_sender_within_timeout	PASS	1 packets, all matched
+main_audio1	slow_sender_past_timeout	PASS	stalled partial frame timed out and was discarded; next connection clean
+main_audio1	slow_receiver	INFO	sent 4000 frames without reading responses; receiver consumed 1337; unknown=[]
+main_audio1	sender_short_write	INFO	k=12: packets=1 intact=0 unknown=[34688] | k=24: packets=1 intact=0 unknown=[13100] | k=40: packets=1 intact=0 unknown=[0]
+main_audio1	reconnect_storm	PASS	5 packets, all matched
+main_audio1	SUMMARY	fails=0

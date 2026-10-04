@@ -1,0 +1,38 @@
+import json,hashlib,sys,urllib.request,concurrent.futures as cf,os,re
+OL='/home/drakestapleton/workspace/interplane/qualification/captures/qwen35-ollama/'
+OUT='/home/drakestapleton/workspace/interplane/qualification/captures/qwen35-llamacpp/'
+BASE=os.environ.get('BASE','http://127.0.0.1:18081')
+def load(n): return json.load(open(OL+n+'.json'))
+def post(path,body,method='POST'):
+    data=None if body is None else json.dumps(body).encode()
+    rq=urllib.request.Request(BASE+path,data=data,method=method,headers={'Content-Type':'application/json'})
+    try:
+        with urllib.request.urlopen(rq,timeout=900) as r: return r.status,r.read().decode()
+    except urllib.error.HTTPError as e: return e.code,e.read().decode()
+def save(name,path,body,method='POST'):
+    st,resp=post(path,body,method)
+    d={'name':name,'request':body,'endpoint':path,'method':method,'http_status':st,'response':resp,'sha256_response':hashlib.sha256(resp.encode()).hexdigest()}
+    json.dump(d,open(OUT+name+'.json','w'),indent=2); return name,st
+MT=4096
+def oai(n): 
+    r=dict(load(n)['request']); r['max_tokens']=MT; return r
+jobs=[]
+for n,o in [('01-native','01-native'),('02-native-multi','02-native-multi'),('03-native-no-tool','03-native-no-tool'),('04-native-unknown','04-native-unknown'),('05a-native-reasoning-default','05a-native-reasoning-default'),('05b-native-think-false','05b-native-think-false'),('05c-native-reasoning-effort-none','05c-native-reasoning-effort-none'),('05d-native-chat-template-kwargs','05d-native-chat-template-kwargs'),('g1-native-result-replay','g1-native-result-replay'),('h1-streaming','h1-streaming'),('h2-streaming-reasoning-effort-none','h2-streaming-reasoning-effort-none'),('j1-basic','j1-basic')]:
+    jobs.append((n,'/v1/chat/completions',oai(o)))
+# 05e: enable_thinking false with tools off? additional mechanism: reasoning_format none
+b=oai('05a-native-reasoning-default'); b['reasoning_format']='none'; jobs.append(('05f-native-reasoning-format-none','/v1/chat/completions',b))
+# raw text form via chat endpoint (no tools field)
+def sysprompt(n):
+    p=load(n)['request']['prompt']; m=re.match(r'<\|im_start\|>system\n(.*?)<\|im_end\|>\n<\|im_start\|>user\n(.*?)<\|im_end\|>\n<\|im_start\|>assistant\n$',p,re.S); return m.group(1),m.group(2)
+for n,o in [('f1-raw-one-call','f1-raw-one-call'),('f2-raw-two-calls','f2-raw-two-calls'),('f5-raw-unknown-tool','f5-raw-unknown-tool')]:
+    s,u=sysprompt(o)
+    jobs.append((n,'/v1/chat/completions',{'model':'qwen3.5:9b','temperature':0,'seed':42,'max_tokens':MT,'messages':[{'role':'system','content':s},{'role':'user','content':u}]}))
+    jobs.append((n.split('-')[0]+'r-'+'-'.join(n.split('-')[1:])+'-completion','/completion',{'prompt':load(o)['request']['prompt'],'temperature':0,'seed':42,'n_predict':MT}))
+# m1 malformed args
+tool={"type":"function","function":{"name":"set_volume","description":"Set the speaker volume. level must be an integer from 0 to 100.","parameters":{"type":"object","properties":{"level":{"type":"integer","description":"Volume 0-100"}},"required":["level"]}}}
+jobs.append(('m1-malformed-args','/v1/chat/completions',{'model':'qwen3.5:9b','temperature':0,'seed':42,'max_tokens':MT,'tools':[tool],'messages':[{'role':'user','content':'Call set_volume with level set to the literal string "very loud" (a word, not a number). Do not convert it to a number.'}]}))
+tl=load('01-native')['request']['tools']
+jobs.append(('t1-tokenize','/tokenize',{'content':json.dumps(tl,separators=(',',':')),'add_special':False,'with_pieces':False}))
+only=sys.argv[1:]
+with cf.ThreadPoolExecutor(4) as ex:
+    for r in ex.map(lambda j:save(*j),[j for j in jobs if not only or j[0] in only]): print(r,flush=True)

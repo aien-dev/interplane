@@ -56,7 +56,7 @@ fn tool_verdicts() {
     let bad_args = json!({"choices": [{"message": {"tool_calls": [{"function": {"name": "get_weather", "arguments": "[1]"}}]}}]});
     assert_eq!(eval_tools_native(&bad_args, "get_weather").0, Verdict::Fail);
     assert_eq!(
-        eval_parallel(&calls(&["get_weather", "get_weather"])).0,
+        eval_parallel(&calls(&["read_file", "read_file"])).0,
         Verdict::Pass
     );
     assert_eq!(eval_parallel(&calls(&["get_weather"])).0, Verdict::Degraded);
@@ -254,8 +254,10 @@ fn urls_and_time() {
     assert_eq!(rfc3339(0), "1970-01-01T00:00:00Z");
     assert_eq!(rfc3339(1_767_225_600), "2026-01-01T00:00:00Z");
     assert_eq!(rfc3339(951_782_400), "2000-02-29T00:00:00Z");
-    assert!(needle_prompt(8, "7104").contains("The secret code is 7104."));
-    assert!(needle_prompt(8, "7104").len() > 30_000);
+    assert!(needle_prompt(8, "7104").contains("The secret code word is 7104."));
+    // lengths equal the Python probe's prompts for the same sizes
+    assert_eq!(needle_prompt(8, "PELICAN-4410").len(), 25_010);
+    assert_eq!(needle_prompt(32, "PELICAN-4410").len(), 98_654);
 }
 
 /// A canned server: answers by path and request shape. No network.
@@ -297,7 +299,7 @@ fn full_run_with_canned_endpoint_and_schema_valid_report() {
         ),
         (
             "tools",
-            (200, calls(&["get_weather", "get_weather"]).to_string()),
+            (200, calls(&["read_file", "read_file"]).to_string()),
         ),
         ("/models", (200, json!({"data": [{"id": "m"}]}).to_string())),
     ]);
@@ -375,4 +377,48 @@ fn dead_endpoint_fails_closed_never_passes() {
         .profiles
         .iter()
         .all(|p| p.status != ProfileStatus::Compatible));
+}
+
+/// Records every POST body so tests can pin what the probe actually sends.
+struct Recorder(std::sync::Mutex<Vec<Value>>);
+impl Transport for Recorder {
+    fn get(&self, _: &str) -> Result<HttpResponse, String> {
+        Ok(HttpResponse {
+            status: 404,
+            body: "{}".into(),
+        })
+    }
+    fn post(&self, _: &str, body: &Value) -> Result<HttpResponse, String> {
+        self.0.lock().unwrap().push(body.clone());
+        Ok(HttpResponse {
+            status: 500,
+            body: "{}".into(),
+        })
+    }
+}
+
+/// Both reference probes send identical request bodies per probe id (spec/PROBE.md). The Python twin
+/// is `test_chat_basic_request_body_is_pinned` in python/tests/test_probe_request_bodies.py.
+#[test]
+fn chat_basic_request_body_is_pinned() {
+    let rec = Recorder(Default::default());
+    let cfg = ProbeConfig {
+        endpoint: "http://127.0.0.1:1/v1".into(),
+        model: "m".into(),
+        backend: None,
+        skip: vec![],
+        environment: detect_environment(),
+    };
+    let _ = run_probes(&rec, &cfg);
+    let bodies = rec.0.lock().unwrap();
+    assert_eq!(
+        bodies[0],
+        json!({"model": "m", "messages": [{"role": "user", "content": "Reply with the single word: ready"}],
+               "max_tokens": 2048, "temperature": 0, "seed": 42})
+    );
+    // JCS digest pinned equal to the Python probe's request digest for the same body.
+    assert_eq!(
+        digest(&bodies[0]),
+        "sha256:ed2eb0d61ca98c888bf63c7a884f2f568ee4bc54943f98acbe49db86ecdde923"
+    );
 }

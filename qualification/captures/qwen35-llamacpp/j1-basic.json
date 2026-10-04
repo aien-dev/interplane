@@ -1,0 +1,20 @@
+{
+  "name": "j1-basic",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Say hello in one short line."
+      }
+    ],
+    "max_tokens": 4096
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello!\",\"reasoning_content\":\"Thinking Process:\\n\\n1.  **Analyze the Request:**\\n    *   Task: Say hello.\\n    *   Constraint: One short line.\\n\\n2.  **Determine the Content:**\\n    *   The user wants a greeting.\\n    *   It needs to be concise (one line).\\n    *   It needs to be short.\\n\\n3.  **Draft Options:**\\n    *   \\\"Hello!\\\"\\n    *   \\\"Hi there!\\\"\\n    *   \\\"Hello, how are you?\\\" (Too long?)\\n    *   \\\"Greetings!\\\"\\n\\n4.  **Select the Best Option:**\\n    *   \\\"Hello!\\\" is simple, direct, and fits the constraint perfectly.\\n\\n5.  **Final Check:**\\n    *   Is it one line? Yes.\\n    *   Is it short? Yes.\\n    *   Does it say hello? Yes.\\n\\n6.  **Final Output Generation:**\\n    *   \\\"Hello!\\\" or \\\"Hi!\\\"\\n\\n    Let's go with \\\"Hello!\\\" or a friendly variation. \\\"Hello!\\\" is safe. \\\"Hi there!\\\" is also good. I'll stick with a simple \\\"Hello!\\\" or \\\"Hi!\\\". Let's choose \\\"Hello!\\\" for clarity. Actually, \\\"Hello!\\\" is perfect.\\n\\n    Wait, I can make it slightly more engaging but still short. \\\"Hello! How can I help you today?\\\" -> That's two clauses, maybe one line. But \\\"one short line\\\" implies brevity.\\n    Let's just say \\\"Hello!\\\"\\n\\n    Refining: \\\"Hello! How are you doing?\\\" is still one line.\\n    But \\\"Hello!\\\" is the most direct interpretation of \\\"Say hello\\\".\\n\\n    Decision: \\\"Hello!\\\"\\n\"}}],\"created\":1791150512,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":367,\"prompt_tokens\":17,\"total_tokens\":384,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"id\":\"chatcmpl-9bvg49blss0L2Re3UXktsagmXiFc9rU4\",\"timings\":{\"cache_n\":0,\"prompt_n\":17,\"prompt_ms\":397.305,\"prompt_per_token_ms\":23.370882352941177,\"prompt_per_second\":42.7882860774468,\"predicted_n\":367,\"predicted_ms\":35673.67,\"predicted_per_token_ms\":97.469043715847,\"predicted_per_second\":10.259667704500266}}",
+  "sha256_response": "e8b91ce2dd3886a86898b01faa61ba46f0e2db481b136c41194df5ac91b01b09"
+}

@@ -1,0 +1,121 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "tools": [
+   {
+    "type": "function",
+    "function": {
+     "name": "read_file",
+     "description": "Read a text file and return its contents.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "File path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "list_dir",
+     "description": "List the entries of a directory.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "Directory path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "write_file",
+     "description": "Write text content to a file, replacing it.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string"
+       },
+       "content": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "path",
+       "content"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "send_email",
+     "description": "Send an email.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "to": {
+        "type": "string"
+       },
+       "body": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "to",
+       "body"
+      ]
+     }
+    }
+   }
+  ],
+  "messages": [
+   {
+    "role": "user",
+    "content": "Please read the file README.md and tell me what it says."
+   },
+   {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+     {
+      "id": "call_gg88yton",
+      "type": "function",
+      "function": {
+       "name": "read_file",
+       "arguments": "{\"path\":\"README.md\"}"
+      }
+     }
+    ]
+   },
+   {
+    "role": "tool",
+    "tool_call_id": "call_gg88yton",
+    "content": "{\"path\":\"README.md\",\"content\":\"INTERPLANE is a protocol.\"}"
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 200,
+ "response": "{\"id\":\"5c0889c4f7f04698aa55feff516fc5aa\",\"object\":\"chat.completion\",\"created\":1791149935,\"model\":\"Qwen/Qwen3.5-9B\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\nThe file `README.md` says: \\\"INTERPLANE is a protocol.\\\"\",\"reasoning_content\":\"The file `README.md` contains the text: \\\"INTERPLANE is a protocol.\\\"\\n\",\"tool_calls\":null},\"logprobs\":null,\"finish_reason\":\"stop\",\"matched_stop\":248046}],\"usage\":{\"prompt_tokens\":595,\"total_tokens\":633,\"completion_tokens\":38,\"prompt_tokens_details\":null,\"reasoning_tokens\":20},\"metadata\":{\"weight_version\":\"default\",\"weight_versions\":[{\"version\":\"default\",\"start\":0,\"end\":38}]}}",
+ "sha256_response": "3ca1ecd695e9f5e7c50d91ad895e9e872df4e419a8fd14bc1b3c92da5e3b7a65"
+}

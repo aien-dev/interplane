@@ -1,0 +1,22 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "messages": [
+   {
+    "role": "system",
+    "content": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT>"
+   },
+   {
+    "role": "user",
+    "content": "Read both /etc/hostname and /etc/os-release, then summarize them."
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 200,
+ "response": "{\"id\":\"57b946444a944d6db8b1d1999318d12c\",\"object\":\"chat.completion\",\"created\":1791150032,\"model\":\"Qwen/Qwen3.5-9B\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\n<tool_call>\\n<function=read_file>\\n<parameter=path>\\n/etc/hostname\\n</parameter>\\n</function>\\n</tool_call>\\n<tool_call>\\n<function=read_file>\\n<parameter=path>\\n/etc/os-release\\n</parameter>\\n</function>\\n</tool_call>\",\"reasoning_content\":\"The user wants me to read two files: /etc/hostname and /etc/os-release, and then summarize their contents. I'll need to use the read_file function twice to get the contents of both files, and then I can provide a summary.\\n\\nLet me start by reading both files.\\n\",\"tool_calls\":null},\"logprobs\":null,\"finish_reason\":\"stop\",\"matched_stop\":248046}],\"usage\":{\"prompt_tokens\":495,\"total_tokens\":612,\"completion_tokens\":117,\"prompt_tokens_details\":null,\"reasoning_tokens\":62},\"metadata\":{\"weight_version\":\"default\",\"weight_versions\":[{\"version\":\"default\",\"start\":0,\"end\":117}]}}",
+ "sha256_response": "68ef550999d5ea548bfdbcf8bcfd736f9250307b87bdcdf135c7ec6a8c821d9e"
+}

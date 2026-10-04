@@ -1,0 +1,24 @@
+{
+  "name": "f1-raw-one-call",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 4096,
+    "messages": [
+      {
+        "role": "system",
+        "content": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT>"
+      },
+      {
+        "role": "user",
+        "content": "Please read the file README.md and tell me what it says."
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<tool_call>\\n<function=read_file>\\n<parameter=path>\\nREADME.md\\n</parameter>\\n</function>\\n</tool_call>\",\"reasoning_content\":\"The user wants me to read the README.md file. I need to use the read_file function with the path \\\"README.md\\\".\\n\"}}],\"created\":1791150483,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":55,\"prompt_tokens\":492,\"total_tokens\":547,\"prompt_tokens_details\":{\"cached_tokens\":488}},\"id\":\"chatcmpl-4DJS9yktN90AdhZaZIasOgzcOlptW5Jg\",\"timings\":{\"cache_n\":488,\"prompt_n\":4,\"prompt_ms\":204.142,\"prompt_per_token_ms\":51.0355,\"prompt_per_second\":19.594204034446612,\"predicted_n\":55,\"predicted_ms\":4898.869,\"predicted_per_token_ms\":90.7197962962963,\"predicted_per_second\":11.02295244065518}}",
+  "sha256_response": "4e072a047675ec76064201d2ab37a5221dc019c9153b2cf8bc76aed1d0095225"
+}

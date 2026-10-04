@@ -1,0 +1,13 @@
+{
+  "name": "t1-tokenize",
+  "request": {
+    "content": "[{\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"description\":\"Read a text file and return its contents.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\",\"description\":\"File path\"}},\"required\":[\"path\"]}}},{\"type\":\"function\",\"function\":{\"name\":\"list_dir\",\"description\":\"List the entries of a directory.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\",\"description\":\"Directory path\"}},\"required\":[\"path\"]}}},{\"type\":\"function\",\"function\":{\"name\":\"write_file\",\"description\":\"Write text content to a file, replacing it.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"},\"content\":{\"type\":\"string\"}},\"required\":[\"path\",\"content\"]}}},{\"type\":\"function\",\"function\":{\"name\":\"send_email\",\"description\":\"Send an email.\",\"parameters\":{\"type\":\"object\",\"properties\":{\"to\":{\"type\":\"string\"},\"body\":{\"type\":\"string\"}},\"required\":[\"to\",\"body\"]}}}]",
+    "add_special": false,
+    "with_pieces": false
+  },
+  "endpoint": "/tokenize",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"tokens\":[58,4754,1267,3147,1628,2129,1628,21624,591,3147,851,2378,2129,4532,3147,4274,264,1414,999,321,460,1141,8529,46292,13390,21624,1267,3147,1640,2129,12811,21624,2267,21624,1267,3147,889,2129,4532,3147,1643,1752,29958,1288,6081,35580,2267,1293,3307,35607,1267,3147,1628,2129,1628,21624,591,3147,1551,4193,2129,4532,3147,826,279,10379,314,264,6025,46292,13390,21624,1267,3147,1640,2129,12811,21624,2267,21624,1267,3147,889,2129,4532,3147,9034,1752,29958,1288,6081,35580,2267,1293,3307,35607,1267,3147,1628,2129,1628,21624,591,3147,4775,2378,2129,4532,3147,7734,1414,2144,310,264,999,11,24101,424,46292,13390,21624,1267,3147,1640,2129,12811,21624,2267,21624,1267,3147,889,56658,1733,21624,1267,3147,889,29958,1288,6081,35580,2267,2129,1733,1293,3307,35607,1267,3147,1628,2129,1628,21624,591,3147,6472,8899,2129,4532,3147,11174,449,2469,46292,13390,21624,1267,3147,1640,2129,12811,21624,951,21624,1267,3147,889,56658,2513,21624,1267,3147,889,29958,1288,6081,35580,951,2129,2513,1293,3307,24634]}",
+  "sha256_response": "035fbd654a8490e30237dedef4faee016bd5412d82e12950dbe40900a7dcc0a7"
+}

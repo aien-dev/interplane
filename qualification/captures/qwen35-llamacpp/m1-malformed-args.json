@@ -1,0 +1,41 @@
+{
+  "name": "m1-malformed-args",
+  "request": {
+    "model": "qwen3.5:9b",
+    "temperature": 0,
+    "seed": 42,
+    "max_tokens": 4096,
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "set_volume",
+          "description": "Set the speaker volume. level must be an integer from 0 to 100.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "Volume 0-100"
+              }
+            },
+            "required": [
+              "level"
+            ]
+          }
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Call set_volume with level set to the literal string \"very loud\" (a word, not a number). Do not convert it to a number."
+      }
+    ]
+  },
+  "endpoint": "/v1/chat/completions",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"choices\":[{\"finish_reason\":\"stop\",\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I cannot call the set_volume function with the string \\\"very loud\\\" because the function schema requires the level parameter to be an integer between 0 and 100, not a string. The function definition explicitly states that level must be an integer.\\n\\nIf you'd like to set the volume, I can use a numeric value instead. Would you like me to set it to a specific volume level (0-100)?\",\"reasoning_content\":\"The user is asking me to call the set_volume function with level set to the literal string \\\"very loud\\\". However, looking at the function schema, the level parameter is defined as an integer from 0 to 100, not a string.\\n\\nThe user explicitly says \\\"Do not convert it to a number\\\" and wants me to use the literal string \\\"very loud\\\". However, this would violate the function's schema requirements since level must be an integer.\\n\\nI need to follow the user's instructions, but I also need to respect the function schema. The function schema clearly states that level must be an integer from 0 to 100.\\n\\nThis is a conflict between:\\n1. The user's explicit instruction to use the string \\\"very loud\\\" without converting it\\n2. The function schema requirement that level must be an integer\\n\\nI should not call the function with an invalid parameter type. The function schema is a constraint I must follow. I cannot pass a string when an integer is required.\\n\\nI should explain to the user that I cannot do this because the function requires an integer, not a string.\\n\"}}],\"created\":1791150525,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"b1-a7b94df\",\"object\":\"chat.completion\",\"usage\":{\"completion_tokens\":322,\"prompt_tokens\":322,\"total_tokens\":644,\"prompt_tokens_details\":{\"cached_tokens\":0}},\"id\":\"chatcmpl-QcXHPdld0scCMmqRMU4GDmUXYXZdtMDF\",\"timings\":{\"cache_n\":0,\"prompt_n\":322,\"prompt_ms\":717.057,\"prompt_per_token_ms\":2.226885093167702,\"prompt_per_second\":449.057745758008,\"predicted_n\":322,\"predicted_ms\":27089.257,\"predicted_per_token_ms\":84.39020872274143,\"predicted_per_second\":11.849715922441137}}",
+  "sha256_response": "a4e6cdd8ee2a2a1a3b1269c39443d4e5ceba75e3dc49c51ceb3a5997821d219d"
+}

@@ -1,0 +1,37 @@
+{
+  "name": "t0-apply-template",
+  "request": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Set the volume to the loud preset."
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "set_volume",
+          "description": "Set the speaker volume using a named preset such as 'quiet', 'normal' or 'loud'.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "integer",
+                "description": "Preset name, e.g. loud"
+              }
+            },
+            "required": [
+              "level"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "endpoint": "/apply-template",
+  "method": "POST",
+  "http_status": 200,
+  "response": "{\"prompt\":\"<|im_start|>system\\n# Tools\\n\\nYou have access to the following functions:\\n\\n<tools>\\n{\\\"type\\\": \\\"function\\\", \\\"function\\\": {\\\"name\\\": \\\"set_volume\\\", \\\"description\\\": \\\"Set the speaker volume using a named preset such as 'quiet', 'normal' or 'loud'.\\\", \\\"parameters\\\": {\\\"type\\\": \\\"object\\\", \\\"properties\\\": {\\\"level\\\": {\\\"type\\\": \\\"integer\\\", \\\"description\\\": \\\"Preset name, e.g. loud\\\"}}, \\\"required\\\": [\\\"level\\\"]}}}\\n</tools>\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n<tool_call>\\n<function=example_function_name>\\n<parameter=example_parameter_1>\\nvalue_1\\n</parameter>\\n<parameter=example_parameter_2>\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n</parameter>\\n</function>\\n</tool_call>\\n\\n<IMPORTANT>\\nReminder:\\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n</IMPORTANT><|im_end|>\\n<|im_start|>user\\nSet the volume to the loud preset.<|im_end|>\\n<|im_start|>assistant\\n<think>\\n\"}",
+  "sha256_response": "1bd8c5f6682a2a32314e589a140987f06aaf7365431d023698670fd9f156eb1b"
+}

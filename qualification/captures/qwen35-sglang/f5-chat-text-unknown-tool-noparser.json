@@ -1,0 +1,22 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "messages": [
+   {
+    "role": "system",
+    "content": "# Tools\n\nYou have access to the following functions:\n\n<tools>\n{\"type\": \"function\", \"function\": {\"name\": \"read_file\", \"description\": \"Read a text file and return its contents.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"File path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"list_dir\", \"description\": \"List the entries of a directory.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\", \"description\": \"Directory path\"}}, \"required\": [\"path\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"write_file\", \"description\": \"Write text content to a file, replacing it.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"path\": {\"type\": \"string\"}, \"content\": {\"type\": \"string\"}}, \"required\": [\"path\", \"content\"]}}}\n{\"type\": \"function\", \"function\": {\"name\": \"send_email\", \"description\": \"Send an email.\", \"parameters\": {\"type\": \"object\", \"properties\": {\"to\": {\"type\": \"string\"}, \"body\": {\"type\": \"string\"}}, \"required\": [\"to\", \"body\"]}}}\n</tools>\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT>"
+   },
+   {
+    "role": "user",
+    "content": "Use the compile_project tool to build the project in /srv/app."
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 200,
+ "response": "{\"id\":\"c5e66cc0fa3141b1b32825a60389ef5b\",\"object\":\"chat.completion\",\"created\":1791152604,\"model\":\"Qwen/Qwen3.5-9B\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"\\n\\nI don't have access to a \\\"compile_project\\\" tool in my available toolkit. The tools I have available are:\\n\\n1. **read_file** - Read text files\\n2. **list_dir** - List directory contents\\n3. **write_file** - Write text to files\\n4. **send_email** - Send emails\\n\\nNone of these tools can compile or build projects. If you need to build a project in /srv/app, you would typically need to:\\n\\n- Use a command-line build tool (like `make`, `npm install`, `cargo build`, etc.)\\n- Or use a development environment that has build capabilities\\n\\nWould you like me to help you with something else using the available tools, such as reading files from the project directory or listing what's in /srv/app?\",\"reasoning_content\":\"The user is asking me to use a \\\"compile_project tool\\\" to build a project in /srv/app. However, looking at the available tools I have access to, I don't see a \\\"compile_project\\\" tool. The tools I have are:\\n\\n1. read_file - Read a text file and return its contents\\n2. list_dir - List the entries of a directory\\n3. write_file - Write text content to a file, replacing it\\n4. send_email - Send an email\\n\\nNone of these tools are for compiling or building projects. The user seems to be referring to a tool that doesn't exist in my available toolkit.\\n\\nI should inform the user that I don't have access to a compile_project tool, and explain what tools I do have available.\\n\",\"tool_calls\":null},\"logprobs\":null,\"finish_reason\":\"stop\",\"matched_stop\":248046}],\"usage\":{\"prompt_tokens\":493,\"total_tokens\":819,\"completion_tokens\":326,\"prompt_tokens_details\":null,\"reasoning_tokens\":160},\"metadata\":{\"weight_version\":\"default\",\"weight_versions\":[{\"version\":\"default\",\"start\":0,\"end\":326}]}}",
+ "sha256_response": "403f16308b5b818e05987def689f037f0ff087667d504b13a40984008d788c27"
+}

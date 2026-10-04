@@ -1,0 +1,121 @@
+{
+ "request": {
+  "model": "Qwen/Qwen3.5-9B",
+  "temperature": 0,
+  "seed": 42,
+  "tools": [
+   {
+    "type": "function",
+    "function": {
+     "name": "read_file",
+     "description": "Read a text file and return its contents.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "File path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "list_dir",
+     "description": "List the entries of a directory.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string",
+        "description": "Directory path"
+       }
+      },
+      "required": [
+       "path"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "write_file",
+     "description": "Write text content to a file, replacing it.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "path": {
+        "type": "string"
+       },
+       "content": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "path",
+       "content"
+      ]
+     }
+    }
+   },
+   {
+    "type": "function",
+    "function": {
+     "name": "send_email",
+     "description": "Send an email.",
+     "parameters": {
+      "type": "object",
+      "properties": {
+       "to": {
+        "type": "string"
+       },
+       "body": {
+        "type": "string"
+       }
+      },
+      "required": [
+       "to",
+       "body"
+      ]
+     }
+    }
+   }
+  ],
+  "messages": [
+   {
+    "role": "user",
+    "content": "Please read the file README.md and tell me what it says."
+   },
+   {
+    "role": "assistant",
+    "content": "",
+    "tool_calls": [
+     {
+      "id": "call_gg88yton",
+      "type": "function",
+      "function": {
+       "name": "read_file",
+       "arguments": "{\"path\": README.md"
+      }
+     }
+    ]
+   },
+   {
+    "role": "tool",
+    "tool_call_id": "call_gg88yton",
+    "content": "{\"path\":\"README.md\",\"content\":\"INTERPLANE is a protocol.\"}"
+   }
+  ]
+ },
+ "endpoint": "/v1/chat/completions",
+ "method": "POST",
+ "status": 400,
+ "response": "{\"object\":\"error\",\"message\":\"Assistant tool call function.arguments must be valid JSON.\",\"type\":\"BadRequest\",\"param\":null,\"code\":400}",
+ "sha256_response": "6c1c201bd3806c873fa4a7fd9ee8b9689b79531a9f7d42a78368c3b586ea8d56"
+}

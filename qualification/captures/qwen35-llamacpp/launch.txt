@@ -1,0 +1,16 @@
+llama.cpp: tag b11398, commit a7b94df2c616bc1f62a73b964b4a71cb0dcc488e (llama-server --version: 0.5.0-dev (build 1, commit a7b94df); /props build_info b1-a7b94df)
+Built from source (no official arm64 CUDA 13.0 prebuilt matched the host toolkit; the release ships CUDA 13.4 arm64 and CPU/Vulkan variants, not used):
+  git clone https://github.com/ggml-org/llama.cpp ~/.local/opt/llama.cpp ; git checkout b11398
+  cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=121 -DCMAKE_BUILD_TYPE=Release -DLLAMA_CURL=OFF
+  cmake --build build -j20 --target llama-server        (CUDA toolkit 13.0.88 at /usr/local/cuda)
+Model: Ollama blob reused directly (GGUF magic verified), sha256 02d45dc1cf451ba2475ac33b301c2dd8f985abe4c182ce04a1f2f5bf0260278d, Q4_K - Medium
+Launch (main server, left running):
+  cd ~/.local/opt/llama.cpp/build/bin && setsid nohup ./llama-server -m ~/.ollama/models/blobs/sha256-02d45dc1cf451ba2475ac33b301c2dd8f985abe4c182ce04a1f2f5bf0260278d --alias qwen3.5:9b --port 18081 --host 127.0.0.1 -c 32768 --jinja -ngl 99 > ~/.llama-server-18081.log 2>&1 &
+  (a first launch without --alias reported the blob path as the model id; relaunched with --alias qwen3.5:9b so the id matches the Ollama captures)
+Reasoning mechanisms tried:
+  request: chat_template_kwargs.enable_thinking=false (05d), reasoning_effort="none" (05c), think=false (05b, ignored), reasoning_format="none" (05f)
+  server flags, on a temporary second server (port 18083, -c 8192, otherwise identical, stopped afterwards): --reasoning off, --reasoning-budget 0 (05-*-server-flag.json)
+Probe commands:
+  python: cd python && PYTHONPATH=. python3 -m interplane.probe http://127.0.0.1:18081/v1 --model qwen3.5:9b --backend llama.cpp --backend-version "b11398 (a7b94df)" --model-digest sha256:02d45d... --out ../qualification/reports/qwen35-9b-llamacpp-b11398.probe.json
+  rust:   rust/target/release/interplane-probe --endpoint http://127.0.0.1:18081/v1 --model qwen3.5:9b --backend llama.cpp --model-revision sha256:02d45d... --out qualification/reports/qwen35-9b-llamacpp-b11398.probe.rust.json
+Captures: sent by a scratch script reusing the Ollama capture request bodies (temperature 0, seed 42, max_tokens 4096 added). Chat template saved as chat_template.jinja (from /props, sha256 a4aee8af..., identical to qualification/evidence/qwen35-9b-chat_template.jinja).

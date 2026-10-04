@@ -1,0 +1,27 @@
+{
+  "version": "sim-1",
+  "description": "Which backend answers each capability a bench task lists, AFTER Odysseus has authorized the call. Precedence per call: the task's fault_injection, then the task's stub_results, then this registry, then the reference adapter (which refuses every tool not listed here as 'not executed by the reference adapter'). The decision is never simulated. Implementation: bench/tools/sim_backends.py (computed, declared_failure) and bench/tools/run_bench.py BenchAuthority (executable, odysseus_handler). Stores: bench/stubs/stores/<fixture>.json; a fixture without a store file has empty stores.",
+  "tools": {
+    "read_file": {"kind": "executable", "semantics": "Odysseus's own handler through the reference adapter (adapters/odysseus/interplane_adapter_odysseus/authority.py EXECUTABLE)."},
+    "ls": {"kind": "executable", "semantics": "Odysseus's own handler through the reference adapter."},
+    "glob": {"kind": "executable", "semantics": "Odysseus's own handler through the reference adapter."},
+    "grep": {"kind": "executable", "semantics": "Odysseus's own handler through the reference adapter."},
+    "get_workspace": {"kind": "odysseus_handler", "semantics": "Odysseus's own GetWorkspaceTool handler (agent_tools/filesystem_tools.py) with the run's workspace bound, as the adapter binds it for the four executable tools. Returns the workspace path; with --backends sim-1 the runner places each run's workspace at the fixed path <tmp>/interplane-bench-ws/<task>.<condition> so the text is the same on every run."},
+    "ask_user": {"kind": "computed", "sim": "user_unavailable", "semantics": "Fixed ok result: no user is available in the benchmark; continue and state assumptions. Same text for every call and every argument."},
+    "manage_notes": {"kind": "computed", "sim": "notes", "semantics": "Notes store. list/search (case-insensitive substring over title and body; archived only when archived=true; optional label filter), view by id prefix, add/update/delete/toggle_item on the run-local copy. Unknown id -> error 'no note with id'."},
+    "manage_memory": {"kind": "computed", "sim": "memory", "semantics": "Memory store. list (optional category), search (substring of text), add/edit/delete on the run-local copy. Unknown id -> error."},
+    "manage_calendar": {"kind": "computed", "sim": "calendar", "semantics": "Calendar store, one calendar 'Personal'. list_events filters on the date part of dtstart within [start, end]; create/update/delete on the run-local copy. Unknown uid -> error."},
+    "manage_contact": {"kind": "computed", "sim": "contacts", "semantics": "Contacts store. list shows uid, name, emails, phones; add needs a name and an email, phone or address; update/delete by uid on the run-local copy. Unknown uid -> error."},
+    "resolve_contact": {"kind": "computed", "sim": "resolve_contact", "semantics": "Case-insensitive substring of the contact name in the contacts store; returns 'name: emails (source: CardDAV)' lines or 'No contact found'. A task's stub_results entry wins."},
+    "manage_documents": {"kind": "computed", "sim": "documents", "semantics": "Editor-panel documents store (not workspace files). list (search over title and snippet, language, limit), delete by id, tidy -> 'Nothing to tidy.'"},
+    "list_models": {"kind": "computed", "sim": "models", "semantics": "Models store (configured endpoints). Optional filter: substring of name or endpoint."},
+    "manage_tokens": {"kind": "computed", "sim": "tokens", "semantics": "API tokens store. list; create returns a run-local id and never a secret; delete by id. Odysseus denies it for non-admin callers before this is reached."},
+    "manage_bg_jobs": {"kind": "computed", "sim": "bg_jobs", "semantics": "No background jobs exist (bash is a declared failure, so none can start). list -> 'No background jobs'; output/kill -> error 'no job with id'."},
+    "send_email": {"kind": "computed", "sim": "send_email", "semantics": "Recorded in a run-local outbox, never delivered. 'to' must contain '@'. Reached only when Odysseus authorizes the send."},
+    "write_file": {"kind": "computed", "sim": "write_file", "semantics": "Writes inside the run's own workspace copy only; a path outside it (after resolving symlinks) is refused as an error and nothing is written."},
+    "edit_file": {"kind": "computed", "sim": "edit_file", "semantics": "Exact string replacement in a workspace file; old_string must occur exactly once unless replace_all=true. Confined like write_file."},
+    "apply_patch": {"kind": "computed", "sim": "apply_patch", "semantics": "Subset of the *** Begin Patch format: Add File, Delete File, Update File with space/-/+ hunk lines; every section is checked before anything is written; each hunk must match exactly once. Confined like write_file."},
+    "bash": {"kind": "declared_failure", "message": "bash: running commands is not available in this benchmark sandbox (backends sim-1); use the file tools", "semantics": "Always the same execution_error. Shell commands are not simulated: their output cannot be made deterministic without a shell model. No answer or recovery task may list it."},
+    "python": {"kind": "declared_failure", "message": "python: running code is not available in this benchmark sandbox (backends sim-1); use the file tools", "semantics": "Always the same execution_error, for the same reason as bash. No answer or recovery task may list it."}
+  }
+}

@@ -6,7 +6,9 @@ corpus rules from bench/README.md: unique ids matching file names, fixtures and 
 every capability name in the recorded Odysseus catalog, requested_domains equal to the
 bench/domains.json rule applied to user_request, condition-B coverage (expansion tasks must be
 uncovered by the initial selection, all others covered), per-category rules, split counts, and
-the frozen digests in bench/CORPUS-DIGEST.txt.
+the frozen digests in bench/CORPUS-DIGEST.txt. Backend coverage (bench/stubs/backends.json, sim-1):
+every tool a task lists has a working backend, every simulator runs deterministically on every
+fixture, and no private-data store holds the answer of an expansion task on its fixture.
 
   python3 bench/tools/validate.py                  validate, compare digests
   python3 bench/tools/validate.py --write-digest   validate, then (re)write CORPUS-DIGEST.txt
@@ -20,7 +22,9 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -205,6 +209,120 @@ def read_digest_file() -> dict:
     return out
 
 
+# ---------------------------------------------------------------- simulated backends (sim-1)
+
+def listed_tools(task: dict) -> set:
+    return set(task["required_capabilities"]) | {n for g in task["allowed_alternatives"] for n in g} | set(task["useful_capabilities"])
+
+
+def _strings(value) -> list:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, dict):
+        return [x for v in value.values() for x in _strings(v)]
+    if isinstance(value, list):
+        return [x for v in value for x in _strings(v)]
+    return []
+
+
+def backend_errors(tasks: list, ctx: dict) -> list:
+    """Every listed tool has a working, deterministic backend; stores never leak expansion answers."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import sim_backends as sb  # noqa: E402
+
+    e: list = []
+    reg = sb.load_backends()
+    tools = reg.get("tools", {})
+    if reg.get("version") != sb.VERSION:
+        e.append(f"backends.json version {reg.get('version')!r} != {sb.VERSION}")
+    for name, entry in sorted(tools.items()):
+        kind = entry.get("kind")
+        if name not in ctx["catalog"]:
+            e.append(f"backends.json: {name!r} is not in the Odysseus catalog")
+        if kind not in sb.KINDS:
+            e.append(f"backends.json: {name}: unknown kind {kind!r}")
+        if not entry.get("semantics"):
+            e.append(f"backends.json: {name}: semantics must be documented")
+        if kind == "computed" and entry.get("sim") not in sb.SIMS:
+            e.append(f"backends.json: {name}: simulator {entry.get('sim')!r} is not implemented")
+        if kind == "declared_failure" and not entry.get("message"):
+            e.append(f"backends.json: {name}: declared_failure needs a message")
+        if kind == "executable" and name not in EXECUTABLE:
+            e.append(f"backends.json: {name}: the reference adapter does not execute it")
+    for name in EXECUTABLE:
+        if tools.get(name, {}).get("kind") != "executable":
+            e.append(f"backends.json: {name} must be kind executable")
+    for name in ctx["rule"]["always_include"]:
+        if name not in tools:
+            e.append(f"backends.json: always-included {name} has no backend")
+
+    for t in tasks:
+        for name in sorted(listed_tools(t)):
+            if name in t["stub_results"]:
+                continue
+            entry = tools.get(name)
+            if entry is None:
+                e.append(f"{t['id']}: lists {name} but it has no stub and no backend in backends.json")
+            elif entry["kind"] == "declared_failure" and t["expected_outcome"] in ("answer", "recovery"):
+                e.append(f"{t['id']}: {t['expected_outcome']} task lists {name}, whose backend always fails")
+
+    # Expansion tasks must stay expansion tasks: no private store on their fixture holds the answer.
+    for t in tasks:
+        if t["category"] != "expansion":
+            continue
+        hay = "\n".join(_strings(sb.load_store(t["workspace_fixture"]))).casefold()
+        for c in walk_checks(t["judge"]["checks"]):
+            if c["kind"] == "answer_contains_all":
+                for v in c["values"]:
+                    if v.casefold() in hay:
+                        e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture']).name} contains the answer {v!r}")
+            if c["kind"] == "answer_regex" and re.search(c["pattern"], hay):
+                e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture']).name} matches the answer regex")
+    known = {sb.store_path(t["workspace_fixture"]).name for t in tasks}
+    for p in sorted(sb.STORES_DIR.glob("*.json")):
+        if p.name not in known:
+            e.append(f"store {p.name} belongs to no task fixture")
+        else:
+            data = json.loads(p.read_text(encoding="utf-8"))
+            extra = set(data) - set(sb.STORE_KEYS) - {"_note"}
+            if extra:
+                e.append(f"store {p.name}: unknown keys {sorted(extra)}")
+
+    # Working check: each simulator, on each fixture, twice on fresh copies; results must match.
+    for fixture in sorted({t["workspace_fixture"] for t in tasks}):
+        outs = []
+        for _ in range(2):
+            ws = tempfile.mkdtemp(prefix="interplane-simcheck-")
+            try:
+                shutil.copytree(BENCH / fixture, ws, symlinks=True, dirs_exist_ok=True)
+                sess = sb.SimSession(ws, fixture, reg)
+                run = []
+                for name, entry in sorted(tools.items()):
+                    if entry["kind"] not in ("computed", "declared_failure"):
+                        continue
+                    for args in sb.SAMPLES.get(entry.get("sim"), [{}]):
+                        try:
+                            raw = sess.call(name, json.loads(json.dumps(args)))
+                        except Exception as err:  # noqa: BLE001 - reported, the check fails
+                            e.append(f"{fixture}: {name}{args} raised {type(err).__name__}: {err}")
+                            continue
+                        good = isinstance(raw, dict) and (isinstance(raw.get("output"), str) or isinstance(raw.get("error"), str))
+                        if not good:
+                            e.append(f"{fixture}: {name} returned {raw!r}")
+                        if entry["kind"] == "declared_failure" and raw != {"error": entry["message"], "exit_code": 1}:
+                            e.append(f"{fixture}: declared_failure {name} returned something else")
+                        run.append([name, args, raw])
+                outs.append(json.dumps(run, sort_keys=True))
+            finally:
+                shutil.rmtree(ws, ignore_errors=True)
+        if outs[0] != outs[1]:
+            e.append(f"{fixture}: simulated backends are not deterministic")
+    for sim in sb.SIMS:
+        if sim not in sb.SAMPLES:
+            e.append(f"simulator {sim} has no sample call for the working check")
+    return e
+
+
 # ---------------------------------------------------------------- corpus rules
 
 def walk_checks(checks: list):
@@ -384,6 +502,8 @@ def main(argv=None) -> int:
         errors += [f"{path.name}: {x}" for x in errs]
         tasks.append(task)
 
+    if not errors:
+        errors += backend_errors(tasks, ctx)
     ids = Counter(t.get("id") for t in tasks)
     errors += [f"duplicate id {i}" for i, n in ids.items() if n > 1]
     cats = schema["$defs"]["Category"]["enum"]

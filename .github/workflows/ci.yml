@@ -64,3 +64,41 @@ jobs:
           bad=[c for c in sorted(set(r)|set(p)) if json.dumps(r.get(c),sort_keys=True)!=json.dumps(p.get(c),sort_keys=True)]
           print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=23 else 0)
           PY
+  adapter-aien:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {path: interplane}
+      - name: pinned AIEN sibling checkouts (aegis-runtime reaches ../aien-protocols by path)
+        run: |
+          mkdir -p interplane-audit
+          git clone -q https://github.com/aien-dev/aegis-runtime.git interplane-audit/aegis-runtime
+          git -C interplane-audit/aegis-runtime checkout -q f4e870953a466bb1cf68f1d88285929024cf1ba9
+          git clone -q https://github.com/aien-dev/aien-protocols.git interplane-audit/aien-protocols
+          git -C interplane-audit/aien-protocols checkout -q 3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
+      - uses: dtolnay/rust-toolchain@stable
+        with: {components: "rustfmt, clippy"}
+      - run: cargo fmt --all --check
+        working-directory: interplane/adapters/aien
+      - run: cargo clippy --all-targets -- -D warnings
+        working-directory: interplane/adapters/aien
+      - run: cargo test
+        working-directory: interplane/adapters/aien
+  adapter-odysseus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: pinned Odysseus checkout (odysseus-dev/odysseus @ 2992bf6)
+        run: |
+          git clone -q https://github.com/odysseus-dev/odysseus.git ../odysseus
+          git -C ../odysseus checkout -q 2992bf6
+          pip install -q -r ../odysseus/requirements.txt pytest pyflakes
+      - run: python -m pyflakes adapters/odysseus
+      - name: adapter tests against the real Odysseus code (no skips allowed)
+        run: |
+          cd adapters/odysseus
+          ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 \
+            python -m pytest tests -q -p no:cacheprovider -rs | tee pytest.log
+          ! grep -q "skipped" pytest.log

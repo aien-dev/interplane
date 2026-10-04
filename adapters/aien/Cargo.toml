@@ -21,10 +21,14 @@ interplane-crossveil = { path = "../../rust/crates/interplane-crossveil" }
 serde_json = "1"
 sha2 = "0.10"
 tokio = { version = "1", features = ["rt"] }
-# Pinned AIEN clones (git checkouts): aien-sovereign-core 7580039, aegis-runtime f4e8709.
-aien-capability = { path = "/home/drakestapleton/workspace/interplane-audit/aien-sovereign-core/crates/aien-capability" }
-aien-mcp = { path = "/home/drakestapleton/workspace/interplane-audit/aien-sovereign-core/crates/aien-mcp" }
-aegis = { path = "/home/drakestapleton/workspace/interplane-audit/aegis-runtime", optional = true }
+# Pinned AIEN sources (public GitHub, exact commits the Phase 0 audit read).
+aien-capability = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "75800398eb53646444d4c12e5a27fdc26cd14e04" }
+aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "75800398eb53646444d4c12e5a27fdc26cd14e04" }
+# aegis-runtime cannot be a git dependency: its own Cargo.toml reaches a sibling checkout
+# (`../aien-protocols/crates/*`). Layout required (see README): next to this repository,
+# `interplane-audit/aegis-runtime` at f4e870953a466bb1cf68f1d88285929024cf1ba9 and
+# `interplane-audit/aien-protocols` at 3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10.
+aegis = { path = "../../../interplane-audit/aegis-runtime", optional = true }
 
 [dev-dependencies]
 interplane-lenshift = { path = "../../rust/crates/interplane-lenshift" }

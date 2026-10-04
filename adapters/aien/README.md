@@ -11,12 +11,24 @@ with the reason `AIEN production cannot mint AuthorizedEffect; approval must com
 and no approval id (AIEN has none to hand out). Nothing under `rust/`, `spec/`, `python/` or
 `conformance/` and no AIEN repository is modified.
 
-## Pinned AIEN sources (path dependencies, both are git checkouts)
+## Pinned AIEN sources
 
-`/home/drakestapleton/workspace/interplane-audit/`: `aien-sovereign-core` at `7580039`
-(crates `aien-capability`, `aien-mcp`), `aegis-runtime` at `f4e8709` (its `aien-protocols` path
-dependency resolves to the sibling clone at `3a4cdbe`). Verify with `git -C <clone> rev-parse HEAD`.
-Everything resolves from the local registry; `cargo build --offline` works.
+`aien-capability` and `aien-mcp` are git dependencies pinned to
+`aien-dev/aien-sovereign-core@75800398eb53646444d4c12e5a27fdc26cd14e04` (the commit the Phase 0
+audit read). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
+`aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
+(`../aien-protocols/crates/*`). The build therefore expects this layout next to the INTERPLANE
+checkout:
+
+```
+<parent>/interplane/adapters/aien           (this crate)
+<parent>/interplane-audit/aegis-runtime      aien-dev/aegis-runtime  @ f4e870953a466bb1cf68f1d88285929024cf1ba9
+<parent>/interplane-audit/aien-protocols     aien-dev/aien-protocols @ 3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
+```
+
+CI recreates exactly that layout (`.github/workflows/ci.yml`, job `adapter-aien`). Without the
+`aegis-gate` feature the crate still builds and every `decide()` is `denied` (fail closed).
+Building `aegis-runtime` writes `mojo/libaegis_simd.so` inside that checkout (its `build.rs`).
 
 ## Reused from AIEN (called for real)
 

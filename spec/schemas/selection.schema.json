@@ -12,7 +12,7 @@
     "selector": {
       "type": "object",
       "required": ["name", "version"],
-      "properties": {"name": {"type": "string"}, "version": {"type": "string"}, "max_capabilities": {"type": ["integer", "null"], "minimum": 1}},
+      "properties": {"name": {"type": "string"}, "version": {"type": "string"}, "max_capabilities": {"type": ["integer", "null"], "minimum": 1}, "expansion": {"$ref": "#/$defs/ExpansionBounds"}},
       "additionalProperties": true
     },
     "requested_domains": {"type": "array", "items": {"type": "string"}},
@@ -29,11 +29,57 @@
         "selected_rendered_bytes": {"type": "integer", "minimum": 0},
         "full_tokens": {"type": ["integer", "null"], "minimum": 0},
         "selected_tokens": {"type": ["integer", "null"], "minimum": 0},
-        "tokenizer": {"type": ["string", "null"]}
+        "tokenizer": {"type": ["string", "null"]},
+        "rendered_bytes": {"$ref": "#/$defs/FullSelected", "description": "Canonical-JSON bytes of the rendered tools array, exactly as sent."},
+        "tokens": {"$ref": "#/$defs/TokenMeasure"}
       },
       "additionalProperties": true
     },
+    "expansions": {"type": "array", "description": "One entry per expansion attempt, in order (CROSSAXIS.md, Bounded expansion).", "items": {"$ref": "#/$defs/Expansion"}},
+    "parent_digest": {"$ref": "common.schema.json#/$defs/Digest", "description": "selection_digest of the selection this one was expanded from."},
+    "selection_digest": {"$ref": "common.schema.json#/$defs/Digest", "description": "JCS digest of this selection with selection_digest and measure removed. Present on expanded selections."},
     "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "$defs": {
+    "FullSelected": {
+      "type": "object",
+      "required": ["full", "selected"],
+      "properties": {"full": {"type": "integer", "minimum": 0}, "selected": {"type": "integer", "minimum": 0}},
+      "additionalProperties": false
+    },
+    "TokenMeasure": {
+      "type": "object",
+      "description": "Every number in the block is in `unit`; units are never mixed in one block.",
+      "required": ["unit", "source", "base_context", "tool_schema", "first_turn_prompt"],
+      "properties": {
+        "unit": {"enum": ["bytes", "tokens_model_reported", "tokens_endpoint_tokenizer", "tokens_estimated"]},
+        "source": {"type": "string", "minLength": 1, "description": "Free text: how the numbers were obtained."},
+        "base_context": {"type": "integer", "minimum": 0},
+        "tool_schema": {"$ref": "#/$defs/FullSelected"},
+        "first_turn_prompt": {"$ref": "#/$defs/FullSelected"},
+        "all_rounds_prompt": {"$ref": "#/$defs/FullSelected"},
+        "completion": {"$ref": "#/$defs/FullSelected"}
+      },
+      "additionalProperties": false
+    },
+    "ExpansionBounds": {
+      "type": "object",
+      "required": ["max_expansions", "max_added_per_expansion"],
+      "properties": {"max_expansions": {"type": "integer", "minimum": 0}, "max_added_per_expansion": {"type": "integer", "minimum": 0}},
+      "additionalProperties": false
+    },
+    "Expansion": {
+      "type": "object",
+      "required": ["round", "reason", "evidence_digest", "added", "refused"],
+      "properties": {
+        "round": {"type": "integer", "minimum": 1},
+        "reason": {"enum": ["requested_excluded", "discovery_hit"]},
+        "evidence_digest": {"$ref": "common.schema.json#/$defs/Digest"},
+        "added": {"type": "array", "items": {"type": "string"}},
+        "refused": {"type": "array", "items": {"type": "object", "required": ["name", "reason"], "properties": {"name": {"type": "string"}, "reason": {"enum": ["not_in_catalog", "already_selected", "runtime_disabled", "max_expansions", "max_added_per_expansion", "max_capabilities"]}}, "additionalProperties": false}}
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": true
 }

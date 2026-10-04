@@ -338,10 +338,16 @@ impl RuntimeAuthority for MockRuntime {
                         name: name.into(),
                     }),
                     description: format!("mock capability {}", s.cap),
-                    parameters: json!({"type": "object", "properties": props, "required": req})
-                        .as_object()
-                        .cloned()
-                        .unwrap_or_default(),
+                    // `required` is omitted when empty: the same parameters object as the
+                    // Python mock, so both languages derive the same catalog digest.
+                    parameters: if req.is_empty() {
+                        json!({"type": "object", "properties": props})
+                    } else {
+                        json!({"type": "object", "properties": props, "required": req})
+                    }
+                    .as_object()
+                    .cloned()
+                    .unwrap_or_default(),
                     domains: s.domains.iter().map(|d| d.to_string()).collect(),
                     runtime_effects: None,
                     schema_digest: None,

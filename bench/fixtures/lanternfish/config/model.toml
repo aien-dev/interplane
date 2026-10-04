@@ -1,0 +1,3 @@
+# Model used to phrase tide summaries
+default_model = "tidecaster-3b"
+fallback_model = "tidecaster-1b"

@@ -1,0 +1,4 @@
+# Lanternfish runtime settings
+port = 8417
+data_dir = "data/stations"
+log_level = "info"

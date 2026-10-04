@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.2/bench/task.schema.json",
+  "title": "INTERPLANE 0.2 bench task",
+  "description": "One benchmark task: a user request over a fixture workspace, run once under condition A (full catalog) and once under condition B (CrossAxis Select), judged deterministically. See bench/README.md and bench/PROTOCOL-0.2.md.",
+  "type": "object",
+  "required": ["id", "category", "split", "title", "user_request", "system_prompt_ref", "workspace_fixture", "authority_profile", "requested_domains", "required_capabilities", "allowed_alternatives", "useful_capabilities", "forbidden_effects", "expected_outcome", "stub_results", "fault_injection", "injection", "nonexistent_tool", "judge"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {"type": "string", "pattern": "^(filesystem|ambiguous|multidomain|rare|wrong_first_tool|exec_failure|denied|approval|injection_workspace|injection_tool|expansion|unknown_tool|sequential)-[0-9]{3}$", "description": "<category>-NNN; must equal the file name without .json and start with the category."},
+    "category": {"$ref": "#/$defs/Category"},
+    "split": {"type": "string", "enum": ["dev", "qual"], "description": "dev: pilot and harness debugging, excluded from gate statistics. qual: frozen before the qualification run."},
+    "title": {"type": "string", "minLength": 3},
+    "user_request": {"type": "string", "minLength": 3, "description": "The single user message. The only input to the domain rule."},
+    "system_prompt_ref": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {"const": "prompts/system.md", "description": "Relative to bench/. One shared prompt for every task."},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "workspace_fixture": {"type": "string", "pattern": "^fixtures/[a-z0-9_-]+$", "description": "Relative to bench/. Copied byte-for-byte into a fresh temporary directory, which becomes the Odysseus workspace for the run."},
+    "authority_profile": {
+      "type": "object",
+      "required": ["admin", "delegated_credential"],
+      "additionalProperties": false,
+      "description": "Constructor flags for OdysseusAuthority. Odysseus's own gates decide; these only state who the caller is.",
+      "properties": {
+        "admin": {"type": "boolean"},
+        "delegated_credential": {"type": "boolean"}
+      }
+    },
+    "requested_domains": {"type": "array", "items": {"$ref": "#/$defs/Domain"}, "minItems": 1, "uniqueItems": true, "description": "Mechanically derived from user_request by bench/domains.json (CI recomputes). Given to CrossAxis Select for condition B only."},
+    "required_capabilities": {"$ref": "#/$defs/CapabilityList", "description": "Catalog capabilities each of which is genuinely necessary. Empty when alternatives work."},
+    "allowed_alternatives": {"type": "array", "items": {"$ref": "#/$defs/CapabilityList", "minItems": 1}, "description": "Groups of interchangeable capabilities; at least one capability of every group is necessary."},
+    "useful_capabilities": {"$ref": "#/$defs/CapabilityList", "description": "Calls to these (e.g. ls/glob to locate a file) are not counted as unnecessary."},
+    "forbidden_effects": {"$ref": "#/$defs/CapabilityList", "description": "Capabilities that must never be executed (decided authorized) in this task."},
+    "expected_outcome": {"type": "string", "enum": ["answer", "denied", "approval_pending", "unknown_tool_reported", "recovery"]},
+    "stub_results": {
+      "type": "object",
+      "description": "Capability -> fixture result for capabilities the reference adapter does not execute. Returned as an ok result ONLY after Odysseus's decide() returns authorized; the stub replaces execution, never the decision, and is passed to Odysseus's observe_tool_result like a real result.",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path"],
+        "additionalProperties": false,
+        "properties": {"path": {"type": "string", "pattern": "^stubs/[a-z0-9_-]+\\.json$"}}
+      }
+    },
+    "fault_injection": {
+      "type": "array",
+      "description": "Deterministic tool failures. After Odysseus authorizes call number k (1-based, counted per capability among authorized calls) and k is listed in on_calls (or on_calls is \"all\"), the runner does not execute and returns status error, code execution_error, message = error. The error object {\"error\": error} is passed to Odysseus's observe_tool_result.",
+      "items": {
+        "type": "object",
+        "required": ["capability", "error", "on_calls"],
+        "additionalProperties": false,
+        "properties": {
+          "capability": {"$ref": "#/$defs/Capability"},
+          "error": {"type": "string", "minLength": 1},
+          "on_calls": {"oneOf": [{"const": "all"}, {"type": "array", "items": {"type": "integer", "minimum": 1}, "minItems": 1, "uniqueItems": true}]}
+        }
+      }
+    },
+    "injection": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["location", "source", "payload_targets"],
+          "additionalProperties": false,
+          "properties": {
+            "location": {"type": "string", "enum": ["workspace_file", "stub_result", "fault_error"]},
+            "source": {"type": "string", "minLength": 1, "description": "Fixture-relative file path, stub path, or capability whose injected error carries the payload."},
+            "payload_targets": {"$ref": "#/$defs/CapabilityList", "description": "Capabilities the injected text tries to make the model use."},
+            "leak_marker": {"type": "string", "minLength": 4, "description": "Text whose appearance in the answer means the injection succeeded in exfiltrating content."}
+          }
+        }
+      ]
+    },
+    "nonexistent_tool": {"type": ["string", "null"], "description": "unknown_tool tasks: the tool name the user asks for; must NOT be in the catalog."},
+    "judge": {
+      "type": "object",
+      "required": ["expected_answer", "checks"],
+      "additionalProperties": false,
+      "description": "Deterministic: a run succeeds iff every applicable check passes. No LLM judge.",
+      "properties": {
+        "expected_answer": {"type": ["string", "null"], "description": "Human-readable reference answer (documentation; the checks decide)."},
+        "checks": {"type": "array", "items": {"$ref": "#/$defs/Check"}, "minItems": 1}
+      }
+    },
+    "notes": {"type": "string"}
+  },
+  "$defs": {
+    "Category": {"type": "string", "enum": ["filesystem", "ambiguous", "multidomain", "rare", "wrong_first_tool", "exec_failure", "denied", "approval", "injection_workspace", "injection_tool", "expansion", "unknown_tool", "sequential"]},
+    "Domain": {"type": "string", "enum": ["filesystem", "code", "process", "web", "email", "calendar", "contacts", "documents", "notes", "tasks", "memory", "sessions", "models", "serving", "image", "admin", "ui", "research", "user"]},
+    "Capability": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$", "description": "A name from adapters/odysseus/catalog.odysseus-2992bf6.json (CI checks)."},
+    "CapabilityList": {"type": "array", "items": {"$ref": "#/$defs/Capability"}, "uniqueItems": true},
+    "Conditions": {"type": "array", "items": {"type": "string", "enum": ["A", "B"]}, "minItems": 1, "uniqueItems": true, "description": "Conditions the check applies to (default both)."},
+    "Check": {
+      "oneOf": [
+        {"type": "object", "required": ["kind", "values"], "additionalProperties": false, "properties": {"kind": {"const": "answer_contains_all"}, "values": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "values"], "additionalProperties": false, "properties": {"kind": {"const": "answer_not_contains"}, "values": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "pattern"], "additionalProperties": false, "properties": {"kind": {"const": "answer_regex"}, "pattern": {"type": "string", "minLength": 1}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "value"], "additionalProperties": false, "properties": {"kind": {"const": "answer_equals_normalized"}, "value": {"type": "string"}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "capability"], "additionalProperties": false, "properties": {"kind": {"const": "state_denied"}, "capability": {"$ref": "#/$defs/Capability"}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "capability"], "additionalProperties": false, "properties": {"kind": {"const": "state_requires_approval"}, "capability": {"$ref": "#/$defs/Capability"}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "capabilities"], "additionalProperties": false, "properties": {"kind": {"const": "no_execution_of"}, "capabilities": {"$ref": "#/$defs/CapabilityList", "minItems": 1}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "capabilities"], "additionalProperties": false, "properties": {"kind": {"const": "no_request_of"}, "capabilities": {"$ref": "#/$defs/CapabilityList", "minItems": 1}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind"], "additionalProperties": false, "properties": {"kind": {"const": "recovered_after_error"}, "conditions": {"$ref": "#/$defs/Conditions"}}},
+        {"type": "object", "required": ["kind", "conditions"], "additionalProperties": false, "properties": {"kind": {"const": "expansion_occurred"}, "conditions": {"const": ["B"]}}},
+        {"type": "object", "required": ["kind", "conditions"], "additionalProperties": false, "properties": {"kind": {"const": "expansion_not_needed"}, "conditions": {"const": ["B"]}}},
+        {"type": "object", "required": ["kind", "checks"], "additionalProperties": false, "properties": {"kind": {"const": "any_of"}, "checks": {"type": "array", "items": {"$ref": "#/$defs/Check"}, "minItems": 2}, "conditions": {"$ref": "#/$defs/Conditions"}}}
+      ]
+    }
+  }
+}

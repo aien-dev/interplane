@@ -1,0 +1,30 @@
+{
+  "kind": "interplane_bench_domain_rule",
+  "version": 1,
+  "frozen": "2026-10-04, before any task was written",
+  "rule": "Lowercase the user_request. A domain is requested when any of its keywords occurs in the request with no letter, digit or underscore immediately before or after it (multi-word keywords match as written). The filesystem domain is also requested when the request contains a file name matching filename_pattern. requested_domains is the sorted, de-duplicated list. If no domain is requested, requested_domains is the default list. Nothing else is consulted: not the category, the fixture, the expected answer or the required capabilities.",
+  "filename_pattern": "[a-z0-9_.-]+\\.(md|txt|toml|json|rs|go|yaml|yml|csv|ini|cfg|log|lock|sh|ics|env)(?![a-z0-9_])",
+  "default": ["filesystem"],
+  "always_include": ["ask_user"],
+  "keywords": {
+    "filesystem": ["file", "files", "folder", "folders", "directory", "directories", "readme", "workspace", "project", "path", "paths"],
+    "code": ["code", "codebase", "source", "function", "functions", "repository", "repo", "grep", "symbol", "struct", "module", "crate"],
+    "process": ["run", "execute", "command", "commands", "shell", "bash", "script", "terminal"],
+    "web": ["web", "website", "url", "internet", "online"],
+    "email": ["email", "emails", "e-mail", "mail", "inbox", "reply"],
+    "contacts": ["contact", "contacts", "address book", "phone number"],
+    "calendar": ["calendar", "meeting", "meetings", "appointment", "event", "events"],
+    "documents": ["document", "documents", "editor"],
+    "notes": ["note", "notes", "checklist", "checklists"],
+    "tasks": ["todo", "to-do", "task", "tasks", "scheduled", "plan"],
+    "memory": ["remember", "memory", "memories", "skill", "skills"],
+    "sessions": ["chat", "chats", "conversation", "conversations", "session", "sessions"],
+    "models": ["model", "models", "huggingface", "llm"],
+    "serving": ["serve", "served", "serving", "preset", "presets", "cookbook", "server", "servers"],
+    "image": ["image", "images", "picture", "photo"],
+    "admin": ["token", "tokens", "webhook", "webhooks", "settings", "endpoint", "endpoints", "mcp", "admin"],
+    "research": ["research"],
+    "ui": ["theme", "panel", "interface"],
+    "user": []
+  }
+}

@@ -62,7 +62,7 @@ jobs:
           import json,sys
           r=json.load(open('rust-verdicts.json')); p=json.load(open('py-verdicts.json'))
           bad=[c for c in sorted(set(r)|set(p)) if json.dumps(r.get(c),sort_keys=True)!=json.dumps(p.get(c),sort_keys=True)]
-          print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=23 else 0)
+          print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=25 else 0)
           PY
   adapter-aien:
     runs-on: ubuntu-latest

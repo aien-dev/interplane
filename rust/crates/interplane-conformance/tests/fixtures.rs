@@ -35,3 +35,29 @@ fn verdicts_are_deterministic() {
         "digests are stable across runs"
     );
 }
+
+#[test]
+fn expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
+    let all = load_fixtures(&dir).unwrap();
+    assert_eq!(all.len(), 25);
+    let mut fx = all
+        .into_iter()
+        .find(|f| f["case"] == "24-expansion-requested-excluded")
+        .unwrap();
+    let run = run_case(&fx);
+    assert_eq!(run.selections.len(), 1);
+    let names: Vec<&str> = run.selections[0]["selected"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|e| e["name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, ["send_email", "write_file"]);
+    assert_eq!(run.observed.len(), 1);
+    assert_eq!(run.observed[0].status.as_str(), "denied");
+    assert_eq!((run.decide_calls, run.execute_calls), (1, 0));
+    // negative control: a wrong expected selection must be reported.
+    fx["expected"]["selections"][0]["selection_digest"] = serde_json::json!("sha256:00");
+    assert!(!compare(&fx, &run).is_empty());
+}

@@ -3,6 +3,7 @@
 use std::path::Path;
 
 use interplane_core::{canonicalize, digest, Limits, RequestLedger};
+use interplane_crossaxis::{expand, select};
 use interplane_crossveil::{
     mock_mapping_table, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,
 };
@@ -19,6 +20,8 @@ pub struct CaseRun {
     pub execute_calls: u32,
     /// Every produced `result` payload, keyed by request id (last one wins), in order.
     pub results: Vec<Value>,
+    /// The selection receipt after each `expand` step, in order.
+    pub selections: Vec<Value>,
 }
 
 /// Run one fixture document.
@@ -30,6 +33,27 @@ pub fn run_case(fx: &Value) -> CaseRun {
     let mut observed = vec![];
     let mut turns = vec![];
     let mut results = vec![];
+    let mut selections = vec![];
+    let catalog = rt.catalog();
+    let mut sel = fx.get("selection").map(|spec| {
+        let strings = |k: &str| -> Vec<String> {
+            spec[k]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default()
+        };
+        select(
+            &catalog,
+            &strings("requested_domains"),
+            spec["max_capabilities"].as_u64().map(|m| m as usize),
+            &strings("always_include"),
+        )
+        .0
+    });
     {
         let mut p = Pipeline::new(
             DialectRegistry::with_defaults(),
@@ -46,7 +70,24 @@ pub fn run_case(fx: &Value) -> CaseRun {
         }
         for step in fx["steps"].as_array().cloned().unwrap_or_default() {
             let turn = step["turn"].as_u64().unwrap_or(0);
-            if let Some(env) = step.get("envelope") {
+            if let Some(ex) = step.get("expand") {
+                if let Some(cur) = sel.take() {
+                    let next = expand(
+                        &cur,
+                        &catalog,
+                        &ex["evidence"],
+                        ex["max_expansions"].as_u64(),
+                        ex["max_added_per_expansion"].as_u64(),
+                    );
+                    match next {
+                        Ok(n) => {
+                            selections.push(serde_json::to_value(&n).unwrap_or(Value::Null));
+                            sel = Some(n);
+                        }
+                        Err(e) => selections.push(json!({"error": e.to_string()})),
+                    }
+                }
+            } else if let Some(env) = step.get("envelope") {
                 let (r, o) = p.admit_value(env);
                 results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
                 observed.push(o);
@@ -75,6 +116,7 @@ pub fn run_case(fx: &Value) -> CaseRun {
         decide_calls: rt.decide_calls,
         execute_calls: rt.execute_calls,
         results,
+        selections,
     }
 }
 
@@ -135,6 +177,11 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
             run.decide_calls, run.execute_calls
         ));
     }
+    if let Some(want) = exp.get("selections") {
+        if want != &Value::Array(run.selections.clone()) {
+            errs.push("selections differ from expected".to_string());
+        }
+    }
     for c in exp["result_checks"].as_array().cloned().unwrap_or_default() {
         let rid = c["request_id"].as_str().unwrap_or("");
         let path = c["path"].as_str().unwrap_or("");
@@ -155,12 +202,16 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
 
 /// One row of the verdict file.
 pub fn verdict(run: &CaseRun, errs: &[String]) -> Value {
-    json!({
+    let mut v = json!({
         "pass": errs.is_empty(),
         "observed": serde_json::to_value(&run.observed).unwrap_or(Value::Null),
         "turns": run.turns,
         "runtime": {"decide_calls": run.decide_calls, "execute_calls": run.execute_calls},
-    })
+    });
+    if !run.selections.is_empty() {
+        v["selections"] = Value::Array(run.selections.clone());
+    }
+    v
 }
 
 /// Load `NN-*.json` fixtures (not subdirectories), sorted by file name.

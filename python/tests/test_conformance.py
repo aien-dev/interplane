@@ -23,12 +23,15 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
     text = out.read_text(encoding="utf-8")
     data = json.loads(text)
     assert list(data) == sorted(data) and len(data) == len(CASES)
-    assert all(
-        v["pass"] and set(v) == {"pass", "observed", "runtime", "turns"} for v in data.values()
-    )
+    base = {"pass", "observed", "runtime", "turns"}
+    assert all(v["pass"] and set(v) - {"selections"} == base for v in data.values())
+    assert {k for k, v in data.items() if "selections" in v} == {
+        "24-expansion-requested-excluded",
+        "25-expansion-refused-by-bound",
+    }
     assert text == jcs(data) + "\n"
     assert all(o["result_digest"] for v in data.values() for o in v["observed"])
-    assert "18/18" in capsys.readouterr().out or len(CASES) != 18
+    assert "25/25" in capsys.readouterr().out or len(CASES) != 25
 
 
 @pytest.mark.skipif(not CASES, reason="no conformance fixtures")

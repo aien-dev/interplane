@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 23 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result). `fixtures/digest/jcs-01.json`: the JCS digest check.
+- `fixtures/NN-slug.json`: the 25 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound). `fixtures/digest/jcs-01.json`: the JCS digest check.
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -31,6 +31,18 @@ was taken and is listed below.
    for the result of `request_id`.
 4. `result_digest` is `null` in fixtures: implementations compute it (digest of the canonical result payload
    with `provenance.duration_ms` null) and the cross-language comparison covers it.
+
+## Selection and expansion fixtures (cases 24, 25)
+
+A fixture may carry `selection: {requested_domains, max_capabilities, always_include}`: the runner
+builds the mock catalog and runs `select` before the first step. A step `{"turn": n, "expand":
+{"evidence": {...}, "max_expansions"?, "max_added_per_expansion"?}}` runs `expand` on the current
+selection and does not touch the pipeline. `expected.selections` is the exact selection receipt
+after each expand step, in order (digests included). A verdict row gains a `selections` key only
+for such cases, so rows 01-23 are unchanged. The reference pipeline has no selected-view mapping:
+the `unknown_capability` that motivates a `requested_excluded` expansion is supplied by the harness
+(the step's evidence), not produced by the pipeline. Case 24 then sends the call through the
+pipeline and expects `denied`: visibility is not authority.
 
 ## Fixture-level `mapping_table`
 
@@ -72,3 +84,4 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 22. Error messages are now pinned by CORE.md ("Canonical result payload shape"); cases 20 and 21 assert them with `result_checks`. `missing tool name` (item 13) is confirmed by that table.
 23. Case 20: the runtime is asked and answers `invalid`, so stage `REJECTED`, decision `invalid`, decide true (CORE.md case table row 20). Case 21: nothing reaches the runtime, so decision null, decide false.
 24. Case 22/23 `provenance.trusted` is asserted false (CORE.md: false for the two untrusted levels); case 19 true.
+25. Cases 24-25 (CROSSAXIS.md, Bounded expansion): the selection receipt after each expansion is compared exactly; `validate_fixtures.py` also recomputes `selection_digest` and the `parent_digest` chain independently and validates each receipt against `selection.schema.json`.

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from .core import Limits, jcs
+from .crossaxis import expand, select
 from .crossveil import canonical_result_payload, default_pipeline
 
 
@@ -30,7 +31,29 @@ def run_case(case: dict) -> dict:
     observed: list = []
     results: list = []
     turns: list = []
+    selections: list = []
+    sel_spec = case.get("selection")
+    catalog = pipe.runtime.catalog()
+    sel = None
+    if sel_spec is not None:
+        sel, _ = select(
+            catalog,
+            sel_spec.get("requested_domains", []),
+            sel_spec.get("max_capabilities"),
+            sel_spec.get("always_include"),
+        )
     for step in case["steps"]:
+        if "expand" in step:
+            ex = step["expand"]
+            sel = expand(
+                sel,
+                catalog,
+                ex["evidence"],
+                ex.get("max_expansions"),
+                ex.get("max_added_per_expansion"),
+            )
+            selections.append(sel.to_dict())
+            continue
         if "envelope" in step:
             result, record = pipe.admit_envelope(step["envelope"], turn=step.get("turn"))
             results.append(result)
@@ -65,6 +88,8 @@ def run_case(case: dict) -> dict:
                 problems.append(f"observed[{i}].{key}: {got.get(key)!r} != {value!r}")
     if "turns" in expected and turns != expected["turns"]:
         problems.append(f"turns {turns!r} != {expected['turns']!r}")
+    if "selections" in expected and selections != expected["selections"]:
+        problems.append("selections differ from expected")
     if "runtime" in expected and runtime != expected["runtime"]:
         problems.append(f"runtime {runtime!r} != {expected['runtime']!r}")
     for check in expected.get("result_checks", []):
@@ -81,6 +106,7 @@ def run_case(case: dict) -> dict:
         "observed": observed,
         "turns": turns,
         "runtime": runtime,
+        "selections": selections,
         "problems": problems,
         "results": [canonical_result_payload(r) for r in results],
     }
@@ -111,8 +137,12 @@ def main(argv: Optional[list] = None) -> int:
         failed += not v["pass"]
     print(f"{len(verdicts) - failed}/{len(verdicts)} passed")
     out = {
-        k: {f: v[f] for f in ("pass", "observed", "turns", "runtime")} for k, v in verdicts.items()
+        k: {f: v[f] for f in ("pass", "observed", "turns", "runtime", "selections") if f in v}
+        for k, v in verdicts.items()
     }
+    for v in out.values():
+        if not v.get("selections"):
+            v.pop("selections", None)
     Path(args.out).write_text(jcs(out) + "\n", encoding="utf-8")
     return 1 if failed else 0
 

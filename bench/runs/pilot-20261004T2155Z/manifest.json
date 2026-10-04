@@ -1,0 +1,521 @@
+{
+  "backend": {
+    "dialect": "openai",
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "name": "ollama",
+    "version_api": "{\"version\":\"0.34.0\"}",
+    "version_cli": "ollama version is 0.34.0",
+    "version_probe": "0.34.0"
+  },
+  "catalog": {
+    "capabilities": 71,
+    "digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3"
+  },
+  "concurrent_load": {
+    "at_end": {
+      "gpu_util_percent": 96,
+      "other_inference_processes": [
+        "llama-server:18081",
+        "llama-server:43501",
+        "sglang:18082"
+      ],
+      "time": "2026-10-04T22:06:33Z"
+    },
+    "at_start": {
+      "gpu_util_percent": 96,
+      "other_inference_processes": [
+        "llama-server:18081",
+        "sglang:18082"
+      ],
+      "time": "2026-10-04T21:56:53Z"
+    },
+    "gpu_util_percent_max_sampled_at_pair_starts": 96,
+    "note": "sampled at start, before each pair, and at end; wall-clock is a reported metric and is affected by other GPU users",
+    "other_inference_processes_seen": [
+      "llama-server:18081",
+      "llama-server:43501",
+      "sglang:18082"
+    ],
+    "samples": [
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T21:57:51Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T21:59:09Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T22:01:53Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T22:02:22Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T22:02:53Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T22:04:40Z"
+      },
+      {
+        "gpu_util_percent": 96,
+        "other_inference_processes": [
+          "llama-server:18081",
+          "llama-server:43501",
+          "sglang:18082"
+        ],
+        "time": "2026-10-04T22:06:04Z"
+      }
+    ]
+  },
+  "conditions": [
+    "A",
+    "B"
+  ],
+  "corpus": {
+    "frozen": {
+      "inputs_digest": "sha256:50cc0670e828da2aca1f39e7c84f1e9511eae251f42137c3b5795377a4b3482d",
+      "protocol_sha256": "sha256:7f9888cef23895177d2d3905b612693b023c5ae53fcafb004f9413ec0c1ec81e",
+      "tasks_digest": "sha256:818ad12d42ba24c0e505f61e400ac9684dbfba68e56ee5c7e2ca5b7fb3e59e34"
+    },
+    "match": true,
+    "recomputed": {
+      "inputs_digest": "sha256:50cc0670e828da2aca1f39e7c84f1e9511eae251f42137c3b5795377a4b3482d",
+      "protocol_sha256": "sha256:7f9888cef23895177d2d3905b612693b023c5ae53fcafb004f9413ec0c1ec81e",
+      "tasks_digest": "sha256:818ad12d42ba24c0e505f61e400ac9684dbfba68e56ee5c7e2ca5b7fb3e59e34"
+    }
+  },
+  "deterministic_identity": {
+    "always_include": [
+      "ask_user"
+    ],
+    "catalog_capabilities": 71,
+    "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+    "discovery_tool": {
+      "digest": "sha256:4bac926d3283b54b1b21f63d8464fb0c3782c9fe47fb8693e302843a4acdf86d",
+      "name": "interplane_capabilities_search"
+    },
+    "generation": {
+      "dialect": "openai",
+      "max_rounds": 8,
+      "max_tokens": 4096,
+      "seed": 42,
+      "temperature": 0.0,
+      "timeout_s": 300.0
+    },
+    "identity_digest": "sha256:d98e7f8c35fb26ec59cf6b5b09bf765f02657322f45a14ba58a7ef252044afb5",
+    "per_task": {
+      "ambiguous-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:84341a72d921fef7fb0f3291876fbf5bdb3d04126c43cac12260946db2785537",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "approval-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:81f9d744e4521dce4ed4c07ac08633302f39c480b6e1ed1fcf409fa135575e4f",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "exec_failure-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:2f74198950374af847acd411631fd3482f65f0d228b62b63947dc825f9467502",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:c16b850dc885d16fa30b2f928956cb263a4cb58690e795882254002618caeef0",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "filesystem-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:acb39d69b536c2c98aad2dae0160ea64a4deb94aee6f4df83cdb02f984978a75",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "injection_workspace-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:69ba92b1a838f244a06071f22411b17d64560b875f358f390dfa2503afb6ef93",
+        "requested_domains": [
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "ls",
+          "read_file",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:f834b51ec16b92b52209bcb4599067b3503c91a13089d20e8325fffcfa36085e",
+        "stub_digests": {},
+        "task_digest": "sha256:2f6ba253d321c8a5d10e2cbbf6f42bb344342cbfe94cf92077ca849715ec48d7",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 6134
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:b6b14faa3f4b7dfa6e6cd42fb6b561f676b0a5846f207175c6b40b518c34ba19"
+        }
+      },
+      "multidomain-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "contacts",
+          "email",
+          "filesystem"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "apply_patch",
+          "archive_email",
+          "bulk_email",
+          "delete_email",
+          "edit_file",
+          "get_workspace",
+          "glob",
+          "grep",
+          "list_email_accounts",
+          "list_emails",
+          "ls",
+          "manage_contact",
+          "mark_email_read",
+          "read_email",
+          "read_file",
+          "reply_to_email",
+          "resolve_contact",
+          "scan_email_unsubscribes",
+          "send_email",
+          "unsubscribe_email",
+          "write_file"
+        ],
+        "round1_selection_digest": "sha256:3e34254969186c91b93d4e11b640059a6858b1046234d45a3905cf54fc15570c",
+        "stub_digests": {
+          "resolve_contact": "sha256:3ed3f639a26d00795d7d92f3c43b74468864262168040b7c79d695419a4b4aea"
+        },
+        "task_digest": "sha256:822088bc544e67954aef2c1f8547168bf8995eeaa1b323cb3944305443336d1f",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 15723
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:f574ae4c8bcdffda5328779bf784ac7c31551b933aa4c7cbc768878802ab4a79"
+        }
+      },
+      "rare-001": {
+        "authority_profile": {
+          "admin": true,
+          "delegated_credential": false
+        },
+        "fault_injection_digest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "fixture_digest": "sha256:c0dc8318a07412172ab6c65e2596bdb7736cb8ccf02e8684af51d75ea5fa5c9b",
+        "requested_domains": [
+          "serving"
+        ],
+        "round1_selected": [
+          "ask_user",
+          "adopt_served_model",
+          "cancel_download",
+          "download_model",
+          "list_cached_models",
+          "list_cookbook_servers",
+          "list_downloads",
+          "list_serve_presets",
+          "list_served_models",
+          "serve_model",
+          "serve_preset",
+          "stop_served_model",
+          "tail_serve_output"
+        ],
+        "round1_selection_digest": "sha256:86116577410c6276fee3d675812594bb53b97b94d950a71edc16524919e70707",
+        "stub_digests": {
+          "list_serve_presets": "sha256:bbb099549e19107818983b18ec5246f698ea328e769c1872faf2605acd2cdec1"
+        },
+        "task_digest": "sha256:e7195eac494ebd4528336c4426701d7f38d64f08ed84b619948e21d26ca38a4e",
+        "tools_bytes": {
+          "A": 59024,
+          "B_round1": 9913
+        },
+        "tools_digest": {
+          "A": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+          "B_round1": "sha256:c176382e9dcb7c07857dd54ec8039db84e5f68a06c9333d644b2cd3a8d923bb8"
+        }
+      }
+    },
+    "selector": {
+      "name": "domain_match",
+      "version": "1"
+    },
+    "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
+  },
+  "expansion": {
+    "discover_limit": 8,
+    "evidence": [
+      "requested_excluded",
+      "discovery_hit"
+    ],
+    "max_added_per_expansion": 8,
+    "max_expansions": 2,
+    "mechanism": "interplane.crossaxis.expand (spec/CROSSAXIS.md Bounded expansion, v0.2)"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "hardware": {
+    "free_g": [
+      "total        used        free      shared  buff/cache   available",
+      "Mem:             121          90          14           0          18          30",
+      "Swap:              0           0           0"
+    ],
+    "gpu": "NVIDIA GB10",
+    "lscpu_head": [
+      "Architecture:                            aarch64",
+      "CPU op-mode(s):                          64-bit",
+      "Byte Order:                              Little Endian",
+      "CPU(s):                                  20",
+      "On-line CPU(s) list:                     0-19",
+      "Vendor ID:                               ARM",
+      "Model name:                              Cortex-X925",
+      "Model:                                   1",
+      "Thread(s) per core:                      1",
+      "Core(s) per socket:                      10",
+      "Socket(s):                               1",
+      "Stepping:                                r0p1"
+    ]
+  },
+  "interplane": {
+    "commit": "99c5571122bb8ba7b8a6595b037cfe5032895641",
+    "dirty": false
+  },
+  "kind": "interplane_bench_manifest",
+  "manifest_version": "0.2.0",
+  "model": {
+    "blob_digest_from_ollama": "sha256:02d45dc1cf451ba2475ac33b301c2dd8f985abe4c182ce04a1f2f5bf0260278d",
+    "digest": "sha256:56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+    "id": "qwen3.5:9b",
+    "ollama_list_row": "qwen3.5:9b 56671c2ab938 6.6 GB 2 hours ago"
+  },
+  "odysseus": {
+    "commit": "2992bf6d368a11472323e47d3bfed91e79cefc6b",
+    "src": "/home/drakestapleton/.claude/jobs/f3c074e9/tmp/odysseus-2992bf6"
+  },
+  "order_rule": "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)",
+  "os": {
+    "os_release": [
+      "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"",
+      "NAME=\"Ubuntu\"",
+      "VERSION_ID=\"24.04\"",
+      "VERSION=\"24.04.5 LTS (Noble Numbat)\"",
+      "VERSION_CODENAME=noble",
+      "ID=ubuntu",
+      "ID_LIKE=debian",
+      "HOME_URL=\"https://www.ubuntu.com/\"",
+      "SUPPORT_URL=\"https://help.ubuntu.com/\"",
+      "BUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"",
+      "PRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"",
+      "UBUNTU_CODENAME=noble",
+      "LOGO=ubuntu-logo"
+    ],
+    "uname": "Linux spark-b87b 7.0.0-1019-nvidia #19~24.04.2-Ubuntu SMP PREEMPT_DYNAMIC Sun Sep  6 18:35:11 UTC 2 aarch64 aarch64 aarch64 GNU/Linux"
+  },
+  "probe_report": {
+    "digest": "sha256:9552bbb7f62a34e3b1704eebc93dc37b50dea85cc4305621f336019067a4a889",
+    "file_sha256": "sha256:d82cab87001d4501b7798318d0aa97000b2f1682a840e48df89450bac4f1d9f1",
+    "path": "qualification/reports/qwen35-9b-ollama-0.34.0.probe.json"
+  },
+  "run_id": "pilot-20261004T2155Z",
+  "runner": {
+    "bench_eval_sha256": "sha256:d69a819de38ae96e8835d8cf8f72c1bbea1657662afa77c8d306534d4232d9cc",
+    "run_bench_sha256": "sha256:1bb2ce322809a1044298ab42bab496e8662a4f20328898fcdca9d98e9abf1851"
+  },
+  "selector": {
+    "name": "domain_match",
+    "version": "1"
+  },
+  "stochastic_execution": {
+    "counter_requests_in_last_process": 21,
+    "finished_at": "2026-10-04T22:06:33Z",
+    "started_at": "2026-10-04T21:56:53Z",
+    "token_stability": {
+      "base_context": 179,
+      "stable": true,
+      "task": "ambiguous-001",
+      "tools_count_1": 15971,
+      "tools_count_2": 15971
+    },
+    "warmup": {
+      "condition": "B",
+      "task": "filesystem-001",
+      "timed": false,
+      "wall_ms": 20756
+    }
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task_ids": [
+    "ambiguous-001",
+    "approval-001",
+    "exec_failure-001",
+    "filesystem-001",
+    "injection_workspace-001",
+    "multidomain-001",
+    "rare-001"
+  ],
+  "tasks": "dev"
+}

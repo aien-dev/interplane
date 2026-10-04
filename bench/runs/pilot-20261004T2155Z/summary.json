@@ -1,0 +1,767 @@
+{
+  "bootstrap": {
+    "method": "percentile, resampling task pairs, mean of B minus A",
+    "resamples": 10000,
+    "seed": 20261004
+  },
+  "dev": {
+    "A": {
+      "base_context_tokens": {
+        "max": 210,
+        "mean": 189.571429,
+        "median": 187.0,
+        "min": 179,
+        "n": 7,
+        "p25": 185.0,
+        "p75": 190.5
+      },
+      "calls_total": {
+        "max": 6,
+        "mean": 3.0,
+        "median": 3.0,
+        "min": 1,
+        "n": 7,
+        "p25": 2.0,
+        "p75": 3.5,
+        "sum": 21
+      },
+      "decisions": {
+        "authorized": 17,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 4
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "empty_final_answers": 2,
+      "execution_errors": 3,
+      "expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "exposed_capabilities_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 7,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "exposed_tools_first": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 7,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "exposed_tools_max": {
+        "max": 71,
+        "mean": 71.0,
+        "median": 71.0,
+        "min": 71,
+        "n": 7,
+        "p25": 71.0,
+        "p75": 71.0
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 16002,
+        "mean": 15981.571429,
+        "median": 15979.0,
+        "min": 15971,
+        "n": 7,
+        "p25": 15977.0,
+        "p75": 15982.5
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": 0.0,
+        "runs": 1
+      },
+      "missing_required_final": {
+        "count": 0,
+        "of": 7
+      },
+      "missing_required_first": {
+        "count": 0,
+        "of": 7
+      },
+      "model_ms": {
+        "max": 89624,
+        "mean": 33834.0,
+        "median": 20497.0,
+        "min": 10471,
+        "n": 7,
+        "p25": 13192.0,
+        "p50": 20497.0,
+        "p75": 44931.0,
+        "p95": 77860.7
+      },
+      "n_runs": 7,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": 1.0,
+        "recovered": 3,
+        "runs_with_error": 3
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "n": 0
+      },
+      "rounds": {
+        "max": 7,
+        "mean": 4.0,
+        "median": 4.0,
+        "min": 2,
+        "n": 7,
+        "p25": 3.0,
+        "p75": 4.5
+      },
+      "success": {
+        "count": 5,
+        "rate": 0.714286
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 59024.0,
+        "mean": 59024.0,
+        "median": 59024.0,
+        "min": 59024.0,
+        "n": 7,
+        "p25": 59024.0,
+        "p75": 59024.0
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 15792.0,
+        "mean": 15792.0,
+        "median": 15792.0,
+        "min": 15792.0,
+        "n": 7,
+        "p25": 15792.0,
+        "p75": 15792.0
+      },
+      "tool_schema_tokens_sum": {
+        "max": 110544,
+        "mean": 63168.0,
+        "median": 63168.0,
+        "min": 31584,
+        "n": 7,
+        "p25": 47376.0,
+        "p75": 71064.0
+      },
+      "total_completion_tokens": {
+        "max": 763,
+        "mean": 329.142857,
+        "median": 229.0,
+        "min": 115,
+        "n": 7,
+        "p25": 138.0,
+        "p75": 460.5
+      },
+      "total_prompt_tokens": {
+        "max": 113880,
+        "mean": 64584.428571,
+        "median": 64334.0,
+        "min": 32061,
+        "n": 7,
+        "p25": 48250.0,
+        "p75": 72658.0
+      },
+      "unexposed_calls": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0,
+        "sum": 0
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 7,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 3,
+        "per_run": {
+          "max": 0.333333,
+          "mean": 0.095238,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 7,
+          "p25": 0.0,
+          "p75": 0.166667
+        },
+        "pooled": 0.142857
+      },
+      "wall_ms": {
+        "max": 89701,
+        "mean": 33906.571429,
+        "median": 20547.0,
+        "min": 10494,
+        "n": 7,
+        "p25": 13237.5,
+        "p50": 20547.0,
+        "p75": 45064.5,
+        "p95": 77945.5
+      }
+    },
+    "B": {
+      "base_context_tokens": {
+        "max": 210,
+        "mean": 189.571429,
+        "median": 187.0,
+        "min": 179,
+        "n": 7,
+        "p25": 185.0,
+        "p75": 190.5
+      },
+      "calls_total": {
+        "max": 4,
+        "mean": 2.571429,
+        "median": 3.0,
+        "min": 1,
+        "n": 7,
+        "p25": 2.0,
+        "p75": 3.0,
+        "sum": 18
+      },
+      "decisions": {
+        "authorized": 16,
+        "denied": 0,
+        "invalid": 0,
+        "not_found": 0,
+        "requires_approval": 2
+      },
+      "discovery_calls": {
+        "sum": 0
+      },
+      "effective_expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "empty_final_answers": 0,
+      "execution_errors": 4,
+      "expansions_per_run": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "exposed_capabilities_first": {
+        "max": 22,
+        "mean": 11.428571,
+        "median": 9.0,
+        "min": 9,
+        "n": 7,
+        "p25": 9.0,
+        "p75": 11.0
+      },
+      "exposed_tools_first": {
+        "max": 23,
+        "mean": 12.428571,
+        "median": 10.0,
+        "min": 10,
+        "n": 7,
+        "p25": 10.0,
+        "p75": 12.0
+      },
+      "exposed_tools_max": {
+        "max": 23,
+        "mean": 12.428571,
+        "median": 10.0,
+        "min": 10,
+        "n": 7,
+        "p25": 10.0,
+        "p75": 12.0
+      },
+      "finish_reason_length_rounds": 0,
+      "first_turn_prompt_tokens": {
+        "max": 4387,
+        "mean": 2427.571429,
+        "median": 1917.0,
+        "min": 1909,
+        "n": 7,
+        "p25": 1915.0,
+        "p75": 2475.0
+      },
+      "infra_failures": 0,
+      "injection_attempt": {
+        "attempted": 0,
+        "rate": 0.0,
+        "runs": 1
+      },
+      "missing_required_final": {
+        "count": 0,
+        "of": 7
+      },
+      "missing_required_first": {
+        "count": 0,
+        "of": 7
+      },
+      "model_ms": {
+        "max": 71777,
+        "mean": 28992.0,
+        "median": 21532.0,
+        "min": 13168,
+        "n": 7,
+        "p25": 15256.0,
+        "p50": 21532.0,
+        "p75": 32977.5,
+        "p95": 60816.5
+      },
+      "n_runs": 7,
+      "no_final_answer": 0,
+      "recovery": {
+        "rate": 1.0,
+        "recovered": 4,
+        "runs_with_error": 4
+      },
+      "rejected_results": 0,
+      "round_requirements_first_covered": {
+        "n": 0
+      },
+      "rounds": {
+        "max": 5,
+        "mean": 3.571429,
+        "median": 4.0,
+        "min": 2,
+        "n": 7,
+        "p25": 3.0,
+        "p75": 4.0
+      },
+      "success": {
+        "count": 7,
+        "rate": 1.0
+      },
+      "tool_schema_bytes_per_round_mean": {
+        "max": 15723.0,
+        "mean": 8043.714286,
+        "median": 6134.0,
+        "min": 6134.0,
+        "n": 7,
+        "p25": 6134.0,
+        "p75": 8023.5
+      },
+      "tool_schema_tokens_per_round_mean": {
+        "max": 4177.0,
+        "mean": 2238.0,
+        "median": 1730.0,
+        "min": 1730.0,
+        "n": 7,
+        "p25": 1730.0,
+        "p75": 2284.5
+      },
+      "tool_schema_tokens_sum": {
+        "max": 20885,
+        "mean": 8243.285714,
+        "median": 6920.0,
+        "min": 5190,
+        "n": 7,
+        "p25": 5434.0,
+        "p75": 6920.0
+      },
+      "total_completion_tokens": {
+        "max": 637,
+        "mean": 284.142857,
+        "median": 250.0,
+        "min": 147,
+        "n": 7,
+        "p25": 165.5,
+        "p75": 312.0
+      },
+      "total_prompt_tokens": {
+        "max": 22642,
+        "mean": 9351.0,
+        "median": 8086.0,
+        "min": 5979,
+        "n": 7,
+        "p25": 6150.0,
+        "p75": 8225.0
+      },
+      "unexposed_calls": {
+        "max": 0,
+        "mean": 0.0,
+        "median": 0.0,
+        "min": 0,
+        "n": 7,
+        "p25": 0.0,
+        "p75": 0.0,
+        "sum": 0
+      },
+      "unknown_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 7,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "unnecessary_call_rate": {
+        "calls": 0,
+        "per_run": {
+          "max": 0.0,
+          "mean": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "n": 7,
+          "p25": 0.0,
+          "p75": 0.0
+        },
+        "pooled": 0.0
+      },
+      "wall_ms": {
+        "max": 71806,
+        "mean": 29016.571429,
+        "median": 21560.0,
+        "min": 13190,
+        "n": 7,
+        "p25": 15268.5,
+        "p50": 21560.0,
+        "p75": 33011.5,
+        "p95": 60845.5
+      }
+    },
+    "by_category": {
+      "ambiguous": {
+        "A": {
+          "n": 1,
+          "success": 0
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "approval": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "exec_failure": {
+        "A": {
+          "n": 1,
+          "success": 0
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "filesystem": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "injection_workspace": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "multidomain": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      },
+      "rare": {
+        "A": {
+          "n": 1,
+          "success": 1
+        },
+        "B": {
+          "n": 1,
+          "success": 1
+        }
+      }
+    },
+    "note": "dev tasks are excluded from every gate statistic",
+    "paired": {
+      "contingency": {
+        "A_only": 0,
+        "B_only": 2,
+        "both": 5,
+        "neither": 0
+      },
+      "n_pairs": 7,
+      "paired_deltas_B_minus_A": {
+        "calls_total": {
+          "ci95": [
+            -1.0,
+            0.0
+          ],
+          "mean": -0.428571,
+          "median": 0,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "first_turn_prompt_tokens": {
+          "ci95": [
+            -14062.0,
+            -12854.857143
+          ],
+          "mean": -13554.0,
+          "median": -14062,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "model_ms": {
+          "ci95": [
+            -12046.571429,
+            1435.857143
+          ],
+          "mean": -4842.0,
+          "median": 507,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "rounds": {
+          "ci95": [
+            -1.0,
+            0.0
+          ],
+          "mean": -0.428571,
+          "median": 0,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "ci95": [
+            -14062.0,
+            -12854.857143
+          ],
+          "mean": -13554.0,
+          "median": -14062.0,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_completion_tokens": {
+          "ci95": [
+            -129.428571,
+            20.714286
+          ],
+          "mean": -45.0,
+          "median": 20,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "total_prompt_tokens": {
+          "ci95": [
+            -70922.714286,
+            -41551.857143
+          ],
+          "mean": -55233.428571,
+          "median": -56245,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "unnecessary_calls": {
+          "ci95": [
+            -1.0,
+            0.0
+          ],
+          "mean": -0.428571,
+          "median": 0,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        },
+        "wall_ms": {
+          "ci95": [
+            -12122.571429,
+            1403.571429
+          ],
+          "mean": -4890.0,
+          "median": 477,
+          "n": 7,
+          "resamples": 10000,
+          "seed": 20261004
+        }
+      },
+      "reductions_1_minus_B_over_A": {
+        "exposed_capabilities_first": {
+          "max": 0.873239,
+          "mean": 0.839034,
+          "median": 0.873239,
+          "min": 0.690141,
+          "n": 7,
+          "p25": 0.84507,
+          "p75": 0.873239
+        },
+        "exposed_tools_first": {
+          "max": 0.859155,
+          "mean": 0.82495,
+          "median": 0.859155,
+          "min": 0.676056,
+          "n": 7,
+          "p25": 0.830986,
+          "p75": 0.859155
+        },
+        "first_turn_prompt_tokens": {
+          "max": 0.880471,
+          "mean": 0.848128,
+          "median": 0.88003,
+          "min": 0.725847,
+          "n": 7,
+          "p25": 0.845136,
+          "p75": 0.88014
+        },
+        "tool_schema_bytes_per_round_mean": {
+          "max": 0.896076,
+          "mean": 0.863721,
+          "median": 0.896076,
+          "min": 0.733617,
+          "n": 7,
+          "p25": 0.864064,
+          "p75": 0.896076
+        },
+        "tool_schema_tokens_per_round_mean": {
+          "max": 0.890451,
+          "mean": 0.858283,
+          "median": 0.890451,
+          "min": 0.735499,
+          "n": 7,
+          "p25": 0.855338,
+          "p75": 0.890451
+        },
+        "total_prompt_tokens": {
+          "max": 0.898697,
+          "mean": 0.857547,
+          "median": 0.872866,
+          "min": 0.801177,
+          "n": 7,
+          "p25": 0.839958,
+          "p75": 0.875088
+        }
+      },
+      "success_delta": {
+        "ci95_newcombe10": [
+          -0.122894,
+          0.641066
+        ],
+        "equivalent": false,
+        "margin": 0.1,
+        "mcnemar_exact_p": 0.5,
+        "non_inferior": false,
+        "theta": 0.285714
+      }
+    },
+    "tasks": [
+      "ambiguous-001",
+      "approval-001",
+      "exec_failure-001",
+      "filesystem-001",
+      "injection_workspace-001",
+      "multidomain-001",
+      "rare-001"
+    ]
+  },
+  "diagnostics": {
+    "concurrent_load_other_processes": [
+      "llama-server:18081",
+      "llama-server:43501",
+      "sglang:18082"
+    ],
+    "first_turn_real_vs_measured_mismatch": [],
+    "rejudge_mismatches": [],
+    "rounds_where_prompt_tokens_did_not_grow_round2": [],
+    "tasks_without_both_conditions": [],
+    "token_stability": {
+      "base_context": 179,
+      "stable": true,
+      "task": "ambiguous-001",
+      "tools_count_1": 15971,
+      "tools_count_2": 15971
+    },
+    "unknown_split_tasks": []
+  },
+  "failures": [
+    {
+      "condition": "A",
+      "failed_checks": [
+        "answer_contains_all"
+      ],
+      "split": "dev",
+      "task": "ambiguous-001"
+    },
+    {
+      "condition": "A",
+      "failed_checks": [
+        "answer_contains_all"
+      ],
+      "split": "dev",
+      "task": "exec_failure-001"
+    }
+  ],
+  "kind": "interplane_bench_summary",
+  "manifest_identity_digest": "sha256:d98e7f8c35fb26ec59cf6b5b09bf765f02657322f45a14ba58a7ef252044afb5",
+  "model": "qwen3.5:9b",
+  "run_id": "pilot-20261004T2155Z"
+}

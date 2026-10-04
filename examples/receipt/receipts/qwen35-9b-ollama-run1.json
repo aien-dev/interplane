@@ -1,0 +1,702 @@
+{
+  "after": {
+    "executed_total": 3,
+    "final_answer": "Project name: Lanternfish",
+    "first_prompt_tokens": 1674,
+    "label": "after",
+    "rounds": [
+      {
+        "completion_tokens": 66,
+        "latency_ms": 2474,
+        "outcome": "tool_request",
+        "prompt_tokens": 1674,
+        "request_digest": "sha256:bdc7614972c13a75833890f32913dd2cb63a2021d7a5eb3f19e8737d222377b6",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [],
+            "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": "execution_error",
+              "execute_invoked": true,
+              "request_id": "call_1is0z5pq",
+              "result_digest": "sha256:5f9d0d5b038e8c3b8e5b5a6877e92ae6e12cdcd1e3b42076d17e764950da9ca1",
+              "stage": "FAILED",
+              "status": "error"
+            },
+            "request_id": "call_1is0z5pq",
+            "result_content_kind": "tool_result",
+            "result_status": "error",
+            "result_trust": "trusted_runtime",
+            "tool": "get_workspace"
+          }
+        ],
+        "turn": 0
+      },
+      {
+        "completion_tokens": 16,
+        "latency_ms": 479,
+        "outcome": "tool_request",
+        "prompt_tokens": 1726,
+        "request_digest": "sha256:4987dd03b8cbccdb9d87b4ddc8f0029307b24d53e39dbf4ec330a4f3be790ce8",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [],
+            "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": null,
+              "execute_invoked": true,
+              "request_id": "call_p1guigr9",
+              "result_digest": "sha256:c0d121a959c0dce06b66587dce87b2a288dc688b9c3e555993b80460b75cf723",
+              "stage": "SUCCEEDED",
+              "status": "ok"
+            },
+            "request_id": "call_p1guigr9",
+            "result_content_kind": "workspace_content",
+            "result_status": "ok",
+            "result_trust": "workspace_untrusted",
+            "tool": "ls"
+          }
+        ],
+        "turn": 1
+      },
+      {
+        "completion_tokens": 60,
+        "latency_ms": 1606,
+        "outcome": "tool_request",
+        "prompt_tokens": 1795,
+        "request_digest": "sha256:ec0d5fb8184939d52fffbc00a8488c7f44cd4a07b888ff8e75231c6802038ddd",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [
+              "path"
+            ],
+            "arguments_digest": "sha256:dc3ebd54791d13d7e2d324cc781e297a4eccdd62c70b0ee8f6afd7650f9a958d",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": null,
+              "execute_invoked": true,
+              "request_id": "call_er68fw3x",
+              "result_digest": "sha256:26eb8d0bcfdfac180d904725be0edb4692df053d2e45181a72336b66ee84f89e",
+              "stage": "SUCCEEDED",
+              "status": "ok"
+            },
+            "request_id": "call_er68fw3x",
+            "result_content_kind": "workspace_content",
+            "result_status": "ok",
+            "result_trust": "workspace_untrusted",
+            "tool": "read_file"
+          }
+        ],
+        "turn": 2
+      },
+      {
+        "completion_tokens": 8,
+        "latency_ms": 288,
+        "outcome": "no_tool",
+        "prompt_tokens": 1882,
+        "request_digest": "sha256:df2c99469dd3390164c80415b5d0d959b5084e34e7cbb6473e262ae6ee61fef4",
+        "text_digest": "sha256:477cee04f47550e0ea675951e82d96583e30ad7b4012e6ac4128782c73066e86",
+        "tool_calls": [],
+        "turn": 3
+      }
+    ],
+    "runtime_decide_calls": 3,
+    "task_success": true,
+    "tool_calls_total": 3,
+    "tools_count": 9,
+    "tools_digest": "sha256:1af978e1541a24ae45150eb06aba475b1337fb7867fdd1394ddc18bb7402976d",
+    "tools_rendered_bytes": 5664,
+    "total_completion_tokens": 150,
+    "total_prompt_tokens": 7077
+  },
+  "before": {
+    "executed_total": 4,
+    "final_answer": "Project name: Lanternfish",
+    "first_prompt_tokens": 15846,
+    "label": "before",
+    "rounds": [
+      {
+        "completion_tokens": 62,
+        "latency_ms": 8062,
+        "outcome": "tool_request",
+        "prompt_tokens": 15846,
+        "request_digest": "sha256:22b71df834d72f269477d043ff8c0e531d2228583012fa774725362113201ea9",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [],
+            "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": "execution_error",
+              "execute_invoked": true,
+              "request_id": "call_lgpa9k33",
+              "result_digest": "sha256:b9531ce776afc162f11eed36d286623823c74488789726cba266647ee0c037f7",
+              "stage": "FAILED",
+              "status": "error"
+            },
+            "request_id": "call_lgpa9k33",
+            "result_content_kind": "tool_result",
+            "result_status": "error",
+            "result_trust": "trusted_runtime",
+            "tool": "get_workspace"
+          }
+        ],
+        "turn": 0
+      },
+      {
+        "completion_tokens": 30,
+        "latency_ms": 949,
+        "outcome": "tool_request",
+        "prompt_tokens": 15898,
+        "request_digest": "sha256:d8595050da771d98f2ba453690a21802c8b426f8e90b1cddb0b23f8b7a3c9367",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [
+              "command"
+            ],
+            "arguments_digest": "sha256:1df8bccaec747dc615b50678f35bf5b51756a45f9b2b77b247c7a617fde58b3e",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": "execution_error",
+              "execute_invoked": true,
+              "request_id": "call_amuexg02",
+              "result_digest": "sha256:21579f3d05ec6a0b27a4f08721f078f8ef064fae8d0e821ef9db9b37a9add6a8",
+              "stage": "FAILED",
+              "status": "error"
+            },
+            "request_id": "call_amuexg02",
+            "result_content_kind": "tool_result",
+            "result_status": "error",
+            "result_trust": "trusted_runtime",
+            "tool": "bash"
+          }
+        ],
+        "turn": 1
+      },
+      {
+        "completion_tokens": 39,
+        "latency_ms": 1222,
+        "outcome": "tool_request",
+        "prompt_tokens": 15964,
+        "request_digest": "sha256:b9d2b6427ee6eb72a8d3e5d1a2624d0661db5b4501405964d92e95eff96435ec",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [],
+            "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": null,
+              "execute_invoked": true,
+              "request_id": "call_8xaq3hxi",
+              "result_digest": "sha256:14e78d5b7b53bd9e75852be37f987429bb40044793529ec94ba7cedf5b43b1fb",
+              "stage": "SUCCEEDED",
+              "status": "ok"
+            },
+            "request_id": "call_8xaq3hxi",
+            "result_content_kind": "workspace_content",
+            "result_status": "ok",
+            "result_trust": "workspace_untrusted",
+            "tool": "ls"
+          }
+        ],
+        "turn": 2
+      },
+      {
+        "completion_tokens": 61,
+        "latency_ms": 1820,
+        "outcome": "tool_request",
+        "prompt_tokens": 16035,
+        "request_digest": "sha256:fc48fe293d610bc218068df35603955543d68b2f65ea3ee9d0ccd595e3f2031b",
+        "text_digest": null,
+        "tool_calls": [
+          {
+            "argument_keys": [
+              "path"
+            ],
+            "arguments_digest": "sha256:48435543008cb2400a0a7c85a56794462c82d236faf099550cced82ebe00ead9",
+            "observed": {
+              "decide_invoked": true,
+              "decision": "authorized",
+              "error_code": null,
+              "execute_invoked": true,
+              "request_id": "call_e8630zxn",
+              "result_digest": "sha256:588469f6b94465c0d69a66fbda605637cfbe9376fabb790e2ffd965e1f183940",
+              "stage": "SUCCEEDED",
+              "status": "ok"
+            },
+            "request_id": "call_e8630zxn",
+            "result_content_kind": "workspace_content",
+            "result_status": "ok",
+            "result_trust": "workspace_untrusted",
+            "tool": "read_file"
+          }
+        ],
+        "turn": 3
+      },
+      {
+        "completion_tokens": 8,
+        "latency_ms": 365,
+        "outcome": "no_tool",
+        "prompt_tokens": 16124,
+        "request_digest": "sha256:3f0380fd9483c5044e727889b5518ecd9e8a11b1d41bc4176c887e9a912980cf",
+        "text_digest": "sha256:477cee04f47550e0ea675951e82d96583e30ad7b4012e6ac4128782c73066e86",
+        "tool_calls": [],
+        "turn": 4
+      }
+    ],
+    "runtime_decide_calls": 4,
+    "task_success": true,
+    "tool_calls_total": 4,
+    "tools_count": 71,
+    "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486",
+    "tools_rendered_bytes": 59024,
+    "total_completion_tokens": 200,
+    "total_prompt_tokens": 79867
+  },
+  "catalog": {
+    "capabilities": 71,
+    "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+    "runtime": "odysseus"
+  },
+  "created_at": "2026-10-04T20:45:00Z",
+  "delta": {
+    "first_prompt_tokens": {
+      "after": 1674,
+      "before": 15846,
+      "saved": 14172,
+      "saved_pct": 89.4
+    },
+    "task_success": {
+      "after": true,
+      "before": true
+    },
+    "tools": {
+      "after": 9,
+      "before": 71
+    },
+    "tools_rendered_bytes": {
+      "after": 5664,
+      "before": 59024
+    },
+    "total_prompt_tokens": {
+      "after": 7077,
+      "before": 79867
+    }
+  },
+  "deterministic_digest": "sha256:ad5ab24935ac73b780bb46e2581eb66e6c1ef3208dd3fc08f34f5011d38c5837",
+  "environment": {
+    "backend": "ollama",
+    "backend_version": "0.34.0",
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "host": "Linux 7.0.0-1019-nvidia aarch64",
+    "interplane_version": "0.1",
+    "model": "qwen3.5:9b",
+    "model_digest": "sha256:56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+    "python": "3.12.3",
+    "runtime_adapter": "interplane_adapter_odysseus (odysseus@2992bf6)"
+  },
+  "kind": "interplane_receipt",
+  "probe_report": {
+    "digest": "sha256:9552bbb7f62a34e3b1704eebc93dc37b50dea85cc4305621f336019067a4a889",
+    "path": "qualification/reports/qwen35-9b-ollama-0.34.0.probe.json",
+    "profiles": {
+      "interplane.core.0.1": "compatible",
+      "lenshift.openai.1": "compatible",
+      "lenshift.qwen35.1": "incompatible",
+      "relayline.tool_replay.1": "compatible"
+    },
+    "verdicts": {
+      "chat.basic": "PASS",
+      "chat.streaming": "PASS",
+      "context.16k": "PASS",
+      "context.32k": "PASS",
+      "context.8k": "PASS",
+      "json.structured": "PASS",
+      "models.list": "PASS",
+      "reasoning.channel": "PASS",
+      "reasoning.disable": "PASS",
+      "tools.native": "PASS",
+      "tools.parallel": "PASS",
+      "tools.result_replay": "PASS",
+      "tools.text_qwen35": "UNSUPPORTED",
+      "tools.unknown_refusal": "PASS"
+    }
+  },
+  "receipt_version": "0.1.0",
+  "selection": {
+    "always_include": [
+      "ask_user"
+    ],
+    "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+    "excluded": [
+      {
+        "name": "adopt_served_model",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "api_call",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "app_api",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "archive_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "ask_teacher",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "bash",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "bulk_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "cancel_download",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "chat_with_model",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "create_document",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "create_session",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "delete_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "download_model",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "edit_document",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "edit_image",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_cached_models",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_cookbook_servers",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_downloads",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_email_accounts",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_emails",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_models",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_serve_presets",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_served_models",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "list_sessions",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_bg_jobs",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_calendar",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_contact",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_documents",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_endpoints",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_mcp",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_memory",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_notes",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_session",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_settings",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_skills",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_tasks",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_tokens",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "manage_webhooks",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "mark_email_read",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "pipeline",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "python",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "read_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "reply_to_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "resolve_contact",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "scan_email_unsubscribes",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "search_chats",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "search_hf_models",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "send_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "send_to_session",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "serve_model",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "serve_preset",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "stop_served_model",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "suggest_document",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "tail_serve_output",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "todowrite",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "trigger_research",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "ui_control",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "unsubscribe_email",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "update_document",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "update_plan",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "web_fetch",
+        "reason": "domain_mismatch"
+      },
+      {
+        "name": "web_search",
+        "reason": "domain_mismatch"
+      }
+    ],
+    "kind": "selection",
+    "measure": {
+      "full_count": 71,
+      "full_rendered_bytes": 59024,
+      "full_tokens": null,
+      "selected_count": 9,
+      "selected_rendered_bytes": 5664,
+      "selected_tokens": null,
+      "tokenizer": null
+    },
+    "requested_domains": [
+      "filesystem"
+    ],
+    "runtime": "odysseus",
+    "selected": [
+      {
+        "domains": [
+          "user"
+        ],
+        "name": "ask_user",
+        "rule_id": "always_include"
+      },
+      {
+        "domains": [
+          "filesystem",
+          "code"
+        ],
+        "name": "apply_patch",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem",
+          "code"
+        ],
+        "name": "edit_file",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem"
+        ],
+        "name": "get_workspace",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem",
+          "code"
+        ],
+        "name": "glob",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "code",
+          "filesystem"
+        ],
+        "name": "grep",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem"
+        ],
+        "name": "ls",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem",
+          "code"
+        ],
+        "name": "read_file",
+        "rule_id": "domain:filesystem"
+      },
+      {
+        "domains": [
+          "filesystem",
+          "code"
+        ],
+        "name": "write_file",
+        "rule_id": "domain:filesystem"
+      }
+    ],
+    "selector": {
+      "max_capabilities": null,
+      "name": "domain_match",
+      "version": "1"
+    }
+  },
+  "task": {
+    "always_include": [
+      "ask_user"
+    ],
+    "domains": [
+      "filesystem"
+    ],
+    "expected_answer_substring": "Lanternfish",
+    "max_rounds": 6,
+    "prompt": "You are working inside a project workspace. Find out the project's name by reading its README, then answer with exactly one line: 'Project name: <name>'. Use tools; do not guess.",
+    "workspace_files": {
+      "README.md": "sha256:33098f42f27eb9e33b677515c3627826e5ebd7ef15336613af23ad38d7bbbc72",
+      "notes/todo.txt": "sha256:b3dea13b18069d5e7f345d33fe7f4929819681c8e478b0503d2eee3bf077d625",
+      "src/main.rs": "sha256:9b7faa757c861652451eb2c7743701875669fa02b5986ebc97bffefc26c9a646"
+    }
+  }
+}

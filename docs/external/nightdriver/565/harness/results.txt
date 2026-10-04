@@ -1,0 +1,4 @@
+case1 old: admit=1 buffers=11 | new: admit=0 buffers=1
+case2 sweep n=20000 old_invariant_violations=14018 new_invariant_violations=0
+case3 internal free/largest = 50000/34000, 8bit free/largest = 16000/3000
+RESULT PASS

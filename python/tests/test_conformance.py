@@ -8,6 +8,7 @@ from conftest import CONF, load
 
 CASES = sorted(CONF.glob("*.json"))
 LIFECYCLE = sorted((CONF / "lifecycle").glob("*.json"))
+INJECTION = sorted((CONF / "injection").glob("*.json"))
 
 
 @pytest.mark.skipif(not CASES, reason="no conformance fixtures")
@@ -23,12 +24,12 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
     assert main([str(CONF), "--out", str(out)]) == 0
     text = out.read_text(encoding="utf-8")
     data = json.loads(text)
-    assert list(data) == sorted(data) and len(data) == len(CASES) + len(LIFECYCLE)
+    assert list(data) == sorted(data) and len(data) == len(CASES) + len(LIFECYCLE) + len(INJECTION)
     life = {k: data.pop(k) for k in list(data) if k.startswith("lifecycle/")}
     assert len(life) == len(LIFECYCLE)
     assert all(v["pass"] and set(v) == {"pass", "steps"} for v in life.values())
     base = {"pass", "observed", "runtime", "turns"}
-    optional = {"selections", "inputs", "exposure"}
+    optional = {"selections", "inputs", "exposure", "injection"}
     assert all(v["pass"] and set(v) - optional == base for v in data.values())
     ledger_cases = {
         "28-input-ledger-continues",
@@ -46,13 +47,18 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
         "40-source-class-model-generated",
     }
     assert {k for k, v in data.items() if "inputs" in v and "exposure" in v} == ledger_cases
+    assert {k for k, v in data.items() if "injection" in v} == {
+        "injection-01-workspace-write",
+        "injection-02-tool-output-markup",
+        "injection-03-forged-approval-in-arguments",
+    }
     assert {k for k, v in data.items() if "selections" in v} == {
         "24-expansion-requested-excluded",
         "25-expansion-refused-by-bound",
     }
     assert text == jcs({**data, **life}) + "\n"
     assert all(o["result_digest"] for v in data.values() for o in v["observed"])
-    total = len(CASES) + len(LIFECYCLE)
+    total = len(CASES) + len(LIFECYCLE) + len(INJECTION)
     assert f"{total}/{total}" in capsys.readouterr().out
 
 

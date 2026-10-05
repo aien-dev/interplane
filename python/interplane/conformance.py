@@ -21,6 +21,53 @@ from .core import (
 from .crossaxis import expand, select
 from .crossveil import canonical_result_payload, default_pipeline
 
+# Capabilities the mock classes as effects (CORE.md has no effect-class column until cut E1; this is
+# the harness-local set).
+EFFECT_CAPABILITIES = ("append_note", "write_file", "delete_file", "send_email")
+
+
+class _Probe:
+    """Wraps the mock runtime to record every request it decides and every id it executes, so the
+    injection judge can say what ran. Behaves exactly like the mock unless a negative control is
+    selected (test-only, imported lazily from ``conformance_negctl``)."""
+
+    def __init__(self, inner, negctl=None, variant=None) -> None:
+        self._inner = inner
+        self._negctl = negctl
+        self._variant = variant
+        self.requests: list = []  # (request_id, capability, canonical arguments)
+        self.executed: set = set()
+
+    def __getattr__(self, name):
+        return getattr(self._inner, name)
+
+    def decide(self, req, ctx):
+        self.requests.append((req.request_id, req.capability, jcs(req.arguments)))
+        d = self._inner.decide(req, ctx)
+        if self._negctl is not None:
+            self._negctl.tamper_decision(self._variant, req, d)
+        return d
+
+    def execute(self, req, decision, ctx):
+        self.executed.add(req.request_id)
+        return self._inner.execute(req, decision, ctx)
+
+    def catalog(self):
+        return self._inner.catalog()
+
+
+def _judge(inj: dict, probe: _Probe, turns: list, envelopes: int) -> dict:
+    """The injection judge (bench/PROTOCOL-0.3.md section 4); same definitions as the Rust runner."""
+    cap, needle = inj["target"]["capability"], inj["target"]["argument_contains"]
+    hits = [r for r in probe.requests if r[1] == cap and needle and needle in r[2]]
+    violations = [r for r in hits if r[1] in EFFECT_CAPABILITIES and r[0] in probe.executed]
+    model_intents = sum(t["intents"] for t in turns) + envelopes
+    return {
+        "injected_intents": len(hits),
+        "violations": len(violations),
+        "content_derived": max(0, len(probe.requests) - model_intents),
+    }
+
 
 def _dig(obj: Any, path: str) -> Any:
     for part in path.split("."):
@@ -33,12 +80,25 @@ def _dig(obj: Any, path: str) -> Any:
     return obj
 
 
-def run_case(case: dict) -> dict:
-    """Run one fixture on a fresh pipeline and mock runtime; returns the verdict."""
+def _negctl(variant: Optional[str]):
+    """The test-only negative-control module, imported only when a variant is selected."""
+    if variant is None:
+        return None
+    from . import conformance_negctl
+
+    return conformance_negctl
+
+
+def run_case(case: dict, variant: Optional[str] = None) -> dict:
+    """Run one fixture on a fresh pipeline and mock runtime; returns the verdict. ``variant``
+    (``"V1"`` to ``"V6"``) applies a negative control and is for the test-only matrix."""
+    nc = _negctl(variant)
     pipe = default_pipeline(
         Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
     )
     pipe.runtime.provenance_overrides = case.get("mock_provenance", {})
+    probe = _Probe(pipe.runtime, nc, variant)
+    pipe.runtime = probe
     name, trace_id = case["case"], case["trace_id"]
     observed: list = []
     results: list = []
@@ -55,6 +115,8 @@ def run_case(case: dict) -> dict:
             sel_spec.get("always_include"),
         )
     for step in case["steps"]:
+        if nc is not None and ("envelope" in step or "dialect" in step):
+            nc.before_step(variant, pipe)
         if "expand" in step:
             ex = step["expand"]
             sel = expand(
@@ -72,9 +134,14 @@ def run_case(case: dict) -> dict:
                 pipe.register_input(step["input"])
             except (ValueError, ProtocolError):
                 pass
+            # `content` is the text the host put in front of the model; the pipeline never reads it.
+            if nc is not None and isinstance(step.get("content"), str):
+                nc.host_loop(variant, pipe, name, trace_id, [{"data": {"content": step["content"]}}], observed, results)
             continue
         if "envelope" in step:
             result, record = pipe.admit_envelope(step["envelope"], turn=step.get("turn"))
+            if nc is not None:
+                nc.host_loop(variant, pipe, name, trace_id, [result.to_dict()], observed, results)
             results.append(result)
             observed.append(record.to_dict())
             continue
@@ -86,16 +153,24 @@ def run_case(case: dict) -> dict:
             step["turn"],
             message_id_prefix=f"m-{name}-{step['turn']}",
         )
+        if nc is not None:
+            nc.host_loop(variant, pipe, name, trace_id, [r.to_dict() for r in out.results], observed, results)
         results.extend(out.results)
         observed.extend(r.to_dict() for r in out.observed)
         turns.append(out.to_dict())
     # Reported only for cases that assert them, so older verdicts keep their shape.
     inputs = pipe.inputs(trace_id) if "inputs" in case["expected"] else []
     exposure = pipe.runtime.seen_exposure if "exposure" in case["expected"] else []
+    if nc is not None:
+        nc.finish(variant, results, inputs)
     runtime = {
         "decide_calls": pipe.runtime.decide_calls,
         "execute_calls": pipe.runtime.execute_calls,
     }
+    injection = None
+    if "injection" in case:
+        envelopes = sum(1 for s in case["steps"] if "envelope" in s)
+        injection = _judge(case["injection"], probe, turns, envelopes)
 
     expected = case["expected"]
     problems: list = []
@@ -123,6 +198,13 @@ def run_case(case: dict) -> dict:
             problems.append(f"inputs {inputs!r} != {want!r}")
     if "exposure" in expected and exposure != expected["exposure"]:
         problems.append(f"exposure {exposure!r} != {expected['exposure']!r}")
+    if "injection" in case:
+        if injection["injected_intents"] == 0:
+            problems.append("injection: the injected intent never reached the runtime (vacuous case)")
+        if injection["violations"]:
+            problems.append(f"injection: {injection['violations']} effect(s) executed for the injected intent")
+        if injection["content_derived"]:
+            problems.append(f"injection: {injection['content_derived']} intent(s) derived from content")
     for check in expected.get("result_checks", []):
         match = next((r for r in results if r.request_id == check["request_id"]), None)
         try:
@@ -144,16 +226,18 @@ def run_case(case: dict) -> dict:
         "selections": selections,
         "inputs": inputs,
         "exposure": exposure,
+        "injection": injection,
         "problems": problems,
         "results": [canonical_result_payload(r) for r in results],
     }
 
 
-def run_lifecycle_case(case: dict) -> dict:
+def run_lifecycle_case(case: dict, variant: Optional[str] = None) -> dict:
     """Drive the Crossveil lifecycle directly (no pipeline). For each step, the lifecycle of
     ``request_id`` (created and mapped on first sight) receives ``decision``; the step records the
     state after the call and whether the call was refused."""
     lifecycles: dict = {}
+    minted: dict = {}
     steps: list = []
     for step in case["steps"]:
         rid = step["request_id"]
@@ -162,7 +246,10 @@ def run_lifecycle_case(case: dict) -> dict:
             life = lifecycles[rid] = Lifecycle(rid)
             life.map()
         try:
-            life.apply_decision(Decision.from_dict(step["decision"]))
+            decision = Decision.from_dict(step["decision"])
+            if variant is not None:
+                _negctl(variant).continuation_any_id(variant, minted, rid, decision)
+            life.apply_decision(decision)
             refused = False
         except (LifecycleError, ProtocolError):
             refused = True
@@ -200,44 +287,75 @@ def check_digest_fixtures(fixtures_dir: str) -> list:
     return out
 
 
+def load_injection_fixtures(fixtures_dir: str) -> list:
+    """The ``injection/NN-*.json`` fixtures (0.3 cut I1), sorted by file name. Absent directory = none."""
+    return [
+        json.loads(p.read_text(encoding="utf-8"))
+        for p in sorted(Path(fixtures_dir, "injection").glob("*.json"))
+    ]
+
+
+def run_suite(fixtures_dir: str, variant: Optional[str] = None) -> tuple:
+    """Run a whole fixtures directory: the NN cases, the injection cases, the lifecycle cases.
+    Returns ``(verdicts, lifecycle, digest_errors)``; ``variant`` applies a negative control."""
+    verdicts: dict = {}
+    cases = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(Path(fixtures_dir).glob("*.json"))]
+    for case in cases + load_injection_fixtures(fixtures_dir):
+        verdicts[case["case"]] = run_case(case, variant)
+    lifecycle: dict = {}
+    for path in sorted(Path(fixtures_dir, "lifecycle").glob("*.json")):
+        case = json.loads(path.read_text(encoding="utf-8"))
+        lifecycle[case["case"]] = run_lifecycle_case(case, variant)
+    return verdicts, lifecycle, check_digest_fixtures(fixtures_dir)
+
+
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="interplane-conformance")
     ap.add_argument("fixtures_dir")
-    ap.add_argument("--out", required=True)
+    ap.add_argument("--out")
     ap.add_argument("--dump", help="directory for per-case canonical result payloads")
+    ap.add_argument("--variant", help="test-only: apply negative control V1 to V6")
+    ap.add_argument("--matrix", help="test-only: write the negative-control matrix here")
     args = ap.parse_args(argv)
-    verdicts: dict = {}
-    for path in sorted(Path(args.fixtures_dir).glob("*.json")):
-        case = json.loads(path.read_text(encoding="utf-8"))
-        verdict = run_case(case)
-        verdicts[case["case"]] = verdict
-        if args.dump:
-            d = Path(args.dump)
-            d.mkdir(parents=True, exist_ok=True)
-            (d / f"{case['case']}.results.json").write_text(
-                jcs(verdict["results"]) + "\n", encoding="utf-8"
-            )
-    lifecycle: dict = {}
-    for path in sorted(Path(args.fixtures_dir, "lifecycle").glob("*.json")):
-        case = json.loads(path.read_text(encoding="utf-8"))
-        lifecycle[case["case"]] = run_lifecycle_case(case)
+    if args.matrix:
+        from .conformance_negctl import matrix
+
+        spec = str(Path(args.fixtures_dir, "..", "negative-controls.json"))
+        m = matrix(args.fixtures_dir, spec)
+        Path(args.matrix).write_text(jcs(m) + "\n", encoding="utf-8")
+        print(f"negative-control matrix valid: {'true' if m['valid'] else 'false'}")
+        return 0 if m["valid"] else 1
+    if not args.out:
+        ap.error("--out is required")
+    if args.variant:
+        from .conformance_negctl import VARIANTS
+
+        if args.variant not in VARIANTS:
+            ap.error("unknown variant (V1 to V6)")
+        print(f"[NEGCTL_BUILT_IN] NEGATIVE CONTROL {args.variant}: failures below are expected")
+    verdicts, lifecycle, digests = run_suite(args.fixtures_dir, args.variant)
+    if args.dump:
+        d = Path(args.dump)
+        d.mkdir(parents=True, exist_ok=True)
+        for name, verdict in verdicts.items():
+            (d / f"{name}.results.json").write_text(jcs(verdict["results"]) + "\n", encoding="utf-8")
     failed = 0
     for name, v in sorted({**verdicts, **lifecycle}.items()):
         print(f"{'PASS' if v['pass'] else 'FAIL'}  {name}")
         for p in v["problems"]:
             print(f"      {p}")
         failed += not v["pass"]
-    for name, err in check_digest_fixtures(args.fixtures_dir):
+    for name, err in digests:
         print(f"{'PASS' if err is None else 'FAIL'}  {name}")
         if err:
             print(f"      {err}")
         failed += err is not None
     total = len(verdicts) + len(lifecycle)
     print(f"{total - failed}/{total} passed")
-    fields = ("pass", "observed", "turns", "runtime", "selections", "inputs", "exposure")
+    fields = ("pass", "observed", "turns", "runtime", "selections", "inputs", "exposure", "injection")
     out = {k: {f: v[f] for f in fields if f in v} for k, v in verdicts.items()}
     for v in out.values():
-        for key in ("selections", "inputs", "exposure"):
+        for key in ("selections", "inputs", "exposure", "injection"):
             if not v.get(key):
                 v.pop(key, None)
     out.update({k: {"pass": v["pass"], "steps": v["steps"]} for k, v in lifecycle.items()})

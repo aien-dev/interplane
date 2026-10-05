@@ -75,7 +75,11 @@ fn world_mutation_requires_approval_and_never_executes() {
     assert!(rec.decide_invoked && !rec.execute_invoked);
     let d = res.decision.as_ref().unwrap();
     assert!(
-        d.reason.as_deref().unwrap().contains("needs approval"),
+        // No user request registered: the empty ledger is external_untrusted (0.3 cut E4).
+        d.reason
+            .as_deref()
+            .unwrap()
+            .contains("under untrusted exposure (floor below user_supplied)"),
         "{d:?}"
     );
     assert_eq!(d.authority.policy_engine, ENGINE_EFFECT);

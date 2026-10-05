@@ -1,4 +1,4 @@
-//! Single-use approvals (aien-mcp at 6554aac) through the adapter and the host-only continuation
+//! Single-use approvals (aien-mcp at 0c1d249) through the adapter and the host-only continuation
 //! API (0.3 cut A3). The first group drives the adapter's host side directly (`decide` to mint the
 //! pending handle, `present_approval` for the continuation decision, then `execute`, the same
 //! calls the pipeline makes). The second group drives the real `Pipeline` through

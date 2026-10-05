@@ -21,7 +21,8 @@ use aien_mcp::memory::MemoryWire;
 use aien_mcp::{
     ApprovalDesk, ApprovalError, ApprovalGrant, AuthorityOutcome, AuthorizedEffect, CallOutcome,
     EffectClassAuthority, EffectIntent, EffectLane, EffectReceipt, EffectScope, Error as McpError,
-    SessionManager, SpeculativeLane, SpeculativeToolCall,
+    Exposure as AienExposure, SessionManager, SpeculativeLane, SpeculativeToolCall,
+    TrustLevel as AienTrust,
 };
 use interplane_core::*;
 use interplane_crossaxis::MappingTable;
@@ -127,6 +128,9 @@ pub struct AienAuthority {
     minted: HashMap<String, String>,
     /// Receipts AIEN's ledger returned for a replayed request, handed back by `execute`.
     replayed: HashMap<String, EffectReceipt>,
+    /// The pipeline's exposure at `decide`, per request id, handed to AIEN again when the host
+    /// presents a grant: the approval answers what the model saw when it asked (0.3 cut E4).
+    exposures: HashMap<String, Option<AienExposure>>,
     provider: ProviderId,
     runtime: tokio::runtime::Runtime,
     wire_calls: Arc<AtomicUsize>,
@@ -176,6 +180,7 @@ impl AienAuthority {
             desk: None,
             minted: HashMap::new(),
             replayed: HashMap::new(),
+            exposures: HashMap::new(),
             provider: ProviderId::new("interplane-reference"),
             runtime,
             wire_calls: Arc::new(AtomicUsize::new(0)),
@@ -364,26 +369,24 @@ impl AienAuthority {
             .spec(&req.capability)
             .map(|(_, d)| routing_class(d.effects()));
         let mut values = vec![format!("effect_class={class:?}")];
-        let outcome = self.effect_lane.authorize_approved(
-            intent.clone(),
-            scope,
-            &EffectClassAuthority,
-            grant,
-            now,
+        // Absent (no decide seen for this request) stays absent: AIEN reads that as untrusted.
+        let lane = lane_for(
+            &self.effect_lane,
+            self.exposures.get(&rid).cloned().flatten(),
         );
+        let outcome =
+            lane.authorize_approved(intent.clone(), scope, &EffectClassAuthority, grant, now);
         // A spent grant presented again for the effect it was spent on is a replay of a finished
         // request: AIEN's ledger returns the existing receipt and nothing is minted or run.
         let outcome = match outcome {
             Err(AuthorityOutcome::Approval(ApprovalError::Consumed)) => {
-                match self
-                    .runtime
-                    .block_on(self.effect_lane.authorize_and_execute_approved(
-                        intent,
-                        scope,
-                        &EffectClassAuthority,
-                        grant,
-                        now,
-                    )) {
+                match self.runtime.block_on(lane.authorize_and_execute_approved(
+                    intent,
+                    scope,
+                    &EffectClassAuthority,
+                    grant,
+                    now,
+                )) {
                     Ok(receipt) => {
                         self.replayed.insert(rid, receipt);
                         values.push("replay=true".into());
@@ -430,11 +433,34 @@ impl AienAuthority {
         self.authorized.remove(request_id).is_some() | self.replayed.remove(request_id).is_some()
     }
 
+    /// What a successful result is (CROSSVEIL.md rule 7, 0.3 cut E4). A file's text is workspace
+    /// content; a listing is tool output made of workspace names; a write result is AIEN's receipt
+    /// plus the adapter's acknowledgement, authored by the runtime. Anything else is tool output of
+    /// unknown origin and gets the weaker label. `trust_workspace` lifts only the two reads.
+    fn label(&self, capability: &str) -> (ContentKind, TrustLevel) {
+        let ws = if self.trust_workspace {
+            TrustLevel::TrustedRuntime
+        } else {
+            TrustLevel::WorkspaceUntrusted
+        };
+        match capability {
+            "read_file" => (ContentKind::WorkspaceContent, ws),
+            "list_dir" => (ContentKind::ToolResult, ws),
+            "write_file" => (ContentKind::ToolResult, TrustLevel::TrustedRuntime),
+            _ => (ContentKind::ToolResult, TrustLevel::ExternalUntrusted),
+        }
+    }
+
     /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`).
     /// This never spends a grant: a `requires_approval` verdict stays pending until the host
     /// continues it through [`Self::present_approval`].
     /// The adapter translates the answer and never builds the authorized value itself.
-    fn decide_effect(&mut self, req: &CapabilityRequest, effects: ToolEffects) -> Decision {
+    fn decide_effect(
+        &mut self,
+        req: &CapabilityRequest,
+        effects: ToolEffects,
+        exposure: Option<AienExposure>,
+    ) -> Decision {
         if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
             if let Err(why) = self.confine(path) {
                 return self.decision(
@@ -450,9 +476,13 @@ impl AienAuthority {
             Err(d) => return *d,
         };
         let mut values = vec![format!("effect_class={:?}", routing_class(effects))];
-        let outcome = self
-            .effect_lane
-            .authorize(intent.clone(), scope, &EffectClassAuthority);
+        self.exposures
+            .insert(req.request_id.as_str().to_string(), exposure.clone());
+        let outcome = lane_for(&self.effect_lane, exposure).authorize(
+            intent.clone(),
+            scope,
+            &EffectClassAuthority,
+        );
         match outcome {
             Ok(effect) => {
                 self.authorized
@@ -527,6 +557,22 @@ impl AienAuthority {
         } else {
             Err(format!("path is outside the workspace: {path}"))
         }
+    }
+}
+
+/// The pipeline's exposure in AIEN's own vocabulary (0.3 cut E4). The pipeline always supplies one;
+/// `None` passes through as `None`, which AIEN treats as untrusted for effects (fail closed).
+fn aien_exposure(ctx: &CallContext) -> Option<AienExposure> {
+    ctx.exposure
+        .as_ref()
+        .map(|e| AienExposure::new(e.inputs.clone(), AienTrust::from_wire(e.floor.as_str())))
+}
+
+/// The effect lane with the host's exposure attached, or the bare lane (no exposure) when absent.
+fn lane_for(lane: &EffectLane, exposure: Option<AienExposure>) -> EffectLane {
+    match exposure {
+        Some(e) => lane.with_exposure(e),
+        None => lane.clone(),
     }
 }
 
@@ -619,7 +665,7 @@ impl RuntimeAuthority for AienAuthority {
         RUNTIME_ID
     }
 
-    fn decide(&mut self, req: &CapabilityRequest, _ctx: &CallContext) -> Decision {
+    fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
         self.decide_calls += 1;
         if !self.available {
             return self.decision(
@@ -675,7 +721,7 @@ impl RuntimeAuthority for AienAuthority {
         }
         let class = routing_class(desc.effects());
         if !matches!(class, EffectClass::Pure | EffectClass::ReadOnly) {
-            return self.decide_effect(req, desc.effects());
+            return self.decide_effect(req, desc.effects(), aien_exposure(ctx));
         }
         // Adapter restriction (can only deny): confine reads to the workspace root.
         if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
@@ -773,12 +819,8 @@ impl RuntimeAuthority for AienAuthority {
         };
         let ok = r.status == ResultStatus::Ok;
         let (kind, trust) = if ok {
-            let t = if self.trust_workspace {
-                TrustLevel::TrustedRuntime
-            } else {
-                TrustLevel::WorkspaceUntrusted
-            };
-            (Some(ContentKind::WorkspaceContent), Some(t))
+            let (k, t) = self.label(&req.capability);
+            (Some(k), Some(t))
         } else {
             (None, None)
         };

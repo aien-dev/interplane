@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-10-05T08:10Z, before the live leg started (08:10:34Z)",
+  "how": "GET http://127.0.0.1:11434/api/version, /api/tags, /api/ps; nvidia-smi compute apps",
+  "ollama_version": "0.34.0",
+  "model": "qwen3.5:9b",
+  "model_digest": "sha256:56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+  "matches_run_manifest_gate_m_backend": true,
+  "models_loaded": ["qwen3.5:9b"],
+  "other_gpu_process": "an image-serving Python process (up 1 day 14 h) held 18408 MiB of GPU memory at 0 % GPU utilization; not Ollama traffic",
+  "campaign_0102Z_finished": "2026-10-05T08:09:29Z"
+}

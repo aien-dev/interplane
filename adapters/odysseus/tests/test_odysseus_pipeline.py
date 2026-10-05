@@ -64,7 +64,7 @@ def test_mutation_after_external_context_requires_approval(run):
     assert (res.status, rec.stage, rec.execute_invoked) == ("requires_approval", "REQUIRES_APPROVAL", False)
     assert res.error.code == "approval_required"
     decision = authority.decisions[res.request_id]
-    assert decision.approval["approval_id"] == f"odysseus-pending-{res.request_id}"
+    assert decision.approval is None  # no id minted: approval continuation is unsupported here
     assert decision.runtime_state["vocabulary"] == "odysseus.tool_gate"
     assert "External untrusted context" in decision.runtime_state["values"][0]
     assert authority.execute_calls == 0

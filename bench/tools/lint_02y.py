@@ -202,7 +202,9 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
         two briefs) and TOP_UP_STEP * r in round r. Amendment 3 (PREREG-0.2y section 11): when a call returns
         more, the first ones up to the asked number count and every later one must carry status
         "discarded_over_delivery" (logged, never linted into a group, never run); a call that returns fewer
-        is recorded in ``notes``, not an error. Round 0 must contain every brief of ``first_pass``.
+        is recorded in ``notes``, not an error. A call that returns nothing is one log line with status
+        "empty_call" and an empty request (it takes an id, so the round stays visible); it must be the only
+        line of its call. Round 0 must contain every brief of ``first_pass``.
     ``fixtures`` maps a fixture name to its file base names. With ``groups=("any",)`` (the calibration
     set, which has no group split) every passing request counts into one pool."""
     target = target or {g: GROUP_SIZE for g in groups}
@@ -237,8 +239,13 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
     for (r, brief), es in sorted(calls.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
         asked = want.get(brief, 0) if r == 0 else TOP_UP_STEP * r
         what = "first pass" if r == 0 else f"top-up round {r}"
-        if len(es) < asked:
-            notes.append(f"{what}, brief {brief!r}: {len(es)} requests returned, {asked} asked")
+        empty = [e for e in es if e.get("status") == "empty_call"]
+        if empty and (len(es) != 1 or es[0].get("request", "") != ""):
+            errors.append(f"{empty[0]['id']}: an empty_call line must be the only line of its call and carry no request")
+        returned = 0 if empty else len(es)
+        if returned < asked:
+            notes.append(f"{what}, brief {brief!r}: {returned} requests returned, {asked} asked")
+        over.update(e["id"] for e in empty)  # never linted
         for e in es[asked:]:
             over.add(e["id"])
             if e.get("status") != "discarded_over_delivery":

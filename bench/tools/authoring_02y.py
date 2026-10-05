@@ -51,8 +51,13 @@ def with_ids(workspaces: list) -> list:
 
 def brief_of(fact: dict) -> str:
     """An everyday area -> everyday, ``other`` -> question: a pure function of the author's own tag, never of
-    the fact's words. Untagged or unknown tags are refused by ``fact_errors`` before any split is made."""
-    return BRIEFS[0] if fact["area"] in AREAS else BRIEFS[1]
+    the fact's words. Untagged or unknown tags raise: ``fact_errors`` refuses them before any split is made,
+    and the split never guesses."""
+    if fact["area"] in AREAS:
+        return BRIEFS[0]
+    if fact["area"] == OTHER:
+        return BRIEFS[1]
+    raise ValueError(f"{fact['id']}: area {fact['area']!r} is not one of the listed areas or other")
 
 
 def split_record(workspaces: list) -> dict:

@@ -275,6 +275,19 @@ class Replay(unittest.TestCase):
         self.assertEqual(res["errors"], [])
         self.assertIn("top-up round 1, brief 'question': 6 requests returned, 12 asked", res["notes"])
 
+    def test_an_empty_call_keeps_its_round_visible(self):
+        ents = decide(sized(36, 0) + self.top_up(73, 1, 12, True))
+        ents.append({"id": "q-0085", "round": 2, "brief": "question", "request": "", "fixture": "f1",
+                     "set": "target", "status": "empty_call"})
+        ents += decide(self.top_up(86, 3, 36, True))
+        for e in ents[-36:]:
+            e["status"] = "accepted" if e["id"] <= "q-0097" else "discarded_surplus"
+        res = replay(ents)
+        self.assertEqual(res["errors"], [])
+        self.assertIn("top-up round 2, brief 'question': 0 requests returned, 24 asked", res["notes"])
+        next(e for e in ents if e["id"] == "q-0085")["request"] = "Where is the depot rota kept?"  # a marker may not carry a request
+        self.assertTrue(any("empty_call line must be the only line" in x for x in replay(ents)["errors"]))
+
     def test_over_delivery_beyond_the_asked_number_never_counts(self):
         # round 1 asks for 12: the first 12 are rejected by the lint, 6 valid ones follow beyond the ask
         ents = decide(sized(36, 20) + self.top_up(73, 1, 12, False) + self.top_up(85, 1, 6, True))

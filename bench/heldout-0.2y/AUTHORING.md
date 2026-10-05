@@ -215,13 +215,15 @@ workspaces only). The first 30 lint-passing requests in id order form the set (s
    `heldout-0.2y/authoring-log.jsonl`: `{"set": "target"|"calibration", "id": "q-NNNN", "round": 0..3,
    "brief": "everyday"|"question", "fixture": "<slug>", "request": "...", "answer": [...], "template": "...",
    "codes": [...], "lint": [<author messages>], "detail": {...}, "group": "nonfile"|"default"|null,
-   "status": "accepted"|"discarded_lint"|"discarded_surplus"|"discarded_over_delivery"}`. `codes` and `detail`
+   "status": "accepted"|"discarded_lint"|"discarded_surplus"|"discarded_over_delivery"|"empty_call"}`. `codes` and `detail`
    stay out of the author's sight.
    **Over- and under-delivery (amendment 3).** One call asks for a number of requests (36 in round 0, 12, 24, 36
    in rounds 1 to 3). When it returns more, the first ones up to that number, in the author's array order, are
    logged and decided; every later one is logged with status `discarded_over_delivery`, is never linted into a
    group and never run, and its fact counts as unused for later calls. When it returns fewer, they are logged as
-   they are and the replay lists the shortfall as a note; the round still counts as one of the three top-ups.
+   they are and the replay lists the shortfall as a note; the round still counts as one of the three top-ups. A call
+   that returns nothing is logged as one line with status `empty_call` and an empty request, so its round stays
+   visible in the log.
    `validate.py --corpus 0.2y` replays the log in id order and fails on any difference.
 3. **Acceptance (section 5).** In id order, a request that passes the lint goes into the group the lint derives
    (`nonfile` or `default`); each group keeps the first 24 accepted; later passing requests are `discarded_surplus`.

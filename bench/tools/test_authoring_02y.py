@@ -80,12 +80,17 @@ class Authoring(unittest.TestCase):
         errs = A.fact_errors([w])
         self.assertTrue(any(e.startswith("a-001: area None") for e in errs), errs)
         self.assertTrue(any(e.startswith("a-002: area 'email'") for e in errs), errs)
+        with self.assertRaises(ValueError):  # the split never guesses a side for a bad tag
+            A.split_record([w])
 
     def test_workspace_balance_is_enforced(self):
         self.assertEqual(A.fact_errors([ws("a", 40)]), [])
         lopsided = ws("b", 40)
         lopsided["facts"][0]["area"] = A.OTHER  # fact 0 was everyday: now 19 everyday, 21 other
         self.assertTrue(any(e.startswith("b: 19 everyday facts") for e in A.fact_errors([lopsided])))
+        few_other = ws("d", 40)
+        few_other["facts"][1]["area"] = A.AREAS[0]  # fact 1 was other: now 21 everyday, 19 other
+        self.assertTrue(any(e.startswith("d: 21 everyday facts in") and "19 other" in e for e in A.fact_errors([few_other])))
         narrow = ws("c", 40)
         for f in narrow["facts"]:
             if f["area"] != A.OTHER:

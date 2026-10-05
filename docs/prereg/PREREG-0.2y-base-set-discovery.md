@@ -262,7 +262,7 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
   12. Over- and under-delivery. A call that returns more requests than it asked for keeps the first ones up to the
       asked number in the author's order; the rest are logged as `discarded_over_delivery`, never grouped or run,
       and their facts stay unused. A call that returns fewer is logged as it is (a replay note, not an error) and
-      the round still counts. Reason: attempt 1's top-up 2 returned 48 of 24 and used up the facts the third top-up
+      the round still counts; a call that returns nothing is one `empty_call` log line. Reason: attempt 1's top-up 2 returned 48 of 24 and used up the facts the third top-up
       needed. Attempt 1's record was replayed with the checker at 2049968; the amended checker is not applied to it.
   13. The bookkeeping paragraph under the fixture brief (check names and pool arithmetic) is moved outside the
       verbatim brief; attempt 1's fixture prompt carried it (no catalog name, keyword or selector detail; recorded,

@@ -5,4 +5,4 @@ AEGIS_RUNTIME_REV=f4e870953a466bb1cf68f1d88285929024cf1ba9
 AIEN_PROTOCOLS_REPO=https://github.com/aien-dev/aien-protocols.git
 AIEN_PROTOCOLS_REV=3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
 # Pinned in Cargo.toml (git dependency); CI checks that Cargo.toml and this line agree.
-SOVEREIGN_CORE_REV=0c1d249f2d119c7c2d726a2d252dc913e6185d28
+SOVEREIGN_CORE_REV=0bdc97a76ce5a3d198dca718f89fad9bc56deb8e

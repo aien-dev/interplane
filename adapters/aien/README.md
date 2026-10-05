@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@0c1d249f2d119c7c2d726a2d252dc913e6185d28` (main after PR #207 merged,
+`aien-dev/aien-sovereign-core@0bdc97a76ce5a3d198dca718f89fad9bc56deb8e` (main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -101,7 +101,7 @@ so they stay pending until continued. `with_effects(name, bits)` re-declares a s
 deny); AIEN's authority decides from the new bits.
 
 **Spend point (limit).** AIEN spends the grant when it mints the effect, inside `present_approval`,
-not when the provider runs it, and aien-mcp at 0c1d249 has no way to give a spent grant back. So the
+not when the provider runs it. aien-mcp at 0bdc97a can revoke only an unspent grant (#208), so a spent grant still cannot be given back (sovereign-core #206). So the
 grant is gone before the pipeline's own checks (digest, expiry string, catalog) and before the
 provider call. Outcomes, all tested in `tests/approval.rs`:
 

@@ -21,9 +21,9 @@ interplane-crossveil = { path = "../../rust/crates/interplane-crossveil" }
 serde_json = "1"
 sha2 = "0.10"
 tokio = { version = "1", features = ["rt"] }
-# Pinned AIEN sources: aien-dev/aien-sovereign-core main at 0c1d249 (PR #207, exposure-aware authority; after #204 single-use approvals).
-aien-capability = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "0c1d249f2d119c7c2d726a2d252dc913e6185d28" }
-aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "0c1d249f2d119c7c2d726a2d252dc913e6185d28" }
+# Pinned AIEN sources: aien-dev/aien-sovereign-core main at 0bdc97a (PR #208, idempotency ledger bound to effect identity, revocable unspent grants; after #207 exposure-aware authority and #204 single-use approvals).
+aien-capability = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "0bdc97a76ce5a3d198dca718f89fad9bc56deb8e" }
+aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = "0bdc97a76ce5a3d198dca718f89fad9bc56deb8e" }
 # aegis-runtime cannot be a git dependency: its own Cargo.toml reaches a sibling checkout
 # (`../aien-protocols/crates/*`). Layout required (see README): next to this repository,
 # `interplane-audit/aegis-runtime` at f4e870953a466bb1cf68f1d88285929024cf1ba9 and

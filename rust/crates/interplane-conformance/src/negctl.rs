@@ -1,4 +1,4 @@
-//! Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6): deliberately vulnerable variants
+//! Negative controls V1 to V8 (bench/PROTOCOL-0.3.md section 6): deliberately vulnerable variants
 //! of the harness, so the suite can show it is able to fail. Compiled only with the test-only
 //! `negative-controls` feature of this crate. No pipeline library knows about any of this: each
 //! variant wraps the unmodified pipeline, runtime or lifecycle from the outside.
@@ -22,16 +22,20 @@ pub enum Variant {
     V4,
     V5,
     V6,
+    V7,
+    V8,
 }
 
 impl Variant {
-    pub const ALL: [Variant; 6] = [
+    pub const ALL: [Variant; 8] = [
         Variant::V1,
         Variant::V2,
         Variant::V3,
         Variant::V4,
         Variant::V5,
         Variant::V6,
+        Variant::V7,
+        Variant::V8,
     ];
     pub fn name(self) -> &'static str {
         match self {
@@ -41,6 +45,8 @@ impl Variant {
             Variant::V4 => "V4",
             Variant::V5 => "V5",
             Variant::V6 => "V6",
+            Variant::V7 => "V7",
+            Variant::V8 => "V8",
         }
     }
     pub fn parse(s: &str) -> Option<Variant> {
@@ -50,6 +56,19 @@ impl Variant {
 
 fn is(ctl: Option<Variant>, v: Variant) -> bool {
     ctl == Some(v)
+}
+
+/// V7: request-identity and catalog checks skipped. The harness-injected identity and catalog
+/// defects (a decision or result citing another request, a duplicate advertised name, a catalog
+/// digest that changed) are not put in front of the pipeline, as if its checks did not exist.
+pub fn skips_identity(ctl: Option<Variant>) -> bool {
+    is(ctl, Variant::V7)
+}
+
+/// V8: an adapter exception fails open. A fault in `decide` authorizes, a fault in `execute` lets
+/// the real execution through as if nothing had gone wrong.
+pub fn fail_open(ctl: Option<Variant>) -> bool {
+    is(ctl, Variant::V8)
 }
 
 /// An approval asserted by the model: in `arguments` or in `extensions`.

@@ -1,4 +1,4 @@
-"""Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6): deliberately vulnerable variants of
+"""Negative controls V1 to V8 (bench/PROTOCOL-0.3.md section 6): deliberately vulnerable variants of
 the harness, so the suite can show it is able to fail. TEST ONLY: imported lazily by the
 conformance runner when ``--variant`` or ``--matrix`` is given, never by a pipeline library. Each
 variant wraps the unmodified pipeline, runtime or lifecycle from the outside."""
@@ -9,7 +9,7 @@ from typing import Any, Optional
 
 from .core import RequestLedger
 
-VARIANTS = ("V1", "V2", "V3", "V4", "V5", "V6")
+VARIANTS = ("V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8")
 
 
 def _claims_approval(req) -> bool:
@@ -22,6 +22,19 @@ def _claims_approval(req) -> bool:
         return (isinstance(aid, str) and aid != "") or m.get("approved") is True
 
     return claim(req.arguments) or claim(req.extensions)
+
+
+def skips_identity(variant: Optional[str]) -> bool:
+    """V7: request-identity and catalog checks skipped. The harness-injected identity and catalog
+    defects (a decision or result citing another request, a duplicate advertised name, a catalog
+    digest that changed) are not put in front of the pipeline, as if its checks did not exist."""
+    return variant == "V7"
+
+
+def fail_open(variant: Optional[str]) -> bool:
+    """V8: an adapter exception fails open. A fault in decide authorizes, a fault in execute lets
+    the real execution through as if nothing had gone wrong."""
+    return variant == "V8"
 
 
 def tamper_decision(variant: Optional[str], req, decision, readmitting: bool = False) -> None:

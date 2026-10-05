@@ -6,8 +6,8 @@ use std::path::Path;
 use std::rc::Rc;
 
 use interplane_core::{
-    canonicalize, digest, CapabilityRequest, Catalog, Decision, Lifecycle, Limits, RequestLedger,
-    ToolResult,
+    canonicalize, digest, CapabilityRequest, Catalog, Decision, DecisionKind, Lifecycle, Limits,
+    RequestLedger, ToolResult,
 };
 use interplane_crossaxis::{expand, select};
 use interplane_crossveil::pipeline::{capability_request_digest, PendingApproval};
@@ -42,12 +42,38 @@ struct Probe<'a> {
     executed: HashSet<String>,
     /// Harness-only (fixture `mock` step): the catalog digest the runtime reports instead of its own.
     catalog_override: Rc<RefCell<Option<String>>>,
+    /// Harness-only (fixture `mock_fault`, cut I4): adapter faults and identity or catalog defects,
+    /// the way a broken adapter would produce them. Never read from model content.
+    fault: Value,
     /// Harness-only: true while a negative control re-admits an original request in place of a
     /// continuation.
     #[cfg_attr(not(feature = "negative-controls"), allow(dead_code))]
     readmit: Rc<Cell<bool>>,
     #[cfg(feature = "negative-controls")]
     ctl: Ctl,
+}
+
+impl Probe<'_> {
+    /// Negative control V7: request-identity and catalog checks skipped, so the harness does not
+    /// put identity or catalog defects in front of the pipeline.
+    fn skips_identity(&self) -> bool {
+        #[cfg(feature = "negative-controls")]
+        return negctl::skips_identity(self.ctl);
+        #[cfg(not(feature = "negative-controls"))]
+        false
+    }
+    /// Negative control V8: an adapter exception fails open.
+    fn fail_open(&self) -> bool {
+        #[cfg(feature = "negative-controls")]
+        return negctl::fail_open(self.ctl);
+        #[cfg(not(feature = "negative-controls"))]
+        false
+    }
+    fn fault_names(&self, key: &str, cap: &str) -> bool {
+        self.fault[key]
+            .as_array()
+            .is_some_and(|a| a.iter().any(|v| v.as_str() == Some(cap)))
+    }
 }
 
 impl RuntimeAuthority for Probe<'_> {
@@ -60,8 +86,23 @@ impl RuntimeAuthority for Probe<'_> {
             req.capability.clone(),
             canonicalize(&Value::Object(req.arguments.clone())),
         ));
+        let raises = self.fault_names("decide_raises", &req.capability);
+        if raises && !self.fail_open() {
+            self.inner.decide_calls += 1; // the adapter was reached, then raised
+            panic!("adapter fault in decide");
+        }
         #[allow(unused_mut)]
         let mut d = self.inner.decide(req, ctx);
+        if raises {
+            d.decision = DecisionKind::Authorized;
+            d.reason = None;
+            d.approval = None;
+        }
+        if let Some(other) = self.fault["decision_request_id"][&req.capability].as_str() {
+            if !self.skips_identity() {
+                d.request_id = other.to_string();
+            }
+        }
         #[cfg(feature = "negative-controls")]
         negctl::tamper_decision(self.ctl, req, &mut d, self.readmit.get());
         d
@@ -73,11 +114,33 @@ impl RuntimeAuthority for Probe<'_> {
         ctx: &CallContext,
     ) -> ToolResult {
         self.executed.insert(req.request_id.clone());
-        self.inner.execute(req, decision, ctx)
+        if self.fault_names("execute_raises", &req.capability) && !self.fail_open() {
+            self.inner.execute_calls += 1; // the adapter was reached, then raised
+            panic!("adapter fault in execute");
+        }
+        let mut r = self.inner.execute(req, decision, ctx);
+        if let Some(other) = self.fault["result_request_id"][&req.capability].as_str() {
+            if !self.skips_identity() {
+                r.request_id = Some(other.to_string());
+            }
+        }
+        r
     }
     fn catalog(&self) -> Catalog {
         let mut c = self.inner.catalog();
-        if let Some(d) = self.catalog_override.borrow().clone() {
+        let dups = self.fault["duplicate_capability"].as_array();
+        if let (Some(extra), false) = (dups, self.skips_identity()) {
+            for e in extra {
+                if let Ok(d) = serde_json::from_value(e.clone()) {
+                    c.capabilities.push(d);
+                }
+            }
+            c.catalog_digest = Some(c.compute_digest());
+        }
+        if let (Some(d), false) = (
+            self.catalog_override.borrow().clone(),
+            self.skips_identity(),
+        ) {
             c.catalog_digest = Some(d);
         }
         c
@@ -160,6 +223,7 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
         requests: vec![],
         executed: HashSet::new(),
         catalog_override: Rc::new(RefCell::new(None)),
+        fault: fx["mock_fault"].clone(),
         readmit: Rc::new(Cell::new(false)),
         #[cfg(feature = "negative-controls")]
         ctl,
@@ -365,7 +429,7 @@ fn is_v6(ctl: Ctl) -> bool {
 fn approval_decision(a: &Value, rid: &str, pend: Option<&PendingApproval>) -> Decision {
     let v = json!({
         "kind": "decision",
-        "request_id": rid,
+        "request_id": a["decision_request_id"].as_str().unwrap_or(rid),
         "decision": a["decision"].as_str().unwrap_or("authorized"),
         "capability": pend.map(|p| p.capability_request.capability.clone()),
         "authority": {"runtime": "mock", "policy_engine": "mock.policy"},

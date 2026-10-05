@@ -945,8 +945,9 @@ STALE_DIGEST = "sha256:" + "0" * 64
 
 
 def mock_mapping_table(name: str = "mock-table") -> MappingTable:
-    """``mock-table`` or ``mock-table-stale`` (same rules, pinned to an outdated catalog digest)."""
-    if name not in ("mock-table", "mock-table-stale"):
+    """``mock-table``; ``mock-table-stale`` (same rules, pinned to an outdated catalog digest); or
+    ``mock-table-pinned`` (same rules, pinned to the mock's live catalog digest)."""
+    if name not in ("mock-table", "mock-table-stale", "mock-table-pinned"):
         raise ValueError(f"unknown mock mapping table: {name}")
     rules = []
     for cap, (ns, canon, *_rest) in _MOCK_CAPS.items():
@@ -978,6 +979,8 @@ def mock_mapping_table(name: str = "mock-table") -> MappingTable:
     table = {"runtime": "mock", "table_version": "1", "rules": rules}
     if name == "mock-table-stale":
         table["catalog_digest"] = STALE_DIGEST
+    elif name == "mock-table-pinned":
+        table["catalog_digest"] = mock_catalog().catalog_digest
     return MappingTable.from_dict(table)
 
 

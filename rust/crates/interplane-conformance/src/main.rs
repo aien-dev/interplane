@@ -78,7 +78,7 @@ fn negative_controls(
         };
     }
     let Some(v) = variant.as_deref().and_then(Variant::parse) else {
-        eprintln!("unknown variant (V1 to V6)");
+        eprintln!("unknown variant (V1 to V8)");
         return ExitCode::from(2);
     };
     println!(

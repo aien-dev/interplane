@@ -7,7 +7,7 @@ Exit status is non-zero on any failure. Checks:
   * fixture shape, 27 required cases, filename == case slug
   * lifecycle/ fixtures: required set, shape, minting decisions valid against decision.schema.json
   * expected.runtime counts agree with the observed records
-  * the JCS digest fixture recomputes
+  * every digest fixture recomputes; InputRecord examples (one per source class) validate
   * negative control: a mutated envelope MUST fail validation
 """
 import copy, glob, hashlib, json, os, sys
@@ -34,6 +34,7 @@ def validator(name):
     return Draft202012Validator(schemas[name], registry=registry, format_checker=FormatChecker())
 V_ENV, V_INTENT = validator("envelope.schema.json"), validator("intent.schema.json")
 V_SEL = validator("selection.schema.json")
+V_INPUT = validator("input.schema.json")
 V_DEC = validator("decision.schema.json")
 
 def check(v, inst, where):
@@ -176,12 +177,40 @@ for p in sorted(glob.glob(os.path.join(FIX, "lifecycle", "*.json"))):
         elif d.get("request_id") != s.get("request_id"): fail("lifecycle/%s: step %d continuation must cite its own request_id" % (name, i))
 if lseen != LIFECYCLE: fail("lifecycle cases missing/extra: %s" % sorted(lseen ^ LIFECYCLE))
 
-# ---- digest fixture
-dp = os.path.join(FIX, "digest", "jcs-01.json")
-d = load(dp)
-got = jcs(d["value"])
-if got != d["expected_jcs"]: fail("digest/jcs-01: expected_jcs mismatch")
-if "sha256:" + hashlib.sha256(got.encode("utf-8")).hexdigest() != d["expected_sha256"]: fail("digest/jcs-01: sha256 mismatch")
+# ---- digest fixtures (every digest/*.json; a "type" is a schema-checked InputRecord or Exposure)
+n_dig = 0
+for dp in sorted(glob.glob(os.path.join(FIX, "digest", "*.json"))):
+    d = load(dp); dn = "digest/" + os.path.basename(dp)[:-5]; n_dig += 1
+    got = jcs(d["value"])
+    if got != d["expected_jcs"]: fail("%s: expected_jcs mismatch" % dn)
+    if "sha256:" + hashlib.sha256(got.encode("utf-8")).hexdigest() != d["expected_sha256"]: fail("%s: sha256 mismatch" % dn)
+    if d.get("type") == "InputRecord": check(V_INPUT, d["value"], dn)
+    elif d.get("type") == "Exposure":
+        check(V_INTENT, {"kind": "tool_request", "request_id": "r", "tool": {"name": "t"}, "arguments": {},
+                         "provenance": {"dialect": "d", "parser_version": "0.1.0", "exposure": d["value"]}}, dn)
+    elif "type" in d: fail("%s: unknown type %r" % (dn, d["type"]))
+
+# ---- InputRecord examples: one per source class (plan cut P2, protocol gate P3)
+INPUT_CLASSES = {"workspace": "workspace_content", "web": "web_content", "memory": "memory", "document": "document",
+                 "skill": "skill", "tool-output": "tool_result", "external-provider": "external_provider",
+                 "runtime-generated": "runtime_instruction", "user-request": "user_request"}
+have_in = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "input", "*.json"))}
+if have_in != set(INPUT_CLASSES): fail("input examples differ: %s" % sorted(have_in ^ set(INPUT_CLASSES)))
+for cls, kind in INPUT_CLASSES.items():
+    ip = os.path.join(FIX, "input", cls + ".json")
+    if not os.path.exists(ip): continue
+    rec = load(ip)
+    if check(V_INPUT, rec, "input/" + cls) and rec["content_kind"] != kind:
+        fail("input/%s: content_kind must be %s" % (cls, kind))
+    if rec.get("trust") in ("trusted_runtime", "user_supplied") and cls not in ("runtime-generated", "user-request"):
+        fail("input/%s: only runtime-generated and user-request material may be trusted" % cls)
+    for k in list(rec):
+        bad = {x: v for x, v in rec.items() if x != k}
+        if V_INPUT.is_valid(bad): fail("negative control: input/%s without %s validated" % (cls, k))
+    if V_INPUT.is_valid({**rec, "trust": "trusted"}): fail("negative control: input/%s with bad trust validated" % cls)
+if V_INTENT.is_valid({"kind": "tool_request", "request_id": "r", "tool": {"name": "t"}, "arguments": {},
+                      "provenance": {"dialect": "d", "parser_version": "0.1.0", "exposure": {"inputs": [], "floor": "trusted"}}}):
+    fail("negative control: exposure with bad floor validated")
 
 # ---- dialect fixtures
 n_dial = n_int = 0
@@ -205,7 +234,7 @@ for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))
 
-print("conformance cases: %d, lifecycle cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, negative controls: ok" % (n_cases, n_life, n_env, n_dial, n_int))
+print("conformance cases: %d, lifecycle cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_env, n_dial, n_int, n_dig, len(have_in)))
 if errors:
     print("FAIL (%d)" % len(errors)); [print(" -", e) for e in errors]; sys.exit(1)
 print("PASS")

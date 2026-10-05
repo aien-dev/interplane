@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interplane.dev/schemas/0.1/input.schema.json",
+  "title": "INTERPLANE InputRecord",
+  "description": "One piece of material placed in front of the model. Recorded by the runtime or the host, never by the model. `trust` is assigned by the runtime; a model cannot raise it.",
+  "type": "object",
+  "required": ["input_id", "content_kind", "trust", "source", "origin", "content_digest", "trace_id", "parent_id", "derived_from"],
+  "properties": {
+    "input_id": {"$ref": "common.schema.json#/$defs/Id", "description": "Unique per trace."},
+    "content_kind": {"$ref": "common.schema.json#/$defs/ContentKind"},
+    "trust": {"$ref": "common.schema.json#/$defs/TrustLevel"},
+    "source": {"$ref": "common.schema.json#/$defs/Party", "description": "Who handed the bytes to the context."},
+    "origin": {"type": "string", "minLength": 1, "maxLength": 2048, "description": "Locator for where the bytes came from: file path, URL, memory record id, provider id or `runtime:<id>`. May be a digest-only form (`sha256:...`) for sensitive locators."},
+    "content_digest": {"$ref": "common.schema.json#/$defs/Digest", "description": "SHA-256 of the exact bytes shown to the model."},
+    "trace_id": {"$ref": "common.schema.json#/$defs/Id"},
+    "parent_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/Id"}, {"type": "null"}], "description": "The message_id or request_id that produced this input. Null for host-registered inputs."},
+    "derived_from": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/Id"}, "description": "input_ids this input was computed from (summaries, nested content). May be empty."}
+  },
+  "additionalProperties": true
+}

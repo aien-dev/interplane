@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0008",
+  "content_kind": "runtime_instruction",
+  "trust": "trusted_runtime",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-runtime"
+  },
+  "origin": "runtime:system-prompt",
+  "content_digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+  "trace_id": "trace-ex",
+  "parent_id": null,
+  "derived_from": []
+}

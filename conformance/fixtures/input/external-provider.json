@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0007",
+  "content_kind": "external_provider",
+  "trust": "external_untrusted",
+  "source": {
+    "kind": "adapter",
+    "id": "provider-x"
+  },
+  "origin": "provider:search-x",
+  "content_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+  "trace_id": "trace-ex",
+  "parent_id": "req-6",
+  "derived_from": []
+}

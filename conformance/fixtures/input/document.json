@@ -1,0 +1,16 @@
+{
+  "input_id": "in-0004",
+  "content_kind": "document",
+  "trust": "external_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-docs"
+  },
+  "origin": "file:report.pdf",
+  "content_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+  "trace_id": "trace-ex",
+  "parent_id": "req-4",
+  "derived_from": [
+    "in-0001"
+  ]
+}

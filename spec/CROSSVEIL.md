@@ -61,6 +61,25 @@ proposal are never flattened into indistinguishable text. Rules:
    `external_untrusted`. AIEN's aegis-runtime has no equivalent today and the adapter fills in
    `unknown` honestly.
 
+5. **InputRecord** (`input.schema.json`) names one piece of material placed in front of the model:
+   `input_id`, `content_kind`, `trust`, `source` (a `Party`: who handed the bytes to the context),
+   `origin` (a locator: file path, URL, memory record id, provider id or `runtime:<id>`, or a
+   digest-only form for sensitive locators), `content_digest`, `trace_id`, `parent_id` (the
+   `message_id` or `request_id` that produced it; `null` for host-registered inputs) and
+   `derived_from` (`input_id`s it was computed from; may be empty). The runtime assigns `trust`.
+   Content the model itself generated is `content_kind = model_generated` with trust
+   `external_untrusted`. The nine source classes are workspace, web, memory, document, skill
+   (including tool descriptions), tool output, external provider, runtime-generated and user
+   request; `conformance/fixtures/input/` holds one schema-valid example of each.
+6. **Exposure** is the optional `provenance.exposure` on a `tool_request`:
+   `{inputs: [input_id...], floor: TrustLevel}`, where `floor` is the least trusted level among the
+   inputs visible to the model when it produced the turn. Order: `trusted_runtime` >
+   `user_supplied` > `workspace_untrusted` > `external_untrusted`; `unknown` counts as
+   `external_untrusted`. The pipeline computes it from its own ledger; an `exposure` arriving inside
+   a model-produced or admitted envelope is discarded and recomputed, never read. In this version
+   (0.3 cut P2) both are types and schemas only: the pipeline does not yet record inputs or compute
+   exposure.
+
 Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
 `invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose
 `mapping.catalog_digest` differs from the runtime's live catalog digest is rejected with

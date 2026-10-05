@@ -1,0 +1,22 @@
+{
+  "type": "InputRecord",
+  "value": {
+    "input_id": "in-0007",
+    "content_kind": "web_content",
+    "trust": "external_untrusted",
+    "source": {
+      "kind": "runtime",
+      "id": "mock-web"
+    },
+    "origin": "https://example.test/page?q=café",
+    "content_digest": "sha256:abababababababababababababababababababababababababababababababab",
+    "trace_id": "trace-p2",
+    "parent_id": null,
+    "derived_from": [
+      "in-0003",
+      "in-0005"
+    ]
+  },
+  "expected_jcs": "{\"content_digest\":\"sha256:abababababababababababababababababababababababababababababababab\",\"content_kind\":\"web_content\",\"derived_from\":[\"in-0003\",\"in-0005\"],\"input_id\":\"in-0007\",\"origin\":\"https://example.test/page?q=café\",\"parent_id\":null,\"source\":{\"id\":\"mock-web\",\"kind\":\"runtime\"},\"trace_id\":\"trace-p2\",\"trust\":\"external_untrusted\"}",
+  "expected_sha256": "sha256:66214ab6be8bc1d7286f835c4b6755382498957f029bc59b60826603369621c1"
+}

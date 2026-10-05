@@ -70,6 +70,22 @@ from interplane_adapter_odysseus.mapping import mapping_table  # noqa: E402
 RECEIPT_VERSION = "0.2.0"
 DISCOVERY = bench_eval.DISCOVERY_TOOL
 ALWAYS_INCLUDE = ["ask_user"]
+# PREREG-0.2y section 2 (F1): condition B5 pins this frozen base set instead of ALWAYS_INCLUDE.
+B5_ALWAYS_INCLUDE = ["ask_user", "ls", "glob", "grep", "read_file"]
+BASE_SETS = {"B5": B5_ALWAYS_INCLUDE}  # condition id -> always_include; every other condition uses ALWAYS_INCLUDE
+
+
+def always_include_for(cond: str) -> list:
+    return BASE_SETS.get(cond, ALWAYS_INCLUDE)
+
+
+def check_base_sets(catalog, conds) -> None:
+    """Refuse to start when a pinned base set names a tool the catalog does not have."""
+    names = {c.name for c in catalog.capabilities}
+    for cond in conds:
+        missing = [n for n in BASE_SETS.get(cond, []) if n not in names]
+        if missing:
+            raise SystemExit(f"condition {cond}: base set names not in the catalog: {missing}")
 FROZEN_PROMPT_SHA = "207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
 ODYSSEUS_COMMIT = "2992bf6"
 DISCOVERY_SPEC = {
@@ -280,11 +296,13 @@ EXPANSION_POLICIES = ("0.2", RUNTIME_POLICY)
 # PROTOCOL-0.2x.md section 4: one id per condition. The id fixes family (judge, rendering), prompt
 # addendum, reasoning switch and expansion policy. "B" is the 0.2 id (policy from --expansion-policy).
 CAMPAIGN_CONDITIONS = ("A", "A2", "A4", "B1", "B2", "B3", "B4")  # canonical order, section 8
-CONDITION_IDS = ("A", "B") + CAMPAIGN_CONDITIONS[1:]
+# B5 (PREREG-0.2y) is explicit only: never part of CAMPAIGN_CONDITIONS, so "all" and the rotation are unchanged.
+EXPLICIT_CONDITIONS = ("B5",)
+CONDITION_IDS = ("A", "B") + CAMPAIGN_CONDITIONS[1:] + EXPLICIT_CONDITIONS
 _SPECS = {
     "A": (False, False, None), "A2": (True, False, None), "A4": (False, True, None),
     "B": (False, False, "flag"), "B1": (False, False, "0.2"), "B2": (True, False, "0.2"),
-    "B3": (False, False, RUNTIME_POLICY), "B4": (False, True, "0.2"),
+    "B3": (False, False, RUNTIME_POLICY), "B4": (False, True, "0.2"), "B5": (False, False, RUNTIME_POLICY),
 }
 REASONING_FIELDS = ("reasoning_effort", "chat_template_kwargs")
 ADDENDUM_REL = Path("prompts") / "discovery-addendum.md"  # under the held-out root
@@ -296,8 +314,11 @@ def condition_spec(cx: dict, cond: str) -> dict:
     addendum, off, policy = _SPECS[cond]
     if policy == "flag":
         policy = cx["expansion_policy"]
-    return {"id": cond, "family": cond[0], "addendum": addendum, "reasoning_off": off,
+    spec = {"id": cond, "family": cond[0], "addendum": addendum, "reasoning_off": off,
             "expansion_policy": policy if cond[0] == "B" else None}
+    if cond in BASE_SETS:  # only conditions with a pinned base set carry the field: other identities are unchanged
+        spec["always_include"] = list(BASE_SETS[cond])
+    return spec
 
 
 def rotated(conds: list, idx: int) -> list:
@@ -462,7 +483,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
     all_names = [c.name for c in catalog.capabilities]
     selection = None
     if fam == "B":
-        selection, _ = select(catalog, task["requested_domains"], always_include=ALWAYS_INCLUDE,
+        selection, _ = select(catalog, task["requested_domains"], always_include=always_include_for(cond),
                               renderer=openai_tools_renderer)
 
     def current_names() -> list:
@@ -523,6 +544,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
             "reasoning_present": bool(msg.get("reasoning") or msg.get("reasoning_content")),
             "outcome": outcome,
             "text_digest": text_sha(text) if text else None,
+            "text": text,  # R1 (PREREG-0.2y section 2): the full assistant text of the round
             "n_tool_calls": len(orig),
         })
         if out is not None and out.outcome != "tool_request":
@@ -583,7 +605,8 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
                        "argument_keys": keys, "arguments_digest": adig, "request_id": rid, "decision": None,
                        "status": "ok", "error_code": None, "executed": False, "result_digest": None,
                        "result_trust": "trusted_runtime", "result_content_kind": "discovery", "exposed": None,
-                       "synthetic": None, "discovery": True}
+                       "synthetic": None, "discovery": True,
+                       "query": q}  # R1: the discovery query exactly as the model sent it (None if absent)
                 if not isinstance(q, str) or not q.strip():
                     content = {"error": "query must be a non-empty string"}
                     rec["status"], rec["error_code"] = "error", "invalid_arguments"
@@ -679,7 +702,7 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
     sel = run["selection"]
     selection_block = None
     if sel is not None:
-        r1 = select(cx["catalog"], task["requested_domains"], always_include=ALWAYS_INCLUDE, renderer=openai_tools_renderer)[0]
+        r1 = select(cx["catalog"], task["requested_domains"], always_include=always_include_for(cond), renderer=openai_tools_renderer)[0]
         d = r1.to_dict()
         d["kind"] = "selection"
         selection_block = {"round1": d, "round1_digest": selection_digest(r1), "final_digest": selection_digest(sel),
@@ -710,6 +733,8 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
         sp = run["spec"]
         rec["condition_spec"] = {"id": cond, "family": sp["family"], "prompt_addendum": sp["addendum"],
                                  "reasoning_off": sp["reasoning_off"], "expansion_policy": sp["expansion_policy"]}
+        if "always_include" in sp:
+            rec["condition_spec"]["always_include"] = sp["always_include"]
         present = sum(1 for r in run["rounds"] if r["reasoning_present"])
         rec["reasoning"] = {"off_requested": sp["reasoning_off"],
                             "field": cx["client"].reasoning_field if sp["reasoning_off"] else None,
@@ -843,9 +868,18 @@ def build_identity(cx: dict, tasks: list) -> dict:
         ident["campaign"] = {"corpus": cx["corpus"], "conditions": {c: condition_spec(cx, c) for c in cx["conditions"]},
                              "addendum_prompt_digest": text_sha(cx["system_prompt_addendum"]),
                              "reasoning_off_field": cx["client"].reasoning_off_fields()}
-    if cx["expansion_policy"] != "0.2" or "B3" in cx["conditions"]:
-        ident["expansion_policy"] = {"name": RUNTIME_POLICY if "B3" in cx["conditions"] else cx["expansion_policy"],
-                                     **({"applies_to": ["B3"]} if "B3" in cx["conditions"] else {}), "schema_budget_ratio": SCHEMA_BUDGET_RATIO,
+    rt_conds = [c for c in ("B3", "B5") if c in cx["conditions"]]  # B5 is B3 with another base set
+    base_conds = [c for c in cx["conditions"] if c in BASE_SETS]
+    if base_conds:  # additive: identities of runs without B5 are byte-identical to before
+        ident["base_sets"] = {c: list(BASE_SETS[c]) for c in base_conds}
+        for t in tasks:
+            sel5, caps5 = select(catalog, t["requested_domains"], always_include=BASE_SETS[base_conds[0]], renderer=openai_tools_renderer)
+            b5_tools = openai_tools_renderer(caps5) + [DISCOVERY_SPEC]
+            per[t["id"]]["base_set_round1"] = {"selection_digest": selection_digest(sel5), "selected": [c.name for c in caps5],
+                                               "tools_digest": digest_of(b5_tools), "tools_bytes": len(jcs(b5_tools).encode())}
+    if cx["expansion_policy"] != "0.2" or rt_conds:
+        ident["expansion_policy"] = {"name": RUNTIME_POLICY if rt_conds else cx["expansion_policy"],
+                                     **({"applies_to": rt_conds} if rt_conds else {}), "schema_budget_ratio": SCHEMA_BUDGET_RATIO,
                                      "full_tools_bytes": cx["full_tools_bytes"], "discover_limit": DISCOVER_LIMIT,
                                      "triggers": ["T1", "T2", "T3"], "suppressed": sorted(SUPPRESSED.values())}
     ident["identity_digest"] = digest_of(ident)
@@ -938,7 +972,8 @@ def main(argv=None) -> int:
     ap.add_argument("--condition", choices=list(CONDITION_IDS) + ["both", "all"], default="both",
                     help="A/B/both = 0.2. A2, A4, B1..B4 = the PROTOCOL-0.2x.md conditions; all = the seven, in order "
                          "A A2 A4 B1 B2 B3 B4 rotated left by (task index mod 7). B3 is arm 3 (runtime-v1), "
-                         "A2/B2 add the discovery addendum, A4/B4 turn reasoning off")
+                         "A2/B2 add the discovery addendum, A4/B4 turn reasoning off. B5 (PREREG-0.2y) = B3 with the "
+                         "base set ask_user ls glob grep read_file; explicit only, never part of all")
     ap.add_argument("--reasoning-field", choices=list(REASONING_FIELDS), default="reasoning_effort",
                     help="request field that turns reasoning off for A4/B4: reasoning_effort=none (Ollama) or "
                          "chat_template_kwargs.enable_thinking=false (SGLang, llama.cpp)")
@@ -995,6 +1030,7 @@ def main(argv=None) -> int:
     if not ody_commit.startswith(ODYSSEUS_COMMIT) and not args.allow_nonfrozen:
         raise SystemExit(f"Odysseus is at {ody_commit}, expected {ODYSSEUS_COMMIT}")
     cx = make_cx(args, tasks_dir, root, conds)
+    check_base_sets(cx["catalog"], conds)
     if text_sha(cx["system_prompt"]) != "sha256:" + FROZEN_PROMPT_SHA and not args.allow_nonfrozen:
         raise SystemExit("prompts/system.md does not match the digest every task pins")
     corpus = check_corpus(not args.allow_nonfrozen, args.corpus)

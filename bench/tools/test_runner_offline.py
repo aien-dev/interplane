@@ -415,6 +415,97 @@ def main() -> int:
                 r = json.loads((hout / "receipts" / f"{tid}.{c}.json").read_text())
                 assert r["task"]["split"] == "qual" and r["fixture"]["name"].startswith("fixtures/") and r["fixture"]["digest"]
         assert hm["order_rule"].startswith("tasks in id order; canonical condition order")
+        # ---- condition B5 (PREREG-0.2y F1) and the R1 receipt fields
+        base5 = ["ask_user", "ls", "glob", "grep", "read_file"]
+        assert run_bench.B5_ALWAYS_INCLUDE == base5 and run_bench.ALWAYS_INCLUDE == ["ask_user"]
+        # existing conditions, order and rotation are untouched: B5 is explicit only
+        assert run_bench.CAMPAIGN_CONDITIONS == ("A", "A2", "A4", "B1", "B2", "B3", "B4")
+        assert "B5" in run_bench.CONDITION_IDS and "B5" not in run_bench.CAMPAIGN_CONDITIONS
+        assert run_bench.always_include_for("B3") == ["ask_user"] and run_bench.always_include_for("B5") == base5
+        assert [run_bench.rotated(list(run_bench.CAMPAIGN_CONDITIONS), k) for k in range(3)] == \
+            [["A", "A2", "A4", "B1", "B2", "B3", "B4"], ["A2", "A4", "B1", "B2", "B3", "B4", "A"], ["A4", "B1", "B2", "B3", "B4", "A", "A2"]]
+        assert "always_include" not in run_bench.condition_spec({"expansion_policy": "0.2"}, "B3")
+        assert all(c in cm["campaign"]["conditions"] and "always_include" not in cm["campaign"]["conditions"][c] for c in conds7)  # all: identity has no base set
+        assert "base_sets" not in cm["deterministic_identity"] and cm["deterministic_identity"]["expansion_policy"]["applies_to"] == ["B3"]
+        b5dir = Path(td) / "b5tasks"
+        b5dir.mkdir()
+        b5t = [task_from("ambiguous-925", "ambiguous-004", "DISCO calendar question", split="dev", requested_domains=["calendar"],
+                         judge={"expected_answer": "x", "checks": [{"kind": "answer_contains_all", "values": ["tide-small"]}]}),
+               task_from("ambiguous-926", "ambiguous-004", "RT-T2 calendar question", split="dev", requested_domains=["calendar"])]
+        for t in b5t:
+            (b5dir / f"{t['id']}.json").write_text(json.dumps(t))
+
+        def run_b5(cond, name, *extra):
+            o = Path(td) / name
+            assert run_bench.main(["--tasks", "dev", "--condition", cond, "--endpoint", ep, "--out", str(o), "--tasks-dir", str(b5dir),
+                                   "--allow-nonfrozen", "--no-warmup", "--backends", "sim-1", *extra]) == 0
+            return o, json.loads((o / "manifest.json").read_text())
+        o5, m5 = run_b5("B5", "b5run")
+        o3, m3 = run_b5("B3", "b3run")
+        assert m5["conditions"] == ["B5"] and m5["campaign"]["conditions"]["B5"]["always_include"] == base5
+        assert m5["deterministic_identity"]["base_sets"] == {"B5": base5} and m5["expansion_policy"]["applies_to"] == ["B5"]
+        assert "base_sets" not in m3["deterministic_identity"]
+        assert m3["deterministic_identity"]["identity_digest"] != m5["deterministic_identity"]["identity_digest"]
+        for tid in ("ambiguous-925", "ambiguous-926"):
+            r5 = json.loads((o5 / "receipts" / f"{tid}.B5.json").read_text())
+            r3 = json.loads((o3 / "receipts" / f"{tid}.B3.json").read_text())
+            assert r5["condition_spec"]["expansion_policy"] == "runtime-v1" and r5["condition_spec"]["always_include"] == base5
+            assert "always_include" not in r3["condition_spec"]
+            ex5, ex3 = r5["rounds"][0]["exposed_names"], r3["rounds"][0]["exposed_names"]
+            assert set(base5) <= set(ex5) and r5["discovery_tool"] == run_bench.DISCOVERY, ex5
+            assert not ({"ls", "glob", "grep"} & set(ex3)), ex3  # B3 keeps the ask_user-only base set
+            assert set(ex3) < set(ex5)  # B5 is B3 plus the base set and nothing else
+            assert r5["selection"]["round1"]["selected"] and set(base5) <= {e["name"] for e in r5["selection"]["round1"]["selected"]}
+        # R1: full assistant text of every round, query of every discovery call; existing fields unchanged
+        r5 = json.loads((o5 / "receipts" / "ambiguous-925.B5.json").read_text())
+        assert r5["rounds"][-1]["text"] == "tide-small, tide-large, whisper-batch"
+        assert all(isinstance(r["text"], str) and "text_digest" in r for r in r5["rounds"])
+        dq = [c for c in r5["calls"] if c["discovery"]]
+        assert dq and dq[0]["query"] == "serve preset" and "arguments_digest" in dq[0], r5["calls"]
+        assert bench_eval.r1_valid(r5) and bench_eval.r1_problems(r5) == []
+        for rr in (json.loads(p.read_text()) for p in (out / "receipts").glob("*.B.json")):  # the 0.2 path carries R1 too
+            assert bench_eval.r1_valid(rr)
+        # a receipt missing R1 fields is invalid (the analyzer drops it for B5)
+        stripped = copy.deepcopy(r5)
+        for r in stripped["rounds"]:
+            del r["text"]
+        for c in stripped["calls"]:
+            c.pop("query", None)
+        assert not bench_eval.r1_valid(stripped) and len(bench_eval.r1_problems(stripped)) == len(stripped["rounds"]) + len(dq)
+        import analyze
+        shutil_copy = Path(td) / "b5bad"
+        (shutil_copy / "receipts").mkdir(parents=True)
+        (shutil_copy / "receipts" / "ambiguous-925.B5.json").write_text(json.dumps(stripped))
+        (shutil_copy / "receipts" / "ambiguous-926.B5.json").write_text((o5 / "receipts" / "ambiguous-926.B5.json").read_text())
+        ld = analyze.load_run(shutil_copy, b5dir)
+        assert [x["task"] for x in ld["r1_invalid"]] == ["ambiguous-925"] and ld["r1_invalid"][0]["condition"] == "B5"
+        assert analyze.load_run(o5, b5dir)["r1_invalid"] == []
+        # the analyzer refuses a run holding an invalid B5 receipt instead of scoring around it
+        try:
+            analyze.build(shutil_copy, b5dir, [], "")
+            raise AssertionError("build scored a run with an invalid B5 receipt")
+        except SystemExit as e:
+            assert "without valid R1 fields" in str(e), e
+        # no rounds is invalid; a non-string query is valid only as a recorded invalid_arguments call
+        assert bench_eval.r1_problems({"rounds": [], "calls": []}) == ["no rounds recorded"]
+        assert not bench_eval.r1_valid({k: v for k, v in r5.items() if k != "rounds"})
+        nullq = copy.deepcopy(r5)
+        nc = [c for c in nullq["calls"] if c["discovery"]][0]
+        nc["query"] = None
+        assert not bench_eval.r1_valid(nullq), "a null query on an ok call must be invalid"
+        nc["status"], nc["error_code"] = "error", "invalid_arguments"
+        assert bench_eval.r1_valid(nullq), "the model's own malformed call, recorded as such, is valid"
+        # the base set is verified against the catalog: a name the catalog lacks refuses the run
+        saved_sets = dict(run_bench.BASE_SETS)
+        run_bench.BASE_SETS["B5"] = base5 + ["no_such_tool"]
+        try:
+            run_b5("B5", "b5bad")
+            raise AssertionError("accepted a base set naming a tool the catalog lacks")
+        except SystemExit as e:
+            assert "no_such_tool" in str(e), e
+        finally:
+            run_bench.BASE_SETS.clear()
+            run_bench.BASE_SETS.update(saved_sets)
         # resume: nothing is rerun
         before = len(Handler.log)
         run_bench.main(["--tasks", "dev", "--condition", "both", "--endpoint", f"http://127.0.0.1:{srv.server_port}/v1",

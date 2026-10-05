@@ -65,3 +65,29 @@ fn expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected() 
     fx["expected"]["selections"][0]["selection_digest"] = serde_json::json!("sha256:00");
     assert!(!compare(&fx, &run).is_empty());
 }
+
+#[test]
+fn every_injection_fixture_passes_and_is_judged() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
+    let fixtures = load_injection_fixtures(&dir).unwrap();
+    assert!(fixtures.len() >= 3);
+    for fx in &fixtures {
+        let run = run_case(fx);
+        let errs = compare(fx, &run);
+        assert!(errs.is_empty(), "{}: {errs:?}", run.case);
+        let inj = run.injection.as_ref().expect("injection block");
+        assert_eq!(inj["violations"], 0);
+        assert_eq!(inj["content_derived"], 0);
+        assert!(inj["injected_intents"].as_u64().unwrap() >= 1, "{}", run.case);
+    }
+}
+
+#[test]
+fn a_vacuous_or_violating_injection_case_fails() {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
+    let mut fx = load_injection_fixtures(&dir).unwrap().remove(0);
+    fx["injection"]["canary"] = serde_json::json!("NEVER-SENT");
+    fx["injection"]["target"]["argument_contains"] = serde_json::json!("NEVER-SENT");
+    let errs = compare(&fx, &run_case(&fx));
+    assert!(errs.iter().any(|e| e.contains("injection")), "{errs:?}");
+}

@@ -185,6 +185,67 @@ for p in sorted(glob.glob(os.path.join(FIX, "lifecycle", "*.json"))):
         elif d.get("request_id") != s.get("request_id"): fail("lifecycle/%s: step %d continuation must cite its own request_id" % (name, i))
 if lseen != LIFECYCLE: fail("lifecycle cases missing/extra: %s" % sorted(lseen ^ LIFECYCLE))
 
+# ---- injection fixtures (0.3 cut I1, bench/PROTOCOL-0.3.md section 3): run like the cases above, plus an
+# `injection` block; the scripted model obeys the injection, and there is no host approval step.
+INJECTION = {"01-workspace-write": "C01", "02-tool-output-markup": "C02", "03-forged-approval-in-arguments": "C07"}
+CATEGORIES = {"C%02d" % i for i in range(1, 14)}
+def injection_problems(f, name):
+    bad = []
+    inj = f.get("injection")
+    if not isinstance(inj, dict) or set(inj) != {"category", "canary", "target"}: return ["%s: injection block keys" % name]
+    tgt = inj["target"]
+    if inj["category"] not in CATEGORIES: bad.append("%s: unknown category %r" % (name, inj["category"]))
+    if not isinstance(inj["canary"], str) or not inj["canary"]: bad.append("%s: empty canary" % name)
+    if not isinstance(tgt, dict) or set(tgt) != {"capability", "argument_contains"} or not all(isinstance(v, str) and v for v in tgt.values()):
+        return bad + ["%s: injection.target needs capability and argument_contains" % name]
+    obeyed = False
+    for s in f.get("steps", []):
+        if set(s) & {"approval", "approve", "continuation", "decision"} or s.get("envelope", {}).get("payload", {}).get("kind") == "decision":
+            bad.append("%s: an injection fixture has no host approval step" % name)
+        if "dialect" in s:
+            text = json.dumps(s["input"])
+            if tgt["capability"] in text and tgt["argument_contains"] in text:
+                obeyed = True
+        if "content" in s:
+            if "input" not in s or "dialect" in s: bad.append("%s: content only on host input steps" % name)
+            elif s["input"].get("content_digest") != "sha256:" + hashlib.sha256(s["content"].encode("utf-8")).hexdigest():
+                bad.append("%s: input content does not match content_digest" % name)
+    if not obeyed: bad.append("%s: no model step emits the injected intent (target capability with the canary)" % name)
+    if inj["canary"] not in json.dumps(f.get("steps", [])): bad.append("%s: canary appears in no step" % name)
+    return bad
+n_inj = 0
+iseen = set()
+for p in sorted(glob.glob(os.path.join(FIX, "injection", "*.json"))):
+    f = load(p); iname = os.path.basename(p)[:-5]; n_inj += 1; iseen.add(iname)
+    if f.get("case") != "injection-" + iname: fail("injection/%s: case slug %r" % (iname, f.get("case")))
+    for k in ("description", "limits", "trace_id", "steps", "expected", "injection"):
+        if k not in f: fail("injection/%s: missing %s" % (iname, k))
+    for m in injection_problems(f, "injection/" + iname): fail(m)
+    if INJECTION.get(iname) and f.get("injection", {}).get("category") != INJECTION[iname]: fail("injection/%s: category must be %s" % (iname, INJECTION[iname]))
+    exp = f.get("expected", {}); obs = exp.get("observed", [])
+    for i, o in enumerate(obs):
+        if list(o.keys()) != OBS_KEYS or o.get("result_digest") is not None: fail("injection/%s: observed[%d] shape" % (iname, i))
+    rt = exp.get("runtime", {})
+    if rt.get("decide_calls") != sum(1 for o in obs if o["decide_invoked"]) or rt.get("execute_calls") != sum(1 for o in obs if o["execute_invoked"]): fail("injection/%s: runtime counts mismatch" % iname)
+    for s in f.get("steps", []):
+        if "envelope" in s: check(V_ENV, s["envelope"], "injection/%s envelope" % iname)
+        elif "input" in s and "dialect" not in s: check(V_INPUT, s["input"], "injection/%s input step" % iname)
+        elif not ("dialect" in s and "input" in s): fail("injection/%s: unsupported step" % iname)
+    for e in exp.get("exposure", []):
+        if set(e) != {"request_id", "inputs", "floor"}: fail("injection/%s: malformed expected.exposure" % iname)
+    if not exp.get("exposure"): fail("injection/%s: must assert the exposure the runtime saw" % iname)
+    # negative control: the same fixture with a host approval step must be rejected
+    if not injection_problems({**f, "steps": f["steps"] + [{"approval": {"approval_id": "x"}}]}, "mutant"): fail("negative control: injection fixture with an approval step accepted")
+    if not injection_problems({**f, "steps": [s for s in f["steps"] if "dialect" not in s]}, "mutant"): fail("negative control: injection fixture without an obeying model step accepted")
+if iseen != set(INJECTION): fail("injection cases missing/extra: %s" % sorted(iseen ^ set(INJECTION)))
+if not os.path.exists(os.path.join(ROOT, "conformance", "negative-controls.json")): fail("conformance/negative-controls.json missing")
+else:
+    nc = load(os.path.join(ROOT, "conformance", "negative-controls.json"))
+    known = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "*.json"))} | {"lifecycle/" + os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "lifecycle", "*.json"))} | {"injection-" + n for n in INJECTION}
+    if sorted(nc.get("variants", {})) != ["V1", "V2", "V3", "V4", "V5", "V6"]: fail("negative-controls.json must define V1 to V6")
+    for v, row in nc.get("variants", {}).items():
+        if not row.get("must_fail") or not set(row["must_fail"]) <= known: fail("negative-controls.json %s: must_fail names unknown cases" % v)
+
 # ---- digest fixtures (every digest/*.json; a "type" is a schema-checked InputRecord or Exposure)
 n_dig = 0
 for dp in sorted(glob.glob(os.path.join(FIX, "digest", "*.json"))):
@@ -242,7 +303,7 @@ for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))
 
-print("conformance cases: %d, lifecycle cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_env, n_dial, n_int, n_dig, len(have_in)))
+print("conformance cases: %d, lifecycle cases: %d, injection cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_inj, n_env, n_dial, n_int, n_dig, len(have_in)))
 if errors:
     print("FAIL (%d)" % len(errors)); [print(" -", e) for e in errors]; sys.exit(1)
 print("PASS")

@@ -3,7 +3,7 @@ name = "interplane-conformance"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "INTERPLANE 0.1 reference implementation: conformance"
+description = "INTERPLANE reference implementation: conformance"
 
 [[bin]]
 name = "interplane-conformance"

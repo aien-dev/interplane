@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "interplane"
-version = "0.1.0"
-description = "INTERPLANE 0.1 Python reference implementation (stdlib only)"
+version = "0.3.0"
+description = "INTERPLANE Python reference implementation (stdlib only)"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }

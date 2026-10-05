@@ -70,6 +70,31 @@ jobs:
         run: python -m interplane.conformance conformance/fixtures --out py-verdicts.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: py-verdicts, path: py-verdicts.json}
+  package:
+    # Release check (plan 19.7 item 8): the packages build, install clean, and behave like the checkout.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
+      - name: build the python wheel
+        run: pip wheel --no-deps -w dist ./python
+      - name: install the wheel into a clean venv and run the offline example from outside the checkout
+        run: |
+          python -m venv "$RUNNER_TEMP/v"
+          "$RUNNER_TEMP/v/bin/pip" install dist/interplane-*.whl
+          cd "$RUNNER_TEMP"
+          INTERPLANE_REQUIRE_INSTALLED=1 "$RUNNER_TEMP/v/bin/python" "$GITHUB_WORKSPACE/examples/offline/run_offline.py"
+      - name: conformance from the installed wheel equals conformance from the checkout
+        run: |
+          (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/v/bin/interplane-conformance" "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/wheel-verdicts.json")
+          PYTHONPATH=python python -m interplane.conformance "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/checkout-verdicts.json"
+          cmp "$RUNNER_TEMP/wheel-verdicts.json" "$RUNNER_TEMP/checkout-verdicts.json"
+      - name: package every Rust crate and build each from its .crate alone
+        working-directory: rust
+        run: cargo package --workspace --locked
   negative-controls:
     runs-on: ubuntu-latest
     steps:

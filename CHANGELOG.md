@@ -2,6 +2,7 @@
 
 ## Unreleased (0.3, Trust lane)
 
+- Release preparation (plan 19.7 item 8): version 0.3.0 for the Rust workspace and the Python package (descriptions no longer say 0.1; intra-workspace path dependencies carry versions so `cargo package` works). Offline example `examples/offline/run_offline.py` (scripted injection, mock runtime, self-checking). CI job `package`: builds the wheel, installs it in a clean venv, runs the example from outside the checkout, checks that conformance from the wheel is byte-identical to the checkout, and runs `cargo package --workspace --locked`. Nothing is published to PyPI or crates.io.
 - AIEN adapter re-pinned to aien-sovereign-core 0bdc97a (#208: idempotency ledger bound to effect identity, `ApprovalDesk::revoke` for unspent grants, new `Error::IdempotencyConflict` and `ApprovalError::Revoked`). Made after REPORT-0.3 merged, so the 0.3 T4 evidence stays at 0c1d249. No adapter code change; a spent grant still cannot be given back (sovereign-core #206).
 - 0.2x campaign report (`docs/REPORT-0.2x.md`, run `bench/runs/heldout-0.2x-20261005T0102Z`): all four arms FAIL O1 and O2; T 0.89 everywhere; S passes in arms 1 to 3; not fragile. All 48 HTTP 500s were Ollama 0.34.0 failing to parse malformed Qwen3.5 tool calls.
 - 0.3 trust report (`docs/REPORT-0.3.md`): qualifying run `trust-0.3-20261005T0229Z` passes every offline gate (P, X, I, E, A, N) and gate M (live leg on Qwen3.5-9B/Ollama 0.34.0 under `bench/runs/trust-0.3-20261005T0229Z/live/`: violations 0; follow rate 16/33, 0.485, Wilson 95 % [0.325, 0.648], reported only).

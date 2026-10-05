@@ -308,6 +308,9 @@ REASONING_FIELDS = ("reasoning_effort", "chat_template_kwargs")
 ADDENDUM_REL = Path("prompts") / "discovery-addendum.md"  # under the held-out root
 HELDOUT_SEEDS = (42, 43, 44)
 CAMPAIGN_CORPUS = "0.2x"
+# PREREG-0.2y: the new 120-task set and its 30-task calibration set run the campaign path too (sim-1, qual split).
+Y_CORPORA = ("0.2y", "0.2y-cal")
+CAMPAIGN_CORPORA = (CAMPAIGN_CORPUS,) + Y_CORPORA
 
 
 def condition_spec(cx: dict, cond: str) -> dict:
@@ -920,6 +923,27 @@ def make_cx(args, tasks_dir: Path, root: Path = BENCH, conds=None) -> dict:
     }
 
 
+def corpus_gate(corpus: str, tasks_dir: Path, which: str, partial_ok: bool = False) -> list:
+    """Load the tasks of a 0.2y corpus and refuse a missing, empty or partial one (exit with a message).
+
+    ``partial_ok`` (with --allow-nonfrozen, synthetic tasks only) skips the exact-count rule, never the
+    missing or empty rule. Returns the selected tasks."""
+    import validate
+
+    if not tasks_dir.is_dir():
+        raise SystemExit(f"corpus {corpus}: tasks folder {tasks_dir} does not exist: refusing to run")
+    if not list(tasks_dir.glob("*.json")):
+        raise SystemExit(f"corpus {corpus}: tasks folder {tasks_dir} holds no tasks: refusing to run")
+    every = load_tasks(tasks_dir, "all", [])
+    want = validate.Y_CALIBRATION_TOTAL if corpus == "0.2y-cal" else validate.Y_TOTAL
+    if len(every) != want and not partial_ok:
+        raise SystemExit(f"corpus {corpus}: {len(every)} tasks, expected exactly {want}: partial corpus, refusing to run")
+    tasks = load_tasks(tasks_dir, which, [])
+    if not tasks:
+        raise SystemExit(f"corpus {corpus}: no task has split {which!r}: refusing to run")
+    return tasks
+
+
 def check_corpus(strict: bool, corpus: str = "0.2") -> dict:
     import validate  # bench/tools/validate.py
 
@@ -967,8 +991,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--tasks", choices=["dev", "qual", "all"], default=None,
                     help="default: dev for corpus 0.2, qual for corpus 0.2x")
-    ap.add_argument("--corpus", choices=["0.2", CAMPAIGN_CORPUS], default="0.2",
-                    help="0.2 = bench/tasks; 0.2x = the held-out set bench/heldout-0.2x (PROTOCOL-0.2x.md); needs --backends sim-1")
+    ap.add_argument("--corpus", choices=["0.2", *CAMPAIGN_CORPORA], default="0.2",
+                    help="0.2 = bench/tasks; 0.2x = the held-out set bench/heldout-0.2x (PROTOCOL-0.2x.md); 0.2y = bench/heldout-0.2y "
+                         "(120 tasks) and 0.2y-cal = its 30-task calibration set (PREREG-0.2y); all need --backends sim-1. "
+                         "0.2y and 0.2y-cal refuse a missing, empty or partial tasks folder and a corpus without its frozen digest file")
+    ap.add_argument("--check-corpus", action="store_true",
+                    help="load the corpus tasks, apply the completeness rules, print the count and exit; no model, no Odysseus")
     ap.add_argument("--condition", choices=list(CONDITION_IDS) + ["both", "all"], default="both",
                     help="A/B/both = 0.2. A2, A4, B1..B4 = the PROTOCOL-0.2x.md conditions; all = the seven, in order "
                          "A A2 A4 B1 B2 B3 B4 rotated left by (task index mod 7). B3 is arm 3 (runtime-v1), "
@@ -1002,17 +1030,30 @@ def main(argv=None) -> int:
 
     out = Path(args.out)
     run_id = out.name.rstrip("/")
-    heldout = args.corpus == CAMPAIGN_CORPUS
-    root = BENCH / "heldout-0.2x" if heldout else BENCH
+    heldout = args.corpus in CAMPAIGN_CORPORA
+    if args.corpus in Y_CORPORA:
+        import validate
+        root = validate.CORPORA[args.corpus]["root"]
+    else:
+        root = BENCH / "heldout-0.2x" if heldout else BENCH
     tasks_dir = Path(args.tasks_dir) if args.tasks_dir else root / "tasks"
     args.tasks = args.tasks or ("qual" if heldout else "dev")
+    if args.corpus in Y_CORPORA:
+        gated = corpus_gate(args.corpus, tasks_dir, args.tasks, partial_ok=args.allow_nonfrozen)
+        if args.check_corpus:
+            print(f"corpus {args.corpus}: {len(gated)} tasks load from {tasks_dir}; completeness rules pass")
+            return 0
+    elif args.check_corpus:
+        raise SystemExit("--check-corpus is for the 0.2y corpora")
     args.campaign_mode = heldout or args.condition not in ("A", "B", "both")
     if args.campaign_mode:
         if args.backends != "sim-1":
             raise SystemExit("0.2x conditions and the held-out corpus need --backends sim-1 (PROTOCOL-0.2x.md section 10)")
         if args.expansion_policy != "0.2":
             raise SystemExit("--expansion-policy is fixed by the condition id in 0.2x (B3 = runtime-v1, others 0.2)")
-        if heldout and args.seed not in HELDOUT_SEEDS and not args.allow_nonfrozen:
+        if args.corpus == "0.2y-cal" and args.seed != HELDOUT_SEEDS[0] and not args.allow_nonfrozen:
+            raise SystemExit("the calibration run is condition A, seed 42, once (PREREG-0.2y section 5)")
+        if heldout and args.corpus != "0.2y-cal" and args.seed not in HELDOUT_SEEDS and not args.allow_nonfrozen:
             raise SystemExit(f"held-out runs use seeds {list(HELDOUT_SEEDS)} (PROTOCOL-0.2x.md section 8)")
     if args.condition == "both":
         conds = list(CAMPAIGN_CONDITIONS[:1]) + ["B"] if not args.campaign_mode else list(CAMPAIGN_CONDITIONS)

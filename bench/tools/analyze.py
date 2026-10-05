@@ -106,16 +106,51 @@ def boot_ci(deltas: list, seed: int = BOOT_SEED, n_boot: int = BOOT_N) -> dict:
 
 # ------------------------------------------------------------------------------- loading
 
-R1_REQUIRED = ("B5",)  # conditions whose receipts must carry the R1 fields (bench_eval.r1_problems)
+R1_ALWAYS = ("B5",)  # conditions whose receipts must carry the R1 fields in every campaign (bench_eval.r1_problems)
+# Campaign identity is manifest["campaign"]["corpus"] (run_bench.py writes it; deterministic_identity.campaign.corpus must agree).
+# Campaigns registered here must satisfy R1 in EVERY listed arm; arms are the PREREG-0.2y section 4 list.
+R1_CAMPAIGNS = {"0.2y": ("A", "B3", "B5")}
+# Historical campaigns keep their original rule (R1 only for B5). A manifest without a campaign block is accepted as the
+# historical 0.2 layout only if every receipt is a 0.2 condition; anything else, or an unknown corpus, is refused (fail closed).
+HISTORICAL_CORPORA = ("0.2", "0.2x")
+LEGACY_CONDITIONS = ("A", "B")
+
+
+def r1_scope(manifest: dict, conditions: set) -> tuple:
+    """Returns (conditions that need R1, problems). Problems mean the run's identity cannot be trusted: the run is refused."""
+    camp = manifest.get("campaign")
+    if camp is None:
+        extra = sorted(conditions - set(LEGACY_CONDITIONS))
+        if extra:
+            return R1_ALWAYS, [f"manifest has no campaign identity but receipts carry non-0.2 conditions {extra}"]
+        return R1_ALWAYS, []
+    corpus = camp.get("corpus") if isinstance(camp, dict) else None
+    di = ((manifest.get("deterministic_identity") or {}).get("campaign") or {}).get("corpus")
+    if not isinstance(corpus, str) or not corpus:
+        return R1_ALWAYS, ["campaign block has no corpus identity"]
+    if di is not None and di != corpus:
+        return R1_ALWAYS, [f"campaign.corpus {corpus!r} disagrees with deterministic_identity.campaign.corpus {di!r}"]
+    if corpus in R1_CAMPAIGNS:
+        arms = R1_CAMPAIGNS[corpus]
+        extra = sorted(conditions - set(arms))
+        return arms, ([f"condition(s) {extra} are not in the {corpus} arm list {list(arms)}"] if extra else [])
+    if corpus in HISTORICAL_CORPORA:
+        return R1_ALWAYS, []
+    return R1_ALWAYS, [f"unknown campaign corpus identity {corpus!r}"]
 
 
 def load_run(run_dir: Path, tasks_dir: Path) -> dict:
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8")) if (run_dir / "manifest.json").exists() else {}
-    rec, r1_invalid = {}, []
+    rec, r1_invalid, raw = {}, [], []
     for p in sorted((run_dir / "receipts").glob("*.json")):
         r = json.loads(p.read_text(encoding="utf-8"))
         rec.setdefault(r["task"]["id"], {})[r["condition"]] = r
-        if r["condition"] in R1_REQUIRED and not bench_eval.r1_valid(r):  # PREREG-0.2y: B5 without R1 fields is invalid
+        raw.append(r)
+    required, id_problems = r1_scope(manifest, {r["condition"] for r in raw})
+    if id_problems:  # fail closed: an untrustworthy identity must not downgrade R1 enforcement
+        r1_invalid.append({"task": "*", "condition": "*", "problems": id_problems})
+    for r in raw:
+        if r["condition"] in required and not bench_eval.r1_valid(r):  # PREREG-0.2y: missing R1 fields are invalid
             r1_invalid.append({"task": r["task"]["id"], "condition": r["condition"], "problems": bench_eval.r1_problems(r)})
     tasks = {}
     for p in sorted(tasks_dir.glob("*.json")):
@@ -128,7 +163,7 @@ def refuse_r1_invalid(data: dict, label: str) -> None:
     """PREREG-0.2y validity: no run with an unrecorded query or text counts. The analyzer refuses the
     whole run rather than scoring around it."""
     if data["r1_invalid"]:
-        raise SystemExit(f"{label}: {len(data['r1_invalid'])} B5 receipt(s) without valid R1 fields, run not scored: "
+        raise SystemExit(f"{label}: {len(data['r1_invalid'])} receipt(s) or identity check(s) without valid R1 fields, run not scored: "
                          + json.dumps(data["r1_invalid"][:5]))
 
 

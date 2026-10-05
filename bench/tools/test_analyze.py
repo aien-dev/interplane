@@ -134,7 +134,7 @@ def write_campaign_block(out: Path, subset: dict, seed: int, recover: dict) -> N
     """recover: (cond, expansion kind) -> bool for this block; default True."""
     rng = random.Random(seed)
     (out / "receipts").mkdir(parents=True, exist_ok=True)
-    (out / "manifest.json").write_text(json.dumps({"campaign": {"seed": seed}, "corpus": {"match": True}, "latency_validity": {"valid": True, "reasons": []},
+    (out / "manifest.json").write_text(json.dumps({"campaign": {"seed": seed, "corpus": "0.2x"}, "corpus": {"match": True}, "latency_validity": {"valid": True, "reasons": []},
                                                    "deterministic_identity": {"identity_digest": f"sha256:synthetic-{seed}"}}, sort_keys=True) + "\n")
     for k, t in subset.items():
         for cond in CONDS7:
@@ -197,6 +197,91 @@ def test_campaign() -> None:
 
 def analyze_to(run: Path, out: Path, extra: list = ()) -> None:
     analyze.main([str(run), "--out", str(out), *extra])
+
+
+def r1_receipt(cond: str, tid: str = "t-1", *, text: bool = True, query: bool = True, bad_query=None) -> dict:
+    """Minimal receipt carrying only what bench_eval.r1_problems reads; discovery call only for B-family arms."""
+    r = {"task": {"id": tid}, "condition": cond, "rounds": [{"round": 1}], "calls": []}
+    if text:
+        r["rounds"][0]["text"] = "assistant text"
+    if cond != "A":
+        c = {"round": 1, "index": 0, "discovery": True}
+        if bad_query is not None:
+            c.update(query=bad_query[0], error_code=bad_query[1])
+        elif query:
+            c["query"] = "serve preset"
+        r["calls"].append(c)
+    return r
+
+
+def write_r1_run(out: Path, corpus, receipts: list, *, campaign: bool = True, di_corpus=None) -> Path:
+    (out / "receipts").mkdir(parents=True)
+    m: dict = {"kind": "x"}
+    if campaign:
+        m["campaign"] = {"corpus": corpus, "seed": 42} if corpus is not None else {"seed": 42}
+    if di_corpus is not None:
+        m["deterministic_identity"] = {"campaign": {"corpus": di_corpus}}
+    (out / "manifest.json").write_text(json.dumps(m))
+    for i, r in enumerate(receipts):
+        (out / "receipts" / f"{r['task']['id']}.{r['condition']}.{i}.json").write_text(json.dumps(r))
+    return out
+
+
+def test_r1_scope() -> None:
+    tdir = BENCH / "tasks"
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        n = [0]
+
+        def load(corpus, receipts, **kw):
+            n[0] += 1
+            return analyze.load_run(write_r1_run(td / f"r{n[0]}", corpus, receipts, **kw), tdir)
+
+        def bad(d):
+            return sorted((x["task"], x["condition"]) for x in d["r1_invalid"])
+
+        # (e) complete valid receipts in every 0.2y arm pass
+        full = [r1_receipt(c, f"t-{c}") for c in ("A", "B3", "B5")]
+        assert load("0.2y", full)["r1_invalid"] == []
+        # (a) missing round text in arm A is invalid under 0.2y, but valid for the historical 0.2x corpus (original rule: B5 only)
+        a_notext = [r1_receipt("A", "t-A", text=False), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5")]
+        assert bad(load("0.2y", a_notext)) == [("t-A", "A")]
+        # (f) historical 0.2x receipts without R1 fields still validate; B5 is still enforced there
+        hist = [r1_receipt(c, f"t-{c}", text=False, query=False) for c in ("A", "B3")]
+        assert load("0.2x", hist)["r1_invalid"] == []
+        assert bad(load("0.2x", hist + [r1_receipt("B5", "t-B5", text=False)])) == [("t-B5", "B5")]
+        # 0.2 layout (no campaign block, conditions A and B only) is legacy and unchanged
+        legacy = [r1_receipt("A", "t-A", text=False), r1_receipt("B", "t-B", text=False, query=False)]
+        assert load(None, legacy, campaign=False)["r1_invalid"] == []
+        # (b) missing discovery queries in B3, (c) in B5
+        assert bad(load("0.2y", [r1_receipt("A"), r1_receipt("B3", "t-B3", query=False), r1_receipt("B5", "t-B5")])) == [("t-B3", "B3")]
+        assert bad(load("0.2y", [r1_receipt("A"), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5", query=False)])) == [("t-B5", "B5")]
+        # (d) malformed recording: raw non-string query is valid only as an invalid_arguments error, in any 0.2y arm
+        ok_bad_args = [r1_receipt("A"), r1_receipt("B3", "t-B3", bad_query=(None, "invalid_arguments")), r1_receipt("B5", "t-B5", bad_query=(7, "invalid_arguments"))]
+        assert load("0.2y", ok_bad_args)["r1_invalid"] == []
+        for arm in ("B3", "B5"):
+            rs = [r1_receipt("A"), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5")]
+            rs = [r1_receipt(arm, f"t-{arm}", bad_query=(["x"], "ok")) if r["condition"] == arm else r for r in rs]
+            assert bad(load("0.2y", rs)) == [(f"t-{arm}", arm)], arm
+        # (g) fail closed on identity: never silently historical
+        for label, d in (("campaign block without corpus", load(None, full)),
+                         ("unknown corpus", load("0.3", full)),
+                         ("disagreeing identity", load("0.2y", full, di_corpus="0.2x")),
+                         ("no manifest campaign, non-0.2 arms", load(None, full, campaign=False)),
+                         ("arm outside the 0.2y list", load("0.2y", full + [r1_receipt("B1", "t-B1")]))):
+            assert any(x["task"] == "*" or x["condition"] == "B1" for x in d["r1_invalid"]), label
+        assert load("0.2y", full, di_corpus="0.2y")["r1_invalid"] == []
+        # (h) one invalid 0.2y receipt refuses the whole run, in build and in the campaign path (non-zero exit)
+        badrun = write_r1_run(td / "bad", "0.2y", [r1_receipt("A", "t-A"), r1_receipt("B3", "t-B3", query=False), r1_receipt("B5", "t-B5")])
+        for call in (lambda: analyze.build(badrun, tdir, [], ""),
+                     lambda: analyze.build_campaign(badrun, [], tdir),
+                     lambda: analyze.main([str(badrun), "--out", str(td / "o")])):
+            try:
+                call()
+                raise AssertionError("an invalid 0.2y receipt did not stop scoring")
+            except SystemExit as e:
+                assert e.code not in (0, None) and "without valid R1 fields" in str(e.code), e.code
+        assert not (td / "o").exists()
 
 
 def test() -> None:
@@ -322,6 +407,8 @@ def main() -> int:
         return 0
     test()
     test_campaign()
+    test_r1_scope()
+    print("r1 scope tests: PASS")
     test_trust_run_no_vacuous_gates()
     return 0
 

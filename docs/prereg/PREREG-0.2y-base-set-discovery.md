@@ -282,9 +282,12 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
       sentence now allows a request to say which everyday thing it is about, with two examples built from the area
       names the brief already lists ("in my mail", "at the meeting"), and still forbids a program, file, folder or
       file type and any how-to. Brief Q is unchanged. No keyword list, tool or selector detail reaches the author.
-      Checked before attempt 3 on the lint only (no author call, no model): six attempt 2 facts asked with the area
-      named ("In my mail, who approved the blue enamel sample?") all pass the full lint into the non-file group; the
-      bare versions derive the default list. Whether the author then writes 24 such requests is not tested.
+      The two examples were chosen by the campaign session, which knows the keyword list, and were checked against
+      the lint before they were written into the brief; they use only area names the brief already lists.
+      Checked before attempt 3 on the lint only (no author call, no model; `test_lint_02y.py`,
+      `test_naming_the_everyday_area_reaches_the_non_file_group`): five attempt 2 facts asked with the area named
+      ("In my mail, who approved the blue enamel sample?") all pass the full lint into the non-file group; the bare
+      versions derive the default list. Whether the author then writes 24 such requests is not tested.
   15. Top-up count stated once. `AUTHORING.md` 4.3 put the count in the brief ("Write {K} requests") and in the
       top-up paragraph ("Write {K} more requests"), and the author read 2K: attempt 2's top-up 1 asked 12 and
       returned 24, top-up 3 asked 36 and the author refused "72" for lack of facts. In a top-up the brief's sentence

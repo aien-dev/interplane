@@ -1,0 +1,6 @@
+{"call": "target/fixtures-call1", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 205, "out_bytes": 37130, "ts": "2026-10-05T18:46:17Z"}
+{"call": "target/requests-r0-everyday", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 60, "out_bytes": 7998, "ts": "2026-10-05T18:47:18Z"}
+{"call": "target/requests-r0-question", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 51, "out_bytes": 7764, "ts": "2026-10-05T18:48:09Z"}
+{"call": "target/requests-r1-everyday", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 23, "out_bytes": 2142, "ts": "2026-10-05T18:48:32Z"}
+{"call": "target/requests-r2-everyday", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 38, "out_bytes": 3960, "ts": "2026-10-05T18:49:11Z"}
+{"call": "target/requests-r3-everyday", "model": "gpt-6-sol", "command": "codex exec --skip-git-repo-check -c model=\"gpt-6-sol\" \"<brief>\"", "rc": 0, "seconds": 42, "out_bytes": 5951, "ts": "2026-10-05T18:49:54Z"}

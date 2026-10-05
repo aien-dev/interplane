@@ -296,3 +296,11 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
       fix under test (section 2) is not evaluated on these tasks, and any new attempt is a new pre-registration, not
       a further amendment.
   Attempt 3 uses new fixtures, a new author run (same author family, section 5) and none of the earlier requests.
+- 2026-10-05 (outcome, not an amendment; recorded under amendment 4 item 16). Authoring attempt 3
+  (`bench/heldout-0.2y/attempt-3/REPORT.md`) filled the default group (24/24) and reached 3 of 24 in the non-file
+  group after three top-ups. The corpus is not frozen and **0.2y authoring ends**. The 0.2y result is this shortfall:
+  in three attempts under section 5, the independent author did not produce 24 lint-passing everyday requests that
+  derive a non-file domain (6, 3 and 3). The fix under test (section 2) is not evaluated; no model under test
+  received any request, no calibration run happened, no threshold was applied. Amendment 4 item 15 (top-up count
+  stated once) worked; item 14 (brief E may name the everyday thing) did not change the author's phrasing (3 of 108
+  everyday requests named one). Any new attempt is a new pre-registration.

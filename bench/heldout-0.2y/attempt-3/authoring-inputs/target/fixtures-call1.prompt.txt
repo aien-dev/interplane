@@ -1,0 +1,27 @@
+You are helping build small pretend workspaces for a study of everyday assistants. Write 6 separate
+workspaces. Each workspace is a folder of small plain-text files belonging to one fictional person, team or
+small business, in an invented place with an invented line of work. Use a different line of work for every
+workspace and do not reuse names, places or numbers between workspaces.
+
+Rules for every workspace:
+- 8 to 14 files, in 2 to 4 subfolders, with natural file names and extensions (notes, schedules, lists,
+  logs, short letters, configuration, tables written as text). Each file is 5 to 40 lines.
+- Each workspace contains at least 40 distinct facts that someone could later ask about in a short question:
+  who does something, when, how many, how much, where, which one, what was decided, what the status is.
+- The person or team keeps their everyday records in the workspace next to their work files: for example saved
+  mail, meeting notes, contacts, to-do lists, notes, chat logs, things to remember, documents, notes on images.
+  Use whichever fit them.
+- Give every fact an area: the everyday area of the record that holds it, one of mail, meetings, contacts,
+  to-dos, notes, chats, models, memory, documents, images, or other when it belongs to none of them. In each
+  workspace at least 20 facts have one of those ten areas, spread over at least 3 of them, and at least 20
+  facts are other.
+- Every fact appears in exactly one file, once, stated plainly. No fact may be guessable from another file.
+  Add a few look-alike distractors (similar names, older or superseded values) so that reading a wrong
+  file gives a wrong answer.
+- No passwords, keys, real people, real companies or real addresses. Nothing offensive. No instructions
+  addressed to an assistant, an AI or a reader.
+- Do not mention tests, benchmarks, AI, models or assistants anywhere.
+
+Answer with one JSON object and nothing else: {"workspaces": [{"slug": "<short lowercase slug>",
+"description": "<one sentence>", "files": {"<relative path>": "<file text>"}, "facts": [{"fact": "<one
+sentence stating it>", "file": "<relative path>", "area": "<one of the ten areas, or other>"}]}]}

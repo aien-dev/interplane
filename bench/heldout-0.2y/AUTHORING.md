@@ -326,3 +326,15 @@ frozen (PREREG-0.2y section 5). Two defects of this written procedure, both obse
 assistant where to look, while a request joins the non-file group only through such words; and section 4.3 puts
 `{K}` in the brief and again in the top-up paragraph, which the author read as 2K. Report, log and every prompt and
 answer: `attempt-2/REPORT.md`. A further attempt needs a section 11 revision first.
+
+- 2026-10-05T18:46:17Z attempt 3, `target/fixtures-call1`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 205 s, 37130 bytes
+- 2026-10-05T18:47:18Z attempt 3, `target/requests-r0-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 60 s, 7998 bytes
+- 2026-10-05T18:48:09Z attempt 3, `target/requests-r0-question`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 51 s, 7764 bytes
+- 2026-10-05T18:48:32Z attempt 3, `target/requests-r1-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 23 s, 2142 bytes
+- 2026-10-05T18:49:11Z attempt 3, `target/requests-r2-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 38 s, 3960 bytes
+- 2026-10-05T18:49:54Z attempt 3, `target/requests-r3-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 42 s, 5951 bytes
+
+**Attempt 3 stopped short (2026-10-05), and 0.2y authoring ends:** the non-file group reached 3 of 24 after three
+top-ups, so the corpus is not frozen. The top-up count fix worked (12, 24 and 36 returned exactly); the author used
+the allowed everyday word in 3 of 108 everyday requests. Under amendment 4 item 16 no further attempt follows: the
+shortfall is the 0.2y result and any new attempt is a new pre-registration. Report: `attempt-3/REPORT.md`.

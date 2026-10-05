@@ -1,0 +1,256 @@
+{
+  "requests": [
+    {
+      "workspace": "brindlefen-bells",
+      "request": "How many brass blanks are in the chest?",
+      "fact_id": "brindlefen-bells-021",
+      "answer": ["52"],
+      "template": "inventory-count"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "What repair does the marsh marker bell need?",
+      "fact_id": "brindlefen-bells-027",
+      "answer": ["a new lip"],
+      "template": "needed-repair"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "Which reed setting is the ferry bell using?",
+      "fact_id": "brindlefen-bells-031",
+      "answer": ["deep reed"],
+      "template": "current-setting"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "Where is the tuning fork kept?",
+      "fact_id": "brindlefen-bells-035",
+      "answer": ["cedar sleeve"],
+      "template": "storage-location"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "How much does bronze clapper casting cost?",
+      "fact_id": "brindlefen-bells-036",
+      "answer": ["57 shells"],
+      "template": "service-price"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "Which repair has an unpaid balance?",
+      "fact_id": "brindlefen-bells-040",
+      "answer": ["garden bell"],
+      "template": "unpaid-work"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "How many corner tabs are in the blue tray?",
+      "fact_id": "virelow-dewpaper-022",
+      "answer": ["153"],
+      "template": "inventory-count"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "Which cards are ready for wrapping?",
+      "fact_id": "virelow-dewpaper-026",
+      "answer": ["willow hall cards"],
+      "template": "ready-work"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "What guide is used for the fan fold?",
+      "fact_id": "virelow-dewpaper-031",
+      "answer": ["damp wooden guide"],
+      "template": "production-method"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "Where are pale green sheets dried?",
+      "fact_id": "virelow-dewpaper-034",
+      "answer": ["in shade"],
+      "template": "drying-location"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "How much does a round sleeve cost?",
+      "fact_id": "virelow-dewpaper-037",
+      "answer": ["157 petals"],
+      "template": "item-price"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "Has the festival tag order been paid?",
+      "fact_id": "virelow-dewpaper-039",
+      "answer": ["yes"],
+      "template": "payment-status"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "How long is the tail spool?",
+      "fact_id": "ossimar-kites-023",
+      "answer": ["254 arm lengths"],
+      "template": "material-length"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Which side of the crescent sail dips?",
+      "fact_id": "ossimar-kites-028",
+      "answer": ["left side"],
+      "template": "performance-issue"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Where is amber stain brushed?",
+      "fact_id": "ossimar-kites-032",
+      "answer": ["along the outer ribs"],
+      "template": "application-location"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Where is the smoky varnish stored?",
+      "fact_id": "ossimar-kites-035",
+      "answer": ["rear cabinet"],
+      "template": "storage-location"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "How much was the school kite deposit?",
+      "fact_id": "ossimar-kites-038",
+      "answer": ["258 beads"],
+      "template": "deposit-amount"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Has the crescent sail invoice been sent?",
+      "fact_id": "ossimar-kites-040",
+      "answer": ["no"],
+      "template": "invoice-status"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "How many oval blanks are in the sorting tray?",
+      "fact_id": "yarovel-pebbles-024",
+      "answer": ["355"],
+      "template": "inventory-count"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "Which stone is awaiting collection?",
+      "fact_id": "yarovel-pebbles-029",
+      "answer": ["porch chime stone"],
+      "template": "collection-status"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "How does the porch stone sound when wet?",
+      "fact_id": "yarovel-pebbles-033",
+      "answer": ["dull"],
+      "template": "sound-quality"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "What surface are the riverstone samples sounded on?",
+      "fact_id": "yarovel-pebbles-035",
+      "answer": ["sand"],
+      "template": "testing-surface"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "How much does a path fitting cost?",
+      "fact_id": "yarovel-pebbles-037",
+      "answer": ["357 crowns"],
+      "template": "service-price"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "Has the porch stone been paid for?",
+      "fact_id": "yarovel-pebbles-039",
+      "answer": ["yes"],
+      "template": "payment-status"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "What is the harvest knife's grip made of?",
+      "fact_id": "thennor-ink-025",
+      "answer": ["bone"],
+      "template": "tool-material"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "Where is the blue batch cooling?",
+      "fact_id": "thennor-ink-027",
+      "answer": ["under cloth"],
+      "template": "batch-location"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "What color stain do dusk-caps produce?",
+      "fact_id": "thennor-ink-031",
+      "answer": ["warm red"],
+      "template": "ingredient-result"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "Where does the green batch settle best?",
+      "fact_id": "thennor-ink-034",
+      "answer": ["in shade"],
+      "template": "settling-location"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "How much does a small glass bottle cost?",
+      "fact_id": "thennor-ink-036",
+      "answer": ["456 marks"],
+      "template": "item-price"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "Which delivery remains unpaid?",
+      "fact_id": "thennor-ink-040",
+      "answer": ["blue batch delivery"],
+      "template": "unpaid-delivery"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "How much does the long shuttle weigh?",
+      "fact_id": "ulmarin-canopies-023",
+      "answer": ["554 grams"],
+      "template": "tool-weight"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "Which canopy is ready for edging?",
+      "fact_id": "ulmarin-canopies-026",
+      "answer": ["herb court canopy"],
+      "template": "ready-work"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "What brightens beneath lantern light?",
+      "fact_id": "ulmarin-canopies-032",
+      "answer": ["pearl thread"],
+      "template": "material-property"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "Where does the arched pattern narrow?",
+      "fact_id": "ulmarin-canopies-034",
+      "answer": ["at its crown"],
+      "template": "pattern-shape"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "How much does a frame fitting cost?",
+      "fact_id": "ulmarin-canopies-037",
+      "answer": ["557 rings"],
+      "template": "service-price"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "What is the status of the festival canopy deposit?",
+      "fact_id": "ulmarin-canopies-040",
+      "answer": ["pending"],
+      "template": "deposit-status"
+    }
+  ]
+}

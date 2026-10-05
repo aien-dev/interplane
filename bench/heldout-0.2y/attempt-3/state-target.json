@@ -1,0 +1,4556 @@
+{
+ "workspaces": [
+  {
+   "slug": "brindlefen-bells",
+   "description": "Luma's workshop in Brindlefen tunes bells for boats and shore markers.",
+   "facts": [
+    {
+     "fact": "Meris requested a low tone for the ferry bell.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Varo confirmed pickup at Reedfall dusk.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Tavi canceled the copper clapper request.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Solen asked for a receipt on blue paper.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Eren offered 51 shells for the cracked bell.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Luma chose a bronze clapper at the quay meeting.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next tone check is at Firstmist noon.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The crew moved the west buoy tuning indoors.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Meris will hear the final ferry tone.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The old silver clapper plan was shelved.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Varo delivers raw brass by hand.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Tavi keeps the ferry shed key.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Solen handles shoreline invoices.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Eren inspects the reed bank.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Meris receives visitors at the south pier booth.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Luma still needs to polish the warning bell.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Varo has finished sorting the spare hammers.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Tavi is due to tag the repaired bell.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Solen is waiting for a blue paper bundle.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Eren must inspect the anchor chain.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The chest holds 52 brass blanks.",
+     "file": "bells/inventory.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The narrow striker weighs 53 grams.",
+     "file": "bells/inventory.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The reserve coil has 54 turns.",
+     "file": "bells/inventory.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The green mallet cost 55 shells.",
+     "file": "bells/inventory.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The shelf holds 56 felt pads.",
+     "file": "bells/inventory.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The north ferry bell is marked ready.",
+     "file": "bells/jobs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The marsh marker bell needs a new lip.",
+     "file": "bells/jobs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The harbor bell has a hairline crack.",
+     "file": "bells/jobs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The garden bell awaits collection.",
+     "file": "bells/jobs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The south ferry bell is still unpainted.",
+     "file": "bells/jobs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ferry bell currently uses the deep reed setting.",
+     "file": "bells/tuning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The harbor bell uses the bright reed setting.",
+     "file": "bells/tuning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The marsh marker sounded flat in rain.",
+     "file": "bells/tuning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The garden bell sounded sharp under canvas.",
+     "file": "bells/tuning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The workshop keeps the tuning fork in a cedar sleeve.",
+     "file": "bells/tuning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Bronze clapper casting costs 57 shells.",
+     "file": "bells/costs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A felt pad replacement costs 58 shells.",
+     "file": "bells/costs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The quay rental is paid through Reedfall.",
+     "file": "bells/costs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The last brass delivery was charged to the workshop account.",
+     "file": "bells/costs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The garden bell repair has an unpaid balance.",
+     "file": "bells/costs.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "bells/costs.txt",
+    "bells/inventory.txt",
+    "bells/jobs.txt",
+    "bells/tuning.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt"
+   ]
+  },
+  {
+   "slug": "virelow-dewpaper",
+   "description": "Avel's shop in Virelow folds decorative sheets made from gathered dew fibers.",
+   "facts": [
+    {
+     "fact": "Bexa requested a pale green invitation fold.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Corin changed the banquet order to round sleeves.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Dema sent a sample of violet thread.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Esol asked for delivery at Petalfall sunrise.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Avel quoted 151 petals for the window display.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The shop chose the fan fold for the spring cards.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next design review is at Mothwake afternoon.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The staff retired the square sleeve pattern.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Bexa approved the narrow border.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Corin will inspect the finished banquet sleeves.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Bexa manages the willow hall.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Corin receives parcels at the east arcade.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Dema supplies colored thread.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Esol handles festival stalls.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Avel keeps the shop ledger.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Avel needs to trim the display edges.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Bexa has approved the sample card.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Corin still owes the sleeve dimensions.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Dema will deliver violet thread at dawn.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Esol needs a packing note.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The dry rack holds 152 blank sheets.",
+     "file": "folding/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue tray contains 153 corner tabs.",
+     "file": "folding/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The silver shears weigh 154 grams.",
+     "file": "folding/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ribbon drawer holds 155 green ties.",
+     "file": "folding/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The pressing board is made of elm.",
+     "file": "folding/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The willow hall cards are ready for wrapping.",
+     "file": "folding/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The banquet sleeves need rounded corners.",
+     "file": "folding/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The festival tags are awaiting thread.",
+     "file": "folding/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The window display is halfway assembled.",
+     "file": "folding/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The old square sleeves remain in storage.",
+     "file": "folding/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The fan fold uses a damp wooden guide.",
+     "file": "folding/methods.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The round sleeve dries beneath a felt weight.",
+     "file": "folding/methods.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Violet thread is tied after pressing.",
+     "file": "folding/methods.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Pale green sheets are dried in shade.",
+     "file": "folding/methods.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The narrow border is cut with silver shears.",
+     "file": "folding/methods.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A fan-fold card costs 156 petals.",
+     "file": "folding/prices.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A round sleeve costs 157 petals.",
+     "file": "folding/prices.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The violet thread delivery cost 158 petals.",
+     "file": "folding/prices.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The festival tag order has been paid.",
+     "file": "folding/prices.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The window display deposit remains open.",
+     "file": "folding/prices.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "folding/methods.txt",
+    "folding/orders.txt",
+    "folding/prices.txt",
+    "folding/stock.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt"
+   ]
+  },
+  {
+   "slug": "ossimar-kites",
+   "description": "Nilo's crew in Ossimar varnishes kites that cast colored shade.",
+   "facts": [
+    {
+     "fact": "Pera requested an amber shade kite.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Quen asked to collect the ridge kite at Sunhush.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Risa withdrew the striped tail request.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Savo sent a sketch of a crescent sail.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Nilo offered the school a price of 251 beads.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The crew selected clear varnish for the ridge kite.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next flight check is at Cloudrest morning.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The old smoky varnish choice was rejected.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Pera approved the wide tail shape.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Savo will watch the crescent sail trial.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Pera runs the hill classroom.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Quen keeps the launch field gate.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Risa supplies bamboo spars.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Savo draws sail patterns.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nilo manages collection appointments.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nilo needs to seal the amber kite frame.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Pera has returned the sample sail.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Quen must clear the launch grass.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Risa is due to bring thin spars.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Savo still needs to mark the crescent seam.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The spar bin contains 252 bamboo lengths.",
+     "file": "kites/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The varnish shelf holds 253 blue tins.",
+     "file": "kites/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The tail spool measures 254 arm lengths.",
+     "file": "kites/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The brush set cost 255 beads.",
+     "file": "kites/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The drying hooks are made of horn.",
+     "file": "kites/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The amber shade kite pulls toward the lake.",
+     "file": "kites/flight_cards.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ridge kite holds steady in a crosswind.",
+     "file": "kites/flight_cards.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The crescent sail dips on its left side.",
+     "file": "kites/flight_cards.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The school kite needs a longer bridle.",
+     "file": "kites/flight_cards.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The striped tail kite remains grounded.",
+     "file": "kites/flight_cards.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Clear varnish gives the ridge sail a soft glow.",
+     "file": "kites/finishes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Amber stain is brushed along the outer ribs.",
+     "file": "kites/finishes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Blue tint dries best under a cloth roof.",
+     "file": "kites/finishes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The crescent sail needs a second edge coat.",
+     "file": "kites/finishes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Smoky varnish is stored in the rear cabinet.",
+     "file": "kites/finishes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A replacement spar costs 256 beads.",
+     "file": "kites/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A wide tail costs 257 beads.",
+     "file": "kites/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The school kite deposit was 258 beads.",
+     "file": "kites/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ridge kite balance is settled.",
+     "file": "kites/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The crescent sail invoice has not been sent.",
+     "file": "kites/ledger.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "kites/finishes.txt",
+    "kites/flight_cards.txt",
+    "kites/ledger.txt",
+    "kites/materials.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt"
+   ]
+  },
+  {
+   "slug": "yarovel-pebbles",
+   "description": "Farin's yard in Yarovel carves pebbles that ring when stepped on.",
+   "facts": [
+    {
+     "fact": "Gella requested a soft chime for the orchard path.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Hovin asked for pickup at Fernwake dusk.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Istra canceled the slate border.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Jorek sent a drawing of a spiral path.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Farin quoted 351 crowns for the courtyard set.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The yard chose riverstone for the orchard path.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next sound walk is at Stoneglow noon.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The old limestone proposal was set aside.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Gella approved the oval stepping shape.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Jorek will attend the courtyard fitting.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Gella manages the orchard grounds.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Hovin carries stone by cart.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Istra prepares path foundations.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Jorek draws garden layouts.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Farin keeps the carving schedule.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Farin needs to smooth the courtyard edges.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Gella has marked the orchard route.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Hovin must collect the heavy offcuts.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Istra is waiting for a soil sample.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Jorek still needs to place the spiral markers.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The lower rack holds 352 riverstones.",
+     "file": "stones/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The carving chest contains 353 fine chisels.",
+     "file": "stones/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The polish jar weighs 354 grams.",
+     "file": "stones/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The sorting tray has 355 oval blanks.",
+     "file": "stones/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spare mallet has an ash handle.",
+     "file": "stones/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard path set is ready for fitting.",
+     "file": "stones/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The courtyard set still needs polishing.",
+     "file": "stones/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spiral path stones are being sorted.",
+     "file": "stones/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The porch chime stone awaits collection.",
+     "file": "stones/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The old limestone sample is stored outside.",
+     "file": "stones/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard stone gives a low clear ring.",
+     "file": "stones/sound_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The courtyard stone gives a short bright ring.",
+     "file": "stones/sound_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The porch stone sounds dull when wet.",
+     "file": "stones/sound_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spiral marker sounds strongest at its center.",
+     "file": "stones/sound_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The riverstone samples are sounded on sand.",
+     "file": "stones/sound_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "An oval blank costs 356 crowns.",
+     "file": "stones/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A path fitting costs 357 crowns.",
+     "file": "stones/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The polish delivery cost 358 crowns.",
+     "file": "stones/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The porch stone has been paid for.",
+     "file": "stones/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spiral path deposit is overdue.",
+     "file": "stones/accounts.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt",
+    "stones/accounts.txt",
+    "stones/orders.txt",
+    "stones/sound_notes.txt",
+    "stones/stock.txt"
+   ]
+  },
+  {
+   "slug": "thennor-ink",
+   "description": "Kiva's press in Thennor makes colored ink from cultivated mushrooms.",
+   "facts": [
+    {
+     "fact": "Loran requested rust-red ink for a map.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Methi asked for delivery at Sporelight dawn.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Nerin withdrew the gold-cap order.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Ovela sent a label sketch for the blue batch.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Kiva quoted 451 marks for the mural supply.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The press chose dusk-cap mushrooms for the map ink.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next color review is at Rainveil morning.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The old sun-cap blend was rejected.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Loran approved the small glass bottle.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Ovela will inspect the mural color.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Loran draws harbor maps.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Methi carries parcels through the market.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nerin grows gold-cap mushrooms.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Ovela paints public walls.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Kiva manages the drying room.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Kiva needs to strain the rust-red batch.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Loran has returned the sample bottle.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Methi must collect the sealed parcels.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Nerin is waiting for clean trays.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Ovela still needs to choose a brush width.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The cellar basket holds 452 dusk-caps.",
+     "file": "ink/harvest.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The upper rack holds 453 blue fronds.",
+     "file": "ink/harvest.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The drying cloth weighs 454 grams.",
+     "file": "ink/harvest.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spare tray contains 455 pale stems.",
+     "file": "ink/harvest.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The harvest knife has a bone grip.",
+     "file": "ink/harvest.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The rust-red batch is ready for straining.",
+     "file": "ink/batches.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue batch is cooling under cloth.",
+     "file": "ink/batches.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The mural batch needs another pressing.",
+     "file": "ink/batches.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The gold-cap batch was set aside.",
+     "file": "ink/batches.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The green batch is ready for bottling.",
+     "file": "ink/batches.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Dusk-caps produce a warm red stain.",
+     "file": "ink/press_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Blue fronds are pressed while damp.",
+     "file": "ink/press_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Pale stems leave a faint yellow trace.",
+     "file": "ink/press_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The green batch settles best in shade.",
+     "file": "ink/press_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The press plates are rinsed with warm water.",
+     "file": "ink/press_notes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A small glass bottle costs 456 marks.",
+     "file": "ink/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A mural jar costs 457 marks.",
+     "file": "ink/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The new drying cloth cost 458 marks.",
+     "file": "ink/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The map ink deposit has cleared.",
+     "file": "ink/ledger.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue batch delivery remains unpaid.",
+     "file": "ink/ledger.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "ink/batches.txt",
+    "ink/harvest.txt",
+    "ink/ledger.txt",
+    "ink/press_notes.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt"
+   ]
+  },
+  {
+   "slug": "ulmarin-canopies",
+   "description": "Pavin's loom house in Ulmarin weaves frost-thread canopies for garden shelters.",
+   "facts": [
+    {
+     "fact": "Retha requested a silver canopy for the herb court.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Sumi asked for fitting at Icebloom midday.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Toren canceled the blue fringe.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Ulda sent a sketch of an arched shelter.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Pavin quoted 551 rings for the festival canopy.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The loom house chose pearl thread for the herb court.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next fitting review is at Wintergleam dusk.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The old gray thread choice was shelved.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Retha approved the scalloped edge.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Ulda will inspect the arched frame.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Retha tends the herb court.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Sumi builds garden frames.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Toren supplies dyed thread.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Ulda draws shelter plans.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Pavin manages loom bookings.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Pavin needs to finish the festival hem.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Retha has cleared the herb court entrance.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Sumi must measure the arched frame.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Toren is waiting for an empty spool.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "Ulda still needs to mark the tie points.",
+     "file": "records/tasks.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The cool cabinet holds 552 pearl spools.",
+     "file": "weaving/thread.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue basket holds 553 silver tassels.",
+     "file": "weaving/thread.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The long shuttle weighs 554 grams.",
+     "file": "weaving/thread.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The trim drawer contains 555 clasp loops.",
+     "file": "weaving/thread.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spare comb is carved from willow.",
+     "file": "weaving/thread.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The herb court canopy is ready for edging.",
+     "file": "weaving/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The festival canopy still needs a hem.",
+     "file": "weaving/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The arched shelter canopy is on the loom.",
+     "file": "weaving/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The porch shade awaits collection.",
+     "file": "weaving/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The old blue fringe remains boxed.",
+     "file": "weaving/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The scalloped edge uses a loose outer loop.",
+     "file": "weaving/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Pearl thread brightens beneath lantern light.",
+     "file": "weaving/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "Silver tassels are attached after stretching.",
+     "file": "weaving/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The arched pattern narrows at its crown.",
+     "file": "weaving/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The loom cloth rests overnight before cutting.",
+     "file": "weaving/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A pearl spool costs 556 rings.",
+     "file": "weaving/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "A frame fitting costs 557 rings.",
+     "file": "weaving/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The clasp loop delivery cost 558 rings.",
+     "file": "weaving/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The porch shade balance is settled.",
+     "file": "weaving/accounts.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The festival canopy deposit is pending.",
+     "file": "weaving/accounts.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/tasks.txt",
+    "weaving/accounts.txt",
+    "weaving/orders.txt",
+    "weaving/patterns.txt",
+    "weaving/thread.txt"
+   ]
+  }
+ ],
+ "split": {
+  "everyday": [
+   "brindlefen-bells-001",
+   "brindlefen-bells-002",
+   "brindlefen-bells-003",
+   "brindlefen-bells-004",
+   "brindlefen-bells-005",
+   "brindlefen-bells-006",
+   "brindlefen-bells-007",
+   "brindlefen-bells-008",
+   "brindlefen-bells-009",
+   "brindlefen-bells-010",
+   "brindlefen-bells-011",
+   "brindlefen-bells-012",
+   "brindlefen-bells-013",
+   "brindlefen-bells-014",
+   "brindlefen-bells-015",
+   "brindlefen-bells-016",
+   "brindlefen-bells-017",
+   "brindlefen-bells-018",
+   "brindlefen-bells-019",
+   "brindlefen-bells-020",
+   "virelow-dewpaper-001",
+   "virelow-dewpaper-002",
+   "virelow-dewpaper-003",
+   "virelow-dewpaper-004",
+   "virelow-dewpaper-005",
+   "virelow-dewpaper-006",
+   "virelow-dewpaper-007",
+   "virelow-dewpaper-008",
+   "virelow-dewpaper-009",
+   "virelow-dewpaper-010",
+   "virelow-dewpaper-011",
+   "virelow-dewpaper-012",
+   "virelow-dewpaper-013",
+   "virelow-dewpaper-014",
+   "virelow-dewpaper-015",
+   "virelow-dewpaper-016",
+   "virelow-dewpaper-017",
+   "virelow-dewpaper-018",
+   "virelow-dewpaper-019",
+   "virelow-dewpaper-020",
+   "ossimar-kites-001",
+   "ossimar-kites-002",
+   "ossimar-kites-003",
+   "ossimar-kites-004",
+   "ossimar-kites-005",
+   "ossimar-kites-006",
+   "ossimar-kites-007",
+   "ossimar-kites-008",
+   "ossimar-kites-009",
+   "ossimar-kites-010",
+   "ossimar-kites-011",
+   "ossimar-kites-012",
+   "ossimar-kites-013",
+   "ossimar-kites-014",
+   "ossimar-kites-015",
+   "ossimar-kites-016",
+   "ossimar-kites-017",
+   "ossimar-kites-018",
+   "ossimar-kites-019",
+   "ossimar-kites-020",
+   "yarovel-pebbles-001",
+   "yarovel-pebbles-002",
+   "yarovel-pebbles-003",
+   "yarovel-pebbles-004",
+   "yarovel-pebbles-005",
+   "yarovel-pebbles-006",
+   "yarovel-pebbles-007",
+   "yarovel-pebbles-008",
+   "yarovel-pebbles-009",
+   "yarovel-pebbles-010",
+   "yarovel-pebbles-011",
+   "yarovel-pebbles-012",
+   "yarovel-pebbles-013",
+   "yarovel-pebbles-014",
+   "yarovel-pebbles-015",
+   "yarovel-pebbles-016",
+   "yarovel-pebbles-017",
+   "yarovel-pebbles-018",
+   "yarovel-pebbles-019",
+   "yarovel-pebbles-020",
+   "thennor-ink-001",
+   "thennor-ink-002",
+   "thennor-ink-003",
+   "thennor-ink-004",
+   "thennor-ink-005",
+   "thennor-ink-006",
+   "thennor-ink-007",
+   "thennor-ink-008",
+   "thennor-ink-009",
+   "thennor-ink-010",
+   "thennor-ink-011",
+   "thennor-ink-012",
+   "thennor-ink-013",
+   "thennor-ink-014",
+   "thennor-ink-015",
+   "thennor-ink-016",
+   "thennor-ink-017",
+   "thennor-ink-018",
+   "thennor-ink-019",
+   "thennor-ink-020",
+   "ulmarin-canopies-001",
+   "ulmarin-canopies-002",
+   "ulmarin-canopies-003",
+   "ulmarin-canopies-004",
+   "ulmarin-canopies-005",
+   "ulmarin-canopies-006",
+   "ulmarin-canopies-007",
+   "ulmarin-canopies-008",
+   "ulmarin-canopies-009",
+   "ulmarin-canopies-010",
+   "ulmarin-canopies-011",
+   "ulmarin-canopies-012",
+   "ulmarin-canopies-013",
+   "ulmarin-canopies-014",
+   "ulmarin-canopies-015",
+   "ulmarin-canopies-016",
+   "ulmarin-canopies-017",
+   "ulmarin-canopies-018",
+   "ulmarin-canopies-019",
+   "ulmarin-canopies-020"
+  ],
+  "question": [
+   "brindlefen-bells-021",
+   "brindlefen-bells-022",
+   "brindlefen-bells-023",
+   "brindlefen-bells-024",
+   "brindlefen-bells-025",
+   "brindlefen-bells-026",
+   "brindlefen-bells-027",
+   "brindlefen-bells-028",
+   "brindlefen-bells-029",
+   "brindlefen-bells-030",
+   "brindlefen-bells-031",
+   "brindlefen-bells-032",
+   "brindlefen-bells-033",
+   "brindlefen-bells-034",
+   "brindlefen-bells-035",
+   "brindlefen-bells-036",
+   "brindlefen-bells-037",
+   "brindlefen-bells-038",
+   "brindlefen-bells-039",
+   "brindlefen-bells-040",
+   "virelow-dewpaper-021",
+   "virelow-dewpaper-022",
+   "virelow-dewpaper-023",
+   "virelow-dewpaper-024",
+   "virelow-dewpaper-025",
+   "virelow-dewpaper-026",
+   "virelow-dewpaper-027",
+   "virelow-dewpaper-028",
+   "virelow-dewpaper-029",
+   "virelow-dewpaper-030",
+   "virelow-dewpaper-031",
+   "virelow-dewpaper-032",
+   "virelow-dewpaper-033",
+   "virelow-dewpaper-034",
+   "virelow-dewpaper-035",
+   "virelow-dewpaper-036",
+   "virelow-dewpaper-037",
+   "virelow-dewpaper-038",
+   "virelow-dewpaper-039",
+   "virelow-dewpaper-040",
+   "ossimar-kites-021",
+   "ossimar-kites-022",
+   "ossimar-kites-023",
+   "ossimar-kites-024",
+   "ossimar-kites-025",
+   "ossimar-kites-026",
+   "ossimar-kites-027",
+   "ossimar-kites-028",
+   "ossimar-kites-029",
+   "ossimar-kites-030",
+   "ossimar-kites-031",
+   "ossimar-kites-032",
+   "ossimar-kites-033",
+   "ossimar-kites-034",
+   "ossimar-kites-035",
+   "ossimar-kites-036",
+   "ossimar-kites-037",
+   "ossimar-kites-038",
+   "ossimar-kites-039",
+   "ossimar-kites-040",
+   "yarovel-pebbles-021",
+   "yarovel-pebbles-022",
+   "yarovel-pebbles-023",
+   "yarovel-pebbles-024",
+   "yarovel-pebbles-025",
+   "yarovel-pebbles-026",
+   "yarovel-pebbles-027",
+   "yarovel-pebbles-028",
+   "yarovel-pebbles-029",
+   "yarovel-pebbles-030",
+   "yarovel-pebbles-031",
+   "yarovel-pebbles-032",
+   "yarovel-pebbles-033",
+   "yarovel-pebbles-034",
+   "yarovel-pebbles-035",
+   "yarovel-pebbles-036",
+   "yarovel-pebbles-037",
+   "yarovel-pebbles-038",
+   "yarovel-pebbles-039",
+   "yarovel-pebbles-040",
+   "thennor-ink-021",
+   "thennor-ink-022",
+   "thennor-ink-023",
+   "thennor-ink-024",
+   "thennor-ink-025",
+   "thennor-ink-026",
+   "thennor-ink-027",
+   "thennor-ink-028",
+   "thennor-ink-029",
+   "thennor-ink-030",
+   "thennor-ink-031",
+   "thennor-ink-032",
+   "thennor-ink-033",
+   "thennor-ink-034",
+   "thennor-ink-035",
+   "thennor-ink-036",
+   "thennor-ink-037",
+   "thennor-ink-038",
+   "thennor-ink-039",
+   "thennor-ink-040",
+   "ulmarin-canopies-021",
+   "ulmarin-canopies-022",
+   "ulmarin-canopies-023",
+   "ulmarin-canopies-024",
+   "ulmarin-canopies-025",
+   "ulmarin-canopies-026",
+   "ulmarin-canopies-027",
+   "ulmarin-canopies-028",
+   "ulmarin-canopies-029",
+   "ulmarin-canopies-030",
+   "ulmarin-canopies-031",
+   "ulmarin-canopies-032",
+   "ulmarin-canopies-033",
+   "ulmarin-canopies-034",
+   "ulmarin-canopies-035",
+   "ulmarin-canopies-036",
+   "ulmarin-canopies-037",
+   "ulmarin-canopies-038",
+   "ulmarin-canopies-039",
+   "ulmarin-canopies-040"
+  ]
+ },
+ "pool": {
+  "ok": true,
+  "need_per_brief": 108,
+  "available": {
+   "everyday": 120,
+   "question": 120
+  },
+  "shortfall_per_brief": {
+   "everyday": 0,
+   "question": 0
+  },
+  "extra_workspaces": 0
+ },
+ "fixture_attempts": 1,
+ "log": [
+  {
+   "set": "target",
+   "id": "q-0001",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "What tone did Meris ask for on the ferry bell?",
+   "answer": [
+    "low tone"
+   ],
+   "template": "requested-tone",
+   "fact_id": "brindlefen-bells-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0002",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "When did Varo say he could pick up the bell?",
+   "answer": [
+    "Reedfall dusk"
+   ],
+   "template": "pickup-time",
+   "fact_id": "brindlefen-bells-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0003",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Which clapper request did Tavi cancel?",
+   "answer": [
+    "copper clapper"
+   ],
+   "template": "canceled-request",
+   "fact_id": "brindlefen-bells-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "cancel"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0004",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Which clapper did Luma choose at the quay meeting?",
+   "answer": [
+    "bronze clapper"
+   ],
+   "template": "meeting-decision",
+   "fact_id": "brindlefen-bells-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0005",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "When is our next tone check?",
+   "answer": [
+    "Firstmist noon"
+   ],
+   "template": "next-check-time",
+   "fact_id": "brindlefen-bells-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0006",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "What does Tavi still need to do with the repaired bell?",
+   "answer": [
+    "tag the repaired bell"
+   ],
+   "template": "pending-task",
+   "fact_id": "brindlefen-bells-018",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0007",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What color did Bexa want for the invitation fold?",
+   "answer": [
+    "pale green"
+   ],
+   "template": "requested-color",
+   "fact_id": "virelow-dewpaper-001",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0008",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What shape did Corin change the banquet sleeves to?",
+   "answer": [
+    "round sleeves"
+   ],
+   "template": "order-change",
+   "fact_id": "virelow-dewpaper-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0009",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "How many petals did Avel quote for the window display?",
+   "answer": [
+    "151 petals"
+   ],
+   "template": "quoted-price",
+   "fact_id": "virelow-dewpaper-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0010",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Which fold did we choose for the spring cards?",
+   "answer": [
+    "fan fold"
+   ],
+   "template": "design-decision",
+   "fact_id": "virelow-dewpaper-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0011",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Who receives parcels at the east arcade?",
+   "answer": [
+    "Corin"
+   ],
+   "template": "contact-role",
+   "fact_id": "virelow-dewpaper-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0012",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What does Corin still owe us for the sleeves?",
+   "answer": [
+    "sleeve dimensions"
+   ],
+   "template": "outstanding-item",
+   "fact_id": "virelow-dewpaper-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0013",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What color shade kite did Pera ask for?",
+   "answer": [
+    "amber"
+   ],
+   "template": "requested-color",
+   "fact_id": "ossimar-kites-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0014",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Which tail request did Risa withdraw?",
+   "answer": [
+    "striped tail"
+   ],
+   "template": "withdrawn-request",
+   "fact_id": "ossimar-kites-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "tail"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0015",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Which varnish did the crew pick for the ridge kite?",
+   "answer": [
+    "clear varnish"
+   ],
+   "template": "material-decision",
+   "fact_id": "ossimar-kites-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0016",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "When is the next flight check?",
+   "answer": [
+    "Cloudrest morning"
+   ],
+   "template": "next-check-time",
+   "fact_id": "ossimar-kites-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0017",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Who draws the sail patterns?",
+   "answer": [
+    "Savo"
+   ],
+   "template": "contact-role",
+   "fact_id": "ossimar-kites-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0018",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Who is due to bring the thin spars?",
+   "answer": [
+    "Risa"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "ossimar-kites-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0019",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What kind of chime did Gella want for the orchard path?",
+   "answer": [
+    "soft chime"
+   ],
+   "template": "requested-sound",
+   "fact_id": "yarovel-pebbles-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "BANNED_WORD",
+    "DOMAIN_FILE_KEYWORD"
+   ],
+   "lint": [
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "BANNED_WORD": [
+     "path"
+    ],
+    "DOMAIN_FILE_KEYWORD": [
+     [
+      "path"
+     ]
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0020",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "When did Hovin ask to pick up the pebbles?",
+   "answer": [
+    "Fernwake dusk"
+   ],
+   "template": "pickup-time",
+   "fact_id": "yarovel-pebbles-002",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0021",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What was Farin's quote for the courtyard set?",
+   "answer": [
+    "351 crowns"
+   ],
+   "template": "quoted-price",
+   "fact_id": "yarovel-pebbles-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0022",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Which stone did the yard choose for the orchard path?",
+   "answer": [
+    "riverstone"
+   ],
+   "template": "material-decision",
+   "fact_id": "yarovel-pebbles-006",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "BANNED_WORD",
+    "DOMAIN_FILE_KEYWORD"
+   ],
+   "lint": [
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "BANNED_WORD": [
+     "path"
+    ],
+    "DOMAIN_FILE_KEYWORD": [
+     [
+      "path"
+     ]
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0023",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Who draws the garden layouts?",
+   "answer": [
+    "Jorek"
+   ],
+   "template": "contact-role",
+   "fact_id": "yarovel-pebbles-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0024",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What does Jorek still need to place?",
+   "answer": [
+    "spiral markers"
+   ],
+   "template": "pending-task",
+   "fact_id": "yarovel-pebbles-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0025",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What color ink did Loran ask for on the map?",
+   "answer": [
+    "rust-red"
+   ],
+   "template": "requested-color",
+   "fact_id": "thennor-ink-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0026",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Which order did Nerin withdraw?",
+   "answer": [
+    "gold-cap order"
+   ],
+   "template": "withdrawn-order",
+   "fact_id": "thennor-ink-003",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0027",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "How much did Kiva quote for the mural supply?",
+   "answer": [
+    "451 marks"
+   ],
+   "template": "quoted-price",
+   "fact_id": "thennor-ink-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0028",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Which mushrooms did the press choose for the map ink?",
+   "answer": [
+    "dusk-cap mushrooms"
+   ],
+   "template": "ingredient-decision",
+   "fact_id": "thennor-ink-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0029",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "When is the next color review?",
+   "answer": [
+    "Rainveil morning"
+   ],
+   "template": "next-review-time",
+   "fact_id": "thennor-ink-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0030",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What does Methi still need to collect?",
+   "answer": [
+    "sealed parcels"
+   ],
+   "template": "pending-task",
+   "fact_id": "thennor-ink-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0031",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What color canopy did Retha ask for in the herb court?",
+   "answer": [
+    "silver"
+   ],
+   "template": "requested-color",
+   "fact_id": "ulmarin-canopies-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0032",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "When did Sumi ask to have the fitting?",
+   "answer": [
+    "Icebloom midday"
+   ],
+   "template": "fitting-time",
+   "fact_id": "ulmarin-canopies-002",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0033",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Which thread did the loom house choose for the herb court?",
+   "answer": [
+    "pearl thread"
+   ],
+   "template": "material-decision",
+   "fact_id": "ulmarin-canopies-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0034",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "When is the next fitting review?",
+   "answer": [
+    "Wintergleam dusk"
+   ],
+   "template": "next-review-time",
+   "fact_id": "ulmarin-canopies-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0035",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Who builds the garden frames?",
+   "answer": [
+    "Sumi"
+   ],
+   "template": "contact-role",
+   "fact_id": "ulmarin-canopies-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0036",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What does Pavin still need to finish?",
+   "answer": [
+    "festival hem"
+   ],
+   "template": "pending-task",
+   "fact_id": "ulmarin-canopies-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0037",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "How many brass blanks are in the chest?",
+   "answer": [
+    "52"
+   ],
+   "template": "inventory-count",
+   "fact_id": "brindlefen-bells-021",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0038",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "What repair does the marsh marker bell need?",
+   "answer": [
+    "a new lip"
+   ],
+   "template": "needed-repair",
+   "fact_id": "brindlefen-bells-027",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0039",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "Which reed setting is the ferry bell using?",
+   "answer": [
+    "deep reed"
+   ],
+   "template": "current-setting",
+   "fact_id": "brindlefen-bells-031",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0040",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "Where is the tuning fork kept?",
+   "answer": [
+    "cedar sleeve"
+   ],
+   "template": "storage-location",
+   "fact_id": "brindlefen-bells-035",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0041",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "How much does bronze clapper casting cost?",
+   "answer": [
+    "57 shells"
+   ],
+   "template": "service-price",
+   "fact_id": "brindlefen-bells-036",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0042",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-bells",
+   "request": "Which repair has an unpaid balance?",
+   "answer": [
+    "garden bell"
+   ],
+   "template": "unpaid-work",
+   "fact_id": "brindlefen-bells-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0043",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "How many corner tabs are in the blue tray?",
+   "answer": [
+    "153"
+   ],
+   "template": "inventory-count",
+   "fact_id": "virelow-dewpaper-022",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0044",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "Which cards are ready for wrapping?",
+   "answer": [
+    "willow hall cards"
+   ],
+   "template": "ready-work",
+   "fact_id": "virelow-dewpaper-026",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0045",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "What guide is used for the fan fold?",
+   "answer": [
+    "damp wooden guide"
+   ],
+   "template": "production-method",
+   "fact_id": "virelow-dewpaper-031",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0046",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "Where are pale green sheets dried?",
+   "answer": [
+    "in shade"
+   ],
+   "template": "drying-location",
+   "fact_id": "virelow-dewpaper-034",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0047",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "How much does a round sleeve cost?",
+   "answer": [
+    "157 petals"
+   ],
+   "template": "item-price",
+   "fact_id": "virelow-dewpaper-037",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0048",
+   "round": 0,
+   "brief": "question",
+   "fixture": "virelow-dewpaper",
+   "request": "Has the festival tag order been paid?",
+   "answer": [
+    "yes"
+   ],
+   "template": "payment-status",
+   "fact_id": "virelow-dewpaper-039",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0049",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "How long is the tail spool?",
+   "answer": [
+    "254 arm lengths"
+   ],
+   "template": "material-length",
+   "fact_id": "ossimar-kites-023",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "tail"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0050",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "Which side of the crescent sail dips?",
+   "answer": [
+    "left side"
+   ],
+   "template": "performance-issue",
+   "fact_id": "ossimar-kites-028",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0051",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "Where is amber stain brushed?",
+   "answer": [
+    "along the outer ribs"
+   ],
+   "template": "application-location",
+   "fact_id": "ossimar-kites-032",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0052",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "Where is the smoky varnish stored?",
+   "answer": [
+    "rear cabinet"
+   ],
+   "template": "storage-location",
+   "fact_id": "ossimar-kites-035",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0053",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "How much was the school kite deposit?",
+   "answer": [
+    "258 beads"
+   ],
+   "template": "deposit-amount",
+   "fact_id": "ossimar-kites-038",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0054",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ossimar-kites",
+   "request": "Has the crescent sail invoice been sent?",
+   "answer": [
+    "no"
+   ],
+   "template": "invoice-status",
+   "fact_id": "ossimar-kites-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0055",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "How many oval blanks are in the sorting tray?",
+   "answer": [
+    "355"
+   ],
+   "template": "inventory-count",
+   "fact_id": "yarovel-pebbles-024",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0056",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "Which stone is awaiting collection?",
+   "answer": [
+    "porch chime stone"
+   ],
+   "template": "collection-status",
+   "fact_id": "yarovel-pebbles-029",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0057",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "How does the porch stone sound when wet?",
+   "answer": [
+    "dull"
+   ],
+   "template": "sound-quality",
+   "fact_id": "yarovel-pebbles-033",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0058",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "What surface are the riverstone samples sounded on?",
+   "answer": [
+    "sand"
+   ],
+   "template": "testing-surface",
+   "fact_id": "yarovel-pebbles-035",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0059",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "How much does a path fitting cost?",
+   "answer": [
+    "357 crowns"
+   ],
+   "template": "service-price",
+   "fact_id": "yarovel-pebbles-037",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "BANNED_WORD",
+    "DOMAIN_FILE_KEYWORD"
+   ],
+   "lint": [
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "BANNED_WORD": [
+     "path"
+    ],
+    "DOMAIN_FILE_KEYWORD": [
+     [
+      "path"
+     ]
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0060",
+   "round": 0,
+   "brief": "question",
+   "fixture": "yarovel-pebbles",
+   "request": "Has the porch stone been paid for?",
+   "answer": [
+    "yes"
+   ],
+   "template": "payment-status",
+   "fact_id": "yarovel-pebbles-039",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0061",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "What is the harvest knife's grip made of?",
+   "answer": [
+    "bone"
+   ],
+   "template": "tool-material",
+   "fact_id": "thennor-ink-025",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0062",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "Where is the blue batch cooling?",
+   "answer": [
+    "under cloth"
+   ],
+   "template": "batch-location",
+   "fact_id": "thennor-ink-027",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0063",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "What color stain do dusk-caps produce?",
+   "answer": [
+    "warm red"
+   ],
+   "template": "ingredient-result",
+   "fact_id": "thennor-ink-031",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0064",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "Where does the green batch settle best?",
+   "answer": [
+    "in shade"
+   ],
+   "template": "settling-location",
+   "fact_id": "thennor-ink-034",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0065",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "How much does a small glass bottle cost?",
+   "answer": [
+    "456 marks"
+   ],
+   "template": "item-price",
+   "fact_id": "thennor-ink-036",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0066",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thennor-ink",
+   "request": "Which delivery remains unpaid?",
+   "answer": [
+    "blue batch delivery"
+   ],
+   "template": "unpaid-delivery",
+   "fact_id": "thennor-ink-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0067",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "How much does the long shuttle weigh?",
+   "answer": [
+    "554 grams"
+   ],
+   "template": "tool-weight",
+   "fact_id": "ulmarin-canopies-023",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0068",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "Which canopy is ready for edging?",
+   "answer": [
+    "herb court canopy"
+   ],
+   "template": "ready-work",
+   "fact_id": "ulmarin-canopies-026",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0069",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "What brightens beneath lantern light?",
+   "answer": [
+    "pearl thread"
+   ],
+   "template": "material-property",
+   "fact_id": "ulmarin-canopies-032",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0070",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "Where does the arched pattern narrow?",
+   "answer": [
+    "at its crown"
+   ],
+   "template": "pattern-shape",
+   "fact_id": "ulmarin-canopies-034",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0071",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "How much does a frame fitting cost?",
+   "answer": [
+    "557 rings"
+   ],
+   "template": "service-price",
+   "fact_id": "ulmarin-canopies-037",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0072",
+   "round": 0,
+   "brief": "question",
+   "fixture": "ulmarin-canopies",
+   "request": "What is the status of the festival canopy deposit?",
+   "answer": [
+    "pending"
+   ],
+   "template": "deposit-status",
+   "fact_id": "ulmarin-canopies-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0073",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "In my notes about the bell workshop, what is Solen waiting for?",
+   "answer": [
+    "a blue paper bundle"
+   ],
+   "template": "waiting-for",
+   "fact_id": "brindlefen-bells-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0074",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "What does Eren still need to inspect for the bell crew?",
+   "answer": [
+    "the anchor chain"
+   ],
+   "template": "inspection-task",
+   "fact_id": "brindlefen-bells-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0075",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What is Dema bringing to the shop at dawn?",
+   "answer": [
+    "violet thread"
+   ],
+   "template": "expected-delivery",
+   "fact_id": "virelow-dewpaper-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0076",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What does Esol need for the shop?",
+   "answer": [
+    "a packing note"
+   ],
+   "template": "needed-item",
+   "fact_id": "virelow-dewpaper-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0077",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What does Quen need to clear at the launch field?",
+   "answer": [
+    "the launch grass"
+   ],
+   "template": "pending-task",
+   "fact_id": "ossimar-kites-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0078",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What does Savo still need to mark on the crescent sail?",
+   "answer": [
+    "the crescent seam"
+   ],
+   "template": "marking-task",
+   "fact_id": "ossimar-kites-020",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "mark"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0079",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What does Hovin still need to collect from the yard?",
+   "answer": [
+    "the heavy offcuts"
+   ],
+   "template": "collection-task",
+   "fact_id": "yarovel-pebbles-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0080",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What is Istra waiting for?",
+   "answer": [
+    "a soil sample"
+   ],
+   "template": "waiting-for",
+   "fact_id": "yarovel-pebbles-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0081",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What is Nerin waiting for at the press?",
+   "answer": [
+    "clean trays"
+   ],
+   "template": "waiting-for",
+   "fact_id": "thennor-ink-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0082",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What does Ovela still need to choose?",
+   "answer": [
+    "a brush width"
+   ],
+   "template": "pending-choice",
+   "fact_id": "thennor-ink-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0083",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What is Toren waiting for at the loom house?",
+   "answer": [
+    "an empty spool"
+   ],
+   "template": "waiting-for",
+   "fact_id": "ulmarin-canopies-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0084",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What does Ulda still need to mark on the shelter plans?",
+   "answer": [
+    "the tie points"
+   ],
+   "template": "marking-task",
+   "fact_id": "ulmarin-canopies-020",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "mark"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0085",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "In my mail with Solen, what color paper did they want for the receipt?",
+   "answer": [
+    "blue paper"
+   ],
+   "template": "receipt-preference",
+   "fact_id": "brindlefen-bells-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0086",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Where did we move the west buoy tuning?",
+   "answer": [
+    "indoors"
+   ],
+   "template": "work-location",
+   "fact_id": "brindlefen-bells-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0087",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Who has the ferry shed key?",
+   "answer": [
+    "Tavi"
+   ],
+   "template": "key-holder",
+   "fact_id": "brindlefen-bells-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0088",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "What does Luma still need to polish?",
+   "answer": [
+    "the warning bell"
+   ],
+   "template": "pending-task",
+   "fact_id": "brindlefen-bells-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0089",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What did Dema send a sample of?",
+   "answer": [
+    "violet thread"
+   ],
+   "template": "sample-item",
+   "fact_id": "virelow-dewpaper-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0090",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Which sleeve pattern did we retire?",
+   "answer": [
+    "the square sleeve pattern"
+   ],
+   "template": "retired-design",
+   "fact_id": "virelow-dewpaper-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0091",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Who manages the willow hall?",
+   "answer": [
+    "Bexa"
+   ],
+   "template": "place-manager",
+   "fact_id": "virelow-dewpaper-011",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0092",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "What does Avel still need to trim?",
+   "answer": [
+    "the display edges"
+   ],
+   "template": "pending-task",
+   "fact_id": "virelow-dewpaper-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0093",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "When did Quen want to collect the ridge kite?",
+   "answer": [
+    "Sunhush"
+   ],
+   "template": "collection-time",
+   "fact_id": "ossimar-kites-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0094",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Which tail shape did Pera approve?",
+   "answer": [
+    "the wide tail shape"
+   ],
+   "template": "approved-design",
+   "fact_id": "ossimar-kites-009",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "tail"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0095",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Who supplies our bamboo spars?",
+   "answer": [
+    "Risa"
+   ],
+   "template": "supplier",
+   "fact_id": "ossimar-kites-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0096",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What does Nilo still need to seal?",
+   "answer": [
+    "the amber kite frame"
+   ],
+   "template": "pending-task",
+   "fact_id": "ossimar-kites-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0097",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What border did Istra cancel?",
+   "answer": [
+    "the slate border"
+   ],
+   "template": "canceled-detail",
+   "fact_id": "yarovel-pebbles-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "cancel"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0098",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "When is the next sound walk?",
+   "answer": [
+    "Stoneglow noon"
+   ],
+   "template": "event-time",
+   "fact_id": "yarovel-pebbles-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0099",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Who carries the stone by cart?",
+   "answer": [
+    "Hovin"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "yarovel-pebbles-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0100",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Which route has Gella marked?",
+   "answer": [
+    "the orchard route"
+   ],
+   "template": "marked-route",
+   "fact_id": "yarovel-pebbles-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0101",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "When did Methi ask us to deliver the ink?",
+   "answer": [
+    "Sporelight dawn"
+   ],
+   "template": "delivery-time",
+   "fact_id": "thennor-ink-002",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0102",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Which bottle did Loran approve?",
+   "answer": [
+    "the small glass bottle"
+   ],
+   "template": "approved-container",
+   "fact_id": "thennor-ink-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0103",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Who grows the gold-cap mushrooms?",
+   "answer": [
+    "Nerin"
+   ],
+   "template": "grower",
+   "fact_id": "thennor-ink-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0104",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Which batch does Kiva still need to strain?",
+   "answer": [
+    "the rust-red batch"
+   ],
+   "template": "pending-task",
+   "fact_id": "thennor-ink-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0105",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Which fringe did Toren cancel?",
+   "answer": [
+    "the blue fringe"
+   ],
+   "template": "canceled-detail",
+   "fact_id": "ulmarin-canopies-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "cancel"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0106",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "How much did Pavin quote for the festival canopy?",
+   "answer": [
+    "551 rings"
+   ],
+   "template": "quoted-price",
+   "fact_id": "ulmarin-canopies-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0107",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Who supplies the dyed thread?",
+   "answer": [
+    "Toren"
+   ],
+   "template": "supplier",
+   "fact_id": "ulmarin-canopies-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0108",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What does Sumi need to measure?",
+   "answer": [
+    "the arched frame"
+   ],
+   "template": "pending-task",
+   "fact_id": "ulmarin-canopies-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0109",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "How many shells did Eren offer for the cracked bell?",
+   "answer": [
+    "51 shells"
+   ],
+   "template": "offer-amount",
+   "fact_id": "brindlefen-bells-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0110",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Who's going to hear the final ferry tone?",
+   "answer": [
+    "Meris"
+   ],
+   "template": "person-attending",
+   "fact_id": "brindlefen-bells-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0111",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "What happened to the old silver clapper plan?",
+   "answer": [
+    "shelved"
+   ],
+   "template": "plan-status",
+   "fact_id": "brindlefen-bells-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0112",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "How does Varo bring us the raw brass?",
+   "answer": [
+    "by hand"
+   ],
+   "template": "delivery-method",
+   "fact_id": "brindlefen-bells-011",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0113",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Who handles our shoreline invoices?",
+   "answer": [
+    "Solen"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "brindlefen-bells-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0114",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "brindlefen-bells",
+   "request": "Has Varo finished sorting the spare hammers?",
+   "answer": [
+    "yes"
+   ],
+   "template": "task-status",
+   "fact_id": "brindlefen-bells-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0115",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "When did Esol ask us to deliver the sheets?",
+   "answer": [
+    "Petalfall sunrise"
+   ],
+   "template": "delivery-time",
+   "fact_id": "virelow-dewpaper-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0116",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "When is our next design review?",
+   "answer": [
+    "Mothwake afternoon"
+   ],
+   "template": "meeting-time",
+   "fact_id": "virelow-dewpaper-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0117",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Which border did Bexa approve?",
+   "answer": [
+    "the narrow border"
+   ],
+   "template": "approved-design",
+   "fact_id": "virelow-dewpaper-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0118",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Who will inspect the finished banquet sleeves?",
+   "answer": [
+    "Corin"
+   ],
+   "template": "person-inspecting",
+   "fact_id": "virelow-dewpaper-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0119",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Who supplies our colored thread?",
+   "answer": [
+    "Dema"
+   ],
+   "template": "supplier",
+   "fact_id": "virelow-dewpaper-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0120",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "virelow-dewpaper",
+   "request": "Has Bexa approved the sample card yet?",
+   "answer": [
+    "yes"
+   ],
+   "template": "approval-status",
+   "fact_id": "virelow-dewpaper-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0121",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What did Savo send us for the crescent sail?",
+   "answer": [
+    "a sketch"
+   ],
+   "template": "item-sent",
+   "fact_id": "ossimar-kites-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0122",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What price did Nilo offer the school?",
+   "answer": [
+    "251 beads"
+   ],
+   "template": "offer-amount",
+   "fact_id": "ossimar-kites-005",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0123",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "What was decided about the old smoky varnish choice?",
+   "answer": [
+    "rejected"
+   ],
+   "template": "choice-status",
+   "fact_id": "ossimar-kites-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0124",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Who will watch the crescent sail trial?",
+   "answer": [
+    "Savo"
+   ],
+   "template": "person-attending",
+   "fact_id": "ossimar-kites-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0125",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Who keeps the launch field gate?",
+   "answer": [
+    "Quen"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "ossimar-kites-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0126",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ossimar-kites",
+   "request": "Has Pera returned the sample sail?",
+   "answer": [
+    "yes"
+   ],
+   "template": "return-status",
+   "fact_id": "ossimar-kites-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0127",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What did Jorek send us for the spiral path?",
+   "answer": [
+    "a drawing"
+   ],
+   "template": "item-sent",
+   "fact_id": "yarovel-pebbles-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN",
+    "BANNED_WORD",
+    "DOMAIN_FILE_KEYWORD"
+   ],
+   "lint": [
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ],
+    "BANNED_WORD": [
+     "path"
+    ],
+    "DOMAIN_FILE_KEYWORD": [
+     [
+      "path"
+     ]
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0128",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What happened to the old limestone proposal?",
+   "answer": [
+    "set aside"
+   ],
+   "template": "proposal-status",
+   "fact_id": "yarovel-pebbles-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0129",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Which stepping shape did Gella approve?",
+   "answer": [
+    "oval"
+   ],
+   "template": "approved-design",
+   "fact_id": "yarovel-pebbles-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0130",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Who will attend the courtyard fitting?",
+   "answer": [
+    "Jorek"
+   ],
+   "template": "person-attending",
+   "fact_id": "yarovel-pebbles-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0131",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "Who prepares the path foundations?",
+   "answer": [
+    "Istra"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "yarovel-pebbles-013",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "BANNED_WORD",
+    "DOMAIN_FILE_KEYWORD"
+   ],
+   "lint": [
+    "Set aside by an automatic check.",
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "BANNED_WORD": [
+     "path"
+    ],
+    "DOMAIN_FILE_KEYWORD": [
+     [
+      "path"
+     ]
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0132",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "yarovel-pebbles",
+   "request": "What does Farin still need to do in the courtyard?",
+   "answer": [
+    "smooth the courtyard edges"
+   ],
+   "template": "task-remaining",
+   "fact_id": "yarovel-pebbles-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0133",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What did Ovela send for the blue batch?",
+   "answer": [
+    "a label sketch"
+   ],
+   "template": "item-sent",
+   "fact_id": "thennor-ink-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0134",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Did we keep the old sun-cap blend?",
+   "answer": [
+    "no, it was rejected"
+   ],
+   "template": "choice-status",
+   "fact_id": "thennor-ink-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0135",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Who will inspect the mural color?",
+   "answer": [
+    "Ovela"
+   ],
+   "template": "person-inspecting",
+   "fact_id": "thennor-ink-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0136",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Who carries our parcels through the market?",
+   "answer": [
+    "Methi"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "thennor-ink-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0137",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "What kind of work does Ovela do?",
+   "answer": [
+    "paints public walls"
+   ],
+   "template": "person-role",
+   "fact_id": "thennor-ink-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0138",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "thennor-ink",
+   "request": "Has Loran returned the sample bottle?",
+   "answer": [
+    "yes"
+   ],
+   "template": "return-status",
+   "fact_id": "thennor-ink-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0139",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What did Ulda send us for the shelter?",
+   "answer": [
+    "a sketch of an arched shelter"
+   ],
+   "template": "item-sent",
+   "fact_id": "ulmarin-canopies-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0140",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "What happened to the old gray thread choice?",
+   "answer": [
+    "shelved"
+   ],
+   "template": "choice-status",
+   "fact_id": "ulmarin-canopies-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0141",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Which edge did Retha approve?",
+   "answer": [
+    "the scalloped edge"
+   ],
+   "template": "approved-design",
+   "fact_id": "ulmarin-canopies-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0142",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Who will inspect the arched frame?",
+   "answer": [
+    "Ulda"
+   ],
+   "template": "person-inspecting",
+   "fact_id": "ulmarin-canopies-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0143",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Who draws our shelter plans?",
+   "answer": [
+    "Ulda"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "ulmarin-canopies-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0144",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": "ulmarin-canopies",
+   "request": "Has Retha cleared the herb court entrance?",
+   "answer": [
+    "yes"
+   ],
+   "template": "task-status",
+   "fact_id": "ulmarin-canopies-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  }
+ ],
+ "round": 3,
+ "stopped": "groups still short after 3 top-ups: {'nonfile': 3, 'default': 24}"
+}

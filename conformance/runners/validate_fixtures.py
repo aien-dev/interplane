@@ -4,7 +4,7 @@
 Exit status is non-zero on any failure. Checks:
   * every explicit envelope step validates against envelope.schema.json
   * every intent in dialects/fixtures validates against intent.schema.json
-  * fixture shape, 27 required cases, filename == case slug
+  * fixture shape, 30 required cases, filename == case slug
   * lifecycle/ fixtures: required set, shape, minting decisions valid against decision.schema.json
   * expected.runtime counts agree with the observed records
   * every digest fixture recomputes; InputRecord examples (one per source class) validate
@@ -72,7 +72,8 @@ REQUIRED = {
  "14-unknown-fields","15-oversized-arguments","16-duplicate-request-ids","17-replay","18-model-retry-after-denial",
  "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result",
  "24-expansion-requested-excluded","25-expansion-refused-by-bound",
- "26-unrecognized-content-kind","27-absent-null-unrecognized-trust"}
+ "26-unrecognized-content-kind","27-absent-null-unrecognized-trust",
+ "28-input-ledger-continues","29-input-derived-from","30-input-forged-exposure"}
 OBS_KEYS = ["request_id","stage","decision","status","error_code","decide_invoked","execute_invoked","result_digest"]
 n_env = n_cases = 0
 neg_done = False
@@ -100,11 +101,17 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
                 if V_ENV.is_valid(bad): fail("negative control: envelope without trace_id unexpectedly valid")
                 neg_done = True
         elif "dialect" in s and "input" in s: pass
+        elif "input" in s and "dialect" not in s:  # host-only input registration (0.3 cut P3)
+            check(V_INPUT, s["input"], name + " input step")
         elif "expand" in s:
             if "selection" not in f: fail("%s: expand step without a selection block" % name)
             ev = s["expand"].get("evidence", {})
             if ev.get("kind") not in ("requested_excluded", "discovery_hit"): fail("%s: bad evidence kind" % name)
         else: fail("%s: step %s has neither envelope nor dialect+input" % (name, s.get("turn")))
+    for rec in exp.get("inputs", []):
+        check(V_INPUT, rec, name + " expected.inputs") if "content_digest" in rec else None
+    for e in exp.get("exposure", []):
+        if set(e) != {"request_id", "inputs", "floor"}: fail("%s: malformed expected.exposure %s" % (name, e))
     for c in exp.get("result_checks", []):
         if set(c) - {"round_trip"} != {"request_id", "path", "equals"} or c.get("round_trip", True) is not True or c["request_id"] not in {o["request_id"] for o in obs}:
             fail("%s: malformed result_check %s" % (name, c))

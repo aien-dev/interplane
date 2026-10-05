@@ -1,0 +1,226 @@
+{
+  "case": "29-input-derived-from",
+  "description": "derived_from on nested content is kept as registered. A summary derived from a registered input leaves the floor at user_supplied. An input derived from an id the ledger does not hold cannot be traced, so it counts as external_untrusted whatever trust the host gave it (fail closed).",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-29",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-29-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "input": {
+        "input_id": "in-29-summary",
+        "content_kind": "document",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "file:summary.md",
+        "content_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": [
+          "in-29-user"
+        ]
+      }
+    },
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_29a",
+            "type": "function",
+            "function": {
+              "name": "append_note",
+              "arguments": "{\"path\": \"/tmp/notes.md\", \"text\": \"hello\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "input_id": "in-29-orphan",
+        "content_kind": "skill",
+        "trust": "trusted_runtime",
+        "source": {
+          "kind": "runtime",
+          "id": "host"
+        },
+        "origin": "runtime:host",
+        "content_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": [
+          "in-29-missing"
+        ]
+      }
+    },
+    {
+      "turn": 1,
+      "dialect": "openai",
+      "model": "mock-model",
+      "continues": true,
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_29b",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_29a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_29b",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      },
+      {
+        "turn": 1,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 2,
+      "execute_calls": 2
+    },
+    "inputs": [
+      {
+        "input_id": "in-29-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-29-summary",
+        "content_kind": "document",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "file:summary.md",
+        "content_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": [
+          "in-29-user"
+        ]
+      },
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "workspace_content",
+        "trust": "trusted_runtime",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-29",
+        "parent_id": "call_29a",
+        "derived_from": []
+      },
+      {
+        "input_id": "in-29-orphan",
+        "content_kind": "skill",
+        "trust": "trusted_runtime",
+        "source": {
+          "kind": "runtime",
+          "id": "host"
+        },
+        "origin": "runtime:host",
+        "content_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "trace_id": "trace-29",
+        "parent_id": null,
+        "derived_from": [
+          "in-29-missing"
+        ]
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_29a",
+        "inputs": [
+          "in-29-user",
+          "in-29-summary"
+        ],
+        "floor": "user_supplied"
+      },
+      {
+        "request_id": "call_29b",
+        "inputs": [
+          "in-29-user",
+          "in-29-summary",
+          "in-auto-0",
+          "in-29-orphan"
+        ],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

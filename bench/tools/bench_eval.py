@@ -203,3 +203,21 @@ def run_metrics(task: dict, condition: str, run: dict) -> dict:
         "tool_schema_bytes_per_round_mean": (sum(r["tools_bytes"] for r in rounds) / n_rounds) if n_rounds else None,
         "infra_failure": bool(run.get("infra_failure")),
     }
+
+
+def r1_problems(receipt: dict) -> list:
+    """R1 receipt fields (PREREG-0.2y section 2): the full assistant text of every round and the
+    query string of every discovery call. Returns the problems found; an empty list means valid.
+    A B5 receipt with any problem is invalid (the analyzer must exclude the run)."""
+    bad = []
+    for r in receipt.get("rounds") or []:
+        if not isinstance(r.get("text"), str):
+            bad.append(f"round {r.get('round')}: no text")
+    for c in receipt.get("calls") or []:
+        if c.get("discovery") and "query" not in c:
+            bad.append(f"round {c.get('round')} call {c.get('index')}: discovery call without query")
+    return bad
+
+
+def r1_valid(receipt: dict) -> bool:
+    return not r1_problems(receipt)

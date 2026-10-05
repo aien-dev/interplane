@@ -106,17 +106,22 @@ def boot_ci(deltas: list, seed: int = BOOT_SEED, n_boot: int = BOOT_N) -> dict:
 
 # ------------------------------------------------------------------------------- loading
 
+R1_REQUIRED = ("B5",)  # conditions whose receipts must carry the R1 fields (bench_eval.r1_problems)
+
+
 def load_run(run_dir: Path, tasks_dir: Path) -> dict:
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8")) if (run_dir / "manifest.json").exists() else {}
-    rec = {}
+    rec, r1_invalid = {}, []
     for p in sorted((run_dir / "receipts").glob("*.json")):
         r = json.loads(p.read_text(encoding="utf-8"))
         rec.setdefault(r["task"]["id"], {})[r["condition"]] = r
+        if r["condition"] in R1_REQUIRED and not bench_eval.r1_valid(r):  # PREREG-0.2y: B5 without R1 fields is invalid
+            r1_invalid.append({"task": r["task"]["id"], "condition": r["condition"], "problems": bench_eval.r1_problems(r)})
     tasks = {}
     for p in sorted(tasks_dir.glob("*.json")):
         t = json.loads(p.read_text(encoding="utf-8"))
         tasks[t["id"]] = t
-    return {"manifest": manifest, "receipts": rec, "tasks": tasks}
+    return {"manifest": manifest, "receipts": rec, "tasks": tasks, "r1_invalid": r1_invalid}
 
 
 def pair_class(a: bool, b: bool) -> str:

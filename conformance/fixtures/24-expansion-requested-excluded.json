@@ -77,10 +77,14 @@
     ],
     "selections": [
       {
-        "catalog_digest": "sha256:58b8ce6dd694fd20945e69dc56fd93cf1e4a1b561afa763cd96a7c2608ac68fc",
+        "catalog_digest": "sha256:0647b1a881e1764b914292ea3fc0d06741d213cdec62fe238687720485a79967",
         "excluded": [
           {
             "name": "append_note",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "call_provider",
             "reason": "domain_mismatch"
           },
           {
@@ -93,6 +97,14 @@
           },
           {
             "name": "list_dir",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "load_skill",
+            "reason": "domain_mismatch"
+          },
+          {
+            "name": "read_document",
             "reason": "domain_mismatch"
           },
           {
@@ -124,7 +136,7 @@
           }
         ],
         "kind": "selection",
-        "parent_digest": "sha256:be25d914921cb453ae85ebe80aae2e07df1c0b13f33c80b34c5e177efe812061",
+        "parent_digest": "sha256:fd89367d0ba12a23a506ff921b547a1765c71d61a1ed970c5dd8be8cc4d096ca",
         "requested_domains": [
           "email"
         ],
@@ -145,7 +157,7 @@
             "rule_id": "expansion:1"
           }
         ],
-        "selection_digest": "sha256:57624fe0189cc34b61029c26ac291a27d032e0b6d8f65904f0dc77f9ab3c33e5",
+        "selection_digest": "sha256:f154685f08708b6710119ebc17428f435ecacbe8ef702a78f5bc0d3026b20706",
         "selector": {
           "expansion": {
             "max_added_per_expansion": 8,

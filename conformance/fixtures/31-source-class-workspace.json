@@ -1,0 +1,102 @@
+{
+  "case": "31-source-class-workspace",
+  "description": "Source class workspace: a workspace file placed in front of the model. The host registers the InputRecord (parent_id null); the next tool_request sees it, so the exposure floor is workspace_untrusted. The call's own result is then recorded automatically.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-31",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-31-ws",
+        "content_kind": "workspace_content",
+        "trust": "workspace_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock-workspace"
+        },
+        "origin": "file:src/lib.rs",
+        "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "trace_id": "trace-31",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_31a",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_31a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-31-ws",
+        "content_kind": "workspace_content",
+        "trust": "workspace_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock-workspace"
+        },
+        "origin": "file:src/lib.rs",
+        "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+        "trace_id": "trace-31",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-auto-0",
+        "parent_id": "call_31a",
+        "trace_id": "trace-31"
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_31a",
+        "inputs": [
+          "in-31-ws"
+        ],
+        "floor": "workspace_untrusted"
+      }
+    ]
+  }
+}

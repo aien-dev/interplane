@@ -34,6 +34,16 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
         "28-input-ledger-continues",
         "29-input-derived-from",
         "30-input-forged-exposure",
+        "31-source-class-workspace",
+        "32-source-class-web",
+        "33-source-class-memory",
+        "34-source-class-document",
+        "35-source-class-skill",
+        "36-source-class-tool-output",
+        "37-source-class-external-provider",
+        "38-source-class-runtime-generated",
+        "39-source-class-user-request",
+        "40-source-class-model-generated",
     }
     assert {k for k, v in data.items() if "inputs" in v and "exposure" in v} == ledger_cases
     assert {k for k, v in data.items() if "selections" in v} == {

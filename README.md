@@ -25,7 +25,7 @@ and execution. INTERPLANE only standardizes what crosses between them and makes 
 | **Crossveil** | the authority-boundary contract: two runtime callbacks, a lifecycle with fail-closed invariants, trust classes | see `STATUS.md` |
 | **CrossAxis** | explicit, versioned capability mapping; a deterministic domain selector with a before/after receipt | minimal in 0.1 |
 | **Interplane Probe** | measured capability qualification of an OpenAI-compatible endpoint | see `STATUS.md` |
-| **Conformance** | 25 canonical cases plus 31 dialect fixtures; Rust and Python runners must agree byte for byte | see `STATUS.md` |
+| **Conformance** | 106 conformance cases plus 54 dialect fixtures; Rust and Python runners must agree byte for byte | see `STATUS.md` |
 | Vectorveil | the envelope and canonical JSON; no transport framework | envelope only |
 | RelayLine | the event vocabulary for multi-round exchanges | contract only |
 

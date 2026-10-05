@@ -1,0 +1,41 @@
+{
+  "dialect": "openai_stream",
+  "name": "error-input-not-text",
+  "description": "Input that is not a string (an already-assembled message): rejected.",
+  "input": {
+    "role": "assistant",
+    "content": null,
+    "tool_calls": [
+      {
+        "id": "call_t",
+        "type": "function",
+        "function": {
+          "name": "read_file",
+          "arguments": "{}"
+        }
+      }
+    ]
+  },
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "stream is not text"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

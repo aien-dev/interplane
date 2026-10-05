@@ -1,0 +1,70 @@
+{
+  "dialect": "openai_stream",
+  "name": "two-calls-interleaved",
+  "description": "Fragments of two calls interleave; calls come out in index order.",
+  "input": "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":1,\"function\":{\"name\":\"list_dir\",\"arguments\":\"{\\\"path\\\":\"},\"id\":\"call_b\",\"type\":\"function\"}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\"},\"id\":\"call_a\",\"type\":\"function\"}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":1,\"function\":{\"arguments\":\"\\\"/d\\\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"/a\\\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n",
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "call_a",
+        "tool": {
+          "name": "read_file",
+          "namespace": null
+        },
+        "arguments": {
+          "path": "/a"
+        },
+        "provenance": {
+          "dialect": "openai_stream",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_a",
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      },
+      {
+        "kind": "tool_request",
+        "request_id": "call_b",
+        "tool": {
+          "name": "list_dir",
+          "namespace": null
+        },
+        "arguments": {
+          "path": "/d"
+        },
+        "provenance": {
+          "dialect": "openai_stream",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_b",
+          "source_digest": null,
+          "raw_name": "list_dir",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      "sha256:d7a9dbd01921c66fb13d02b1b91208e2247a61c6784f59bb5086f8304dbf3675",
+      "sha256:ac62fffc0ee784cc3b787d643bdf1aacafc3c3b73ba1ab577bc9f31eef1cf31e"
+    ]
+  }
+}

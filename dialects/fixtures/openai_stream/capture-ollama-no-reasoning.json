@@ -1,0 +1,51 @@
+{
+  "dialect": "openai_stream",
+  "name": "capture-ollama-no-reasoning",
+  "description": "Real ollama stream (Qwen3.5-9B), byte-identical to the capture's response body.",
+  "capture": {
+    "path": "qualification/captures/qwen35-ollama/h2-streaming-reasoning-effort-none.json",
+    "sha256_response": "efec12328920dc70371a8995a13fe4f445fcfb665fa7b12ed8cad867ecc7f31a"
+  },
+  "input": "data: {\"id\":\"chatcmpl-406\",\"object\":\"chat.completion.chunk\",\"created\":1791145858,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_wjh7d815\",\"index\":0,\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-406\",\"object\":\"chat.completion.chunk\",\"created\":1791145858,\"model\":\"qwen3.5:9b\",\"system_fingerprint\":\"fp_ollama\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n",
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [
+      {
+        "kind": "tool_request",
+        "request_id": "call_wjh7d815",
+        "tool": {
+          "name": "read_file",
+          "namespace": null
+        },
+        "arguments": {
+          "path": "README.md"
+        },
+        "provenance": {
+          "dialect": "openai_stream",
+          "dialect_version": "1",
+          "model": "mock-model",
+          "parser_version": "1.0.0",
+          "source_turn": 0,
+          "source_call_id": "call_wjh7d815",
+          "source_digest": null,
+          "raw_name": "read_file",
+          "coercion": "none"
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": [
+      "sha256:f07114a61f0ab51bf3d5764c8d7cc2f3d351412cd2b4281f5289e62f2ca0ea90"
+    ]
+  }
+}

@@ -9,6 +9,7 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Core schemas | specified | specified | validated | 10 schemas under spec/schemas, JSON Schema 2020-12 |
 | Core types + validation + JCS | conformant | conformant | 27 cases + digest/jcs-01 | verdict files byte-identical |
 | Lenshift openai | conformant | conformant | 8 dialect fixtures | |
+| Lenshift openai_stream | conformant | conformant | 23 dialect fixtures (6 real streams from Ollama, llama.cpp, SGLang) | SSE body assembled into one message; incomplete streams rejected, never guessed; digests compared across languages |
 | Lenshift qwen35 | conformant, qualified | conformant, qualified | 10 dialect fixtures + real captures | real Qwen3.5-9B captures under qualification/captures |
 | Lenshift aien_legacy | tested | tested | 13 dialect fixtures, JCS-identical | aien-cli textual `<tool_call>` JSON (client.rs:381-419); unterminated calls rejected |
 | Lenshift ajax | reserved | reserved | none | no official artifact (2026-10-04) |

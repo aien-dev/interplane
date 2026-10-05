@@ -851,6 +851,8 @@ class Limits:
     max_messages_per_trace: int = 4096
     max_requests_per_trace: int = 4096
     max_inputs_per_trace: int = 4096
+    max_closed_traces: int = 4096
+    retired_filter_bits: int = 8_388_608
 
     @classmethod
     def from_dict(cls, data: Optional[dict]) -> "Limits":

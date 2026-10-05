@@ -297,3 +297,168 @@ fn refused_call_uses_its_request_id() {
     assert_eq!(e.code.as_str(), "duplicate_request_id");
     assert_eq!(e.message, "duplicate request_id: c8");
 }
+
+// -- closed-trace retirement (spec/CORE.md, "Closing a trace") ------------------------------------
+// Same scenarios and literals in python/tests/test_session_limits.py.
+
+const CYCLES: usize = 100_000;
+/// Fresh ids f0..f39 a 32-bit filter holding r0..r7 refuses (sha256 positions, CORE.md).
+const RETIRED_FILTER_PARITY: [usize; 8] = [6, 18, 19, 28, 30, 31, 37, 38];
+
+fn open_and_close(p: &mut Pipeline<'_>, trace: &str) {
+    assert_eq!(admit(p, trace, "m1", "r1"), ok());
+    p.close_trace(trace);
+}
+
+fn closed(trace: &str) -> (String, Option<String>, Option<String>) {
+    refused("session_closed", &format!("session closed: {trace}"))
+}
+
+fn limits(max_closed_traces: usize, retired_filter_bits: usize) -> Limits {
+    Limits {
+        max_closed_traces,
+        retired_filter_bits,
+        ..Limits::default()
+    }
+}
+
+#[test]
+fn retirement_defaults() {
+    let l = Limits::default();
+    assert_eq!(
+        (l.max_closed_traces, l.retired_filter_bits),
+        (4096, 8_388_608)
+    );
+    let l: Limits = serde_json::from_str(r#"{"max_closed_traces": 3}"#).unwrap();
+    assert_eq!((l.max_closed_traces, l.retired_filter_bits), (3, 8_388_608));
+}
+
+#[test]
+fn closing_an_unknown_trace_retains_nothing() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, Limits::default());
+    for i in 0..10_000 {
+        p.close_trace(&format!("never-seen-{i}"));
+    }
+    assert_eq!(p.closed_trace_state(), (0, 0));
+    // The trace was never closed, so its first message is a fresh trace.
+    assert_eq!(admit(&mut p, "never-seen-0", "m1", "r1"), ok());
+    p.close_trace("never-seen-0");
+    assert_eq!(p.closed_trace_state(), (1, 0));
+    p.close_trace("never-seen-0"); // closing a closed trace is a no-op too
+    assert_eq!(p.closed_trace_state(), (1, 0));
+}
+
+#[test]
+fn retired_trace_stays_refused() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, limits(2, 8_388_608));
+    for t in ["a", "b", "c"] {
+        open_and_close(&mut p, t);
+    }
+    // "a" left the window of the last 2 closed ids and was retired into the filter.
+    assert_eq!(p.closed_trace_state(), (2, 1_048_576));
+    assert_eq!(admit(&mut p, "a", "m1", "r1"), closed("a")); // the replay
+    assert_eq!(admit(&mut p, "a", "m2", "r2"), closed("a")); // and any new message
+    assert_eq!(
+        p.register_input(input_rec("i1", "a")).unwrap_err(),
+        "session closed: a"
+    );
+    p.close_trace("a"); // closing a retired trace is a no-op
+    assert_eq!(p.closed_trace_state(), (2, 1_048_576));
+    assert!(!p.ledger.holds("a") && p.inputs("a").is_empty());
+    let n = p.events.len();
+    assert_eq!(admit(&mut p, "d", "m1", "r1"), ok()); // a fresh trace is admitted
+    assert!(p.events.len() > n);
+}
+
+#[test]
+fn retired_trace_refuses_continuations() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, limits(1, 8_388_608));
+    p.run_turn(
+        "openai",
+        "m",
+        &turn(vec![call("c1", "delete_file", json!({"path": "/tmp/x"}))]),
+        "t",
+        0,
+    );
+    let pa = p.pending_approval("t", "c1").expect("pending");
+    p.close_trace("t");
+    open_and_close(&mut p, "u"); // pushes "t" out of the window
+    assert_eq!(p.closed_trace_state(), (1, 1_048_576));
+    let d = continuation("c1", &pa.approval_id);
+    let err = p
+        .continue_approval("t", "c1", &d, &pa.request_digest, NOW)
+        .unwrap_err();
+    assert_eq!(err.as_str(), "session_closed");
+    assert_eq!(
+        p.cancel_approval("t", "c1").unwrap_err().as_str(),
+        "session_closed"
+    );
+}
+
+#[test]
+fn zero_filter_bits_refuses_every_new_trace_after_a_retirement() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, limits(0, 0));
+    assert_eq!(admit(&mut p, "held", "m1", "r1"), ok());
+    assert_eq!(admit(&mut p, "fresh-before", "m1", "r1"), ok());
+    open_and_close(&mut p, "a");
+    assert_eq!(p.closed_trace_state(), (0, 0));
+    assert_eq!(admit(&mut p, "a", "m1", "r1"), closed("a"));
+    assert_eq!(
+        admit(&mut p, "never-used", "m1", "r1"),
+        closed("never-used")
+    );
+    assert_eq!(admit(&mut p, "held", "m2", "r2"), ok()); // held traces keep working
+}
+
+/// A 32-bit filter makes false refusals frequent; both SDKs refuse exactly the same fresh ids.
+#[test]
+fn retirement_filter_is_identical_across_sdks() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, limits(0, 32));
+    for i in 0..8 {
+        open_and_close(&mut p, &format!("r{i}"));
+    }
+    assert_eq!(p.closed_trace_state(), (0, 4));
+    for i in 0..8 {
+        let t = format!("r{i}");
+        assert_eq!(admit(&mut p, &t, "m2", "r2"), closed(&t));
+    }
+    let refused: Vec<usize> = (0..40)
+        .filter(|i| {
+            admit(&mut p, &format!("f{i}"), "m1", "r1").1.as_deref() == Some("session_closed")
+        })
+        .collect();
+    assert_eq!(refused, RETIRED_FILTER_PARITY);
+}
+
+#[test]
+fn open_close_cycles_stay_within_the_bound_and_replays_stay_refused() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, Limits::default());
+    for i in 0..CYCLES {
+        open_and_close(&mut p, &format!("s{i}"));
+    }
+    let l = p.limits;
+    let bound = (l.max_closed_traces, l.retired_filter_bits / 8);
+    assert_eq!(p.closed_trace_state(), bound);
+    assert!(p.events.is_empty() && p.ledger.traces().next().is_none());
+    for i in 0..CYCLES {
+        let t = format!("s{i}");
+        assert_eq!(admit(&mut p, &t, "m1", "r1"), closed(&t));
+    }
+    assert_eq!(p.closed_trace_state(), bound);
+}
+
+/// Before the fix both SDKs recorded the id of an unknown trace on close: its first message was
+/// then refused `session_closed`.
+#[test]
+fn unknown_close_does_not_poison_the_trace() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, Limits::default());
+    p.close_trace("never-seen");
+    assert_eq!(admit(&mut p, "never-seen", "m1", "r1"), ok());
+}

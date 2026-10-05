@@ -6,7 +6,9 @@ never fabricates or caches a decision, and fails closed on every adapter fault.
 """
 
 import copy
+import hashlib
 import re
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Any, Optional, Protocol, runtime_checkable
 
@@ -290,6 +292,36 @@ def _approval_expired(expires_at: Any, now: Any) -> bool:
     return not _utc_shape(expires_at) or not _utc_shape(now) or now >= expires_at
 
 
+class _RetiredFilter:
+    """Fixed-size filter of retired closed-trace ids (CORE.md, "Closing a trace"). Positions: the
+    first four big-endian 32-bit words of sha256(trace_id as UTF-8), each modulo ``bits``. It never
+    forgets an added id; it can match an id never added (a false refusal, fail closed). With
+    ``bits`` 0 it matches every id once anything was added."""
+
+    def __init__(self, bits: int) -> None:
+        self.bits = max(0, bits)
+        self.data = bytearray((self.bits + 7) // 8)
+        self.count = 0
+
+    def _positions(self, trace_id: str) -> list:
+        h = hashlib.sha256(trace_id.encode("utf-8")).digest()
+        return [int.from_bytes(h[4 * i : 4 * i + 4], "big") % self.bits for i in range(4)]
+
+    def add(self, trace_id: str) -> None:
+        self.count += 1
+        if self.bits:
+            for pos in self._positions(trace_id):
+                self.data[pos >> 3] |= 1 << (pos & 7)
+
+    def matches(self, trace_id: str) -> bool:
+        if not self.bits:
+            return self.count > 0
+        return all(self.data[pos >> 3] & (1 << (pos & 7)) for pos in self._positions(trace_id))
+
+    def size_bytes(self) -> int:
+        return len(self.data)
+
+
 class Pipeline:
     """Reference pipeline: Lenshift.parse -> Core.admit -> CrossAxis.map -> decide -> execute."""
 
@@ -313,7 +345,10 @@ class Pipeline:
         # (trace_id, request_id) -> _PendingEntry. Host-only: only continue_approval and
         # cancel_approval read or change it; a new pipeline starts empty (0.3 cut A1/A2).
         self._pending: dict = {}
-        self._closed: set = set()  # trace ids closed by the host (session state limits)
+        # Trace ids closed by the host (session state limits): the last ``max_closed_traces`` in
+        # close order, exactly; older ones are retired into a fixed-size filter (CORE.md).
+        self._closed: OrderedDict = OrderedDict()
+        self._retired: Optional[_RetiredFilter] = None
 
     # -- session state limits (CORE.md) ---------------------------------------------
     def _holds(self, trace_id: str) -> bool:
@@ -331,15 +366,27 @@ class Pipeline:
         held |= set(self._seq) | set(self._awaiting) | {k[0] for k in self._pending}
         return len(held)
 
+    def _is_closed(self, trace_id: str) -> bool:
+        """True for a closed trace: in the window of recent closed ids, or matched by the
+        retirement filter (which may also match a trace that was never used: refused, fail closed)."""
+        if trace_id in self._closed:
+            return True
+        return self._retired is not None and not self._holds(trace_id) and self._retired.matches(trace_id)
+
+    def closed_trace_state(self) -> tuple:
+        """``(closed ids held exactly, bytes of the retirement filter)``: the state closing traces
+        keeps. Bounded by ``(max_closed_traces, ceil(retired_filter_bits / 8))``."""
+        return len(self._closed), (self._retired.size_bytes() if self._retired is not None else 0)
+
     def _can_hold(self, trace_id: str) -> bool:
         """False for a closed trace, and for a new trace while ``max_traces`` are held."""
-        if trace_id in self._closed:
+        if self._is_closed(trace_id):
             return False
         return self._holds(trace_id) or self._held_count() < self.limits.max_traces
 
     def _message_refusal(self, trace_id: str) -> Optional[tuple]:
         """``(code, message)`` when a further message on the trace is refused, else None."""
-        if trace_id in self._closed:
+        if self._is_closed(trace_id):
             return ErrorCode.SESSION_CLOSED, f"session closed: {trace_id}"
         if not self._holds(trace_id) and self._held_count() >= self.limits.max_traces:
             return ErrorCode.SESSION_LIMIT_EXCEEDED, "session limit exceeded: max_traces"
@@ -349,7 +396,7 @@ class Pipeline:
         return None
 
     def _request_refusal(self, trace_id: str) -> Optional[tuple]:
-        if trace_id in self._closed:
+        if self._is_closed(trace_id):
             return ErrorCode.SESSION_CLOSED, f"session closed: {trace_id}"
         if self.ledger.request_count(trace_id) >= self.limits.max_requests_per_trace:
             msg = "session limit exceeded: max_requests_per_trace"
@@ -366,11 +413,18 @@ class Pipeline:
     def close_trace(self, trace_id: str) -> None:
         """Host-only: drop everything the pipeline keeps for the trace (ledger ids, inputs,
         approval entries, event sequence, events) and refuse any later message, request, input or
-        continuation on it with ``session_closed``. Closing an unknown or closed trace is a no-op.
-        Never called from model output or an admitted envelope."""
-        if trace_id in self._closed:
+        continuation on it with ``session_closed``. Closing a trace that holds no state (unknown,
+        already closed or retired) is a no-op and records nothing. The id joins the window of the
+        last ``max_closed_traces`` closed ids; the oldest id leaving the window is retired into the
+        filter, so it stays refused. Never called from model output or an admitted envelope."""
+        if self._is_closed(trace_id) or not self._holds(trace_id):
             return
-        self._closed.add(trace_id)
+        self._closed[trace_id] = None
+        while len(self._closed) > self.limits.max_closed_traces:
+            oldest, _ = self._closed.popitem(last=False)
+            if self._retired is None:
+                self._retired = _RetiredFilter(self.limits.retired_filter_bits)
+            self._retired.add(oldest)
         self.ledger.forget(trace_id)
         self._inputs.pop(trace_id, None)
         self._seq.pop(trace_id, None)
@@ -386,7 +440,7 @@ class Pipeline:
         ``ValueError`` on a duplicate ``input_id`` for the trace, past ``max_inputs_per_trace``,
         on a new trace while ``max_traces`` are held, or on a closed trace; nothing is recorded then."""
         rec = record if isinstance(record, InputRecord) else InputRecord.from_dict(record)
-        if rec.trace_id in self._closed:
+        if self._is_closed(rec.trace_id):
             raise ValueError(f"session closed: {rec.trace_id}")
         ledger = self._inputs.get(rec.trace_id, [])
         if any(r.input_id == rec.input_id for r in ledger):
@@ -699,7 +753,7 @@ class Pipeline:
         )
 
     def _live_pending(self, trace_id: str, request_id: str) -> _PendingEntry:
-        if trace_id in self._closed:
+        if self._is_closed(trace_id):
             raise ContinuationRefused("session_closed")
         p = self._pending.get((trace_id, request_id))
         if p is None or p.life.state is not State.REQUIRES_APPROVAL:

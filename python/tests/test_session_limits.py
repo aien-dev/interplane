@@ -236,3 +236,130 @@ def test_refused_call_uses_its_request_id():
     out = p.run_turn("openai", "m", turn(call("c8", '{"path": "/tmp/a"}')), "t", 1)
     assert out.results[0].error.code == "duplicate_request_id"
     assert out.results[0].error.message == "duplicate request_id: c8"
+
+
+# -- closed-trace retirement (spec/CORE.md, "Closing a trace") ------------------------------------
+# Same scenarios and literals in rust/crates/interplane-crossveil/tests/session_limits.rs.
+
+CYCLES = 100_000
+# Fresh ids f0..f39 a 32-bit filter holding r0..r7 refuses (sha256 positions, CORE.md).
+RETIRED_FILTER_PARITY = [6, 18, 19, 28, 30, 31, 37, 38]
+
+
+def open_and_close(p, trace):
+    assert admit(p, trace, "m1", "r1") == OK
+    p.close_trace(trace)
+
+
+def closed(trace):
+    return ("rejected", "session_closed", f"session closed: {trace}")
+
+
+def test_retirement_defaults():
+    lim = Limits()
+    assert (lim.max_closed_traces, lim.retired_filter_bits) == (4096, 8_388_608)
+    assert Limits.from_dict({"max_closed_traces": 3}).max_closed_traces == 3
+
+
+def test_closing_an_unknown_trace_retains_nothing():
+    p = pipe()
+    for i in range(10_000):
+        p.close_trace(f"never-seen-{i}")
+    assert p.closed_trace_state() == (0, 0)
+    # the trace was never closed, so its first message is a fresh trace
+    assert admit(p, "never-seen-0", "m1", "r1") == OK
+    p.close_trace("never-seen-0")
+    assert p.closed_trace_state() == (1, 0)
+    p.close_trace("never-seen-0")  # closing a closed trace is a no-op too
+    assert p.closed_trace_state() == (1, 0)
+
+
+def test_retired_trace_stays_refused():
+    p = pipe(max_closed_traces=2)
+    for t in ("a", "b", "c"):
+        open_and_close(p, t)
+    # "a" left the window of the last 2 closed ids and was retired into the filter
+    assert p.closed_trace_state() == (2, 1_048_576)
+    assert admit(p, "a", "m1", "r1") == closed("a")  # the replay
+    assert admit(p, "a", "m2", "r2") == closed("a")  # and any new message
+    with pytest.raises(ValueError, match="^session closed: a$"):
+        p.register_input(input_rec("i1", "a"))
+    p.close_trace("a")  # closing a retired trace is a no-op
+    assert p.closed_trace_state() == (2, 1_048_576)
+    assert not p.ledger.holds("a") and p.inputs("a") == []
+    assert all(e.extra["trace_id"] != "a" for e in p.events)
+    assert admit(p, "d", "m1", "r1") == OK  # a fresh trace is admitted
+
+
+def test_retired_trace_refuses_continuations():
+    p = pipe(max_closed_traces=1)
+    p.run_turn(
+        "openai",
+        "m",
+        {
+            "role": "assistant",
+            "content": None,
+            "tool_calls": [
+                {
+                    "id": "c1",
+                    "type": "function",
+                    "function": {"name": "delete_file", "arguments": '{"path": "/tmp/x"}'},
+                }
+            ],
+        },
+        "t",
+        0,
+    )
+    pa = p.pending_approval("t", "c1")
+    assert pa is not None
+    p.close_trace("t")
+    open_and_close(p, "u")  # pushes "t" out of the window
+    assert p.closed_trace_state() == (1, 1_048_576)
+    with pytest.raises(ContinuationRefused) as e1:
+        p.continue_approval("t", "c1", continuation("c1", pa.approval_id), pa.request_digest, NOW)
+    assert e1.value.reason == "session_closed"
+    with pytest.raises(ContinuationRefused) as e2:
+        p.cancel_approval("t", "c1")
+    assert e2.value.reason == "session_closed"
+
+
+def test_zero_filter_bits_refuses_every_new_trace_after_a_retirement():
+    p = pipe(max_closed_traces=0, retired_filter_bits=0)
+    assert admit(p, "held", "m1", "r1") == OK
+    assert admit(p, "fresh-before", "m1", "r1") == OK
+    open_and_close(p, "a")
+    assert p.closed_trace_state() == (0, 0)
+    assert admit(p, "a", "m1", "r1") == closed("a")
+    assert admit(p, "never-used", "m1", "r1") == closed("never-used")  # cannot be told apart
+    assert admit(p, "held", "m2", "r2") == OK  # held traces keep working
+
+
+def test_retirement_filter_is_identical_across_sdks():
+    """A 32-bit filter makes false refusals frequent; both SDKs refuse exactly the same fresh ids."""
+    p = pipe(max_closed_traces=0, retired_filter_bits=32)
+    for i in range(8):
+        open_and_close(p, f"r{i}")
+    assert p.closed_trace_state() == (0, 4)
+    assert all(admit(p, f"r{i}", "m2", "r2") == closed(f"r{i}") for i in range(8))
+    refused = [i for i in range(40) if admit(p, f"f{i}", "m1", "r1")[1] == "session_closed"]
+    assert refused == RETIRED_FILTER_PARITY
+
+
+def test_open_close_cycles_stay_within_the_bound_and_replays_stay_refused():
+    p = pipe()
+    for i in range(CYCLES):
+        open_and_close(p, f"s{i}")
+    lim = p.limits
+    assert p.closed_trace_state() == (lim.max_closed_traces, lim.retired_filter_bits // 8)
+    assert p.events == [] and not list(p.ledger.traces())
+    for i in range(CYCLES):
+        assert admit(p, f"s{i}", "m1", "r1") == closed(f"s{i}")
+    assert p.closed_trace_state() == (lim.max_closed_traces, lim.retired_filter_bits // 8)
+
+
+def test_unknown_close_does_not_poison_the_trace():
+    """Before the fix both SDKs recorded the id of an unknown trace on close: its first message was
+    then refused ``session_closed``."""
+    p = pipe()
+    p.close_trace("never-seen")
+    assert admit(p, "never-seen", "m1", "r1") == OK

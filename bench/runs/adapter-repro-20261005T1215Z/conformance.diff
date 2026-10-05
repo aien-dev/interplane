@@ -1,0 +1,36 @@
+--- repro-src/conformance/adapter-translation.json	2026-10-05 07:18:25.832952919 -0500
++++ repro-clean/conformance/adapter-translation.json	2026-10-05 07:23:25.461136805 -0500
+@@ -30,6 +30,22 @@
+         "delete_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"const": "approval-case"}}}
+       }
+     },
++    "toy": {
++      "system": "toy",
++      "runtime_id": "toy",
++      "native_reads": {
++        "read_file": {"name": "list_items", "args": {"scope": {"from": ["path"], "as": "basename"}}},
++        "list_dir": {"name": "list_items", "args": {"scope": {"from": ["path"], "as": "basename"}}}
++      },
++      "effects": {
++        "write_file": {"name": "add_item", "args": {"list": {"from": ["path"], "as": "basename"}, "text": {"from": ["content", "text"]}}},
++        "append_note": {"name": "add_item", "args": {"list": {"from": ["path"], "as": "basename"}, "text": {"from": ["text", "content"]}}},
++        "delete_file": {"name": "delete_item", "args": {"item_id": {"from": ["path"], "as": "basename"}}}
++      },
++      "approval_effects": {
++        "delete_file": {"name": "delete_item", "args": {"item_id": {"from": ["path"], "as": "basename"}}}
++      }
++    },
+     "aien": {
+       "system": "T4",
+       "runtime_id": "aien",
+--- repro-src/conformance/runners/adapter_subset.py	2026-10-05 07:18:25.834851425 -0500
++++ repro-clean/conformance/runners/adapter_subset.py	2026-10-05 07:23:25.480137056 -0500
+@@ -230,7 +230,7 @@
+ 
+ 
+ if __name__ == "__main__":
+-    if len(sys.argv) == 3 and sys.argv[1] in ("--subset", "--plans") and sys.argv[2] in ("odysseus", "aien"):
++    if len(sys.argv) == 3 and sys.argv[1] in ("--subset", "--plans") and sys.argv[2] in ("odysseus", "aien", "toy"):
+         if sys.argv[1] == "--subset":
+             print("\n".join(subset(sys.argv[2])))
+         else:

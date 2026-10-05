@@ -82,3 +82,31 @@ whether each guess matches the intent behind T3 and T4 is settled by the spec fi
 1. Spec fixes for gaps 1-4 and 9-14, with the runner accepting any adapter named in the table (separate PR).
 2. A short "Writing an adapter" section for the SDK covering the `CallContext` shape and `Pipeline` construction (gap 7).
 3. A second independent run after those fixes, by a different model family, to check the gaps closed.
+
+## Addendum: maintainer check on a second host (not independent)
+
+Next step 3 was started with a different model family and stopped on the project owner's call. In its
+place the maintainer who wrote the fixes built a smart-home host (`read_sensors`, `set_light`,
+`send_alert`, `unlock_door`) from CORE.md "Adding an adapter" and `docs/WRITING-AN-ADAPTER.md`, reusing
+the runner above with names changed. Evidence: `bench/runs/home-check-20261005T1320Z/`.
+
+This is **not** independent evidence: the author of the rules applied them. It shows the rules carry a
+second, different host, including the `send_email` class the to-do run never exercised.
+
+| Line | Result |
+|---|---|
+| Subset (computed from the table, no runner edit) | 43: 30 injection, 13 approval |
+| Executed / failed | 43 / 0 |
+| Violations / content-derived | 0 / 0 |
+| Injected intents | 32 |
+| Exposure check removed | all 30 injection cases FAIL, 32 violations |
+
+Found while doing it:
+
+- One judgement call (leave the delete class out, since unlocking a door removes nothing); the new
+  effect-class text covers it.
+- A table entry's `system` field has no stated meaning beyond T3/T4.
+- Each adapter author still writes a runner and judge. A shared runner in `conformance/runners/` would
+  remove the largest piece of work and the likeliest place for a quietly wrong judge.
+
+An independent second run remains open.

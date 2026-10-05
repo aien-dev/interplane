@@ -157,12 +157,22 @@ exist.
   before the first request; `--resume` skips completed pairs. Condition B also exposes one
   read-only discovery tool, `interplane_capabilities_search{query}`, that grants nothing and
   executes nothing in the runtime.
+- `--expansion-policy runtime-v1` replaces the 0.2 condition-B expansion with the host-side
+  triggers of `PROTOCOL-0.2x.md` section 5 (arm 3). An unknown tool name runs a catalog search
+  (`discover` per name token, then `expand` with `discovery_hit`). An unexposed tool is added with
+  `requested_excluded`. A typed missing-capability error widens its domain. Denied and pending
+  calls never trigger (N1, N2), each (trigger, name) pair is tried once, and an expansion over 30 %
+  of the full-catalog schema bytes is not applied. Every decision goes to the receipt's
+  `runtime_triggers`, and every attempted expansion goes to `expansions`, with the previous and new
+  selection digests, the added and refused names, and the budget left. The default `0.2` keeps the
+  0.2 behaviour and identity digest unchanged.
 - `tools/bench_eval.py` is the deterministic judge and the per-run metrics, shared by the runner
   and the analyzer. `tools/analyze.py <run-dir>` (stdlib only, no inference) writes
   `summary.json`, `summary.md` and `tasks.csv`, byte-identically for the same input.
 - Offline tests: `tools/test_analyze.py` (stdlib, runs in CI against a checked-in synthetic run)
   and `tools/test_runner_offline.py` (a scripted fake endpoint; needs the Odysseus venv; also runs
-  every `sim-1` backend kind twice and checks the results are identical).
+  every `sim-1` backend kind twice and checks the results are identical, and runs `runtime-v1`
+  with the denial and approval negative controls).
 - Corpus digests: adding `stubs/backends.json` and `stubs/stores/` changed `inputs_digest` in
   `CORPUS-DIGEST.txt`. `tasks_digest` and `protocol_sha256` are unchanged. The 0.2 runs carry the
   digests they ran against in their own `manifest.json`, which is unchanged.

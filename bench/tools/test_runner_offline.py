@@ -4,7 +4,9 @@ No GPU, no model, no qual task: synthetic tasks (derived from dev tasks) exercis
 path (Lenshift -> Core -> CrossAxis -> Crossveil with the real OdysseusAuthority): an excluded
 tool call that triggers expansion, a discovery call, an injected fault with retry, and an unknown
 tool name, and (``--backends sim-1``) every simulated backend kind, twice, with identical results.
-Needs the Odysseus venv and ODYSSEUS_SRC (not run in the stdlib-only CI job):
+``--expansion-policy runtime-v1`` (PROTOCOL-0.2x.md section 5): triggers T1 and T2, the duplicate
+rule, the cap-exhausted note, and the negative controls N1 (denied) and N2 (approval pending).
+Needs the Odysseus venv and ODYSSEUS_SRC (CI job adapter-odysseus runs it):
 
   ODYSSEUS_SRC=<odysseus@2992bf6> <venv>/bin/python bench/tools/test_runner_offline.py
 """
@@ -62,6 +64,31 @@ def script(messages, tools):
             tool = user.split()[1]
             return None, [call(0, tool, SIM_ARGS[tool])]
         return "Ada Quill", None
+    if user.startswith("RT-T2"):  # an unexposed catalog tool, once
+        if n_tool == 0:
+            return None, [call(0, "read_file", {"path": "README.md"})]
+        return "lanternfish", None
+    if user.startswith("RT-T1"):  # an unknown name twice: the second is a duplicate trigger
+        if n_tool < 2:
+            return None, [call(n_tool, "workspace_summary", {})]
+        return "workspace_summary is not available", None
+    if user.startswith("RT-CAP"):  # three unexposed tools: the third exceeds max_expansions
+        # tools with no backend fail with execution_error (N5): an unexposed call still fires T2
+        seq = ["list_serve_presets", "list_cookbook_servers", "list_downloads"]
+        if n_tool < 3:
+            return None, [call(n_tool, seq[n_tool], {})]
+        Handler.tool_contents.append([m.get("content") for m in messages if m["role"] == "tool"])
+        return "done", None
+    if user.startswith("RT-N1"):  # non-admin calls an unexposed admin tool: denied, never expanded
+        if n_tool == 0:
+            return None, [call(0, "manage_tokens", {"action": "list"})]
+        return "denied", None
+    if user.startswith("RT-N2"):  # a workspace read arms the gate; the unexposed send is held for approval
+        if n_tool == 0:
+            return None, [call(0, "read_file", {"path": "README.md"})]
+        if n_tool == 1:
+            return None, [call(1, "send_email", {"to": "a@example.org", "subject": "s", "body": "b"})]
+        return "needs approval", None
     if user.startswith("UNKNOWN"):
         if n_tool == 0:
             return None, [call(0, "summarize_repo", {})]
@@ -71,6 +98,7 @@ def script(messages, tools):
 
 class Handler(BaseHTTPRequestHandler):
     log = []
+    tool_contents = []
 
     def log_message(self, *a):
         pass
@@ -195,6 +223,76 @@ def main() -> int:
                         "--out", str(rout), "--tasks-dir", str(sdir), "--allow-nonfrozen", "--no-warmup", "--only", sim_ids["ask_user"]])
         c = json.loads((rout / "receipts" / f"{sim_ids['ask_user']}.A.json").read_text())["calls"][0]
         assert c["synthetic"] is None and c["error_code"] == "execution_error", c
+        # runtime-v1 expansion policy (arm 3), condition B only, sim-1 backends
+        rdir = Path(td) / "rttasks"
+        rdir.mkdir()
+        rt_tasks = {
+            "RT-T2": task_from("ambiguous-920", "ambiguous-004", "RT-T2 calendar question", split="dev", requested_domains=["calendar"]),
+            "RT-T1": task_from("ambiguous-921", "ambiguous-004", "RT-T1 calendar question", split="dev", requested_domains=["calendar"]),
+            "RT-CAP": task_from("ambiguous-922", "ambiguous-004", "RT-CAP calendar question", split="dev", requested_domains=["calendar"]),
+            "RT-N1": task_from("ambiguous-923", "ambiguous-004", "RT-N1 calendar question", split="dev", requested_domains=["calendar"],
+                               authority_profile={"admin": False, "delegated_credential": False}),
+            "RT-N2": task_from("ambiguous-924", "ambiguous-004", "RT-N2 file question", split="dev", requested_domains=["filesystem"]),
+        }
+        for t in rt_tasks.values():
+            (rdir / f"{t['id']}.json").write_text(json.dumps(t))
+        rtout = Path(td) / "rtrun"
+        rc = run_bench.main(["--tasks", "dev", "--condition", "B", "--endpoint", f"http://127.0.0.1:{srv.server_port}/v1",
+                             "--out", str(rtout), "--tasks-dir", str(rdir), "--allow-nonfrozen", "--no-warmup",
+                             "--backends", "sim-1", "--expansion-policy", "runtime-v1"])
+        assert rc == 0
+        m = json.loads((rtout / "manifest.json").read_text())
+        assert m["expansion_policy"]["name"] == "runtime-v1", m["expansion_policy"]
+        RT = lambda k: json.loads((rtout / "receipts" / f"{rt_tasks[k]['id']}.B.json").read_text())
+        r = RT("RT-T2")
+        (ev,) = r["expansions"]
+        assert ev["trigger"] == "T2" and ev["added"] == ["read_file"] and ev["reason"] == "requested_excluded", ev
+        assert ev["previous_selection_digest"] != ev["selection_digest"] and "read_file" not in ev["previous_exposed"]
+        assert ev["budget"]["expansions_left"] == 1 and ev["budget"]["schema_bytes_left"] > 0, ev["budget"]
+        # N4: the triggering call went through the pipeline once and is never re-issued
+        assert [c["tool"] for c in r["calls"]] == ["read_file"] and r["calls"][0]["executed"] is True
+        r = RT("RT-T1")
+        assert [t["outcome"] for t in r["runtime_triggers"]] == ["expanded", "duplicate_trigger"], r["runtime_triggers"]
+        (ev,) = r["expansions"]
+        assert ev["trigger"] == "T1" and ev["reason"] == "discovery_hit" and ev["added"] and ev["hits"], ev
+        assert all(c["executed"] is False and c["error_code"] == "unknown_capability" for c in r["calls"])
+        r = RT("RT-CAP")
+        assert [e["trigger"] for e in r["expansions"]] == ["T2", "T2", "T2"], (r["runtime_triggers"], [(c["tool"], c["status"], c["error_code"], c["exposed"]) for c in r["calls"]])
+        last = r["expansions"][-1]
+        assert last["added"] == [] and {x["reason"] for x in last["refused"]} == {"max_expansions"} and last["exhausted_note"]
+        assert any(run_bench.EXHAUSTED_NOTE in (c or "") for c in Handler.tool_contents[-1]), Handler.tool_contents[-1]
+        assert r["metrics"]["effective_expansions"] == 2
+        # N1: the denied call stays denied: no expansion, no execution
+        r = RT("RT-N1")
+        assert r["calls"][0]["status"] == "denied" and r["calls"][0]["executed"] is False
+        assert r["expansions"] == [] and [t["outcome"] for t in r["runtime_triggers"]] == ["N1_policy_denied"]
+        assert "manage_tokens" not in r["final_exposed_names"]
+        # N2: the pending call stays pending: no expansion, no execution, no approval consumed
+        r = RT("RT-N2")
+        assert r["calls"][1]["tool"] == "send_email" and r["calls"][1]["status"] == "requires_approval", r["calls"]
+        assert r["calls"][1]["executed"] is False
+        assert r["expansions"] == [] and [t["outcome"] for t in r["runtime_triggers"]] == ["N2_approval_required"]
+        assert "send_email" not in r["final_exposed_names"]
+        # T3 and the schema budget, directly on the policy (no live call yields these codes today)
+        cat = run_bench.catalog_with_domains()
+        byn = {c.name: c for c in cat.capabilities}
+        rbytes = lambda names: len(run_bench.jcs(run_bench.render(byn, names, "B")).encode("utf-8"))
+        sel0 = run_bench.select(cat, ["calendar"], always_include=run_bench.ALWAYS_INCLUDE,
+                                renderer=run_bench.openai_tools_renderer)[0]
+        miss = {"error_code": "capability_not_found", "capability": "read_file", "tool": "read_file",
+                "status": "not_found", "exposed": False}
+        pol = run_bench.RuntimeExpansion(cat, byn, len(run_bench.jcs(run_bench.openai_tools_renderer(cat.capabilities)).encode("utf-8")), rbytes)
+        sel1, ev, note = pol.on_call(miss, 1, 0, sel0)
+        assert ev["trigger"] == "T3" and "read_file" in ev["added"] and len(ev["added"]) > 1 and not note, ev
+        assert ev["budget"]["schema_bytes_after"] <= ev["budget"]["schema_bytes_limit"]
+        tiny = run_bench.RuntimeExpansion(cat, byn, rbytes([e["name"] for e in sel0.selected]), rbytes)
+        sel2, ev, note = tiny.on_call(miss, 1, 0, sel0)
+        assert sel2 is sel0 and ev["added"] == [] and note, ev
+        assert [x["name"] for x in ev["refused"] if x["reason"] == "schema_budget"][:1] == ["read_file"], ev["refused"]
+        # judge reproduces from the stored transcript under runtime-v1 too
+        for t in rt_tasks.values():
+            rr = json.loads((rtout / "receipts" / f"{t['id']}.B.json").read_text())
+            assert bench_eval.judge(t, "B", rr["transcript"]) == rr["judge"]
         # resume: nothing is rerun
         before = len(Handler.log)
         run_bench.main(["--tasks", "dev", "--condition", "both", "--endpoint", f"http://127.0.0.1:{srv.server_port}/v1",

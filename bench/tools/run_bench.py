@@ -259,6 +259,117 @@ def raw_ok(raw: dict) -> bool:
 
 # ------------------------------------------------------------------------------- one run
 
+# ---------------------------------------------------------------- runtime-triggered expansion
+# PROTOCOL-0.2x.md section 5 (arm 3). Host-side, visibility only: it runs after Odysseus has decided
+# a call and only ever calls interplane.crossaxis.discover / expand. It never decides, executes,
+# retries or re-issues a call, and never touches approvals.
+
+RUNTIME_POLICY = "runtime-v1"
+EXPANSION_POLICIES = ("0.2", RUNTIME_POLICY)
+SCHEMA_BUDGET_RATIO = 0.30
+DISCOVER_LIMIT = 8
+MISSING_CODES = ("capability_not_found", "stale_capability")
+SUPPRESSED = {"denied": "N1_policy_denied", "requires_approval": "N2_approval_required"}
+CAP_REASONS = ("max_expansions", "max_added_per_expansion", "schema_budget")
+EXHAUSTED_NOTE = ("No further tools can be made available in this conversation. Answer with the tools "
+                  "you have, or tell the user what is missing.")
+
+
+def name_tokens(name: str) -> list:
+    """Search tokens of a requested tool name: split on _ . -, lowercase, length >= 3, first-seen order."""
+    out: list = []
+    for tok in re.split(r"[_.\-]+", name.lower()):
+        if len(tok) >= 3 and tok not in out:
+            out.append(tok)
+    return out
+
+
+class RuntimeExpansion:
+    """Triggers T1 (unknown tool -> catalog search), T2 (unexposed tool -> requested_excluded) and
+    T3 (typed missing capability -> widen the domain), with negative rules N1/N2 (denied and
+    pending calls never trigger), one attempt per (trigger, name), and a schema-byte budget."""
+
+    def __init__(self, catalog, by_name: dict, full_bytes: int, render_bytes):
+        self.catalog, self.by_name = catalog, by_name
+        self.limit = int(full_bytes * SCHEMA_BUDGET_RATIO)
+        self.render_bytes = render_bytes
+        self.seen: set = set()
+        self.log: list = []
+
+    def classify(self, rec: dict, exposed: set):
+        code, cap, tool = rec["error_code"], rec["capability"], rec["tool"]
+        if code == "unknown_capability" or (code == "capability_not_found" and (cap or tool) not in self.by_name):
+            return "T1", tool
+        if code in MISSING_CODES and cap in self.by_name:
+            return "T3", cap
+        if cap is not None and cap in self.by_name and cap not in exposed:
+            return "T2", cap
+        return None, None
+
+    def on_call(self, rec: dict, round_no: int, index: int, selection):
+        """Returns (selection, expansion_event or None, append_exhausted_note)."""
+        names = [e["name"] for e in selection.selected]
+        trig, name = self.classify(rec, set(names))
+        if trig is None:
+            return selection, None, False
+        entry = {"round": round_no, "call_index": index, "trigger": trig, "name": name,
+                 "signal": {"error_code": rec["error_code"], "exposed": rec["exposed"], "status": rec["status"]}}
+        self.log.append(entry)
+        if rec["status"] in SUPPRESSED:
+            entry["outcome"] = SUPPRESSED[rec["status"]]
+            return selection, None, False
+        if (trig, name) in self.seen:
+            entry["outcome"] = "duplicate_trigger"
+            return selection, None, False
+        self.seen.add((trig, name))
+        if trig == "T1":
+            hits: set = set()
+            for tok in name_tokens(name or ""):
+                hits.update(discover(self.catalog, selection, tok, limit=DISCOVER_LIMIT))
+            hits_l = sorted(hits)[:DISCOVER_LIMIT]
+            entry["query_tokens"] = name_tokens(name or "")
+            if not hits_l:
+                entry["outcome"] = "no_hits"
+                return selection, None, False
+            evidence = {"kind": "discovery_hit", "query": name, "names": hits_l}
+        elif trig == "T2":
+            evidence = {"kind": "requested_excluded", "name": name}
+        else:
+            evidence = {"kind": "requested_excluded", "name": name, "include_domain_siblings": True}
+        prev_digest = selection_digest(selection)
+        event = {"round": round_no, "call_index": index, "policy": RUNTIME_POLICY, "trigger": trig, "name": name,
+                 "signal": entry["signal"], "reason": evidence["kind"],
+                 "previous_selection_digest": prev_digest, "previous_exposed": names}
+        try:
+            new = expand(selection, self.catalog, evidence)
+        except ExpansionError as err:
+            entry["outcome"] = "error"
+            event.update({"error": str(err), "added": [], "refused": [], "selection_digest": prev_digest})
+            return selection, event, False
+        exp = new.extra["expansions"][-1]
+        added, refused = list(exp["added"]), list(exp["refused"])
+        bytes_after = self.render_bytes([e["name"] for e in new.selected])
+        if added and bytes_after > self.limit:
+            refused = [{"name": n, "reason": "schema_budget"} for n in added] + refused
+            added, new = [], selection
+            bytes_after = self.render_bytes(names)
+        bounds = new.selector.get("expansion") or {}
+        used = sum(1 for e in (new.extra.get("expansions") or []) if e.get("added"))
+        max_exp = bounds.get("max_expansions", 2)
+        event.update({
+            "evidence_digest": exp["evidence_digest"], "expansion_round": exp["round"],
+            "selection_digest": selection_digest(new), "added": added, "refused": refused,
+            "budget": {"expansions_left": max(max_exp - used, 0), "schema_bytes_limit": self.limit,
+                       "schema_bytes_after": bytes_after, "schema_bytes_left": self.limit - bytes_after},
+        })
+        if trig == "T1":
+            event["hits"] = hits_l
+        note = not added and any(r["reason"] in CAP_REASONS for r in refused)
+        event["exhausted_note"] = note
+        entry["outcome"] = "expanded" if added else "refused"
+        return new, event, note
+
+
 def render(by_name: dict, names: list, cond: str) -> list:
     tools = openai_tools_renderer([by_name[n] for n in names])
     return tools + [DISCOVERY_SPEC] if cond == "B" else tools
@@ -313,6 +424,11 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
 
     def current_names() -> list:
         return all_names if selection is None else [e["name"] for e in selection.selected]
+
+    rt = None
+    if cond == "B" and cx.get("expansion_policy") == RUNTIME_POLICY:
+        rt = RuntimeExpansion(catalog, by_name, cx["full_tools_bytes"],
+                              lambda names: len(jcs(render(by_name, names, "B")).encode("utf-8")))
 
     rounds, calls, expansion_events, coverage_trace, round_tools = [], [], [], [], []
     final_answer, ended, infra_error = None, "max_rounds", None
@@ -395,7 +511,16 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
                 tool_msgs[i] = out.rendered[j]
         # ---- expansion and discovery, in call order (visibility only; authority was already decided)
         for i in range(len(orig)):
-            if i in recs:
+            if i in recs and rt is not None:
+                selection, ev, note = rt.on_call(recs[i], turn + 1, i, selection)
+                if ev is not None:
+                    expansion_events.append(ev)
+                    n_eff += 1 if ev["added"] else 0
+                if note and tool_msgs[i] is not None:
+                    tm = dict(tool_msgs[i])
+                    tm["content"] = (tm.get("content") or "") + "\n\n" + EXHAUSTED_NOTE
+                    tool_msgs[i] = tm
+            elif i in recs:
                 cap = recs[i]["capability"]
                 if cond == "B" and cap is not None and cap in by_name and cap not in set(current_names()):
                     try:
@@ -459,6 +584,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         "final_exposed_names": list(final_names), "coverage_trace": coverage_trace, "wall_ms": wall_ms,
         "selection": selection, "base_messages": base_messages, "_round_tools": round_tools,
         "trace_id": trace_id, "workspace_events": dict(authority.bench_events),
+        "runtime_triggers": rt.log if rt is not None else None,
     }
 
 
@@ -526,6 +652,7 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
         "discovery_tool": DISCOVERY if cond == "B" else None,
         "selection": selection_block,
         "rounds": run["rounds"], "calls": run["calls"], "expansions": run["expansions"],
+        **({"runtime_triggers": run["runtime_triggers"]} if run.get("runtime_triggers") is not None else {}),
         "final_exposed_names": run["final_exposed_names"] if cond == "B" else None,
         "coverage_trace": run["coverage_trace"],
         "ended": run["ended"], "infra_error": run["infra_error"],
@@ -649,6 +776,10 @@ def build_identity(cx: dict, tasks: list) -> dict:
     }
     if cx["backends"] != "reference":  # the 0.2 reference identity stays byte-identical
         ident["backends"] = backends_identity(cx)
+    if cx["expansion_policy"] != "0.2":
+        ident["expansion_policy"] = {"name": cx["expansion_policy"], "schema_budget_ratio": SCHEMA_BUDGET_RATIO,
+                                     "full_tools_bytes": cx["full_tools_bytes"], "discover_limit": DISCOVER_LIMIT,
+                                     "triggers": ["T1", "T2", "T3"], "suppressed": sorted(SUPPRESSED.values())}
     ident["identity_digest"] = digest_of(ident)
     return ident
 
@@ -670,6 +801,8 @@ def make_cx(args, tasks_dir: Path) -> dict:
         "system_prompt": sp, "client": client, "counter": LiveCounter(client), "max_rounds": args.max_rounds,
         "fixture_digests": {f: tree_digest(BENCH / f) for f in fixtures},
         "backends": args.backends,
+        "expansion_policy": args.expansion_policy,
+        "full_tools_bytes": len(jcs(openai_tools_renderer(catalog.capabilities)).encode("utf-8")),
         "backend_registry": sim_backends.load_backends() if args.backends == "sim-1" else None,
         "generation": {"temperature": args.temperature, "seed": args.seed, "max_tokens": args.max_tokens,
                        "timeout_s": args.timeout, "max_rounds": args.max_rounds, "dialect": "openai"},
@@ -725,6 +858,9 @@ def main(argv=None) -> int:
     ap.add_argument("--backends", choices=["reference", "sim-1"], default="reference",
                     help="reference = 0.2 behaviour (only read_file/ls/glob/grep and task stubs execute); "
                          "sim-1 = bench/stubs/backends.json simulated backends")
+    ap.add_argument("--expansion-policy", choices=list(EXPANSION_POLICIES), default="0.2",
+                    help="0.2 = the 0.2 condition-B expansion (unexposed call -> requested_excluded); "
+                         "runtime-v1 = PROTOCOL-0.2x.md section 5 triggers T1-T3 with N1/N2 and caps (arm 3)")
     args = ap.parse_args(argv)
 
     out = Path(args.out)
@@ -778,6 +914,7 @@ def main(argv=None) -> int:
         "catalog": {"digest": identity["catalog_digest"], "capabilities": identity["catalog_capabilities"]},
         "corpus": corpus, "system_prompt_digest": identity["system_prompt_digest"], "generation": cx["generation"],
         "backends": identity.get("backends", {"mode": "reference"}),
+        "expansion_policy": identity.get("expansion_policy", {"name": "0.2"}),
         "order_rule": "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)",
         "deterministic_identity": identity,
     }

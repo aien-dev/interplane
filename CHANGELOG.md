@@ -15,6 +15,7 @@
 - Benchmark corpus (44 tasks), protocol, paired runner and analyzer; run `qual-20261004T2207Z`.
 - Bench simulated backends `sim-1` (`bench/stubs/backends.json`, `run_bench.py --backends sim-1`): every tool a task lists executes deterministically after Odysseus authorizes it; `validate.py` checks coverage, determinism and that stores do not leak expansion answers. Default stays the 0.2 reference behaviour; `inputs_digest` updated.
 - Pre-registered 0.2x protocol (`bench/PROTOCOL-0.2x.md`, future work, no results): 120-task held-out set (`bench/heldout-0.2x/`), the 0.2 tasks become dev cases, seven conditions (four one-factor arms with matched full-catalog baselines), runtime-triggered expansion rules and caps, thresholds and a power table (`stats.py --power`); `validate.py --corpus 0.2x` in CI.
+- Runtime-triggered expansion `run_bench.py --expansion-policy runtime-v1` (PROTOCOL-0.2x arm 3): host-side T1/T2/T3 over the existing `discover`/`expand`, N1/N2 negative rules, duplicate and schema-budget caps, `runtime_triggers` receipts; offline tests include denial and approval negative controls. Default `0.2` unchanged.
 - AIEN adapter on the real `EffectAuthority` path (sovereign-core #203, #204, pinned 6554aac), single-use approval tests.
 
 - `selection.measure`: `rendered_bytes` and an optional unit-disciplined `tokens` block (`bytes`, `tokens_model_reported`, `tokens_endpoint_tokenizer`, `tokens_estimated`); `TokenCounter` with `BytesOnly` and `EstimatedTokens` (estimator v1) in both languages.

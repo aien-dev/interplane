@@ -116,3 +116,5 @@ jobs:
           ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 \
             python -m pytest tests -q -p no:cacheprovider -rs | tee pytest.log
           ! grep -q "skipped" pytest.log
+      - name: bench runner offline test (scripted endpoint, sim-1 backends, runtime-v1 with denial/approval negative controls)
+        run: ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_runner_offline.py

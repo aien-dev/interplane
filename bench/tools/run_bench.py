@@ -1045,6 +1045,11 @@ def main(argv=None) -> int:
             return 0
     elif args.check_corpus:
         raise SystemExit("--check-corpus is for the 0.2y corpora")
+    if args.corpus in Y_CORPORA and not args.allow_nonfrozen \
+            and os.path.realpath(tasks_dir) != os.path.realpath(validate.CORPORA[args.corpus]["tasks"]):
+        # The frozen digest covers the canonical folder only: a real run reads exactly those tasks.
+        raise SystemExit(f"corpus {args.corpus}: --tasks-dir {tasks_dir} is not the frozen tasks folder "
+                         f"{validate.CORPORA[args.corpus]['tasks']}: refusing to run (synthetic runs need --allow-nonfrozen)")
     args.campaign_mode = heldout or args.condition not in ("A", "B", "both")
     if args.campaign_mode:
         if args.backends != "sim-1":
@@ -1061,6 +1066,9 @@ def main(argv=None) -> int:
         conds = list(CAMPAIGN_CONDITIONS)
     else:
         conds = [args.condition]
+    if args.corpus == "0.2y-cal" and conds != ["A"]:
+        # Never bypassed, not even for synthetic runs: no B condition ever runs on the calibration set.
+        raise SystemExit("the calibration run is condition A, seed 42, once (PREREG-0.2y section 5): pass --condition A")
     src = os.environ.get("ODYSSEUS_SRC", "")
     ody = _odysseus.load()
     if ody is None or not src:
@@ -1092,6 +1100,7 @@ def main(argv=None) -> int:
     manifest_path = out / "manifest.json"
     manifest = {
         "kind": "interplane_bench_manifest", "manifest_version": "0.2.0", "run_id": run_id,
+        "allow_nonfrozen": bool(args.allow_nonfrozen),  # true = synthetic or unfrozen inputs: never a result
         "tasks": args.tasks, "task_ids": [t["id"] for t in tasks], "conditions": conds,
         "interplane": git_state(REPO), "runner": {"run_bench_sha256": file_sha(Path(__file__)), "bench_eval_sha256": file_sha(BENCH / "tools" / "bench_eval.py")},
         "odysseus": env["odysseus"],

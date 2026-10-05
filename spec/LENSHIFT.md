@@ -219,7 +219,8 @@ Required qwen35 fixtures: valid single call; multiple calls; malformed (unclosed
 reasoning plus call; plain answer with no tool; unknown tool name (parses fine); partial/truncated
 call; multi-line parameter value; JSON-typed parameter; hermes_json form. Required aien_legacy fixtures: valid single call; multiple calls; reasoning plus call; repaired bracket; repaired missing braces; trailing comma (rejected); single quotes (rejected); unterminated (rejected, partial); fenced json fallback; placeholder name (rejected); missing arguments; arguments not object; plain answer. Required openai fixtures:
 single; multiple; arguments not JSON; arguments not object; missing name; reasoning_content present;
-plain answer; legacy function_call.
+plain answer; legacy function_call; arguments as a decoded object (rejected); arguments not a string
+(rejected).
 
 Fixture provenance: inputs are constructed from the official template grammar, not captured from a
 live model, until the qualification run under `qualification/` captures real outputs and pins them.

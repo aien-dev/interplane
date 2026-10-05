@@ -52,16 +52,19 @@ def decide_subset(name, case, adapter, table):
     """(in_subset, reason). The rule, in order; the first failing clause names the reason."""
     ad = table["adapters"][adapter]
     is_approval = name.startswith("approval/")
-    if any(k in case for k in table["harness_keys"]):
+    is_pf = name in table["provider_failure_cases"]
+    if is_pf and "provider_failure_effects" not in ad:
+        return False, "provider-failure case (protocol A15) runs on T4 only"
+    if any(k in case for k in table["harness_keys"] if not (is_pf and k == "mock_fault")):
         return False, "carries a harness-only mock key"
     for s in case["steps"]:
         if any(k in s for k in table["harness_steps"]):
             return False, "has a harness-only mock step"
     if is_approval:
         num = int(name.split("/")[1][:2])
-        if not table["approval_cases"]["first"] <= num <= table["approval_cases"]["last"]:
+        if not is_pf and not table["approval_cases"]["first"] <= num <= table["approval_cases"]["last"]:
             return False, "not a protocol approval case (A01 to A14)"
-        classes = ad["approval_effects"]
+        classes = ad["provider_failure_effects" if is_pf else "approval_effects"]
     else:
         target = case["injection"]["target"]["capability"]
         if target not in ad["effects"]:
@@ -100,6 +103,8 @@ def _map_args(spec, args):
             continue
         if m.get("as") == "basename" and isinstance(val, str):
             val = val.rsplit("/", 1)[-1]
+        if "prefix" in m and isinstance(val, str):
+            val = m["prefix"] + val
         out[key] = val
     out.update({k: v for k, v in args.items() if k not in used})
     return out
@@ -184,7 +189,10 @@ def translate(name, case, adapter, table=None):
     table = table or load_table()
     ad = table["adapters"][adapter]
     is_approval = name.startswith("approval/")
-    classes = ad["approval_effects"] if is_approval else ad["effects"]
+    if name in table["provider_failure_cases"]:
+        classes = ad["provider_failure_effects"]
+    else:
+        classes = ad["approval_effects"] if is_approval else ad["effects"]
     plan = []
     for step in case["steps"]:
         if "approve" in step or "cancel" in step:

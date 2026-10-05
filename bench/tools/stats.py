@@ -67,6 +67,15 @@ def mcnemar_exact(f: int, g: int) -> float:
     return min(1.0, 2 * tail)
 
 
+def mcnemar_one_sided(f: int, g: int) -> float:
+    """One-sided exact McNemar p-value for "f beats g": P(X >= f), X ~ Binomial(f + g, 1/2).
+    PREREG-0.2y section 6 / 7: 6 wins to 0 gives 0.015625, 7 to 1 gives 0.03515625."""
+    m = f + g
+    if m == 0:
+        return 1.0
+    return sum(math.comb(m, i) for i in range(f, m + 1)) / 2 ** m
+
+
 MARGIN = 0.10  # pre-registered success-delta margin (PROTOCOL-0.2.md)
 
 

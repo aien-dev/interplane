@@ -23,6 +23,13 @@ and writes campaign-summary.json and campaign-summary.md: per arm (1 to 4) the g
 seed 42 against its matched baseline, the diagnostics O2a and O2b, O1 and O2 per expansion kind,
 trigger counts, refusals, the negative controls, and the label ``fragile`` when a gate criterion
 of the arm flips under seed 43 or 44. The 0.2 outputs above are unchanged.
+
+0.2y mode (PREREG-0.2y section 6; implemented in analyze_y.py):
+
+  python3 bench/tools/analyze.py <seed-42 block> --campaign-y [--stability <seed-43>,<seed-44>] [--out DIR]
+
+writes campaign-y-summary.json and campaign-y-summary.md: the primary metric P, the guards T, S, Safety
+and Validity, the failed-request exclusion with its two sensitivity checks, and the fragile label.
 """
 
 from __future__ import annotations
@@ -781,11 +788,16 @@ def main(argv=None) -> int:
     ap.add_argument("--out", help="output directory (default: the run directory)")
     ap.add_argument("--tasks-dir", default=None, help="default: bench/tasks, or bench/heldout-0.2x/tasks with --campaign")
     ap.add_argument("--campaign", action="store_true", help="0.2x seven-condition analysis; run_dir is the seed 42 block")
+    ap.add_argument("--campaign-y", action="store_true", help="0.2y three-condition analysis (A, B3, B5; P, T, S, Safety, Validity); run_dir is the seed 42 block")
     ap.add_argument("--stability", default="", help="with --campaign: comma-separated seed 43 and 44 block directories")
     ap.add_argument("--exclude", default="", help="comma-separated qual task ids for a labelled sensitivity section")
     ap.add_argument("--exclude-reason", default="")
     args = ap.parse_args(argv)
     run_dir = Path(args.run_dir)
+    if args.campaign_y:
+        import analyze_y
+        return analyze_y.main([args.run_dir, "--stability", args.stability] + (["--out", args.out] if args.out else [])
+                              + (["--tasks-dir", args.tasks_dir] if args.tasks_dir else []))
     if args.campaign:
         tdir = Path(args.tasks_dir) if args.tasks_dir else HELDOUT_TASKS
         summary = build_campaign(run_dir, [Path(x) for x in args.stability.split(",") if x], tdir)

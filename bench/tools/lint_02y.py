@@ -198,7 +198,13 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
         and "discarded_surplus" for a passing one beyond the group size (kept in the log, never run);
       * round r >= 1 (a top-up) may only use the brief of a group that was short after the rounds
         before it, and there are at most MAX_TOP_UPS such rounds;
-      * round 0 has exactly ``first_pass[brief]`` requests per brief (default 36 each, two briefs).
+      * one call = one (round, brief). It asks for ``first_pass[brief]`` requests in round 0 (default 36 each,
+        two briefs) and TOP_UP_STEP * r in round r. Amendment 3 (PREREG-0.2y section 11): when a call returns
+        more, the first ones up to the asked number count and every later one must carry status
+        "discarded_over_delivery" (logged, never linted into a group, never run); a call that returns fewer
+        is recorded in ``notes``, not an error. A call that returns nothing is one log line with status
+        "empty_call" and an empty request (it takes an id, so the round stays visible); it must be the only
+        line of its call. Round 0 must contain every brief of ``first_pass``.
     ``fixtures`` maps a fixture name to its file base names. With ``groups=("any",)`` (the calibration
     set, which has no group split) every passing request counts into one pool."""
     target = target or {g: GROUP_SIZE for g in groups}
@@ -221,23 +227,30 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
             errors.append(f"{e['id']}: round {e.get('round')} after round {prev} (ids must follow authoring order)")
         prev = max(prev, e.get("round", 0))
 
-    briefs0: dict = {}
-    for e in ordered:
-        if e.get("round", 0) == 0:
-            briefs0[e.get("brief")] = briefs0.get(e.get("brief"), 0) + 1
     want = first_pass if first_pass is not None else {"everyday": FIRST_PASS_PER_BRIEF, "question": FIRST_PASS_PER_BRIEF}
-    if briefs0 != want:
-        errors.append(f"first pass has {briefs0} requests per brief, expected {want}")
-
-    # top-up sizes: round r asks for TOP_UP_STEP * r requests per call, one call per brief used in that round
-    per_call: dict = {}
+    calls: dict = {}
     for e in ordered:
-        if e.get("round", 0) >= 1:
-            key = (e["round"], e.get("brief"))
-            per_call[key] = per_call.get(key, 0) + 1
-    for (r, brief), n in sorted(per_call.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
-        if n != TOP_UP_STEP * r:
-            errors.append(f"top-up round {r}, brief {brief!r}: {n} requests, expected {TOP_UP_STEP * r}")
+        calls.setdefault((e.get("round", 0), e.get("brief")), []).append(e)
+    briefs0 = {b for (r, b) in calls if r == 0}
+    if briefs0 != set(want):
+        errors.append(f"first pass has briefs {sorted(map(str, briefs0))}, expected {sorted(want)}")
+    notes: list = []
+    over: set = set()  # ids beyond the asked number of their call
+    for (r, brief), es in sorted(calls.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
+        asked = want.get(brief, 0) if r == 0 else TOP_UP_STEP * r
+        what = "first pass" if r == 0 else f"top-up round {r}"
+        empty = [e for e in es if e.get("status") == "empty_call"]
+        if empty and (len(es) != 1 or es[0].get("request", "") != ""):
+            errors.append(f"{empty[0]['id']}: an empty_call line must be the only line of its call and carry no request")
+        returned = 0 if empty else len(es)
+        if returned < asked:
+            notes.append(f"{what}, brief {brief!r}: {returned} requests returned, {asked} asked")
+        over.update(e["id"] for e in empty)  # never linted
+        for e in es[asked:]:
+            over.add(e["id"])
+            if e.get("status") != "discarded_over_delivery":
+                errors.append(f"{e['id']}: beyond the {asked} asked in {what}, brief {brief!r}, but recorded "
+                              f"status {e.get('status')!r}, expected 'discarded_over_delivery'")
 
     count = {g: 0 for g in groups}
     short_before = {0: set(groups)}
@@ -251,9 +264,11 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
             short_before[r] = {g for g in groups if count[g] < target[g]}
             if not short_before[r]:
                 errors.append(f"{e['id']}: top-up round {r} although no group was short")
-        allowed = set(briefs0) if pooled else {brief_for_group[g] for g in short_before[r] if g in brief_for_group}
+        allowed = briefs0 if pooled else {brief_for_group[g] for g in short_before[r] if g in brief_for_group}
         if r >= 1 and e.get("brief") not in allowed:
             errors.append(f"{e['id']}: top-up brief {e.get('brief')!r} does not match a short group")
+        if e["id"] in over:
+            continue  # checked above; an over-delivered request is never linted into a group
         if e.get("fixture") not in fixtures:
             errors.append(f"{e['id']}: unknown fixture {e.get('fixture')!r}")
         res = lint_request(e["request"], catalog, rule, fixtures.get(e.get("fixture"), ()), tool_domains)
@@ -277,4 +292,4 @@ def replay(entries: list, catalog: Iterable, rule: dict, fixtures: dict, tool_do
     for g in groups:
         if count[g] != target[g]:
             errors.append(f"group {g}: {count[g]} accepted, need exactly {target[g]}")
-    return {"errors": errors, "accepted": accepted, "counts": count}
+    return {"errors": errors, "accepted": accepted, "counts": count, "notes": notes}

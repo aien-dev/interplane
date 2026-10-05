@@ -1,0 +1,3 @@
+# Model used to write keeper summaries
+default_model = "keeper-7b"
+fallback_model = "keeper-2b"

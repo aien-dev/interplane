@@ -1,0 +1,48 @@
+{
+  "_note": "Private-data store for heldout-0.2x/fixtures/orchard (backends sim-1). Holds no expansion answer.",
+  "notes": [
+    {
+      "id": "e5a1c3d0",
+      "title": "Pruning",
+      "note_type": "note",
+      "content": "Prune the Russet row on 2026-02-14.",
+      "label": "",
+      "archived": false
+    }
+  ],
+  "memory": [
+    {
+      "id": "m-o1",
+      "category": "fact",
+      "text": "Reports are in GBP."
+    }
+  ],
+  "calendar": [
+    {
+      "uid": "ev-o1",
+      "summary": "Cider tasting",
+      "dtstart": "2027-05-01T18:00",
+      "location": "Barn"
+    }
+  ],
+  "contacts": [
+    {
+      "uid": "c-o1",
+      "name": "Hal Brook",
+      "emails": [
+        "hal@brookfarm.example"
+      ],
+      "phones": []
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-o1",
+      "title": "Yield summary draft",
+      "language": "markdown",
+      "snippet": "Bramley 2026: 3300 kg (draft)"
+    }
+  ],
+  "models": [],
+  "tokens": []
+}

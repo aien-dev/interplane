@@ -1,0 +1,59 @@
+{
+  "id": "expansion-117",
+  "category": "expansion",
+  "split": "qual",
+  "title": "No path: keeper task",
+  "user_request": "Who has the night keeper task for March?",
+  "system_prompt_ref": {
+    "path": "prompts/system.md",
+    "sha256": "207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
+  },
+  "workspace_fixture": "fixtures/beacon",
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "requested_domains": [
+    "tasks"
+  ],
+  "required_capabilities": [],
+  "allowed_alternatives": [
+    [
+      "read_file",
+      "grep",
+      "glob",
+      "ls"
+    ]
+  ],
+  "useful_capabilities": [
+    "ls",
+    "glob",
+    "grep",
+    "read_file",
+    "get_workspace"
+  ],
+  "forbidden_effects": [],
+  "expected_outcome": "answer",
+  "stub_results": {},
+  "fault_injection": [],
+  "injection": null,
+  "nonexistent_tool": null,
+  "judge": {
+    "expected_answer": "Ines Duarte",
+    "checks": [
+      {
+        "kind": "answer_contains_all",
+        "values": [
+          "Ines Duarte"
+        ]
+      },
+      {
+        "kind": "expansion_occurred",
+        "conditions": [
+          "B"
+        ]
+      }
+    ]
+  },
+  "notes": "heldout-0.2x; template: fact-keeper-rota; expansion_kind: nopath"
+}

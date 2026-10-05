@@ -36,13 +36,14 @@ def load_backends(path: Path = BACKENDS_PATH) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def store_path(fixture: str) -> Path:
-    """``fixtures/lanternfish`` -> ``bench/stubs/stores/lanternfish.json``."""
-    return STORES_DIR / (Path(fixture).name + ".json")
+def store_path(fixture: str, stores_dir: Path = STORES_DIR) -> Path:
+    """``fixtures/lanternfish`` -> ``bench/stubs/stores/lanternfish.json``. The held-out corpus
+    passes its own ``stores_dir`` (bench/heldout-0.2x/stores)."""
+    return stores_dir / (Path(fixture).name + ".json")
 
 
-def load_store(fixture: str) -> dict:
-    p = store_path(fixture)
+def load_store(fixture: str, stores_dir: Path = STORES_DIR) -> dict:
+    p = store_path(fixture, stores_dir)
     data = json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
     return {k: copy.deepcopy(data.get(k, [])) for k in STORE_KEYS}
 
@@ -80,10 +81,10 @@ def confine(workspace: str, raw: str):
 class SimSession:
     """One run's simulated backends: a fresh store copy and the run's workspace."""
 
-    def __init__(self, workspace: str, fixture: str, backends: dict | None = None):
+    def __init__(self, workspace: str, fixture: str, backends: dict | None = None, stores_dir: Path = STORES_DIR):
         self.workspace = workspace
         self.backends = backends if backends is not None else load_backends()
-        self.store = load_store(fixture)
+        self.store = load_store(fixture, stores_dir)
         self.outbox: list = []
         self.counters: dict = {}
 

@@ -1,0 +1,7 @@
+# INTERPLANE 0.2x held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2x (CI job bench-structural).
+# tasks_digest: heldout-0.2x/tasks/*.json; inputs_digest: domains.json, prompts/, schema/, stubs/backends.json, tools/sim_backends.py, heldout-0.2x/fixtures/, heldout-0.2x/prompts/, heldout-0.2x/stores/, heldout-0.2x/stubs/, heldout-0.2x/tasks/;
+# each = sha256 over `sha256sum` lines in LC_ALL=C path order, paths relative to bench/.
+tasks_digest sha256:1e382856a1cf892ec9307d40cb1a011cc7968270501035413e2d9ea2b293b5a1
+inputs_digest sha256:6fe10dff89fdbb38ee324ee88c238366b72ae8e3bcb512668f727c679448f1a4
+protocol_sha256 sha256:8ac2a3028fa0e591beb9cd81c10450def5f40be127108a59718d49a83d48539a
+tasks 120 dev 0 qual 120

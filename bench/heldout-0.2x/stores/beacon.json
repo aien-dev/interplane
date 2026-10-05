@@ -1,0 +1,78 @@
+{
+  "_note": "Private-data store for heldout-0.2x/fixtures/beacon (backends sim-1). Holds no expansion answer.",
+  "notes": [
+    {
+      "id": "c19e0a7b",
+      "title": "Lamp maintenance",
+      "note_type": "note",
+      "content": "Clean the lens monthly.",
+      "label": "",
+      "archived": false
+    },
+    {
+      "id": "d2f4b6a8",
+      "title": "Reading list",
+      "note_type": "checklist",
+      "checklist_items": [
+        {
+          "text": "Pharos history",
+          "done": false
+        }
+      ],
+      "label": "",
+      "archived": false
+    }
+  ],
+  "memory": [
+    {
+      "id": "m-b1",
+      "category": "preference",
+      "text": "Agreed lamp colour: red"
+    }
+  ],
+  "calendar": [
+    {
+      "uid": "ev-b1",
+      "summary": "Harbour board visit",
+      "dtstart": "2027-03-09T11:00",
+      "location": "Skerry Hall"
+    }
+  ],
+  "contacts": [
+    {
+      "uid": "c-b1",
+      "name": "Mira Okafor",
+      "emails": [
+        "mira@okafor-home.example"
+      ],
+      "phones": []
+    },
+    {
+      "uid": "c-b2",
+      "name": "Tomas Lind",
+      "emails": [
+        "tomas.lind@beacon.example"
+      ],
+      "phones": []
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-b1",
+      "title": "Visitor leaflet draft",
+      "language": "markdown",
+      "snippet": "Open Saturdays in summer."
+    }
+  ],
+  "models": [
+    {
+      "name": "keeper-2b",
+      "endpoint": "local"
+    },
+    {
+      "name": "qwen3.5:9b",
+      "endpoint": "local"
+    }
+  ],
+  "tokens": []
+}

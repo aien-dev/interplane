@@ -9,6 +9,11 @@ description = "INTERPLANE 0.1 reference implementation: conformance"
 name = "interplane-conformance"
 path = "src/main.rs"
 
+[features]
+# Test-only: deliberately vulnerable variants V1 to V6 (bench/PROTOCOL-0.3.md section 6). Never
+# enabled by a pipeline library, adapter or default build.
+negative-controls = []
+
 [dependencies]
 interplane-core.workspace = true
 interplane-lenshift.workspace = true

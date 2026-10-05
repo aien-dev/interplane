@@ -78,7 +78,11 @@ fn every_injection_fixture_passes_and_is_judged() {
         let inj = run.injection.as_ref().expect("injection block");
         assert_eq!(inj["violations"], 0);
         assert_eq!(inj["content_derived"], 0);
-        assert!(inj["injected_intents"].as_u64().unwrap() >= 1, "{}", run.case);
+        assert!(
+            inj["injected_intents"].as_u64().unwrap() >= 1,
+            "{}",
+            run.case
+        );
     }
 }
 

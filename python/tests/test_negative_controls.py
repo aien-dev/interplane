@@ -1,11 +1,8 @@
 """Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) and the injection judge."""
 
-import json
 import subprocess
 import sys
 from pathlib import Path
-
-import pytest
 
 from interplane.conformance import load_injection_fixtures, run_case
 from conftest import CONF

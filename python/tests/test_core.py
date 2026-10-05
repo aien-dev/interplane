@@ -428,6 +428,8 @@ def test_interplane_code_never_constructs_authorized_decisions():
     src = Path(__file__).resolve().parents[1] / "interplane"
     offenders = []
     for path in src.rglob("*.py"):
+        if path.name == "conformance_negctl.py":
+            continue  # test-only negative controls V2/V4 forge authorizations on purpose; never imported by the library
         text = path.read_text(encoding="utf-8")
         if path.name == "crossveil.py":
             text = text.split("class MockRuntime", 1)[0] + text.split("def default_pipeline", 1)[-1]

@@ -32,4 +32,5 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Qwen3.5-9B on llama.cpp b11398 | - | qualified | probes 14/14 (Rust and Python, aligned) | qualification/captures/qwen35-llamacpp |
 | Qwen3.5-9B on SGLang 0.5.20 (bf16, qwen3_coder parser) | - | qualified | probes 14/14 (Rust and Python, aligned) | earlier 12/14 kept as pre-alignment |
 | AIEN authority path (sovereign-core #203, #204) | tested | - | adapter approval tests (6) | single-use approvals; grants in memory, spent at mint, host clock |
+| Injection harness + negative controls (0.3 cut I1) | tested | tested | 3 seed injection cases | scripted obedient model, effect judge, V1-V6 built only into the runners (Rust feature, Python flag), matrix byte-identical in both languages, `conformance/TRUST-DIGEST.txt`; category corpora are I2-I4, gate N needs them |
 | CI | running | running | - | github.com/aien-dev/interplane: schemas, rust, python, cross-language identity, both adapters |

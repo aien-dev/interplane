@@ -49,6 +49,8 @@ jobs:
       - run: cargo fmt --all --check
       - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test --all
+      - name: negative controls (test-only feature) detect their defects
+        run: cargo test -p interplane-conformance --features negative-controls
       - name: conformance (rust)
         run: cargo run -q -p interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -66,6 +68,34 @@ jobs:
         run: python -m interplane.conformance conformance/fixtures --out py-verdicts.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: py-verdicts, path: py-verdicts.json}
+  negative-controls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0"}
+      - run: pip install -c constraints/ci-python.txt -e python
+      - name: trust corpus and protocol digests match conformance/TRUST-DIGEST.txt
+        run: python conformance/runners/trust_digest.py --check
+      - name: pipeline libraries never mention the negative controls
+        run: |
+          ! grep -rIl -E 'negctl|negative-controls|NEGCTL' rust/crates/interplane-core rust/crates/interplane-crossveil rust/crates/interplane-crossaxis rust/crates/interplane-lenshift python/interplane/core.py python/interplane/crossveil.py python/interplane/crossaxis.py python/interplane/lenshift
+      - name: default build refuses a variant and carries no variant code
+        working-directory: rust
+        run: |
+          cargo build -q -p interplane-conformance
+          ! grep -q NEGCTL_BUILT_IN target/debug/interplane-conformance
+          rc=0; target/debug/interplane-conformance ../conformance/fixtures --out /dev/null --variant V4 || rc=$?
+          test "$rc" = 2
+      - name: negative-control matrix, offline, both languages (every variant must be detected)
+        run: |
+          (cd rust && cargo run -q -p interplane-conformance --features negative-controls -- ../conformance/fixtures --matrix ../rust-matrix.json)
+          python -m interplane.conformance conformance/fixtures --matrix py-matrix.json
+          cmp rust-matrix.json py-matrix.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with: {name: negative-control-matrix, path: rust-matrix.json}
   cross-language:
     needs: [rust, python]
     runs-on: ubuntu-latest
@@ -80,7 +110,7 @@ jobs:
           import json,sys
           r=json.load(open('rust-verdicts.json')); p=json.load(open('py-verdicts.json'))
           bad=[c for c in sorted(set(r)|set(p)) if json.dumps(r.get(c),sort_keys=True)!=json.dumps(p.get(c),sort_keys=True)]
-          print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=45 else 0)
+          print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=48 else 0)
           PY
   adapter-aien:
     runs-on: ubuntu-latest

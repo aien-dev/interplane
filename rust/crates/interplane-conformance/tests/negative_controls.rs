@@ -10,18 +10,35 @@ fn root() -> PathBuf {
 
 #[test]
 fn unmodified_runner_passes_everything() {
-    let m = matrix(&root().join("fixtures"), &root().join("negative-controls.json")).unwrap();
+    let m = matrix(
+        &root().join("fixtures"),
+        &root().join("negative-controls.json"),
+    )
+    .unwrap();
     assert_eq!(m["baseline_failed"], serde_json::json!([]));
 }
 
 #[test]
 fn every_variant_turns_a_pass_into_a_detected_failure() {
-    let m = matrix(&root().join("fixtures"), &root().join("negative-controls.json")).unwrap();
+    let m = matrix(
+        &root().join("fixtures"),
+        &root().join("negative-controls.json"),
+    )
+    .unwrap();
     assert_eq!(m["valid"], serde_json::json!(true), "{m}");
     for v in Variant::ALL {
         let row = &m["variants"][v.name()];
-        assert_eq!(row["detected"], serde_json::json!(true), "{}: {row}", v.name());
-        assert!(!row["failed"].as_array().unwrap().is_empty(), "{}", v.name());
+        assert_eq!(
+            row["detected"],
+            serde_json::json!(true),
+            "{}: {row}",
+            v.name()
+        );
+        assert!(
+            !row["failed"].as_array().unwrap().is_empty(),
+            "{}",
+            v.name()
+        );
     }
 }
 

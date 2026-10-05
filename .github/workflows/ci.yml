@@ -81,12 +81,13 @@ jobs:
         with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
       - name: build the python wheel
         run: pip wheel --no-deps -w dist ./python
-      - name: install the wheel into a clean venv and run the offline example from outside the checkout
+      - name: install the wheel into a clean venv and run both examples from outside the checkout
         run: |
           python -m venv "$RUNNER_TEMP/v"
           "$RUNNER_TEMP/v/bin/pip" install dist/interplane-*.whl
           cd "$RUNNER_TEMP"
           INTERPLANE_REQUIRE_INSTALLED=1 "$RUNNER_TEMP/v/bin/python" "$GITHUB_WORKSPACE/examples/offline/run_offline.py"
+          INTERPLANE_REQUIRE_INSTALLED=1 "$RUNNER_TEMP/v/bin/python" "$GITHUB_WORKSPACE/examples/adapter/todo_adapter.py"
       - name: conformance from the installed wheel equals conformance from the checkout
         run: |
           (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/v/bin/interplane-conformance" "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/wheel-verdicts.json")

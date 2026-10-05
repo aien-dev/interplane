@@ -1,0 +1,88 @@
+{
+  "home": {
+    "system": "maintainer-check",
+    "runtime_id": "home",
+    "native_reads": {
+      "read_file": {
+        "name": "read_sensors",
+        "args": {
+          "room": {
+            "const": "hall"
+          }
+        }
+      },
+      "list_dir": {
+        "name": "read_sensors",
+        "args": {
+          "room": {
+            "const": "all"
+          }
+        }
+      }
+    },
+    "effects": {
+      "write_file": {
+        "name": "set_light",
+        "args": {
+          "room": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          },
+          "level": {
+            "from": [
+              "content",
+              "text"
+            ]
+          }
+        }
+      },
+      "append_note": {
+        "name": "set_light",
+        "args": {
+          "room": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          },
+          "level": {
+            "from": [
+              "text",
+              "content"
+            ]
+          }
+        }
+      },
+      "send_email": {
+        "name": "send_alert",
+        "args": {
+          "to": {
+            "from": [
+              "to"
+            ]
+          },
+          "message": {
+            "from": [
+              "body"
+            ]
+          }
+        }
+      }
+    },
+    "approval_effects": {
+      "delete_file": {
+        "name": "unlock_door",
+        "args": {
+          "door": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          }
+        }
+      }
+    }
+  }
+}

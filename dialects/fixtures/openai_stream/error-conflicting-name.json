@@ -1,0 +1,28 @@
+{
+  "dialect": "openai_stream",
+  "name": "error-conflicting-name",
+  "description": "A later fragment names a different tool for the same index: stream error.",
+  "input": "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"name\":\"read_file\",\"arguments\":\"{\"},\"id\":\"call_s\",\"type\":\"function\"}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"path\\\":\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"name\":\"delete_file\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n",
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "",
+    "intents": [],
+    "rejected": [
+      {
+        "index": 0,
+        "code": "malformed_tool_call",
+        "message": "conflicting tool call name"
+      }
+    ],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

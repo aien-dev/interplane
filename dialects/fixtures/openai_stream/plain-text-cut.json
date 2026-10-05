@@ -1,0 +1,22 @@
+{
+  "dialect": "openai_stream",
+  "name": "plain-text-cut",
+  "description": "A plain answer cut off without finish_reason: text kept, no call, partial false.",
+  "input": "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hel\"},\"finish_reason\":null}]}\n\n",
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "Hel",
+    "intents": [],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

@@ -33,8 +33,8 @@ turn so ids are filled in one step.)
 ## Dialect `openai` (version 1)
 
 Input: one assistant message object `{role, content, tool_calls?, reasoning_content?}` as returned
-by an OpenAI-compatible `/v1/chat/completions` (non-streamed, or streamed-and-assembled by the
-caller).
+by an OpenAI-compatible `/v1/chat/completions` (non-streamed, or streamed and assembled by the
+caller; dialect `openai_stream` below assembles a stream).
 
 - `tool_calls[i].function.name` -> raw_name; `tool_calls[i].id` -> source_call_id.
 - `function.arguments` is a JSON string: parse; must be an object. Not JSON -> `malformed_tool_call`
@@ -47,6 +47,58 @@ caller).
 Render result -> `{"role":"tool","tool_call_id":<source_call_id or request_id>,"content":<string>}`
 where content is `data` JSON-serialized (canonical) for `ok`, otherwise
 `{"error": {"code":..., "message":...}, "status": ...}` serialized. Never raw secrets.
+
+## Dialect `openai_stream` (version 1)
+
+Input: the body of a streamed OpenAI-compatible `/v1/chat/completions` response (`stream: true`), as
+one string of Server-Sent Events, exactly as the server sent it. Lenshift assembles the fragments
+into one assistant message and parses it with the `openai` rules above. Grounded in the six streamed
+captures under `qualification/captures/qwen35-{ollama,llamacpp,sglang}/h{1,2}-*.json`: Ollama sends
+each tool call whole; llama.cpp sends `id`, `name` and `"{"` first and the arguments in later pieces;
+SGLang does the same but repeats `"id": null, "name": null` in every later piece and sends
+`content: "\n\n"` before the call.
+
+Framing (the `data` subset of the WHATWG Server-Sent Events format):
+- Split on `\n`; a trailing `\r` on a line is removed. A line `data` or `data:<value>` appends
+  `<value>` (one leading space removed) to the event's data lines. Lines starting with `:` and all
+  other fields (`event`, `id`, `retry`) are ignored. A blank line ends an event; its data is the data
+  lines joined with `\n`. An event not ended by a blank line before the end of input is discarded.
+- Event data `[DONE]` ends the stream; any later event is a stream error. Any other data must be a
+  JSON object (strict JSON, as for arguments); otherwise a stream error.
+
+Assembly, chunk by chunk in arrival order:
+- `choices` absent, not an array, or empty (for example a usage chunk): ignored. A choice that is
+  not an object: stream error "stream choice is not an object". A choice with an `index` that is not
+  the integer `0`: stream error "multiple choices are not supported" (an absent `index` counts as 0).
+- `delta.content` and `delta.reasoning_content` / `delta.reasoning` strings are concatenated; `null`
+  is skipped. `delta.role` is ignored.
+- `delta.tool_calls[]` (ignored when not an array): each fragment must be an object with an integer
+  `index` from 0 to 2^64-1 (`1.0` is not an integer), else stream error "tool call fragment has no
+  index". Per index: the first non-empty string `id` and the first non-empty string
+  `function.name` are kept; a later, different non-empty value is a stream error ("conflicting tool
+  call id" / "conflicting tool call name"); `null` and `""` are skipped. `function.arguments`
+  strings are concatenated.
+- `finish_reason`: must be a string or `null`, else stream error "finish_reason is not a string"; the
+  first non-null value is kept; a later, different non-null value is a stream
+  error "conflicting finish_reason".
+
+Assembled message: `{"role": "assistant", "content": <text>, "tool_calls": [...]}` with calls in
+ascending `index`, each `{"type": "function", "function": {"name", "arguments"}}` plus `"id"` when one
+arrived; `"reasoning_content"` is present when reasoning text arrived. A call with no name or no
+arguments keeps the field absent and is rejected by the `openai` rules.
+
+Completeness: the stream is complete only when `finish_reason` is `stop`, `tool_calls` or
+`function_call`. Otherwise (absent, `length`, `content_filter`, anything else) every call of the turn
+is rejected `malformed_tool_call` "truncated tool call" with its own index, digest and id, and
+`partial = true` when there was at least one call. Text is kept. A cut-off stream is never guessed,
+even when a call's arguments already parse.
+
+Stream errors and non-string input: no intents, `text = ""`, one `rejected` entry at index 0
+(`malformed_tool_call`, the error message, `source_digest` = sha256 of the body text, or of its JCS
+form for a non-string), `partial = false`.
+
+Intents carry `dialect = "openai_stream"`, `dialect_version = "1"`; `source_digest` is of the
+assembled call object (JCS), as for `openai`. Render result is the same as `openai`.
 
 ## Dialect `qwen35` (version 1)
 
@@ -156,6 +208,11 @@ the abstraction test for that.
 ## Fixtures
 
 `dialects/fixtures/<dialect>/<name>.json`: `{"input": ..., "model": ..., "expected": LenshiftTurn-without-digests, "expected_digests": {...}}`.
+Required openai_stream fixtures: every streamed capture under `qualification/captures` byte for byte
+(with its `sha256_response`); fragmented call; repeated null fragments; two interleaved calls; cut
+mid-arguments; cut after complete arguments; `finish_reason` length; unterminated last event; CRLF
+and comment framing; streamed plain text, complete and cut; assembled arguments not JSON; each stream
+error. Fixtures record `expected_digests`, and both runners compare every recorded digest.
 Required qwen35 fixtures: valid single call; multiple calls; malformed (unclosed function);
 reasoning plus call; plain answer with no tool; unknown tool name (parses fine); partial/truncated
 call; multi-line parameter value; JSON-typed parameter; hermes_json form. Required aien_legacy fixtures: valid single call; multiple calls; reasoning plus call; repaired bracket; repaired missing braces; trailing comma (rejected); single quotes (rejected); unterminated (rejected, partial); fenced json fallback; placeholder name (rejected); missing arguments; arguments not object; plain answer. Required openai fixtures:

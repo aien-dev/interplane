@@ -80,8 +80,27 @@ fn dialect_fixtures_match() {
                 }
             }
             assert_eq!(Value::Array(rej), want_rej, "{name} rejected");
+            // Digests are masked above; where the Python reference recorded them in
+            // `expected_digests` (null = not recorded), they must match too.
+            let d = &fx["expected_digests"];
+            if !d["reasoning_digest"].is_null() {
+                assert_eq!(
+                    json!(t.reasoning_digest),
+                    d["reasoning_digest"],
+                    "{name} reasoning digest"
+                );
+            }
+            if let Some(want) = d["source_digests"].as_array() {
+                for (k, w) in want.iter().enumerate().filter(|(_, w)| !w.is_null()) {
+                    assert_eq!(
+                        json!(t.intents[k].provenance.source_digest),
+                        *w,
+                        "{name} source digest {k}"
+                    );
+                }
+            }
             n += 1;
         }
     }
-    assert!(n >= 31, "expected the 31 dialect fixtures, ran {n}");
+    assert!(n >= 54, "expected the 54 dialect fixtures, ran {n}");
 }

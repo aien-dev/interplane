@@ -34,10 +34,16 @@ def test_dialect_fixture(path):
         turn.intents
     )
     assert all(r["source_digest"] for r in turn.rejected)
+    digests = fx.get("expected_digests", {})
+    if digests.get("reasoning_digest") is not None:
+        assert turn.reasoning_digest == digests["reasoning_digest"]
+    for k, want in enumerate(digests.get("source_digests", [])):
+        if want is not None:
+            assert turn.intents[k].provenance["source_digest"] == want
 
 
 def test_registry():
-    assert lenshift.names() == ["aien_legacy", "openai", "qwen35"]
+    assert lenshift.names() == ["aien_legacy", "openai", "openai_stream", "qwen35"]
     with pytest.raises(lenshift.UnsupportedDialect) as e:
         lenshift.get("ajax")
     assert e.value.code == "unsupported_dialect"

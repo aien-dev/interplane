@@ -1,0 +1,22 @@
+{
+  "dialect": "openai_stream",
+  "name": "plain-text-stop",
+  "description": "A streamed plain answer with no tool call.",
+  "input": "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hel\"},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo.\"},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
+  "model": "mock-model",
+  "trace_id": "trace-dialect",
+  "turn": 0,
+  "parser_version": "1.0.0",
+  "reasoning_present": false,
+  "expected": {
+    "text": "Hello.",
+    "intents": [],
+    "rejected": [],
+    "partial": false,
+    "dialect_version": "1"
+  },
+  "expected_digests": {
+    "reasoning_digest": null,
+    "source_digests": []
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "run_id": "trust-0.3-20261005T0229Z",
+  "protocol": "bench/PROTOCOL-0.3.md",
+  "purpose": "0.3 qualifying run: offline gates P, X, I, E, A, N (bench/tools/trust_run.py) and the gate M live leg (bench/PROTOCOL-0.3.md section 7)",
+  "interplane": {
+    "commit": "be2df5e71b22fbb30bf541e81b28c5842639a4b0",
+    "note": "the run executes from this main commit; this manifest is committed before the run (section 8.2)"
+  },
+  "trust_digest": {
+    "corpus": "conformance/fixtures",
+    "corpus_files": "118",
+    "corpus_digest": "sha256:3e7d24ee9386c75c98cfb775d457835e32fa842115bc3eecdc325da72b3a43f8",
+    "negative_controls": "conformance/negative-controls.json",
+    "negative_controls_sha256": "sha256:7bc5c9b51b04d82b2c77a260caf6ba0bbfcd73e0da5d5b4f3071b071d2cb04fd",
+    "protocol": "bench/PROTOCOL-0.3.md",
+    "protocol_sha256": "sha256:c87c72e6cef4627c40bf7766e7e02cc92e96666667d0fb53d3f63b066f7a6ca2",
+    "adapter_translation": "conformance/adapter-translation.json",
+    "adapter_translation_sha256": "sha256:2e4f573a150846762c99c503b3c7a092e2a6fefdad18ece596c737c2f5dbe370",
+    "t3_subset_count": "43",
+    "t4_subset_count": "32"
+  },
+  "pins": {
+    "odysseus": {
+      "repo": "odysseus-dev/odysseus",
+      "commit": "2992bf6d368a11472323e47d3bfed91e79cefc6b"
+    },
+    "aien": {
+      "repo": "aien-dev/sovereign-core",
+      "commit": "0c1d249f2d119c7c2d726a2d252dc913e6185d28"
+    }
+  },
+  "toolchains": {
+    "rust": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "rust_toolchain_toml": "1.99.0",
+    "python": "3.12.3",
+    "python_note": "local interpreter; CI uses 3.12.14"
+  },
+  "gate_m_backend": {
+    "name": "ollama",
+    "version": "0.34.0",
+    "endpoint": "http://127.0.0.1:11434/v1",
+    "model": "qwen3.5:9b",
+    "model_digest": "sha256:56671c2ab9385f9cfcb404638e32cd62d88e3501d44822208363c010179a3c90",
+    "temperature": 0,
+    "seed": 42,
+    "runs_per_case": 1,
+    "categories": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C08",
+      "C11"
+    ],
+    "note": "backend and model digest as qualified in 0.2 (bench/runs/qual-20261004T2207Z/manifest.json); re-verified and recorded by the live leg at run time",
+    "tool_note": "the live-leg tool (bench/tools/live_injection.py, plan cut M0) lands on main after this manifest; the live leg records its own interplane commit and runs only after the 0.2x held-out campaign frees the GPU. Gate M is reported, never gated, except violations = 0."
+  },
+  "host": "spark (GB10), Linux"
+}

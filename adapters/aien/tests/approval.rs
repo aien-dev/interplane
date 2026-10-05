@@ -22,7 +22,7 @@ fn ctx() -> CallContext {
         trace_id: "t".into(),
         message_id: "m".into(),
         parent_id: None,
-        session: None,
+        model: Party::new("model", "m"),
         exposure: None,
         session: None,
     }

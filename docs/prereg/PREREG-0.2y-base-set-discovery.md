@@ -125,7 +125,8 @@ misled the selector; a full capability name or a non-keyword name token (`manage
   it passes and derives the default list, and is otherwise discarded with its lint message
   recorded. Each group takes the first 24 accepted in id order; the rest are discarded unrun.
 - If a group has fewer than 24 after one pass, the author gets one top-up request: "write k more
-  requests of the same kind" plus the lint messages of the discarded ones (no word list), and the
+  requests of the same kind", using the everyday-work brief for a short non-file group and the
+  plain-question brief for a short default group, plus the lint messages of the discarded ones (no word list), and the
   same rule runs on the new ids. At most three top-ups; if a group is still short, the corpus is not
   frozen, the shortfall is reported, and the authoring rules are revised under section 11 before a
   fresh authoring round.
@@ -216,5 +217,5 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
 - 2026-10-05 (review, before any task or run exists): the leakage lint exempts name tokens that are
   also `domains.json` keywords (34 of 94 collide; without it the 24 wrong-domain tasks could not
   pass), and section 5 now fixes how the 24 wrong-domain and 24 default tasks are authored,
-  accepted in id order, topped up and logged. Diagnosis source paths corrected to `seed-42/` to
+  accepted in id order, topped up (with the brief that feeds the short group) and logged. Diagnosis source paths corrected to `seed-42/` to
   `seed-44/`. Thresholds, arms and sample size unchanged.

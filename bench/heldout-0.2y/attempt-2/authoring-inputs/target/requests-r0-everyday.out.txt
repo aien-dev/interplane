@@ -1,0 +1,45 @@
+{
+  "requests": [
+    {"workspace":"vellmere-bells","request":"Who approved the blue enamel sample?","fact_id":"vellmere-bells-001","answer":["Selva"],"template":"sample-approver"},
+    {"workspace":"vellmere-bells","request":"Who asked for a softer chime?","fact_id":"vellmere-bells-003","answer":["the marsh office"],"template":"requesting-office"},
+    {"workspace":"vellmere-bells","request":"Where did polishing move after the Monday huddle?","fact_id":"vellmere-bells-007","answer":["the north bench"],"template":"work-location"},
+    {"workspace":"vellmere-bells","request":"Who is our quay courier?","fact_id":"vellmere-bells-011","answer":["Orin"],"template":"contact-role"},
+    {"workspace":"vellmere-bells","request":"When is the bell rope estimate due?","fact_id":"vellmere-bells-019","answer":["Wednesday"],"template":"task-deadline"},
+    {"workspace":"vellmere-bells","request":"What did we decide to do with the cracked ladle?","fact_id":"vellmere-bells-020","answer":["replace it"],"template":"equipment-action"},
+
+    {"workspace":"sablewick-wardrobe","request":"How long did Nemi extend the moon cloak rental?","fact_id":"sablewick-wardrobe-002","answer":["through Sunday"],"template":"rental-end"},
+    {"workspace":"sablewick-wardrobe","request":"What ties did the crew choose for the otter vest?","fact_id":"sablewick-wardrobe-006","answer":["linen ties"],"template":"material-choice"},
+    {"workspace":"sablewick-wardrobe","request":"Which room is the Thursday fitting in now?","fact_id":"sablewick-wardrobe-007","answer":["the mirror room"],"template":"meeting-location"},
+    {"workspace":"sablewick-wardrobe","request":"Who repairs sleeves for us?","fact_id":"sablewick-wardrobe-013","answer":["Corlo"],"template":"contact-role"},
+    {"workspace":"sablewick-wardrobe","request":"What still needs doing on the fox mask strap?","fact_id":"sablewick-wardrobe-017","answer":["stitching"],"template":"repair-task"},
+    {"workspace":"sablewick-wardrobe","request":"What day is the owl costume fitting confirmed for?","fact_id":"sablewick-wardrobe-019","answer":["Saturday"],"template":"fitting-day"},
+
+    {"workspace":"thistledrift-inks","request":"Who ordered the blackberry ink?","fact_id":"thistledrift-inks-001","answer":["Uma"],"template":"order-customer"},
+    {"workspace":"thistledrift-inks","request":"What did the blend team pick for the amber batch?","fact_id":"thistledrift-inks-006","answer":["pear syrup"],"template":"recipe-ingredient"},
+    {"workspace":"thistledrift-inks","request":"Where is Wednesday's tasting happening now?","fact_id":"thistledrift-inks-007","answer":["the cool room"],"template":"meeting-location"},
+    {"workspace":"thistledrift-inks","request":"Who is the parcel runner?","fact_id":"thistledrift-inks-013","answer":["Jori"],"template":"contact-role"},
+    {"workspace":"thistledrift-inks","request":"What's the status of the plum shade?","fact_id":"thistledrift-inks-018","answer":["still under review"],"template":"review-status"},
+    {"workspace":"thistledrift-inks","request":"What's the status of the amber batch recipe?","fact_id":"thistledrift-inks-020","answer":["sealed"],"template":"document-status"},
+
+    {"workspace":"mossquay-markers","request":"Who wanted a darker border on the ferry marker?","fact_id":"mossquay-markers-002","answer":["Brell"],"template":"change-requester"},
+    {"workspace":"mossquay-markers","request":"What pattern did the design table choose for the well marker?","fact_id":"mossquay-markers-006","answer":["a spiral"],"template":"pattern-choice"},
+    {"workspace":"mossquay-markers","request":"When is the next pattern review?","fact_id":"mossquay-markers-010","answer":["Sunday"],"template":"review-day"},
+    {"workspace":"mossquay-markers","request":"Who drives the orchard wagon?","fact_id":"mossquay-markers-014","answer":["Doven"],"template":"contact-role"},
+    {"workspace":"mossquay-markers","request":"What's next for the chipped sample corner?","fact_id":"mossquay-markers-016","answer":["recutting"],"template":"repair-task"},
+    {"workspace":"mossquay-markers","request":"Is the dune sketch ready for mounting?","fact_id":"mossquay-markers-018","answer":["ready for mounting"],"template":"work-readiness"},
+
+    {"workspace":"brindlefen-kites","request":"Who reported the tear in the cloud sail?","fact_id":"brindlefen-kites-004","answer":["Ibel"],"template":"issue-reporter"},
+    {"workspace":"brindlefen-kites","request":"What thread did the repair crew choose for the cloud sail?","fact_id":"brindlefen-kites-006","answer":["waxed thread"],"template":"material-choice"},
+    {"workspace":"brindlefen-kites","request":"Where did Friday's inspection move?","fact_id":"brindlefen-kites-007","answer":["the loft"],"template":"meeting-location"},
+    {"workspace":"brindlefen-kites","request":"Who supplies our ribbon spools?","fact_id":"brindlefen-kites-012","answer":["Gera"],"template":"supplier-contact"},
+    {"workspace":"brindlefen-kites","request":"What's the status of the saffron kite seam?","fact_id":"brindlefen-kites-017","answer":["ready to sew"],"template":"repair-status"},
+    {"workspace":"brindlefen-kites","request":"What is the striped delta waiting for?","fact_id":"brindlefen-kites-019","answer":["a wind check"],"template":"pending-check"},
+
+    {"workspace":"larkhollow-stamps","request":"Who requested the paler blue trial sheet?","fact_id":"larkhollow-stamps-002","answer":["Luma"],"template":"requesting-person"},
+    {"workspace":"larkhollow-stamps","request":"What cut did the print table choose for the market cards?","fact_id":"larkhollow-stamps-006","answer":["a fern cut"],"template":"design-choice"},
+    {"workspace":"larkhollow-stamps","request":"Where is Monday's color session happening now?","fact_id":"larkhollow-stamps-007","answer":["the back studio"],"template":"meeting-location"},
+    {"workspace":"larkhollow-stamps","request":"Who is the court courier?","fact_id":"larkhollow-stamps-013","answer":["Meren"],"template":"contact-role"},
+    {"workspace":"larkhollow-stamps","request":"What's the status of the seed emblem block?","fact_id":"larkhollow-stamps-018","answer":["ready to ink"],"template":"production-status"},
+    {"workspace":"larkhollow-stamps","request":"Where is the ochre sample?","fact_id":"larkhollow-stamps-020","answer":["on the drying rack"],"template":"item-location"}
+  ]
+}

@@ -131,6 +131,9 @@ def test_trace_limit_and_close_frees_a_slot():
     assert got == ("rejected", LIMIT, "session limit exceeded: max_traces")
     assert not p.ledger.holds("c") and not [e for e in p.events if e.extra["trace_id"] == "c"]
     assert admit(p, "a", "m2", "r2") == OK  # a held trace keeps working
+    with pytest.raises(ValueError, match="^session limit exceeded: max_traces$"):
+        p.register_input(input_rec("i1", "c"))  # inputs cannot open a further trace either
+    assert p.inputs("c") == []
     p.close_trace("a")
     assert admit(p, "c", "m1", "r1") == OK
 

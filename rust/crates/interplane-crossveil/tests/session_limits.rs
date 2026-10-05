@@ -185,6 +185,12 @@ fn trace_limit_and_close_frees_a_slot() {
     );
     assert!(!p.ledger.holds("c") && p.events.len() == n);
     assert_eq!(admit(&mut p, "a", "m2", "r2"), ok());
+    // Inputs cannot open a further trace either.
+    assert_eq!(
+        p.register_input(input_rec("i1", "c")),
+        Err("session limit exceeded: max_traces".to_string())
+    );
+    assert!(p.inputs("c").is_empty());
     p.close_trace("a");
     assert_eq!(admit(&mut p, "c", "m1", "r1"), ok());
 }

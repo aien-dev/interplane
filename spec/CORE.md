@@ -49,7 +49,7 @@ raised by a model.
 | `max_traces`: traces held at once | 1024 | the first message of a further trace is refused `session_limit_exceeded`; nothing is recorded for it |
 | `max_messages_per_trace`: `message_id`s recorded on one trace | 4096 | the further message is refused `session_limit_exceeded` and not recorded |
 | `max_requests_per_trace`: `request_id`s recorded on one trace | 4096 | the further request is rejected `session_limit_exceeded` before any runtime contact and not recorded |
-| `max_inputs_per_trace`: InputRecords registered on one trace | 4096 | `register_input` fails (host error, as for a duplicate `input_id`); nothing is recorded |
+| `max_inputs_per_trace`: InputRecords registered on one trace | 4096 | `register_input` fails (host error, as for a duplicate `input_id`); nothing is recorded. `register_input` on a trace that holds no state while `max_traces` are held fails the same way (`session limit exceeded: max_traces`) |
 
 A message or request is refused at exactly the stage, and in exactly the form, at which
 `replayed_message` and `duplicate_request_id` are refused, with the code `session_limit_exceeded`

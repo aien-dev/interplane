@@ -402,6 +402,9 @@ impl<'a> Pipeline<'a> {
         if held >= self.limits.max_inputs_per_trace {
             return Err("session limit exceeded: max_inputs_per_trace".to_string());
         }
+        if !self.holds(&rec.trace_id) && self.held_count() >= self.limits.max_traces {
+            return Err("session limit exceeded: max_traces".to_string());
+        }
         self.inputs
             .entry(rec.trace_id.clone())
             .or_default()

@@ -377,7 +377,7 @@ class Pipeline:
         """Host-only: register an input placed in front of the model on ``record.trace_id``, before
         the turn that can see it. Never called from model output or an admitted envelope. Raises
         ``ValueError`` on a duplicate ``input_id`` for the trace, past ``max_inputs_per_trace``,
-        or on a closed trace; nothing is recorded then."""
+        on a new trace while ``max_traces`` are held, or on a closed trace; nothing is recorded then."""
         rec = record if isinstance(record, InputRecord) else InputRecord.from_dict(record)
         if rec.trace_id in self._closed:
             raise ValueError(f"session closed: {rec.trace_id}")
@@ -386,6 +386,8 @@ class Pipeline:
             raise ValueError(f"duplicate input_id: {rec.input_id}")
         if len(ledger) >= self.limits.max_inputs_per_trace:
             raise ValueError("session limit exceeded: max_inputs_per_trace")
+        if not self._holds(rec.trace_id) and self._held_count() >= self.limits.max_traces:
+            raise ValueError("session limit exceeded: max_traces")
         ledger = self._inputs.setdefault(rec.trace_id, [])
         ledger.append(copy.deepcopy(rec))
         return rec

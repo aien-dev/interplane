@@ -117,7 +117,7 @@ already records for each call: the `error_code`, the `capability`, the `exposed`
 | id | observable event | action |
 |---|---|---|
 | T1 unknown tool | `error_code = unknown_capability` (name not in the mapping table), or `capability_not_found` for a name not in the catalog | catalog search: `discover(catalog, selection, token)` for each token of the requested name split on `_ . -` with length ≥ 3. Hits are united, sorted and cut at 8, then `expand(..., {"kind": "discovery_hit", "query": <name>, "names": hits})` |
-| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), unless the call was denied or held for approval (N1, N2) | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409`) |
+| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), unless the call was denied or held for approval (N1, N2) | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409` at commit 2de4c81, under the comment `# ---- expansion and discovery, in call order`) |
 | T3 typed missing capability | `error_code` is `capability_not_found` or `stale_capability` for a name that **is** in the catalog | widen the domain: `expand(..., {"kind": "requested_excluded", "name": cap, "include_domain_siblings": true})` |
 
 For an unexposed catalog tool (T2), the catalog search the plan asks for reduces to an exact-name
@@ -259,7 +259,7 @@ pair counts as a failure for the B side.
 
 - Runner: `--corpus 0.2x` (task root `bench/heldout-0.2x`); `--condition` for the seven
   conditions; the prompt addendum; the reasoning-off request field, since today `Client.chat`
-  sends only model, messages, temperature, seed, max_tokens and tools (`run_bench.py:134-143`);
+  sends only model, messages, temperature, seed, max_tokens and tools (`run_bench.py:134-143` at commit 2de4c81);
   `--backends sim-1` required for both corpora.
 - Arm 3 policy as in section 5, with negative controls: on denied and approval tasks, zero
   unauthorized executions and zero expansion events fired by a denied or pending call.
@@ -302,3 +302,5 @@ digests differ from the frozen ones does not count.
 
 - 2026-10-04: initial pre-registration (120 held-out tasks, seven conditions, thresholds above).
   No held-out run exists.
+- 2026-10-04: runner line citations pinned to commit 2de4c81 so later runner edits cannot move
+  them. No held-out run exists.

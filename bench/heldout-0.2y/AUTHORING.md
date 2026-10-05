@@ -131,7 +131,9 @@ Write {N} requests that a person could type to a personal assistant about their 
 one asking for exactly one of the listed facts (each fact has an id). Phrase them the way someone talks about their everyday work:
 mail, meetings, contacts, to-dos, notes, chats, models, memory, documents, images. Spread the requests
 over the workspaces evenly, and use each fact at most once. Each request is one or two sentences of ordinary
-speech. Do not tell the assistant where to look and do not describe how to find the answer.
+speech. A request may say which of these everyday things it is about, the way people do ("in my mail", "at the
+meeting"), but it does not name a program, a file, a folder or a file type, and does not describe how to find
+the answer.
 
 Answer with one JSON object and nothing else: {"requests": [{"workspace": "<slug>", "request": "<text>",
 "fact_id": "<the id of the fact you used>", "answer": ["<short answer string that must appear in
@@ -160,9 +162,10 @@ answer in its array order, then all of Brief Q's. No request is edited, reordere
 ### 4.3 Top-up (at most three rounds; one call per short group)
 
 Sent only when a group has fewer than 24 accepted after the previous round. A short non-file group gets the
-Brief E wording, a short default group gets the Brief Q wording, each with `{K}` in place of `{N}`
-(`{K}` = 12 times the number of the round, so 12, 24, 36), the same workspaces and their facts that were not
-used yet, and this paragraph inserted before the JSON instruction:
+Brief E wording, a short default group gets the Brief Q wording, with the number left out of its first
+sentence ("Write requests that ...", amendment 4: the count is stated once, below), the same workspaces and their
+facts that were not used yet, and this paragraph inserted before the JSON instruction, with `{K}` = 12 times the
+number of the round (12, 24, 36):
 
 ```text
 Write {K} more requests of the same kind. Some earlier requests were set aside by an automatic check. These
@@ -240,7 +243,8 @@ workspaces only). The first 30 lint-passing requests in id order form the set (s
 
 All are listed, each with its reason, in the dated section 11 amendments of the pre-registration: items 1 to 10 in
 amendment 2 (written before any task, fixture or request existed), items 11 to 13 in amendment 3 (written after
-attempt 1 stopped short and before attempt 2). None changes a threshold, arm or sample size.
+attempt 1 stopped short and before attempt 2), items 14 to 16 in amendment 4 (written after attempt 2 stopped
+short and before attempt 3). None changes a threshold, arm or sample size.
 
 1. **Lint scope.** Applies to `discovery_needed` requests only (target and calibration), not to the 72 regression
    requests: their categories legitimately name files and tools and the author has no catalog.
@@ -269,6 +273,17 @@ attempt 1 stopped short and before attempt 2). None changes a threshold, arm or 
     top-up 2 returned 48 of 24 and used up the facts the third top-up needed.
 13. **Bookkeeping outside the brief (amendment 3).** The paragraph on fact checks and pool size under 4.1 is not
     sent to the author; attempt 1's fixture prompt carried it.
+14. **Brief E may name the everyday thing (amendment 4).** Brief E's last sentence allows a request to say which
+    everyday thing it is about ("in my mail", "at the meeting") and still forbids a program, file, folder or file
+    type and any how-to; brief Q keeps "Do not tell the assistant where to look". Reason: attempt 2 fed brief E
+    mail, meeting and contact facts, but "Do not tell the assistant where to look" kept the area word out of the
+    request, and the lint groups a request as non-file only from its own words (3 of 24, `attempt-2/REPORT.md`).
+    Section 5 of the pre-registration forbids a tool, path or extension, not the everyday word.
+15. **Top-up count stated once (amendment 4).** In a top-up the brief's first sentence carries no number; only
+    "Write {K} more requests of the same kind" does. Reason: with `{K}` in both, the author read 2K (attempt 2:
+    top-up 1 asked 12 and returned 24; top-up 3 refused "72" for lack of facts).
+16. **Last attempt (amendment 4).** If attempt 3 is short, 0.2y authoring stops: the shortfall is the 0.2y result,
+    the fix under test is not evaluated, and any new attempt is a new pre-registration.
 
 ## 6b. Open points
 

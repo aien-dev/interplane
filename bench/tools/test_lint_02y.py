@@ -126,6 +126,21 @@ class RejectionRules(unittest.TestCase):
         self.assertTrue(lint("Which supplier does the harbour crew order lanterns from?")["ok"])
         self.assertTrue(lint("Who wrote the company profile?")["ok"])  # no squashed-substring check: "profile" is fine
 
+    def test_naming_the_everyday_area_reaches_the_non_file_group(self):
+        # amendment 4 (brief E may name the everyday thing): attempt 2 facts asked bare land in the default
+        # group; the same facts with the area named pass into the non-file group
+        pairs = [
+            ("Who approved the blue enamel sample?", "In my mail, who approved the blue enamel sample?"),
+            ("Where did polishing move after the huddle?", "What did the meeting decide about polishing?"),
+            ("Who is our quay courier?", "Who is our quay courier in my contacts?"),
+            ("What's the status of the plum shade?", "What did my notes say about the plum shade?"),
+            ("What day is the owl costume fitting confirmed for?",
+             "In the chat, what day did we confirm for the owl fitting?"),
+        ]
+        for bare, named in pairs:
+            self.assertEqual((lint(bare)["ok"], lint(bare)["group"]), (True, "default"), bare)
+            self.assertEqual((lint(named)["ok"], lint(named)["group"]), (True, "nonfile"), named)
+
     def test_known_limits_are_accepted(self):
         # documented in the section 11 amendment: single-space splits inside a word and run-together forms
         self.assertEqual(lint("How many fil e lanterns arrive on Friday?")["codes"], [])

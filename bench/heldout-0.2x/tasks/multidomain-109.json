@@ -47,6 +47,10 @@
         "values": [
           "white"
         ]
+      },
+      {
+        "kind": "answer_regex",
+        "pattern": "(?i)(?<![a-z])red(?![a-z])"
       }
     ]
   },

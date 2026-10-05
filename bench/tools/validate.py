@@ -70,7 +70,11 @@ DEV_RANGE = (6, 10)
 # 0.2x composition (PROTOCOL-0.2x.md section 3): fixed, all qual.
 HELDOUT_TOTAL = 120
 HELDOUT_EXPANSION_KINDS = {"named": 8, "path": 8, "nopath": 8}
-HELDOUT_MIN_PER_CATEGORY = 6
+HELDOUT_CATEGORY_COUNTS = {
+    "filesystem": 12, "ambiguous": 8, "multidomain": 10, "rare": 8, "wrong_first_tool": 8,
+    "exec_failure": 8, "denied": 8, "approval": 8, "injection_workspace": 6, "injection_tool": 6,
+    "expansion": 24, "unknown_tool": 6, "sequential": 8,
+}
 
 
 # ---------------------------------------------------------------- minimal JSON Schema 2020-12
@@ -501,8 +505,8 @@ def heldout_errors(tasks: list, per: dict) -> list:
         if t["category"] == "expansion" and (not m or m.group(1) not in HELDOUT_EXPANSION_KINDS):
             e.append(f"{t['id']}: expansion task needs 'expansion_kind: named|path|nopath' in notes")
     for c, cnt in per.items():
-        if cnt["qual"] < HELDOUT_MIN_PER_CATEGORY:
-            e.append(f"category {c}: {cnt['qual']} held-out tasks, need >= {HELDOUT_MIN_PER_CATEGORY}")
+        if cnt["qual"] != HELDOUT_CATEGORY_COUNTS.get(c, 0):
+            e.append(f"category {c}: {cnt['qual']} held-out tasks, protocol fixes {HELDOUT_CATEGORY_COUNTS.get(c, 0)}")
     kinds = Counter(m.group(1) for t in tasks if t["category"] == "expansion"
                     for m in [re.search(r"expansion_kind: ([a-z]+)", t.get("notes") or "")] if m)
     if dict(kinds) != HELDOUT_EXPANSION_KINDS:

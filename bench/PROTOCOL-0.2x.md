@@ -98,6 +98,9 @@ baseline that shares the arm's model, prompt and generation settings:
 - **Identical in all seven conditions:** model and digest, backend and version, `temperature = 0`,
   `max_tokens = 4096`, timeout 300 s, `MAX_ROUNDS = 8`, Odysseus `2992bf6`, catalog, fixtures,
   stores, stubs, fault injections, authority profiles and `sim-1` backends.
+- **Unknown-tool judging** is unchanged from 0.2: a task passes if the answer reports the tool as
+  unavailable **or** answers through a fallback (an `any_of` check). The two halves are reported
+  separately, so a reader can see which one carried each pass.
 - **Judge conditions:** checks marked `"conditions": ["B"]` apply to B1 to B4, and checks marked
   `["A"]` apply to A, A2 and A4.
 
@@ -196,7 +199,7 @@ pair counts as a failure for the B side.
 `python3 bench/tools/stats.py --power` gives the share of simulated campaigns in which S holds
 (seed 1, 3000 trials per cell, both-succeed rate 0.75). pd is the discordant-pair rate.
 
-| n pairs | pd 0.08 | pd 0.12 | pd 0.16 | pd 0.20 | false pass at θ = -0.10 (pd 0.12 to 0.20) |
+| n pairs | pd 0.08 | pd 0.12 | pd 0.16 | pd 0.20 | pass rate at the margin θ = -0.10 (pd 0.12 to 0.20) |
 |---|---|---|---|---|---|
 | 60 | 0.687 | 0.530 | 0.427 | 0.358 | 0.019 to 0.023 |
 | 100 | 0.898 | 0.771 | 0.659 | 0.561 | 0.023 |
@@ -206,7 +209,8 @@ pair counts as a failure for the B side.
 - The 0.2 qual run had 6 discordant pairs in 37, pd ≈ 0.16.
 - At n = 120 a truly equal arm passes S with probability about 0.75 at that discordance, and 0.85
   at pd 0.12.
-- A truly worse arm (θ = -0.10) passes at most about 2.5 % of the time.
+- An arm exactly at the margin (θ = -0.10, the boundary of the null hypothesis) passes at most about
+  2.5 % of the time. That is the size of the test, as intended for a one-sided 95 % bound.
 - 150 pairs would add about 0.09 power at pd 0.16 for 25 % more authoring and run time. 120 was
   chosen as the budget.
 - O2 at 24 tasks: 22 of 24 is the smallest count meeting 90 %. A true recovery rate of 0.95 passes

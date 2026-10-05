@@ -40,8 +40,14 @@
   "injection": null,
   "nonexistent_tool": null,
   "judge": {
-    "expected_answer": "3410 kg (the draft says 3300)",
+    "expected_answer": "Yield summary draft; 3410 kg (the draft says 3300)",
     "checks": [
+      {
+        "kind": "answer_contains_all",
+        "values": [
+          "Yield summary"
+        ]
+      },
       {
         "kind": "answer_regex",
         "pattern": "(?<![0-9])3410(?![0-9])"

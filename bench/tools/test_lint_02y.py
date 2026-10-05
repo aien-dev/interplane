@@ -270,9 +270,27 @@ class Replay(unittest.TestCase):
         full = make_entries()
         self.assertTrue(any("no group was short" in x for x in replay(decide(full + self.top_up(73, 1, 12, True)))["errors"]))
 
-    def test_top_up_sizes_must_be_12_24_36(self):
-        errs = replay(decide(sized(36, 20) + self.top_up(73, 1, 6, True)))["errors"]
-        self.assertTrue(any("top-up round 1, brief 'question': 6 requests, expected 12" in x for x in errs), errs)
+    def test_top_up_under_delivery_is_a_note(self):
+        res = replay(decide(sized(36, 20) + self.top_up(73, 1, 6, True)))
+        self.assertEqual(res["errors"], [])
+        self.assertIn("top-up round 1, brief 'question': 6 requests returned, 12 asked", res["notes"])
+
+    def test_over_delivery_beyond_the_asked_number_never_counts(self):
+        # round 1 asks for 12: the first 12 are rejected by the lint, 6 valid ones follow beyond the ask
+        ents = decide(sized(36, 20) + self.top_up(73, 1, 12, False) + self.top_up(85, 1, 6, True))
+        errs = replay(ents)["errors"]
+        self.assertTrue(any(x.startswith("q-0085: beyond the 12 asked in top-up round 1") for x in errs), errs)
+        for e in ents[-6:]:
+            e["status"] = "discarded_over_delivery"
+        errs = replay(ents)["errors"]
+        # marked correctly they are not linted into a group, so the default group stays short
+        self.assertEqual(errs, ["group default: 20 accepted, need exactly 24"], errs)
+        ents = decide(sized(36, 20) + self.top_up(73, 1, 12, True) + self.top_up(85, 1, 6, True))
+        for e in ents[-6:]:
+            e["status"] = "discarded_over_delivery"
+        self.assertEqual(replay(ents)["errors"], [])
+        ents[-7]["status"] = "discarded_over_delivery"  # one inside the ask may not be marked
+        self.assertTrue(any(x.startswith("q-0084: recorded status") for x in replay(ents)["errors"]))
 
     def test_more_than_three_top_ups_fails(self):
         ents = sized(36, 0)
@@ -298,8 +316,12 @@ class Replay(unittest.TestCase):
         ents = decide(make_entries())
         ents[0], ents[1] = ents[1], ents[0]
         self.assertTrue(any("not in request-id order" in x for x in replay(ents)["errors"]))
-        ents = decide(make_entries(nonfile=30, default=36))
-        self.assertTrue(any("first pass has" in x for x in replay(ents)["errors"]))
+        # amendment 3: a short first pass is a note, a missing brief is an error
+        res = replay(decide(make_entries(nonfile=30, default=36)))
+        self.assertEqual(res["errors"], [])
+        self.assertIn("first pass, brief 'everyday': 30 requests returned, 36 asked", res["notes"])
+        ents = [e for e in decide(make_entries()) if e["brief"] == "question"]
+        self.assertTrue(any("first pass has briefs" in x for x in replay(ents)["errors"]))
 
     def test_calibration_pool_takes_the_first_30(self):
         ents = decide(make_entries(), target={"any": 30}, groups=("any",))

@@ -80,6 +80,13 @@ Rules for every workspace:
   logs, short letters, configuration, tables written as text). Each file is 5 to 40 lines.
 - Each workspace contains at least 40 distinct facts that someone could later ask about in a short question:
   who does something, when, how many, how much, where, which one, what was decided, what the status is.
+- The person or team keeps their everyday records in the workspace next to their work files: for example saved
+  mail, meeting notes, contacts, to-do lists, notes, chat logs, things to remember, documents, notes on images.
+  Use whichever fit them.
+- Give every fact an area: the everyday area of the record that holds it, one of mail, meetings, contacts,
+  to-dos, notes, chats, models, memory, documents, images, or other when it belongs to none of them. In each
+  workspace at least 20 facts have one of those ten areas, spread over at least 3 of them, and at least 20
+  facts are other.
 - Every fact appears in exactly one file, once, stated plainly. No fact may be guessable from another file.
   Add a few look-alike distractors (similar names, older or superseded values) so that reading a wrong
   file gives a wrong answer.
@@ -89,22 +96,29 @@ Rules for every workspace:
 
 Answer with one JSON object and nothing else: {"workspaces": [{"slug": "<short lowercase slug>",
 "description": "<one sentence>", "files": {"<relative path>": "<file text>"}, "facts": [{"fact": "<one
-sentence stating it>", "file": "<relative path>"}]}]}
+sentence stating it>", "file": "<relative path>", "area": "<one of the ten areas, or other>"}]}]}
+```
 
-Fact sentences must not contain a path, a file name or a file extension (`authoring_02y.fact_errors` checks;
-a failing fixture call is repeated whole, and the failing call stays in the record).
+Bookkeeping (not sent to the author; amendment 3 moved it out of the verbatim block, attempt 1's fixture prompt
+carried the paragraph below in its pre-amendment form): fact sentences must not contain a path, a file name or a file extension, every fact carries one of the ten areas
+or `other`, and each workspace has at least 20 facts on each side and at least 3 distinct areas
+(`authoring_02y.fact_errors` checks all of it; a failing fixture call is repeated whole, and the failing call stays
+in the record). The area list is the one brief E already names (PREREG-0.2y section 5); the author never sees a
+keyword list, a capability name or the selector. Area tags and balance: amendment 3, after attempt 1. "models"
+stays in the area list because brief E names it, but the example list above leaves it out, since the brief also
+says not to mention models.
 The 6 workspaces are the number `authoring_02y.workspaces_needed()` returns: both briefs together need 216
 facts (2 x (36 + 12 + 24 + 36)) and 6 x 40 = 240. If `pool_check` still reports a shortfall on the returned
 workspaces, the fixture call is repeated for `extra_workspaces` more workspaces (deterministic, same brief,
 different invented lines of work), never edited by hand.
-```
 
 ### 4.2 Target requests, round 0 (sent once per brief type; same two briefs for the calibration set)
 
 Facts are handed over as `id` plus sentence only. The `file` field and every path are removed
-(`authoring_02y.facts_for_author`). Brief E sees the facts with an odd serial inside their workspace, brief Q the
-facts with an even serial (a deterministic split by fact id, `split_record`, written to
-`authoring-inputs/fact-split.json`). The two briefs never share a fact. Facts used by an earlier request of the
+(`authoring_02y.facts_for_author`). Brief E sees the facts the fixture author tagged with one of the ten everyday
+areas, brief Q the facts tagged `other` (a deterministic split by the author's own tag, never by reading a fact,
+`split_record`, written to `authoring-inputs/fact-split.json`; amendment 3 replaced attempt 1's odd/even split).
+The two briefs never share a fact. The `area` tag is not shown to the request author. Facts used by an earlier request of the
 same brief are left out of its later calls.
 
 Brief E (everyday work), `{N}` = 36; `{WORKSPACES}` = slug, description and the id-plus-sentence facts of its subset, nothing else:
@@ -201,7 +215,13 @@ workspaces only). The first 30 lint-passing requests in id order form the set (s
    `heldout-0.2y/authoring-log.jsonl`: `{"set": "target"|"calibration", "id": "q-NNNN", "round": 0..3,
    "brief": "everyday"|"question", "fixture": "<slug>", "request": "...", "answer": [...], "template": "...",
    "codes": [...], "lint": [<author messages>], "detail": {...}, "group": "nonfile"|"default"|null,
-   "status": "accepted"|"discarded_lint"|"discarded_surplus"}`. `codes` and `detail` stay out of the author's sight.
+   "status": "accepted"|"discarded_lint"|"discarded_surplus"|"discarded_over_delivery"}`. `codes` and `detail`
+   stay out of the author's sight.
+   **Over- and under-delivery (amendment 3).** One call asks for a number of requests (36 in round 0, 12, 24, 36
+   in rounds 1 to 3). When it returns more, the first ones up to that number, in the author's array order, are
+   logged and decided; every later one is logged with status `discarded_over_delivery`, is never linted into a
+   group and never run, and its fact counts as unused for later calls. When it returns fewer, they are logged as
+   they are and the replay lists the shortfall as a note; the round still counts as one of the three top-ups.
    `validate.py --corpus 0.2y` replays the log in id order and fails on any difference.
 3. **Acceptance (section 5).** In id order, a request that passes the lint goes into the group the lint derives
    (`nonfile` or `default`); each group keeps the first 24 accepted; later passing requests are `discarded_surplus`.
@@ -216,8 +236,9 @@ workspaces only). The first 30 lint-passing requests in id order form the set (s
 
 ## 6. Deviations from section 5 of the pre-registration
 
-All are listed, each with its reason, in the dated section 11 amendment of the pre-registration (2026-10-05,
-written before any task, fixture or request exists). None changes a threshold, arm or sample size.
+All are listed, each with its reason, in the dated section 11 amendments of the pre-registration: items 1 to 10 in
+amendment 2 (written before any task, fixture or request existed), items 11 to 13 in amendment 3 (written after
+attempt 1 stopped short and before attempt 2). None changes a threshold, arm or sample size.
 
 1. **Lint scope.** Applies to `discovery_needed` requests only (target and calibration), not to the 72 regression
    requests: their categories legitimately name files and tools and the author has no catalog.
@@ -236,6 +257,16 @@ written before any task, fixture or request exists). None changes a threshold, a
 9. **Fact pool.** Facts are shown as id plus sentence only; briefs E and Q draw disjoint subsets; 6 workspaces of
    40 or more facts; `pool_check` enlarges the pool deterministically if base requests plus maximum top-ups do not fit.
 10. **Calibration pooling.** The 30 calibration tasks use one pool, any group, the same lint.
+11. **Area-tagged facts (amendment 3).** The fixture author tags each fact with one of the ten everyday areas of
+    brief E or `other`, with at least 20 on each side and 3 distinct areas per workspace; brief E draws the tagged
+    facts and brief Q the `other` facts, replacing the odd/even split. Reason: in attempt 1 every fact was a fact
+    about a workshop's own files, so the everyday-work brief had nothing from mail, meetings or notes to ask
+    about (6 of 89 lint-passing everyday requests derived a non-file domain).
+12. **Over- and under-delivery (amendment 3).** Requests beyond the asked number of a call are logged as
+    `discarded_over_delivery`, never grouped, and their facts stay unused; a short call is a note. Reason: attempt 1's
+    top-up 2 returned 48 of 24 and used up the facts the third top-up needed.
+13. **Bookkeeping outside the brief (amendment 3).** The paragraph on fact checks and pool size under 4.1 is not
+    sent to the author; attempt 1's fixture prompt carried it.
 
 ## 6b. Open points
 
@@ -263,4 +294,5 @@ the same model and an empty scratch working directory for each call).
 
 **Attempt 1 stopped short (2026-10-05):** the non-file group reached 6 of 24 after three top-ups, so the corpus is not
 frozen (PREREG-0.2y section 5). Report, log and every prompt and answer: `attempt-1/REPORT.md`. The authoring rules
-are revised under section 11 before attempt 2.
+are revised under section 11 before attempt 2 (amendment 3: area-tagged facts, over-delivery rule). Attempt 2 uses
+new fixtures, a new author run and none of attempt 1's requests.

@@ -245,3 +245,26 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
      the pool is 6 workspaces of 40 or more facts and is enlarged deterministically if it cannot cover base
      requests plus maximum top-ups: removes a path leak and a shared-fact overlap.
   10. Calibration tasks pool both groups (first 30 passing in id order): section 5 gives no group split for them.
+- 2026-10-05 (amendment 3, after authoring attempt 1 stopped short and before attempt 2; no target or calibration
+  task exists, no model under test has received any request). Attempt 1 (`bench/heldout-0.2y/attempt-1/REPORT.md`)
+  filled the default group (24/24) but the non-file group reached 6 of 24 after three top-ups, so under section 5
+  the corpus was not frozen and the authoring rules are revised here. Thresholds, arms, sample size, group sizes,
+  lint and acceptance rule are unchanged; the 24/24 requirement stays.
+  11. Area-tagged facts. The fixture author keeps everyday records in each workspace and tags every fact with one
+      of the ten life areas brief E already names (mail, meetings, contacts, to-dos, notes, chats, models, memory,
+      documents, images) or `other`; each workspace has at least 20 facts on each side and 3 distinct areas. Brief E
+      draws the tagged facts, brief Q the `other` facts (replacing amendment 2 item 9's odd/even split). Reason: in
+      attempt 1 every fact was about a workshop's own files, so the everyday-work brief had no mail, meeting or note
+      to ask about (6 of 89 lint-passing everyday requests derived a non-file domain). The split uses the author's
+      tag, never a reading of the fact; the request author never sees the tag, a keyword list or the selector. This
+      is a hypothesis about the shortfall, not a tested one: if attempt 2 is short again, the corpus is again not
+      frozen.
+  12. Over- and under-delivery. A call that returns more requests than it asked for keeps the first ones up to the
+      asked number in the author's order; the rest are logged as `discarded_over_delivery`, never grouped or run,
+      and their facts stay unused. A call that returns fewer is logged as it is (a replay note, not an error) and
+      the round still counts. Reason: attempt 1's top-up 2 returned 48 of 24 and used up the facts the third top-up
+      needed. Attempt 1's record was replayed with the checker at 2049968; the amended checker is not applied to it.
+  13. The bookkeeping paragraph under the fixture brief (check names and pool arithmetic) is moved outside the
+      verbatim brief; attempt 1's fixture prompt carried it (no catalog name, keyword or selector detail; recorded,
+      not changing attempt 1's outcome).
+  Attempt 2 uses new fixtures, a new author run (same author family, section 5) and none of attempt 1's requests.

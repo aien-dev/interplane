@@ -31,7 +31,9 @@ def run_cases():
         for step in case["steps"]:
             if "expand" in step:
                 continue
-            if "envelope" in step:
+            if "input" in step and "dialect" not in step:
+                pipe.register_input(step["input"])
+            elif "envelope" in step:
                 results.append(pipe.admit_envelope(step["envelope"])[0])
             else:
                 results.extend(

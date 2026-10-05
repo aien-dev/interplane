@@ -1,0 +1,147 @@
+{
+  "case": "30-input-forged-exposure",
+  "description": "An admitted envelope claims provenance.exposure {inputs: [forged-clean], floor: trusted_runtime}. The pipeline never reads it: the request is admitted with the exposure computed from the trace's own ledger, where a web input holds the floor at external_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-30",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-30-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-30",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "input": {
+        "input_id": "in-30-web",
+        "content_kind": "web_content",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "host"
+        },
+        "origin": "https://example.test/page",
+        "content_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "trace_id": "trace-30",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-30-0-0",
+        "trace_id": "trace-30",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "req-30a",
+          "tool": {
+            "namespace": null,
+            "name": "read_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "read_file",
+            "coercion": "none",
+            "exposure": {
+              "inputs": [
+                "forged-clean"
+              ],
+              "floor": "trusted_runtime"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "req-30a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-30-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-30",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-30-web",
+        "content_kind": "web_content",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "host"
+        },
+        "origin": "https://example.test/page",
+        "content_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "trace_id": "trace-30",
+        "parent_id": null,
+        "derived_from": []
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "req-30a",
+        "inputs": [
+          "in-30-user",
+          "in-30-web"
+        ],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

@@ -76,9 +76,15 @@ proposal are never flattened into indistinguishable text. Rules:
    inputs visible to the model when it produced the turn. Order: `trusted_runtime` >
    `user_supplied` > `workspace_untrusted` > `external_untrusted`; `unknown` counts as
    `external_untrusted`. The pipeline computes it from its own ledger; an `exposure` arriving inside
-   a model-produced or admitted envelope is discarded and recomputed, never read. In this version
-   (0.3 cut P2) both are types and schemas only: the pipeline does not yet record inputs or compute
-   exposure.
+   a model-produced or admitted envelope is discarded and recomputed, never read. Since 0.3 cut P3
+   the pipeline computes it. Per trace it keeps a ledger of inputs: every result it renders back
+   to the model is recorded automatically (`parent_id` is the `request_id`, `trust` and
+   `content_kind` are the result's normalized provenance, `unknown` when it has none), and the
+   host adds any other input before a turn through a host-only registration call that model
+   output and envelopes cannot reach. All `tool_request`s of a turn, and the `CallContext` passed
+   to `decide` and `execute`, carry the ledger as it stood when the turn began. Exposure fails
+   closed: an empty ledger, an input of unknown or unrecognized trust, and an input whose
+   `derived_from` names an id the ledger does not hold all count as `external_untrusted`.
 
 Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
 `invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose

@@ -353,3 +353,67 @@ fn mock_table_shape() {
     assert!(t.catalog_digest.is_none());
     assert!(mock_mapping_table_stale().catalog_digest.is_some());
 }
+
+fn input_rec(id: &str, trust: &str, trace: &str) -> InputRecord {
+    serde_json::from_value(json!({
+        "input_id": id, "content_kind": "user_request", "trust": trust,
+        "source": {"kind": "operator", "id": "op"}, "origin": "user:prompt",
+        "content_digest": format!("sha256:{}", "a".repeat(64)),
+        "trace_id": trace, "parent_id": null, "derived_from": []
+    }))
+    .unwrap()
+}
+
+#[test]
+fn exposure_fails_closed_when_ledger_is_empty() {
+    let mut rt = MockRuntime::new();
+    pipe(&mut rt).run_turn(
+        "openai",
+        "m",
+        &turn(vec![call("a", "read_file", json!({"path": "/x"}))]),
+        "t",
+        0,
+    );
+    assert_eq!(
+        rt.seen_exposure,
+        vec![json!({"request_id": "a", "inputs": [], "floor": "external_untrusted"})]
+    );
+}
+
+#[test]
+fn exposure_floor_is_least_trusted_and_unknown_ranks_external() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt);
+    p.register_input(input_rec("a", "trusted_runtime", "t"))
+        .unwrap();
+    assert_eq!(p.exposure_for("t").floor, TrustLevel::TrustedRuntime);
+    p.register_input(input_rec("b", "user_supplied", "t"))
+        .unwrap();
+    assert_eq!(p.exposure_for("t").floor, TrustLevel::UserSupplied);
+    p.register_input(input_rec("c", "not-a-level", "t"))
+        .unwrap();
+    assert_eq!(p.exposure_for("t").floor, TrustLevel::ExternalUntrusted);
+    p.register_input(input_rec("d", "trusted_runtime", "other"))
+        .unwrap();
+    assert_eq!(p.exposure_for("other").floor, TrustLevel::TrustedRuntime);
+    assert!(p
+        .register_input(input_rec("a", "user_supplied", "t"))
+        .is_err());
+}
+
+#[test]
+fn input_registration_is_not_reachable_from_an_envelope() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt);
+    let mut payload = serde_json::to_value(input_rec("x", "trusted_runtime", "t")).unwrap();
+    payload["kind"] = json!("input_record");
+    let env = json!({
+        "interplane_version": "0.1", "message_id": "m1", "trace_id": "t", "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {"kind": "model", "id": "m"}, "destination": {"kind": "runtime", "id": "mock"},
+        "payload": payload
+    });
+    let (res, _) = p.admit_value(&env);
+    assert_eq!(res.error.unwrap().code, ErrorCode::MalformedEnvelope);
+    assert!(p.inputs("t").is_empty());
+}

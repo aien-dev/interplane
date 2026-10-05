@@ -28,7 +28,14 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
     assert len(life) == len(LIFECYCLE)
     assert all(v["pass"] and set(v) == {"pass", "steps"} for v in life.values())
     base = {"pass", "observed", "runtime", "turns"}
-    assert all(v["pass"] and set(v) - {"selections"} == base for v in data.values())
+    optional = {"selections", "inputs", "exposure"}
+    assert all(v["pass"] and set(v) - optional == base for v in data.values())
+    ledger_cases = {
+        "28-input-ledger-continues",
+        "29-input-derived-from",
+        "30-input-forged-exposure",
+    }
+    assert {k for k, v in data.items() if "inputs" in v and "exposure" in v} == ledger_cases
     assert {k for k, v in data.items() if "selections" in v} == {
         "24-expansion-requested-excluded",
         "25-expansion-refused-by-bound",

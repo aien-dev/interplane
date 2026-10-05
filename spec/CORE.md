@@ -218,7 +218,11 @@ One JSON file per case under `conformance/fixtures/NN-slug.json`:
 A `step` with `dialect` is parsed by Lenshift; the runner wraps each intent in an envelope with
 `message_id = "m-<case>-<turn>-<n>"`, `timestamp = "2026-01-01T00:00:00Z"`, source
 `{"kind":"model","id":<model>}`, destination `{"kind":"runtime","id":"mock"}`. A step with
-`envelope` is admitted as-is. Rendered results are fed back into the next step only when the step
+`envelope` is admitted as-is. A step with `input` and no `dialect` is a host-only input
+registration: the runner passes its `InputRecord` to the pipeline's `register_input` before the
+next turn (0.3 cut P3). Two optional `expected` blocks: `inputs`, the trace's ledger after the last
+step in order, each entry matched on the keys the fixture lists; and `exposure`, `[{request_id, inputs, floor}]` as seen in `CallContext` at each `decide`.
+Verdict files carry `inputs` and `exposure` only for cases that assert them. Rendered results are fed back into the next step only when the step
 declares `"continues": true`.
 
 Lifecycle fixtures live under `conformance/fixtures/lifecycle/NN-slug.json` and drive the

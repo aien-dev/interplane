@@ -78,6 +78,122 @@ def write_run(out: Path) -> None:
             (out / "receipts" / f"{tid}.{cond}.json").write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n")
 
 
+# ---------------------------------------------------------------- 0.2x campaign (seven conditions, three seeds)
+
+HELD = BENCH / "heldout-0.2x" / "tasks"
+CONDS7 = ["A", "A2", "A4", "B1", "B2", "B3", "B4"]
+
+
+def held_subset(tdir: Path) -> dict:
+    """Five real held-out tasks: one expansion task per kind, one denied, one filesystem."""
+    allt = {t["id"]: t for t in (json.loads(p.read_text()) for p in sorted(HELD.glob("*.json")))}
+    pick = {}
+    for tid, t in allt.items():
+        k = analyze.expansion_kind(t) if t["category"] == "expansion" else t["category"]
+        if k in ("named", "path", "nopath", "denied", "filesystem") and k not in pick:
+            pick[k] = tid
+    tdir.mkdir(parents=True, exist_ok=True)
+    for tid in pick.values():
+        (tdir / f"{tid}.json").write_text(json.dumps(allt[tid]))
+    return {k: allt[v] for k, v in pick.items()}
+
+
+def campaign_receipt(task: dict, cond: str, seed: int, rng: random.Random, recover: bool) -> dict:
+    fam = cond[0]
+    run = synth_run(task, fam, True, rng)
+    needs_exp = task["category"] == "expansion" and fam == "B"
+    if needs_exp and not recover:
+        run["expansions"] = []
+        run["coverage_trace"] = [{"round": 1, "effective_expansions": 0, "covered": False}, {"round": 2, "effective_expansions": 0, "covered": False}]
+        run["final_exposed_names"] = []
+        run["calls"][0].update(exposed=False)
+    run["calls"][0].update(index=0, executed=True)
+    if task["category"] == "denied":
+        run["calls"] = [{"round": 1, "index": 0, "tool": "manage_tokens", "capability": "manage_tokens", "decision": "denied", "status": "denied",
+                         "error_code": "policy_denied", "discovery": False, "exposed": False, "executed": False}]
+        # the 0.2 mechanism (B1, B2, B4) also exposes after a denied call; runtime-v1 (B3) never does
+        run["expansions"] = ([{"round": 1, "call_index": 0, "trigger": "requested_excluded", "reason": "requested_excluded",
+                               "added": ["manage_tokens"], "refused": []}] if cond in ("B1", "B2", "B4") else [])
+    tr = {"final_answer": run["final_answer"],
+          "calls": [{k: c[k] for k in ("round", "tool", "capability", "decision", "status", "error_code", "discovery")} for c in run["calls"]],
+          "expansions": [{"round": e["round"], "reason": e.get("reason"), "added": e["added"], "refused": e["refused"]} for e in run["expansions"]]}
+    rc = {"kind": "interplane_bench_receipt", "task": {"id": task["id"], "category": task["category"], "split": task["split"]}, "condition": cond,
+          "generation": {"seed": seed}, "rounds": run["rounds"], "calls": run["calls"], "expansions": run["expansions"], "transcript": tr,
+          "judge": bench_eval.judge(task, fam, tr), "metrics": bench_eval.run_metrics(task, fam, run), "measure": {},
+          "tool_schema_tokens_per_round": run["tool_schema_tokens"],
+          "reasoning": {"off_requested": cond in ("A4", "B4"), "field": None, "rounds_with_reasoning": 0, "invalid_for_arm4": False}}
+    if cond == "B3" and needs_exp:
+        rc["runtime_triggers"] = [{"round": 1, "call_index": 0, "trigger": "T2", "name": "x", "outcome": "expanded" if recover else "refused"}]
+    if cond == "B3" and task["category"] == "denied":
+        rc["runtime_triggers"] = [{"round": 1, "call_index": 0, "trigger": "T2", "name": "manage_tokens", "outcome": "N1_policy_denied"}]
+    return rc
+
+
+def write_campaign_block(out: Path, subset: dict, seed: int, recover: dict) -> None:
+    """recover: (cond, expansion kind) -> bool for this block; default True."""
+    rng = random.Random(seed)
+    (out / "receipts").mkdir(parents=True, exist_ok=True)
+    (out / "manifest.json").write_text(json.dumps({"campaign": {"seed": seed}, "corpus": {"match": True}, "latency_validity": {"valid": True, "reasons": []},
+                                                   "deterministic_identity": {"identity_digest": f"sha256:synthetic-{seed}"}}, sort_keys=True) + "\n")
+    for k, t in subset.items():
+        for cond in CONDS7:
+            rec = recover.get((cond, k), True)
+            (out / "receipts" / f"{t['id']}.{cond}.json").write_text(json.dumps(campaign_receipt(t, cond, seed, rng, rec), sort_keys=True) + "\n")
+
+
+def test_campaign() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        td = Path(td)
+        subset = held_subset(td / "tasks")
+        assert len(subset) == 5
+        # seed 42: arm 3 (B3) recovers named and path but not nopath; arm 1 (B1) recovers nothing but tries on the named task
+        s42 = {("B3", "nopath"): False, ("B1", "named"): False, ("B1", "path"): False, ("B1", "nopath"): False}
+        # seed 43: B3 recovers nopath too (O2 flips); everything else as seed 42. seed 44 equals seed 42.
+        s43 = {k: v for k, v in s42.items() if k != ("B3", "nopath")}
+        for seed, rec in ((42, s42), (43, s43), (44, s42)):
+            write_campaign_block(td / f"s{seed}", subset, seed, rec)
+        args = ["--campaign", "--tasks-dir", str(td / "tasks"), "--stability", f"{td / 's43'},{td / 's44'}"]
+        analyze.main([str(td / "s42"), "--out", str(td / "o1"), *args])
+        analyze.main([str(td / "s42"), "--out", str(td / "o2"), *args])
+        for f in ("campaign-summary.json", "campaign-summary.md"):
+            assert (td / "o1" / f).read_bytes() == (td / "o2" / f).read_bytes(), f"{f} is not deterministic"
+        s = json.loads((td / "o1" / "campaign-summary.json").read_text())
+        a1, a2, a3, a4 = (s["arms"][k] for k in "1234")
+        assert [a["condition"] for a in (a1, a2, a3, a4)] == ["B1", "B2", "B3", "B4"] and [a["baseline"] for a in (a1, a2, a3, a4)] == ["A", "A2", "A", "A4"]
+        # per-arm T, S, O1, O2 and the diagnostics O2a and O2b
+        assert a3["gates"]["T"]["pass"] is True and a3["gates"]["T"]["value"] > 0.9
+        e3 = a3["expansion_tasks"]
+        assert (e3["tasks"], e3["O1_covered_final"], e3["O2_recovered_within_1"], e3["O2a_trigger_fired"], e3["O2b_recovered_given_trigger"]) == (3, 2, 2, 3, 2), e3
+        assert a3["gates"]["O2"]["pass"] is False and a3["gate_flags"]["O2"] is False and a3["verdict"].startswith("FAIL")
+        e1 = a1["expansion_tasks"]
+        assert (e1["O2_recovered_within_1"], e1["O2a_trigger_fired"]) == (0, 0), e1  # B1 here neither recovered nor fired
+        assert a2["expansion_tasks"]["O2_recovered_within_1"] == 3 and a4["expansion_tasks"]["O2_recovered_within_1"] == 3
+        # per expansion kind
+        assert a3["by_expansion_kind"]["nopath"]["O2_recovered_within_1"] == 0 and a3["by_expansion_kind"]["named"]["O2_recovered_within_1"] == 1
+        assert sorted(a3["by_expansion_kind"]) == ["named", "nopath", "path"]
+        # fragile: B3 O1 and O2 flip under seed 43 only; arms with identical blocks are not fragile
+        assert a3["fragile"] is True and a3["stability"]["stability1"]["flipped"] == ["O1", "O2"] and a3["stability"]["stability2"]["flipped"] == []
+        assert a3["verdict"].endswith("(fragile)")
+        assert a1["fragile"] is False and a2["fragile"] is False and a4["fragile"] is False
+        # negative controls: B3 zero; B1 shows the 0.2 mechanism exposing after a denied call
+        assert a3["negative_controls"] == {"executions_of_denied_or_pending_calls": 0, "expansions_fired_by_denied_or_pending_call": 0}
+        assert a1["negative_controls"]["expansions_fired_by_denied_or_pending_call"] == 1
+        assert a3["trigger_counts"] == {"T2": 4} and a3["suppressed_n1_n2"] == 1, (a3["trigger_counts"], a3["suppressed_n1_n2"])
+        # an arm 4 run with reasoning present is invalid
+        victim = next((td / "s42" / "receipts").glob("*.B4.json"))
+        r = json.loads(victim.read_text())
+        r["reasoning"]["invalid_for_arm4"] = True
+        victim.write_text(json.dumps(r))
+        analyze.main([str(td / "s42"), "--out", str(td / "o3"), *args])
+        s3 = json.loads((td / "o3" / "campaign-summary.json").read_text())
+        assert s3["arms"]["4"]["gates"]["overall"] == "INVALID" and len(s3["arms"]["4"]["reasoning_present_in_arm4_runs"]) == 1
+        # without stability blocks the fragile label is not evaluated
+        analyze.main([str(td / "s42"), "--out", str(td / "o4"), "--campaign", "--tasks-dir", str(td / "tasks")])
+        assert json.loads((td / "o4" / "campaign-summary.json").read_text())["arms"]["3"]["fragile"] is None
+        assert "Fragile: yes" in (td / "o1" / "campaign-summary.md").read_text()
+    print("campaign analyzer tests: PASS")
+
+
 def analyze_to(run: Path, out: Path, extra: list = ()) -> None:
     analyze.main([str(run), "--out", str(out), *extra])
 
@@ -128,6 +244,7 @@ def main() -> int:
         print("fixture and expected outputs written")
         return 0
     test()
+    test_campaign()
     return 0
 
 

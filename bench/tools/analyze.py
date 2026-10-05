@@ -13,6 +13,16 @@ qual task is dropped after results are seen).
 
 Deterministic: the same input gives byte-identical output (fixed bootstrap seed, fixed float
 rounding, sorted keys, no timestamps, no environment data).
+
+Campaign mode (PROTOCOL-0.2x.md sections 4, 6, 8, 11):
+
+  python3 bench/tools/analyze.py <seed-42 run dir> --campaign [--stability <seed-43 dir>,<seed-44 dir>] [--out DIR]
+
+reads the seven-condition run of the held-out set (receipts ``<task>.<A|A2|A4|B1|B2|B3|B4>.json``)
+and writes campaign-summary.json and campaign-summary.md: per arm (1 to 4) the gate T, S, O1, O2 on
+seed 42 against its matched baseline, the diagnostics O2a and O2b, O1 and O2 per expansion kind,
+trigger counts, refusals, the negative controls, and the label ``fragile`` when a gate criterion
+of the arm flips under seed 43 or 44. The 0.2 outputs above are unchanged.
 """
 
 from __future__ import annotations
@@ -25,6 +35,7 @@ import math
 import random
 import statistics
 import sys
+from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -37,6 +48,10 @@ BOOT_SEED = 20261004
 BOOT_N = 10000
 ROUND = 6
 GATE_T, GATE_O1, GATE_O2 = 0.70, 0.95, 0.90
+# PROTOCOL-0.2x.md section 4: arm -> (matched baseline condition, arm condition)
+ARMS = {"1": ("A", "B1"), "2": ("A2", "B2"), "3": ("A", "B3"), "4": ("A4", "B4")}
+CRITERIA = ("T", "S", "O1", "O2")
+HELDOUT_TASKS = BENCH / "heldout-0.2x" / "tasks"
 
 
 def rnd(x):
@@ -454,16 +469,236 @@ def write_outputs(summary: dict, out_dir: Path) -> None:
     (out_dir / "tasks.csv").write_text(buf.getvalue(), encoding="utf-8")
 
 
+# ------------------------------------------------------------------------------- 0.2x campaign
+
+def expansion_kind(task: dict):
+    import re
+    m = re.search(r"expansion_kind: ([a-z]+)", task.get("notes") or "")
+    return m.group(1) if m else None
+
+
+def template_of(task: dict):
+    import re
+    m = re.search(r"template: ([a-z0-9_.-]+)", task.get("notes") or "")
+    return m.group(1) if m else None
+
+
+def trigger_fired(rec: dict) -> bool:
+    """O2a: a runtime trigger (T1, T2, T3), an attempted expansion, or a model discovery call."""
+    return bool(rec.get("runtime_triggers")) or bool(rec.get("expansions")) or rec["metrics"]["discovery_calls"] > 0
+
+
+def recovered_in_one(m: dict) -> bool:
+    return m["covered_after_effective_expansions"] is not None and m["covered_after_effective_expansions"] <= 1
+
+
+def expansion_figures(rows: list) -> dict:
+    """O1, O2, O2a and O2b over the expansion tasks of ``rows`` (rows hold the arm receipt under "B")."""
+    o1 = sum(1 for r in rows if not r["B"]["metrics"]["missing_required_final"])
+    o2 = sum(1 for r in rows if recovered_in_one(r["B"]["metrics"]))
+    fired = [r for r in rows if trigger_fired(r["B"])]
+    return {"tasks": len(rows), "O1_covered_final": o1, "O2_recovered_within_1": o2,
+            "O2a_trigger_fired": len(fired), "O2b_recovered_given_trigger": sum(1 for r in fired if recovered_in_one(r["B"]["metrics"]))}
+
+
+def negative_controls(recs: list) -> dict:
+    """Counts that must be zero for arm 3 (section 5, N1 and N2, section 10)."""
+    unauth = fired = 0
+    for r in recs:
+        by_call = {(c["round"], c["index"]): c for c in r["calls"]}
+        unauth += sum(1 for c in r["calls"] if c["decision"] in ("denied", "requires_approval") and c.get("executed"))
+        for e in r["expansions"]:
+            c = by_call.get((e.get("round"), e.get("call_index")))
+            if c is not None and c["decision"] in ("denied", "requires_approval") and e.get("added"):
+                fired += 1
+    return {"executions_of_denied_or_pending_calls": unauth, "expansions_fired_by_denied_or_pending_call": fired}
+
+
+def arm_extras(rows: list, recs: list) -> dict:
+    exp = [r for r in rows if r["_task"]["category"] == "expansion"]
+    kinds = sorted({expansion_kind(r["_task"]) for r in exp} - {None})
+    trig, outcome, refused, notes = Counter(), Counter(), Counter(), 0
+    for r in recs:
+        for t in r.get("runtime_triggers") or []:
+            trig[t["trigger"]] += 1
+            outcome[t.get("outcome", "none")] += 1
+        for e in r["expansions"]:
+            for x in e.get("refused") or []:
+                refused[x["reason"] if isinstance(x, dict) else str(x)] += 1
+            notes += 1 if e.get("exhausted_note") else 0
+    cats = sorted({r["_task"]["category"] for r in rows})
+    tmpl: dict = {}
+    for r in rows:
+        t = template_of(r["_task"]) or r["_id"]
+        d = tmpl.setdefault(t, {"tasks": 0, "baseline_success": 0, "arm_success": 0})
+        d["tasks"] += 1
+        d["baseline_success"] += int(r["A"]["judge"]["success"])
+        d["arm_success"] += int(r["B"]["judge"]["success"])
+    return {
+        "expansion_tasks": expansion_figures(exp),
+        "by_expansion_kind": {k: expansion_figures([r for r in exp if expansion_kind(r["_task"]) == k]) for k in kinds},
+        "trigger_counts": dict(sorted(trig.items())), "trigger_outcomes": dict(sorted(outcome.items())),
+        "refusals_by_reason": dict(sorted(refused.items())),
+        "duplicate_triggers": outcome.get("duplicate_trigger", 0),
+        "suppressed_n1_n2": outcome.get("N1_policy_denied", 0) + outcome.get("N2_approval_required", 0),
+        "cap_exhausted_notes": notes,
+        "negative_controls": negative_controls(recs),
+        "success_by_category": {c: {"baseline": sum(1 for r in rows if r["_task"]["category"] == c and r["A"]["judge"]["success"]),
+                                    "arm": sum(1 for r in rows if r["_task"]["category"] == c and r["B"]["judge"]["success"]),
+                                    "n": sum(1 for r in rows if r["_task"]["category"] == c)} for c in cats},
+        "success_by_template": dict(sorted(tmpl.items())),
+        "infra_failures": sum(1 for r in recs if r["metrics"]["infra_failure"]),
+    }
+
+
+def campaign_rows(run: dict, arm: str) -> tuple:
+    base, cond = ARMS[arm]
+    rows, recs = [], []
+    for tid in sorted(run["receipts"]):
+        rc = run["receipts"][tid]
+        t = run["tasks"].get(tid)
+        if t is None or base not in rc or cond not in rc:
+            continue
+        row = {"A": rc[base], "B": rc[cond], "_task": t, "_id": tid}
+        for c in (row["A"], row["B"]):
+            c["task_def"] = t
+        rows.append(row)
+        recs.append(rc[cond])
+    return rows, recs
+
+
+def campaign_arm(run: dict, arm: str) -> dict:
+    rows, recs = campaign_rows(run, arm)
+    expected = len(run["tasks"])
+    g = gates(rows, expected)
+    out = {"baseline": ARMS[arm][0], "condition": ARMS[arm][1], "gates": g, **arm_extras(rows, recs)}
+    if arm == "4":
+        bad = sorted(r["_id"] for r in rows for c in ("A", "B") if r[c].get("reasoning", {}).get("invalid_for_arm4"))
+        out["reasoning_present_in_arm4_runs"] = bad
+        if bad:  # section 4: such a run is invalid for arm 4
+            g["overall"] = "INVALID"
+    return out
+
+
+def flags_of(gates_: dict) -> dict:
+    return {k: gates_[k]["pass"] for k in CRITERIA}
+
+
+def build_campaign(gate_dir: Path, stab_dirs: list, tasks_dir: Path) -> dict:
+    runs = {"gate": load_run(gate_dir, tasks_dir)}
+    labels = {"gate": gate_dir.name}
+    for i, d in enumerate(stab_dirs):
+        runs[f"stability{i + 1}"] = load_run(d, tasks_dir)
+        labels[f"stability{i + 1}"] = d.name
+    out: dict = {"kind": "interplane_bench_campaign_summary", "gate_seed_dir": labels["gate"],
+                 "stability_dirs": [labels[k] for k in labels if k != "gate"], "arms": {}}
+    out["blocks"] = {k: {"seed": (r["manifest"].get("campaign") or {}).get("seed"),
+                         "frozen_digests_match": (r["manifest"].get("corpus") or {}).get("match"),
+                         "latency_valid": (r["manifest"].get("latency_validity") or {}).get("valid"),
+                         "latency_invalid_reasons": (r["manifest"].get("latency_validity") or {}).get("reasons"),
+                         "identity_digest": (r["manifest"].get("deterministic_identity") or {}).get("identity_digest")}
+                     for k, r in runs.items()}
+    for arm in sorted(ARMS):
+        a = campaign_arm(runs["gate"], arm)
+        base_flags = flags_of(a["gates"])
+        stab, flips = {}, []
+        for k in runs:
+            if k == "gate":
+                continue
+            ga = campaign_arm(runs[k], arm)["gates"]
+            f = flags_of(ga)
+            changed = sorted(c for c in CRITERIA if f[c] != base_flags[c])
+            stab[k] = {"flags": f, "overall": ga["overall"], "flipped": changed}
+            flips += changed
+        a["gate_flags"] = base_flags
+        a["stability"] = stab
+        a["fragile"] = (bool(flips) if stab else None)
+        a["verdict"] = a["gates"]["overall"] + (" (fragile)" if a["fragile"] else "")
+        out["arms"][arm] = a
+    # secondary comparisons (reported, not gated): B2, B3 and B4 against B1, seed 42
+    sec = {}
+    rc = runs["gate"]["receipts"]
+    for arm in ("2", "3", "4"):
+        cond = ARMS[arm][1]
+        tids = sorted(t for t in rc if "B1" in rc[t] and cond in rc[t] and t in runs["gate"]["tasks"])
+        exp = [t for t in tids if runs["gate"]["tasks"][t]["category"] == "expansion"]
+        sec[f"{cond}_vs_B1"] = {
+            "tasks": len(tids), "success_B1": sum(1 for t in tids if rc[t]["B1"]["judge"]["success"]),
+            f"success_{cond}": sum(1 for t in tids if rc[t][cond]["judge"]["success"]),
+            "expansion_tasks_covered_final_B1": sum(1 for t in exp if not rc[t]["B1"]["metrics"]["missing_required_final"]),
+            f"expansion_tasks_covered_final_{cond}": sum(1 for t in exp if not rc[t][cond]["metrics"]["missing_required_final"])}
+    out["secondary_vs_B1"] = sec
+    return out
+
+
+def campaign_md(summary: dict) -> str:
+    L = ["# 0.2x campaign summary", "",
+         f"Gate seed block `{summary['gate_seed_dir']}`; stability blocks {', '.join('`' + d + '`' for d in summary['stability_dirs']) or 'none'}. "
+         "The gate verdict uses seed 42 only; a gate criterion that flips under seed 43 or 44 labels the arm fragile (PROTOCOL-0.2x.md section 8).", "",
+         "## Blocks", "", "| block | seed | frozen digests match | latency valid |", "|---|---|---|---|"]
+    for k, b in summary["blocks"].items():
+        L.append(f"| {k} | {fmt(b['seed'])} | {fmt(b['frozen_digests_match'])} | {fmt(b['latency_valid'])} |")
+    L += ["", "## Gates (seed 42)", "", "| arm | pair | T | S | O1 | O2 | O2a | O2b | verdict |", "|---|---|---|---|---|---|---|---|---|"]
+    for arm, a in summary["arms"].items():
+        g, e = a["gates"], a["expansion_tasks"]
+        s = g["S"]
+        L.append(f"| {arm} | {a['baseline']} vs {a['condition']} | {fmt(g['T']['value'])} ({fmt(g['T']['pass'])}) | "
+                 f"theta {fmt(s.get('theta'))}, CI low {fmt(s['ci95'][0]) if 'ci95' in s else 'n/a'} ({fmt(s['pass'])}) | "
+                 f"{fmt(g['O1']['rate_covered'])} ({fmt(g['O1']['pass'])}) | {e['O2_recovered_within_1']} of {e['tasks']} ({fmt(g['O2']['pass'])}) | "
+                 f"{e['O2a_trigger_fired']} of {e['tasks']} | {e['O2b_recovered_given_trigger']} of {e['O2a_trigger_fired']} | **{a['verdict']}** |")
+    L += ["", "T is the median of 1 - arm/baseline per-round tool-schema tokens (threshold 0.70). S is the paired success delta with its Newcombe "
+          "method-10 lower bound (threshold -0.10). O1 needs 0.95. O2, O2a and O2b are counts over the 24 expansion tasks (O2 needs 22).", ""]
+    for arm, a in summary["arms"].items():
+        L += [f"## Arm {arm}: {a['baseline']} vs {a['condition']}", "",
+              f"Pairs {a['gates']['n_pairs']} of {a['gates']['expected_qual_pairs']}. Infra failures on the arm side: {a['infra_failures']}.", ""]
+        if a["stability"]:
+            L.append("Stability: " + "; ".join(f"{k} flipped {', '.join(v['flipped']) or 'nothing'}" for k, v in a["stability"].items()) + f". Fragile: {fmt(a['fragile'])}.")
+        else:
+            L.append("Stability blocks not supplied: fragile label not evaluated.")
+        L += ["", "| expansion kind | tasks | O1 covered | O2 within 1 | O2a | O2b |", "|---|---|---|---|---|---|"]
+        for k, f in a["by_expansion_kind"].items():
+            L.append(f"| {k} | {f['tasks']} | {f['O1_covered_final']} | {f['O2_recovered_within_1']} | {f['O2a_trigger_fired']} | {f['O2b_recovered_given_trigger']} |")
+        nc = a["negative_controls"]
+        L += ["", f"Triggers {a['trigger_counts'] or 'none'}; outcomes {a['trigger_outcomes'] or 'none'}; refusals {a['refusals_by_reason'] or 'none'}; "
+                  f"duplicates {a['duplicate_triggers']}; suppressed N1/N2 {a['suppressed_n1_n2']}; cap-exhausted notes {a['cap_exhausted_notes']}.",
+              f"Negative controls (must be zero for arm 3): executions of denied or pending calls {nc['executions_of_denied_or_pending_calls']}, "
+              f"expansions fired by a denied or pending call {nc['expansions_fired_by_denied_or_pending_call']}."]
+        if "reasoning_present_in_arm4_runs" in a:
+            L.append(f"Arm 4 runs with reasoning present (invalid): {len(a['reasoning_present_in_arm4_runs'])}.")
+        L += ["", "| category | baseline | arm | n |", "|---|---|---|---|"]
+        for c, v in a["success_by_category"].items():
+            L.append(f"| {c} | {v['baseline']} | {v['arm']} | {v['n']} |")
+        L.append("")
+    L += ["## Secondary comparisons against B1 (reported, not gated)", ""]
+    for k, v in summary["secondary_vs_B1"].items():
+        L.append(f"- {k}: " + ", ".join(f"{a} {b}" for a, b in v.items()))
+    L += ["", "Results per template are in `campaign-summary.json` (`success_by_template`).", ""]
+    return "\n".join(L)
+
+
+def write_campaign(summary: dict, out_dir: Path) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / "campaign-summary.json").write_text(json.dumps(rnd(summary), indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    (out_dir / "campaign-summary.md").write_text(campaign_md(rnd(summary)), encoding="utf-8")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("run_dir")
     ap.add_argument("--out", help="output directory (default: the run directory)")
-    ap.add_argument("--tasks-dir", default=str(BENCH / "tasks"))
+    ap.add_argument("--tasks-dir", default=None, help="default: bench/tasks, or bench/heldout-0.2x/tasks with --campaign")
+    ap.add_argument("--campaign", action="store_true", help="0.2x seven-condition analysis; run_dir is the seed 42 block")
+    ap.add_argument("--stability", default="", help="with --campaign: comma-separated seed 43 and 44 block directories")
     ap.add_argument("--exclude", default="", help="comma-separated qual task ids for a labelled sensitivity section")
     ap.add_argument("--exclude-reason", default="")
     args = ap.parse_args(argv)
     run_dir = Path(args.run_dir)
-    summary = build(run_dir, Path(args.tasks_dir), args.exclude.split(","), args.exclude_reason)
+    if args.campaign:
+        tdir = Path(args.tasks_dir) if args.tasks_dir else HELDOUT_TASKS
+        summary = build_campaign(run_dir, [Path(x) for x in args.stability.split(",") if x], tdir)
+        write_campaign(summary, Path(args.out) if args.out else run_dir)
+        return 0
+    summary = build(run_dir, Path(args.tasks_dir or BENCH / "tasks"), args.exclude.split(","), args.exclude_reason)
     write_outputs(summary, Path(args.out) if args.out else run_dir)
     return 0
 

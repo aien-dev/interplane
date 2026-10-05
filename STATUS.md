@@ -28,7 +28,7 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | AIEN adapter | tested (on the real EffectAuthority path, pinned sovereign-core 6554aac; was 10 pipeline tests in 0.1) | - | - | ADR 0003; real aien-mcp SpeculativeLane + aegis gate; aien-cli SafetyEngine not linkable (private); AGPL |
 | Odysseus adapter | - | tested (55 tests vs odysseus@2992bf6) | - | executes read_file/ls/glob/grep via Odysseus handlers; AGPL |
 | Before/after receipt (0.1 goal) | - | qualified | 2 runs, reproduced | examples/receipt |
-| CrossAxis gate, 0.2 pre-registered (37 pairs, qwen3.5:9b on Ollama) | - | qualified: FAIL | bench/runs/qual-20261004T2207Z | T 0.877 PASS, S PASS (B 0.730 vs A 0.676), O1 0.865 FAIL, O2 0/5 FAIL; model did not use the discovery tool. See docs/REPORT-0.2.md |
+| CrossAxis gate, 0.2 pre-registered (37 pairs, qwen3.5:9b on Ollama) | - | qualified: FAIL | bench/runs/qual-20261004T2207Z | T 0.877 PASS, S PASS (B 0.730 vs A 0.676), O1 0.865 FAIL, O2 0/5 FAIL; model did not use the discovery tool. See docs/REPORT-0.2.md. 0.2x held-out campaign (bench/PROTOCOL-0.2x.md) not run: runner prepared; arm 3 negative controls N1 and N2 (denied and approval-pending calls cause no expansion and no execution) tested offline in bench/tools/test_runner_offline.py |
 | Qwen3.5-9B on llama.cpp b11398 | - | qualified | probes 14/14 (Rust and Python, aligned) | qualification/captures/qwen35-llamacpp |
 | Qwen3.5-9B on SGLang 0.5.20 (bf16, qwen3_coder parser) | - | qualified | probes 14/14 (Rust and Python, aligned) | earlier 12/14 kept as pre-alignment |
 | AIEN authority path (sovereign-core #203, #204) | tested | - | adapter approval tests (6) | single-use approvals; grants in memory, spent at mint, host clock |

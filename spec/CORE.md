@@ -49,6 +49,7 @@ MAPPED
   -> AUTHORIZED    runtime decision = authorized
 REQUIRES_APPROVAL
   -> AUTHORIZED | DENIED   only by a NEW runtime decision that cites the minted approval_id
+  -> DENIED                host cancel, or a continuation that fails a binding check (Approval continuation)
 AUTHORIZED
   -> EXECUTING     runtime began execution
 EXECUTING
@@ -63,6 +64,94 @@ continuation only when it cites exactly that id. A continuation with no id, an e
 runtime never minted, or an id minted for another request is refused and the state does not change.
 With the minted id, `authorized` gives AUTHORIZED and every other value (including unknown values)
 gives DENIED. Conformance: `conformance/fixtures/lifecycle/`.
+
+### Approval continuation (host call, 0.3 cut A1)
+
+A request in REQUIRES_APPROVAL can be continued only by the **host**, through calls on the
+pipeline that no model output, envelope, `tool_request`, `arguments`, `extensions` or text can
+reach. No model-writable field is read as a grant and none is added that could be mistaken for one;
+an envelope whose payload kind is `decision` is still refused at admission.
+
+```
+continue_approval(trace_id, decision, request_digest, now) -> resolved(result, ObservedRecord) | refused(reason)
+cancel_approval(trace_id, request_id)              -> resolved(result, ObservedRecord) | refused(reason)
+pending_approval(trace_id, request_id)             -> read-only view of the pending entry, or none
+```
+
+`decision` is the `decision` payload the runtime produced for the continuation (it names its own
+`request_id`); the pipeline never builds one.
+The host gets it from the runtime's own approval channel, never from model content.
+
+**Pending entry.** Created when a request reaches REQUIRES_APPROVAL with a non-empty minted
+`approval_id`, keyed `(trace_id, request_id)`. It holds the lifecycle, the minted `approval_id`,
+the minted `approval.expires_at`, the `request_digest` (`sha256:` digest of the JCS form of the
+`capability_request` exactly as it was sent to `decide`, which binds runtime, capability, arguments
+and mapping), the runtime's live catalog digest at that moment, and what `execute` will need. It is
+in memory only. A request whose `requires_approval` decision carries no minted id has no pending
+entry and cannot be continued.
+
+**Correlation.** A continuation is accepted only when all of these agree: `trace_id`, `request_id`
+(the request has a pending entry and the decision cites it), the `approval_id` the runtime minted
+for that request, and `request_digest` of the original `capability_request`. The approval applies to
+the exact effect that will run: a continuation naming changed arguments, another capability or
+another request is refused as described below.
+
+**Order of checks (identical in every SDK).**
+
+1. A pending entry for `(trace_id, request_id)` that is still in REQUIRES_APPROVAL. Otherwise the call is
+   **refused** (`no_pending_approval`): nothing changes, nothing is executed, no record is
+   produced. This covers an unknown request, a request that already executed, was denied or
+   cancelled, a second continuation (replay), and a pipeline instance created after a restart.
+2. `decision.request_id` equals the request id.
+3. `decision.approval.approval_id` equals the minted id exactly (absent, empty, never minted, or
+   minted for another request all fail).
+4. `request_digest` equals the stored digest.
+5. Expiry, against the host clock `now` (checked against the minted `expires_at`, never against a
+   value on the continuation). Both must have the exact shape `YYYY-MM-DDTHH:MM:SSZ` (UTC); with
+   that fixed width, string order is time order. The approval is expired when `now >= expires_at`.
+   An `expires_at` that is present but not of that shape, or a `now` that is not, counts as expired.
+6. The live catalog digest equals the one stored at pending time.
+7. The decision value: `authorized` executes; every other value is DENIED, an unknown value with
+   `unknown_decision`.
+
+A failure at steps 2 to 6 on a live pending entry is a **denial**: the request goes to DENIED, which
+is terminal, execute is not called, and the host must start a new request. (A wrong or foreign id
+is evidence of confusion or attack; fail closed.) The lifecycle itself still refuses a wrong id
+without changing state (see above); the pipeline turns that refusal into a terminal denial.
+
+| Outcome | stage | `result.status` | `error.code` | `error.message` |
+|---|---|---|---|---|
+| executed | SUCCEEDED, FAILED or TIMED_OUT | as executed | as executed | as executed |
+| step 2 | DENIED | `denied` | `unknown_decision` | `unknown decision value: mismatched request_id` |
+| step 3 | DENIED | `denied` | `policy_denied` | `approval refused: approval_id does not match` |
+| step 4 | DENIED | `denied` | `policy_denied` | `approval refused: capability_request digest does not match` |
+| step 5 | DENIED | `denied` | `policy_denied` | `approval expired` |
+| step 6 | DENIED | `denied` | `stale_capability` | `runtime catalog changed since approval was requested` |
+| step 7, `denied` | DENIED | `denied` | `policy_denied` | the decision's `reason`, else `denied by runtime policy` |
+| step 7, other | DENIED | `denied` | `unknown_decision` | `unknown decision value: <value>` |
+| cancel | DENIED | `denied` | `policy_denied` | `approval cancelled by host` |
+
+The `ObservedRecord` of a resolved continuation has `decision` `authorized` when it executed and
+`denied` otherwise, `decide_invoked` true (the runtime decided the request when it required approval;
+a continuation never calls `decide`, so the runtime's decide count does not move) and
+`execute_invoked` true only if `execute` ran. A refused call produces no record, no result and no
+event.
+
+**Cancellation.** `cancel_approval` on a pending entry resolves it to DENIED (terminal). On anything
+else it is refused. A continuation after a cancel is refused and DENIED stays.
+
+**Replay.** A continuation is a transition on the existing entry, never an admission: it does not
+touch the request ledger, so `replayed_message` and `duplicate_request_id` stay on. Re-admitting
+the original `tool_request` envelope after a continuation is refused as `replayed_message` and
+runs nothing. Host effect idempotency (a runtime's own receipt ledger) is separate and is not
+reused here.
+
+**Restart.** The pending table lives in the pipeline instance. After a restart no request is
+pending, every continuation is refused, and the host starts a new request.
+
+**Exposure.** The executed result of a continuation is recorded in the trace's input ledger the same
+way a rendered result is (`parent_id` is the request id, `content_digest` is the digest of the
+canonical result payload), so what the model sees next stays inside its exposure floor.
 
 Invariants (every implementation must enforce; conformance tests check them):
 
@@ -173,7 +262,7 @@ Runtime id `mock`. Policy engine id `mock.policy`. Catalog version `1`.
 | `read_file` | `filesystem.read` | `path: string` | filesystem, code | authorized | ok, `data = {"path": <path>, "content": "mock content of <path>"}` |
 | `list_dir` | `filesystem.list` | `path: string` | filesystem, code | authorized | ok, `data = {"path": <path>, "entries": ["a.txt", "b.txt"]}` |
 | `write_file` | `filesystem.write` | `path: string, content: string` | filesystem | denied, reason "mock policy: writes are denied" | never |
-| `delete_file` | `filesystem.delete` | `path: string` | filesystem | requires_approval, `approval.approval_id = "mock-approval-<request_id>"`, scope `single_action` | never |
+| `delete_file` | `filesystem.delete` | `path: string` | filesystem | requires_approval, `approval.approval_id = "mock-approval-<request_id>"`, scope `single_action`, `approval.expires_at` null unless the fixture sets `mock_approval.expires_at` | only after an approved continuation: ok, `data = {"path": <path>, "deleted": true}` (no filesystem is touched), provenance as the other defaults |
 | `send_email` | `email.send` | `to: string, body: string` | email | denied, reason "mock policy: external side effects are denied" | never |
 | `fail_tool` | `test.fail` | none | test | authorized | error, `execution_error`, message "mock execution failure" |
 | `slow_tool` | `test.slow` | none | test | authorized | timed_out, `execution_timeout`, message "mock execution exceeded 1000 ms" (simulated, no real wait) |
@@ -279,6 +368,37 @@ decision that mints the `approval_id`; later steps are continuation attempts. Ea
 state after the call and `refused` (true when the lifecycle refused the decision or the decision
 did not parse). The verdict row is `{"pass", "steps"}` under the key `lifecycle/<slug>`; rows of
 the `NN-slug` cases are unchanged.
+
+Approval fixtures live under `conformance/fixtures/approval/NN-slug.json` (case name
+`approval-ANN-slug`, `NN` is the case number A01 to A14 of bench/PROTOCOL-0.3.md section 3.3). They
+are `NN-slug` pipeline fixtures (same envelope, `dialect` and `expected` rules) with four more step
+kinds, all issued by the fixture's host side and never by the model:
+
+- `{"approve": {"request_id", "approval_id", "decision"?, "arguments"?, "now"?, "trace_id"?}}`:
+  the runner builds the runtime's continuation `decision` (`kind` decision, `request_id`,
+  `decision` value, default `authorized`, `capability` of the pending request, authority
+  `mock` / `mock.policy`, `approval: {approval_id}`) and calls `continue_approval`. `request_digest`
+  is the pending entry's own digest; when `arguments` is present it is the digest of the pending
+  `capability_request` with those arguments substituted (a host that changed what it asks to run).
+  With no pending entry it is the digest of JSON `null`. `now` is the host clock, default
+  `2026-01-01T00:00:00Z`; `trace_id` defaults to the fixture's.
+- `{"cancel": {"request_id", "trace_id"?}}`: `cancel_approval`.
+- `{"restart": true}`: drops the pipeline and builds a fresh one over the same mock runtime (fresh
+  ledger, empty pending table).
+- `{"mock": {"catalog_digest": "sha256:..."}}`: harness-only, changes the digest the mock runtime
+  reports for its catalog (a catalog that changed under a pending request).
+
+A fixture may carry `mock_approval: {"expires_at": "..."}`: the mock mints that `expires_at` in the
+approval of `delete_file`. Harness configuration like `mock_provenance`; never read from model content.
+
+`expected.continuations` lists one row per `approve` and `cancel` step, in order:
+`{"step": <index in steps>, "kind": "approve" | "cancel", "request_id", "outcome": "resolved" |
+"refused", "stage": <stage name of the request after the call, or null when it has no entry>,
+"reason": null | "no_pending_approval", "message": <error.message of the resolved result, or null>}`.
+Resolved calls also append their `ObservedRecord` to `expected.observed` and their result to the
+case's results (after the original result, so a `result_check` still reads the original). The
+verdict row of an approval case gains `continuations`; no other row changes. The runner's
+`restart` step is the only way to reach the "after restart" behaviour.
 
 ObservedRecord (deterministic, no timestamps, no durations):
 

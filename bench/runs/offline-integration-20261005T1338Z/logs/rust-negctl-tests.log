@@ -1,0 +1,66 @@
+   Compiling getrandom v0.3.4
+   Compiling bitflags v2.13.2
+   Compiling bit-vec v0.8.0
+   Compiling interplane-conformance v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-conformance)
+   Compiling tower-http v0.6.11
+   Compiling bit-set v0.8.0
+   Compiling fancy-regex v0.14.0
+   Compiling reqwest v0.12.28
+   Compiling ahash v0.8.12
+   Compiling referencing v0.30.0
+   Compiling jsonschema v0.30.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.74s
+     Running unittests src/lib.rs (target/debug/deps/interplane_conformance-169f8c8c802e771f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/interplane_conformance-82f3e35e2082d162)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/default_build.rs (target/debug/deps/default_build-04b1bc9ecc3be040)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/fixtures.rs (target/debug/deps/fixtures-fc833b103b071f11)
+
+running 6 tests
+test comparison_detects_disagreement ... ok
+test a_vacuous_or_violating_injection_case_fails ... ok
+test expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected ... ok
+test verdicts_are_deterministic ... ok
+test every_injection_fixture_passes_and_is_judged ... ok
+test every_fixture_passes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/negative_controls.rs (target/debug/deps/negative_controls-6809df4665c87485)
+
+running 3 tests
+test variant_names_round_trip ... ok
+test unmodified_runner_passes_everything ... ok
+test every_variant_turns_a_pass_into_a_detected_failure ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+     Running tests/schemas.rs (target/debug/deps/schemas-ac3480e1c6bfa59b)
+
+running 3 tests
+test fixture_envelopes_validate ... ok
+test catalog_selection_and_events_validate ... ok
+test produced_messages_validate ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+   Doc-tests interplane_conformance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

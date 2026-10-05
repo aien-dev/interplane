@@ -1,0 +1,59 @@
+run run: 4 tasks, conditions ['A', 'B'], identity sha256:3bf82d651560397a3126b7a3687cf3800cdf668df751384bfa74db26b0787dcb
+[1/4] exec_failure-901 A:ok/0s/3r B:ok/0s/3r
+[2/4] expansion-901 B:ok/0s/2r A:ok/0s/2r
+[3/4] rare-901 A:ok/0s/2r B:ok/0s/3r
+[4/4] unknown_tool-901 B:ok/0s/2r A:ok/0s/2r
+done: 4 pairs run; manifest /tmp/tmpb49tg8s7/run/manifest.json
+run simrun1: 5 tasks, conditions ['A'], identity sha256:79094277eb63e756af9cde786327622bd7ea8a9b51360d7c30a831577cf6fcab
+[1/5] ambiguous-910 A:ok/0s/2r
+[2/5] ambiguous-911 A:ok/0s/2r
+[3/5] ambiguous-912 A:ok/0s/2r
+[4/5] ambiguous-913 A:ok/0s/2r
+[5/5] ambiguous-914 A:ok/0s/2r
+done: 5 pairs run; manifest /tmp/tmpb49tg8s7/simrun1/manifest.json
+run simrun2: 5 tasks, conditions ['A'], identity sha256:79094277eb63e756af9cde786327622bd7ea8a9b51360d7c30a831577cf6fcab
+[1/5] ambiguous-910 A:ok/0s/2r
+[2/5] ambiguous-911 A:ok/0s/2r
+[3/5] ambiguous-912 A:ok/0s/2r
+[4/5] ambiguous-913 A:ok/0s/2r
+[5/5] ambiguous-914 A:ok/0s/2r
+done: 5 pairs run; manifest /tmp/tmpb49tg8s7/simrun2/manifest.json
+run refrun: 1 tasks, conditions ['A'], identity sha256:8d0fc7020eba3b3b192786eec63ad04a39547e99045d5ae58216107a14cc0051
+[1/1] ambiguous-912 A:ok/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/refrun/manifest.json
+run rtrun: 5 tasks, conditions ['B'], identity sha256:afc84e51cb24f4094719ae804b157eb1b1399d3aa0473f5386898a9e938e8106
+[1/5] ambiguous-920 B:FAIL/0s/2r
+[2/5] ambiguous-921 B:FAIL/0s/3r
+[3/5] ambiguous-922 B:FAIL/0s/4r
+[4/5] ambiguous-923 B:FAIL/0s/2r
+[5/5] ambiguous-924 B:FAIL/0s/3r
+done: 5 pairs run; manifest /tmp/tmpb49tg8s7/rtrun/manifest.json
+run camp: 5 tasks, conditions ['A', 'A2', 'A4', 'B1', 'B2', 'B3', 'B4'], identity sha256:6e552f6543990bac36e3379407302a594c8a80018e88a6c94f92c6fc37fa99f0
+[1/5] ambiguous-920 A:FAIL/0s/2r A2:FAIL/0s/2r A4:FAIL/0s/2r B1:FAIL/0s/2r B2:FAIL/0s/2r B3:FAIL/0s/2r B4:FAIL/0s/2r
+[2/5] ambiguous-921 A2:FAIL/0s/3r A4:FAIL/0s/3r B1:FAIL/0s/3r B2:FAIL/0s/3r B3:FAIL/0s/3r B4:FAIL/0s/3r A:FAIL/0s/3r
+[3/5] ambiguous-922 A4:FAIL/0s/4r B1:FAIL/0s/4r B2:FAIL/0s/4r B3:FAIL/0s/4r B4:FAIL/0s/4r A:FAIL/0s/4r A2:FAIL/0s/4r
+[4/5] ambiguous-923 B1:FAIL/0s/2r B2:FAIL/0s/2r B3:FAIL/0s/2r B4:FAIL/0s/2r A:FAIL/0s/2r A2:FAIL/0s/2r A4:FAIL/0s/2r
+[5/5] ambiguous-924 B2:FAIL/0s/3r B3:FAIL/0s/3r B4:FAIL/0s/3r A:FAIL/0s/3r A2:FAIL/0s/3r A4:FAIL/0s/3r B1:FAIL/0s/3r
+done: 5 pairs run; manifest /tmp/tmpb49tg8s7/camp/manifest.json
+run sw-A-plain: 1 tasks, conditions ['A'], identity sha256:4cce81c535c7ea82ea2e2ca8ae4e1b843010b3e16e9bc703dcdb144c7453044f
+[1/1] ambiguous-920 A:FAIL/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/sw-A-plain/manifest.json
+run sw-A4-plain: 1 tasks, conditions ['A4'], identity sha256:dc18529f33956c241e6b1d7a32387a0a18a7a79283b62e5efc279123bc182969
+[1/1] ambiguous-920 A4:FAIL/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/sw-A4-plain/manifest.json
+run sw-B4---reasoning-field-chat_template_kwargs: 1 tasks, conditions ['B4'], identity sha256:3afe3ef187f53f84e0382a0e91bf3cda85626623019d0d85101ea58d0eda9e17
+[1/1] ambiguous-920 B4:FAIL/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/sw-B4---reasoning-field-chat_template_kwargs/manifest.json
+run sw-A2-plain: 1 tasks, conditions ['A2'], identity sha256:bb1c934cd080552b4cfbd73428d9c037bfc772a824285c1d020607b520b601b4
+[1/1] ambiguous-920 A2:FAIL/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/sw-A2-plain/manifest.json
+run sw-B4---seed-44: 1 tasks, conditions ['B4'], identity sha256:06510ede73ddc051891956fd930db81efca977149a2ca5a80909e242f3754f77
+[1/1] ambiguous-920 B4:FAIL/0s/2r
+done: 1 pairs run; manifest /tmp/tmpb49tg8s7/sw-B4---seed-44/manifest.json
+run held: 2 tasks, conditions ['A', 'A2', 'A4', 'B1', 'B2', 'B3', 'B4'], identity sha256:8e4ec3b67c9b9d4ca8f45bf355ed05d9ba25bdce5e2e771c2d59a1cf51770b38
+[1/2] expansion-101 A:FAIL/0s/1r A2:FAIL/0s/1r A4:FAIL/0s/1r B1:FAIL/0s/1r B2:FAIL/0s/1r B3:FAIL/0s/1r B4:FAIL/0s/1r
+[2/2] multidomain-101 A2:FAIL/0s/1r A4:FAIL/0s/1r B1:FAIL/0s/1r B2:FAIL/0s/1r B3:FAIL/0s/1r B4:FAIL/0s/1r A:FAIL/0s/1r
+done: 2 pairs run; manifest /tmp/tmpb49tg8s7/held/manifest.json
+run run: 4 tasks, conditions ['A', 'B'], identity sha256:3bf82d651560397a3126b7a3687cf3800cdf668df751384bfa74db26b0787dcb
+done: 0 pairs run; manifest /tmp/tmpb49tg8s7/run/manifest.json
+offline runner test: PASS

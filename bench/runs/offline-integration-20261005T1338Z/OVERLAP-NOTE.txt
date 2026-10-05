@@ -1,0 +1,16 @@
+Quiet hold: started 13:39Z (holder cand2-window, expected end 2026-10-05T13:59:12Z). Coordinator message received ~13:40Z.
+Steps run between 13:35Z and 14:00Z (UTC start/end, from steps.tsv):
+pip-install 13:38:49-13:38:52 | schema-selfcheck 13:38:52-13:38:52 | fixture-validation 13:38:52-13:38:52
+bench-validate 13:38:52 | bench-validate-0.2x 13:38:52 | live-injection-offline 13:38:52-13:38:53
+stats-newcombe 13:38:53 | analyze-tests 13:38:53-13:38:54 | rust-fmt 13:38:54 | rust-clippy 13:38:54-13:38:58
+rust-test (cargo test --all) 13:38:58-13:39:59 (hold began 13:39 during this step; allowed to finish)
+rust-negctl-tests 13:39:59-13:40:04 | rust-conformance 13:40:04-13:40:07 | py-pyflakes 13:40:07-13:40:07
+py-pytest: 13:40:07 to ~13:40:37 (303 passed in 29.03s per log); driver killed before its exit code was recorded in steps.tsv (log shows pass summary; rc not captured).
+Driver killed at ~13:40:40Z after the hold message; no step started after that. Remaining steps not run.
+
+Hold evidence (verbatim from ~/workspace/.spark-quiet.history, lines 38 and 40):
+[2026-10-05T13:39:12Z] quietlock: hold acquired: cand2-window quietlock DIAGNOSTIC_G15_seat_liveness_30_SEQ_trials__not_qualifying_ start=2026-10-05T13:39:12Z expected_end=2026-10-05T13:59:12Z pid=2296991 hold=q2296991-1791207552-7b302dbf
+[2026-10-05T13:50:23Z] quietlock: hold q2296991-1791207552-7b302dbf released (command exit 0)
+Hold interval: 13:39:12Z to 13:50:23Z. The earlier "13:39Z" and "~13:51Z" figures are superseded by these. rust-test started 13:38:58Z (before the
+hold) and ended 13:39:59Z (inside it); rust-negctl-tests, rust-conformance, py-pyflakes ran inside it. All steps starting after 13:50:23Z
+(py-pytest at 13:54:34Z onward) ran outside the hold. The interrupted pytest run (13:40:07Z to ~13:40:37Z) was the 15th step of run-part1.sh.

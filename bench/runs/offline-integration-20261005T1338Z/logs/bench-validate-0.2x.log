@@ -1,0 +1,19 @@
+category              dev qual
+  filesystem             0   12
+  ambiguous              0    8
+  multidomain            0   10
+  rare                   0    8
+  wrong_first_tool       0    8
+  exec_failure           0    8
+  denied                 0    8
+  approval               0    8
+  injection_workspace    0    6
+  injection_tool         0    6
+  expansion              0   24
+  unknown_tool           0    6
+  sequential             0    8
+  total                  0  120   (120 tasks)
+tasks_digest sha256:89996c0bbdced1ff119635fce95376514ca3a2de9b2a2b9047c8e8b499f4e6e7
+inputs_digest sha256:060ae80194c41a535cf9d573ac705f35f0f8b90d02f531927a65f2826726c6e6
+protocol_sha256 sha256:89fe9ec2da2c26c83cbe462e70216b9ae3ae53af4e4c51d92945b6224a8d0f6d
+PASS: 120 tasks valid (schema also checked with jsonschema)

@@ -1,0 +1,294 @@
+   Compiling libc v0.2.190
+   Compiling cfg-if v1.0.5
+   Compiling typenum v1.20.1
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling zeroize v1.9.0
+   Compiling rand_core v0.10.1
+   Compiling subtle v2.6.1
+   Compiling smallvec v1.16.2
+   Compiling pin-project-lite v0.2.17
+   Compiling once_cell v1.21.4
+   Compiling futures-core v0.3.34
+   Compiling bytes v1.12.1
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling cmov v0.5.4
+   Compiling futures-sink v0.3.34
+   Compiling num-traits v0.2.19
+   Compiling const-oid v0.10.2
+   Compiling zerofrom v0.1.8
+   Compiling scopeguard v1.2.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling log v0.4.34
+   Compiling futures-channel v0.3.34
+   Compiling lock_api v0.4.14
+   Compiling slab v0.4.12
+   Compiling yoke v0.8.3
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling base64ct v1.8.3
+   Compiling cpubits v0.1.1
+   Compiling ff v0.14.0
+   Compiling thiserror v1.0.69
+   Compiling ctutils v0.4.2
+   Compiling writeable v0.6.4
+   Compiling sha1_smol v1.0.1
+   Compiling zerovec v0.11.8
+   Compiling litemap v0.8.3
+   Compiling zerotrie v0.2.5
+   Compiling group v0.14.0
+   Compiling futures-util v0.3.34
+   Compiling utf8_iter v1.0.4
+   Compiling base16ct v1.0.0
+   Compiling percent-encoding v2.3.2
+   Compiling pem-rfc7468 v1.0.0
+   Compiling http v1.5.0
+   Compiling zerocopy v0.8.59
+   Compiling tower-service v0.3.3
+   Compiling icu_normalizer_data v2.3.0
+   Compiling httparse v1.10.1
+   Compiling der v0.8.2
+   Compiling icu_properties_data v2.3.0
+   Compiling form_urlencoded v1.2.2
+   Compiling aho-corasick v1.1.5
+   Compiling rustls-pki-types v1.15.1
+   Compiling base64 v0.23.1
+   Compiling tower-layer v0.3.3
+   Compiling try-lock v0.2.5
+   Compiling getrandom v0.4.3
+   Compiling hybrid-array v0.4.15
+   Compiling generic-array v0.14.7
+   Compiling cpufeatures v0.2.17
+   Compiling parking_lot_core v0.9.12
+   Compiling errno v0.3.14
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling getrandom v0.2.17
+   Compiling tracing v0.1.44
+   Compiling signal-hook-registry v1.4.8
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling cpufeatures v0.3.1
+   Compiling parking_lot v0.12.5
+   Compiling untrusted v0.9.0
+   Compiling hex v0.4.3
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling crypto-bigint v0.7.5
+   Compiling digest v0.10.7
+   Compiling tokio v1.53.2
+   Compiling http-body v1.1.0
+   Compiling regex-syntax v0.8.11
+   Compiling strsim v0.11.1
+   Compiling ring v0.17.14
+   Compiling want v0.3.1
+   Compiling sync_wrapper v1.0.2
+   Compiling sha2 v0.10.9
+   Compiling ryu v1.0.23
+   Compiling atomic-waker v1.1.2
+   Compiling httpdate v1.0.3
+   Compiling http-body-util v0.1.5
+   Compiling ipnet v2.12.2
+   Compiling thiserror v2.0.21
+   Compiling rand_core v0.6.4
+   Compiling iana-time-zone v0.1.65
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling digest v0.11.3
+   Compiling bitflags v2.13.2
+   Compiling spki v0.8.0
+   Compiling uuid v1.27.0
+   Compiling sec1 v0.8.1
+   Compiling hmac v0.13.0
+   Compiling pkcs8 v0.11.0
+   Compiling signature v3.0.0
+   Compiling sha2 v0.11.0
+   Compiling darling_core v0.24.1
+   Compiling webpki-roots v1.0.9
+   Compiling utf8parse v0.2.2
+   Compiling base64 v0.22.1
+   Compiling sha1 v0.10.7
+   Compiling icu_provider v2.3.1
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling anstyle-parse v1.0.0
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling time-core v0.1.9
+   Compiling num-conv v0.2.2
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling colorchoice v1.0.5
+   Compiling anstyle v1.0.14
+   Compiling utf-8 v0.7.6
+   Compiling data-encoding v2.11.1
+   Compiling byteorder v1.5.0
+   Compiling anstyle-query v1.1.5
+   Compiling futures-executor v0.3.34
+   Compiling ref-cast v1.0.27
+   Compiling time-macros v0.2.32
+   Compiling anstream v1.0.0
+   Compiling elliptic-curve v0.14.1
+   Compiling primefield v0.14.0
+   Compiling rfc6979 v0.6.0
+   Compiling aien-protocol-types v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-protocol-types)
+   Compiling csv-core v0.1.13
+   Compiling deranged v0.5.8
+   Compiling wnaf v0.14.1
+   Compiling rustls-webpki v0.103.15
+   Compiling regex-automata v0.4.18
+   Compiling mime v0.3.17
+   Compiling equivalent v1.0.2
+   Compiling ppv-lite86 v0.2.21
+   Compiling ecdsa v0.17.0
+   Compiling primeorder v0.14.0
+   Compiling ahash v0.8.12
+   Compiling clap_lex v1.1.1
+   Compiling lazy_static v1.5.1
+   Compiling rustls v0.23.45
+   Compiling rand_chacha v0.3.1
+   Compiling hashbrown v0.14.5
+   Compiling idna_adapter v1.2.2
+   Compiling powerfmt v0.2.0
+   Compiling rand v0.8.8
+   Compiling idna v1.1.0
+   Compiling dyn-clone v1.0.20
+   Compiling hashbrown v0.17.1
+   Compiling schemars v1.2.2
+   Compiling clap_builder v4.6.7
+   Compiling sharded-slab v0.1.7
+   Compiling p256 v0.14.0
+   Compiling axum-core v0.4.5
+   Compiling aien-action-protocol v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-action-protocol)
+   Compiling url v2.5.8
+   Compiling time v0.3.55
+   Compiling csv v1.4.0
+   Compiling tungstenite v0.24.0
+   Compiling indexmap v2.14.2
+   Compiling hashlink v0.9.1
+   Compiling libsqlite3-sys v0.28.0
+   Compiling futures v0.3.34
+   Compiling serde_path_to_error v0.1.20
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling matchit v0.7.3
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling nu-ansi-term v0.50.3
+   Compiling fallible-iterator v0.3.0
+   Compiling anyhow v1.0.104
+   Compiling tower-http v0.5.2
+   Compiling aien-capability v0.1.0 (https://github.com/aien-dev/aien-sovereign-core.git?rev=0bdc97a76ce5a3d198dca718f89fad9bc56deb8e#0bdc97a7)
+   Compiling libloading v0.8.9
+   Compiling aien-provenance v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-provenance)
+   Compiling linux-raw-sys v0.12.1
+   Compiling fastrand v2.5.0
+   Compiling hyper v1.11.1
+   Compiling tokio-util v0.7.19
+   Compiling tower v0.5.3
+   Compiling tokio-tungstenite v0.24.0
+   Compiling rustix v1.1.5
+   Compiling tower-http v0.6.11
+   Compiling tokio-stream v0.1.19
+   Compiling aien-inference-protocol v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-inference-protocol)
+   Compiling aien-evaluation-protocol v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-evaluation-protocol)
+   Compiling darling_macro v0.24.1
+   Compiling clap v4.6.7
+   Compiling hyper-util v0.1.21
+   Compiling regex v1.13.1
+   Compiling matchers v0.2.0
+   Compiling rusqlite v0.31.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling darling v0.24.1
+   Compiling interplane-core v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-core)
+   Compiling rmcp-macros v3.4.0
+   Compiling aien-agent-state-abi v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-agent-state-abi)
+   Compiling tokio-rustls v0.26.6
+   Compiling tempfile v3.27.0
+   Compiling hyper-rustls v0.27.10
+   Compiling axum v0.7.9
+   Compiling reqwest v0.12.28
+   Compiling rmcp v3.4.0
+   Compiling interplane-crossaxis v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossaxis)
+   Compiling interplane-lenshift v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-lenshift)
+   Compiling aien-inference-client v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-inference-client)
+   Compiling aien-probe v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aien-protocols/crates/aien-probe)
+   Compiling interplane-crossveil v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossveil)
+   Compiling aegis v0.2.0 (/home/drakestapleton/workspace/cand2-campaign/interplane-audit/aegis-runtime)
+   Compiling aien-mcp v0.1.0 (https://github.com/aien-dev/aien-sovereign-core.git?rev=0bdc97a76ce5a3d198dca718f89fad9bc56deb8e#0bdc97a7)
+   Compiling interplane-adapter-aien v0.1.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/adapters/aien)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.69s
+     Running unittests src/lib.rs (target/debug/deps/interplane_adapter_aien-b88bd6a02f9ef6cb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/approval.rs (target/debug/deps/approval-61ec095ca1a496b1)
+
+running 15 tests
+test a_continuation_without_a_pending_request_is_refused ... ok
+test a_grant_never_changes_what_decide_answers ... ok
+test without_a_grant_it_stays_pending ... ok
+test expired_grant_is_refused ... ok
+test approved_effect_executes_once ... ok
+test spent_grant_used_again_is_consumed_and_runs_nothing ... ok
+test grant_for_a_different_effect_is_a_mismatch ... ok
+test replay_of_the_same_request_returns_the_existing_receipt ... ok
+test stale_scope_is_refused_and_denial_is_terminal ... ok
+test cancel_is_terminal_and_a_later_grant_runs_nothing ... ok
+test host_continuation_executes_once_and_replay_is_refused ... ok
+test spend_point_provider_failure_after_mint_is_reported_and_recoverable ... ok
+test expired_grant_through_the_pipeline_is_denied ... ok
+test spend_point_pipeline_refusal_after_mint_runs_nothing_and_is_reported ... ok
+test model_content_cannot_stand_in_for_a_grant ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/exposure.rs (target/debug/deps/exposure-5bfbdbcf21ab68ef)
+
+running 4 tests
+test results_are_labelled_by_what_they_are ... ok
+test workspace_read_holds_the_injected_effect ... ok
+test user_request_only_uses_the_base_rule ... ok
+test host_registered_untrusted_content_holds_every_injected_effect ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/pipeline.rs (target/debug/deps/pipeline-7aa46c52939c8963)
+
+running 14 tests
+test adapter_source_never_constructs_authorized_effect ... ok
+test catalog_records_both_digests ... ok
+test nonexistent_capability_is_not_found ... ok
+test irreversible_effect_is_denied_with_aiens_reason_and_never_executes ... ok
+test list_dir_ok_and_trusted_flag_is_honoured ... ok
+test local_ephemeral_effect_is_authorized_by_aien_and_executes_with_receipt ... ok
+test effect_replay_does_not_execute_twice ... ok
+test runtime_absent_fails_closed ... ok
+test escape_from_workspace_is_denied ... ok
+test allowed_read_is_ok_with_workspace_provenance ... ok
+test missing_argument_is_invalid_with_pinned_message ... ok
+test aien_gate_denies_unlisted_shell_command ... ok
+test runtime_failure_is_execution_error ... ok
+test world_mutation_requires_approval_and_never_executes ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/t4_corpus.rs (target/debug/deps/t4_corpus-35393e10ec91246e)
+
+running 1 test
+test t4_subset_runs_and_every_case_passes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+   Doc-tests interplane_adapter_aien
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

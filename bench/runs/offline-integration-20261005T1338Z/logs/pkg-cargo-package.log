@@ -1,0 +1,81 @@
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-core v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-core)
+    Updating crates.io index
+    Packaged 13 files, 87.6KiB (22.0KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-crossaxis v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossaxis)
+    Updating crates.io index
+    Packaged 5 files, 44.6KiB (12.0KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-lenshift v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-lenshift)
+    Updating crates.io index
+    Packaged 11 files, 61.0KiB (15.4KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-crossveil v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossveil)
+    Updating crates.io index
+    Packaged 9 files, 112.5KiB (26.3KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-conformance v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-conformance)
+    Updating crates.io index
+    Packaged 11 files, 98.5KiB (26.9KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging interplane-probe v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-probe)
+    Updating crates.io index
+    Packaged 7 files, 89.0KiB (24.5KiB compressed)
+   Verifying interplane-core v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-core)
+   Compiling interplane-core v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-core-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.23s
+   Verifying interplane-crossaxis v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossaxis)
+    Updating crates.io index
+   Unpacking interplane-core v0.3.0 (registry `/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/tmp-registry`)
+   Compiling interplane-core v0.3.0
+   Compiling interplane-crossaxis v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-crossaxis-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.19s
+   Verifying interplane-lenshift v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-lenshift)
+    Updating crates.io index
+   Compiling interplane-lenshift v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-lenshift-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.61s
+   Verifying interplane-crossveil v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossveil)
+    Updating crates.io index
+   Unpacking interplane-crossaxis v0.3.0 (registry `/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/tmp-registry`)
+   Unpacking interplane-lenshift v0.3.0 (registry `/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/tmp-registry`)
+   Compiling interplane-crossaxis v0.3.0
+   Compiling interplane-lenshift v0.3.0
+   Compiling interplane-crossveil v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-crossveil-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.26s
+   Verifying interplane-conformance v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-conformance)
+    Updating crates.io index
+   Unpacking interplane-crossveil v0.3.0 (registry `/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/tmp-registry`)
+   Compiling interplane-crossveil v0.3.0
+   Compiling interplane-conformance v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-conformance-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.39s
+   Verifying interplane-probe v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-probe)
+    Updating crates.io index
+   Compiling smallvec v1.16.2
+   Compiling getrandom v0.2.17
+   Compiling percent-encoding v2.3.2
+   Compiling interplane-core v0.3.0
+   Compiling ring v0.17.14
+   Compiling form_urlencoded v1.2.2
+   Compiling icu_normalizer v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling rustls-webpki v0.103.15
+   Compiling interplane-lenshift v0.3.0
+   Compiling rustls v0.23.45
+   Compiling ureq v2.12.1
+   Compiling interplane-probe v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/target/package/interplane-probe-0.3.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 10.77s

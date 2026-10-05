@@ -1,0 +1,407 @@
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling regex-syntax v0.8.11
+   Compiling typenum v1.20.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling once_cell v1.21.4
+   Compiling smallvec v1.16.2
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling libc v0.2.190
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling utf8_iter v1.0.4
+   Compiling percent-encoding v2.3.2
+   Compiling num-traits v0.2.19
+   Compiling thiserror v2.0.21
+   Compiling futures-core v0.3.34
+   Compiling zerofrom v0.1.8
+   Compiling bitflags v2.13.2
+   Compiling pin-project-lite v0.2.17
+   Compiling zerocopy v0.8.59
+   Compiling icu_normalizer_data v2.3.0
+   Compiling icu_properties_data v2.3.0
+   Compiling futures-sink v0.3.34
+   Compiling bytes v1.12.1
+   Compiling form_urlencoded v1.2.2
+   Compiling bit-vec v0.8.0
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling yoke v0.8.3
+   Compiling slab v0.4.12
+   Compiling log v0.4.34
+   Compiling try-lock v0.2.5
+   Compiling tower-service v0.3.3
+   Compiling httparse v1.10.1
+   Compiling aho-corasick v1.1.5
+   Compiling want v0.3.1
+   Compiling futures-channel v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-util v0.3.34
+   Compiling bit-set v0.8.0
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling scopeguard v1.2.0
+   Compiling base64 v0.22.1
+   Compiling tower-layer v0.3.3
+   Compiling num-integer v0.1.47
+   Compiling atomic-waker v1.1.2
+   Compiling lock_api v0.4.14
+   Compiling http v1.5.0
+   Compiling num-complex v0.4.6
+   Compiling ref-cast v1.0.27
+   Compiling generic-array v0.14.7
+   Compiling base64 v0.23.1
+   Compiling ryu v1.0.23
+   Compiling ipnet v2.12.2
+   Compiling tracing v0.1.44
+   Compiling borrow-or-share v0.2.4
+   Compiling outref v0.5.2
+   Compiling num-bigint v0.4.8
+   Compiling num-iter v0.1.46
+   Compiling lazy_static v1.5.1
+   Compiling vsimd v0.8.0
+   Compiling uuid v1.27.0
+   Compiling bytecount v0.6.9
+   Compiling num-cmp v0.1.0
+   Compiling zeroize v1.9.0
+   Compiling untrusted v0.9.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling rustls-pki-types v1.15.1
+   Compiling simd-adler32 v0.3.10
+   Compiling adler2 v2.0.1
+   Compiling icu_collections v2.3.0
+   Compiling icu_locale_core v2.3.0
+   Compiling miniz_oxide v0.9.1
+   Compiling cpufeatures v0.2.17
+   Compiling getrandom v0.3.4
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling http-body v1.1.0
+   Compiling parking_lot_core v0.9.12
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling http-body-util v0.1.5
+   Compiling uuid-simd v0.8.0
+   Compiling getrandom v0.2.17
+   Compiling regex-automata v0.4.18
+   Compiling digest v0.10.7
+   Compiling parking_lot v0.12.5
+   Compiling rand_core v0.9.5
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling sha2 v0.10.9
+   Compiling tokio v1.53.2
+   Compiling ring v0.17.14
+   Compiling webpki-roots v1.0.9
+   Compiling rustix v1.1.5
+   Compiling getrandom v0.4.3
+   Compiling crc32fast v1.5.2
+   Compiling fastrand v2.5.0
+   Compiling subtle v2.6.1
+   Compiling webpki-roots v0.26.11
+   Compiling wait-timeout v0.2.1
+   Compiling fnv v1.0.7
+   Compiling quick-error v1.2.3
+   Compiling rand v0.9.5
+   Compiling flate2 v1.1.10
+   Compiling num-rational v0.4.2
+   Compiling rand_xorshift v0.4.0
+   Compiling unarray v0.1.4
+   Compiling icu_provider v2.3.1
+   Compiling fluent-uri v0.3.2
+   Compiling num v0.4.3
+   Compiling serde_urlencoded v0.7.1
+   Compiling fraction v0.15.3
+   Compiling email_address v0.2.9
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling rustls-webpki v0.103.15
+   Compiling rustls v0.23.45
+   Compiling tempfile v3.27.0
+   Compiling idna_adapter v1.2.2
+   Compiling ahash v0.8.12
+   Compiling ppv-lite86 v0.2.21
+   Compiling idna v1.1.0
+   Compiling rusty-fork v0.3.1
+   Compiling referencing v0.30.0
+   Compiling rand_chacha v0.9.0
+   Compiling url v2.5.8
+   Compiling proptest v1.10.0
+   Compiling tower v0.5.3
+   Compiling hyper v1.11.1
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.14.0
+   Compiling interplane-core v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-core)
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.21
+   Compiling reqwest v0.12.28
+   Compiling interplane-lenshift v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-lenshift)
+   Compiling interplane-crossaxis v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossaxis)
+   Compiling ureq v2.12.1
+   Compiling interplane-crossveil v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-crossveil)
+   Compiling interplane-probe v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-probe)
+   Compiling interplane-conformance v0.3.0 (/home/drakestapleton/workspace/cand2-campaign/wt-ip-offline/rust/crates/interplane-conformance)
+   Compiling jsonschema v0.30.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.83s
+     Running unittests src/lib.rs (target/debug/deps/interplane_conformance-2f545d7522b87332)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/interplane_conformance-65bca092b1e88882)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/default_build.rs (target/debug/deps/default_build-10919f5f3e2713ef)
+
+running 2 tests
+test default_build_refuses_a_variant ... ok
+test default_binary_carries_no_variant_code ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/fixtures.rs (target/debug/deps/fixtures-f239f779633bfbb9)
+
+running 6 tests
+test comparison_detects_disagreement ... ok
+test a_vacuous_or_violating_injection_case_fails ... ok
+test expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected ... ok
+test verdicts_are_deterministic ... ok
+test every_fixture_passes ... ok
+test every_injection_fixture_passes_and_is_judged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running tests/negative_controls.rs (target/debug/deps/negative_controls-fbba5613417c6846)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/schemas.rs (target/debug/deps/schemas-c572c54f4c12f127)
+
+running 3 tests
+test fixture_envelopes_validate ... ok
+test catalog_selection_and_events_validate ... ok
+test produced_messages_validate ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running unittests src/lib.rs (target/debug/deps/interplane_core-e74a382a0fe0bea2)
+
+running 9 tests
+test ledger::tests::replay_and_duplicate ... ok
+test jcs::tests::strings_escape ... ok
+test jcs::tests::utf16_key_order ... ok
+test ledger::tests::limits_defaults_and_partial_json ... ok
+test jcs::tests::sorts_keys_and_strips_whitespace ... ok
+test jcs::tests::numbers_es6 ... ok
+test version::tests::major_mismatch_rejected ... ok
+test version::tests::parse_ok_and_bad ... ok
+test jcs::tests::digest_known ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/core.rs (target/debug/deps/core-f332017751d83258)
+
+running 23 tests
+test error_code_unknown_is_preserved ... ok
+test exposure_roundtrips_inside_provenance_extensions ... ok
+test lifecycle_cannot_skip_the_decision ... ok
+test lifecycle_happy_path ... ok
+test envelope_malformed_input ... ok
+test lifecycle_denied_is_terminal_and_unknown_is_denied ... ok
+test cancel_only_leaves_requires_approval_and_only_to_denied ... ok
+test decision_roundtrip_and_unknown_value_is_never_authorized ... ok
+test lifecycle_approval_needs_new_decision_with_approval_id ... ok
+test lifecycle_rejections_and_wrong_request ... ok
+test input_record_examples_roundtrip_and_null_parent_is_explicit ... ok
+test result_shape_is_pinned ... ok
+test trust_levels_and_unknown_values ... ok
+test tool_request_roundtrip_const_kind ... ok
+test result_roundtrip_digest_ignores_duration ... ok
+test other_payloads_roundtrip ... ok
+test catalog_digest_is_order_independent ... ok
+test lifecycle_continuation_must_cite_the_minted_approval_id ... ok
+test envelope_version_major_mismatch ... ok
+test envelope_positive_roundtrip_and_unknown_fields ... ok
+test envelope_negative_cases ... ok
+test props::id_pattern_matches_reference ... ok
+test props::canonical_parses_back_equal_and_is_stable ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (target/debug/deps/interplane_crossaxis-96614efcda9e8bfb)
+
+running 13 tests
+test tests::alias_passthrough_and_rename ... ok
+test tests::coercion_records_keys ... ok
+test tests::measure_counts_bytes ... ok
+test tests::estimated_tokens_exact_and_differential ... ok
+test tests::unknown_is_exact_not_fuzzy ... ok
+test tests::table_loading_negative_and_numeric_version ... ok
+test tests::select_max_and_always_include ... ok
+test tests::measure_bytes_are_wire_bytes_and_tokens_are_absent_without_a_counter ... ok
+test tests::select_domain_match_sorted_deterministic ... ok
+test tests::expand_siblings_runtime_disabled_and_discover ... ok
+test tests::expand_drops_measure_and_rejects_a_foreign_catalog_and_bad_evidence ... ok
+test tests::expand_adds_records_and_chains_digests ... ok
+test tests::expand_refusal_reasons_and_order ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/interplane_crossveil-b0d16dd69128b69e)
+
+running 1 test
+test pipeline::tests::retirement_filter_positions_match_the_spec_vector ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pipeline.rs (target/debug/deps/pipeline-a662f123c3c4a313)
+
+running 21 tests
+test mock_table_shape ... ok
+test malformed_and_replayed_envelopes_by_value ... ok
+test exposure_floor_is_least_trusted_and_unknown_ranks_external ... ok
+test input_registration_is_not_reachable_from_an_envelope ... ok
+test unknown_decision_is_denied_and_never_executes ... ok
+test request_digest_is_pinned_and_matches_python ... ok
+test defaults_are_tool_result_unknown_and_pre_runtime_is_null ... ok
+test argument_coercion_happens_before_the_runtime_validates ... ok
+test events_are_monotonic_and_ordered ... ok
+test panic_in_execute_is_execution_error ... ok
+test stale_table_rejects_before_decide ... ok
+test result_markup_is_data_not_intent ... ok
+test approval_claims_in_arguments_are_ignored ... ok
+test exposure_fails_closed_when_ledger_is_empty ... ok
+test panic_in_decide_fails_closed ... ok
+test runtime_cannot_return_non_execution_status_from_execute ... ok
+test rejected_requests_never_reach_the_runtime ... ok
+test continuation_executes_once_and_never_calls_decide ... ok
+test continuation_leaves_the_request_ledger_alone_and_feeds_the_exposure_ledger ... ok
+test unreadable_clock_or_expiry_counts_as_expired ... ok
+test per_turn_limit_rejects_the_33rd ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/session_limits.rs (target/debug/deps/session_limits-e5daa4a2ba26a6af)
+
+running 17 tests
+test defaults ... ok
+test retirement_defaults ... ok
+test input_limit_records_nothing ... ok
+test closing_an_unknown_trace_retains_nothing ... ok
+test refused_call_uses_its_request_id ... ok
+test replay_is_still_reported_at_the_message_limit ... ok
+test unknown_close_does_not_poison_the_trace ... ok
+test request_limit_rejects_before_runtime_contact ... ok
+test retired_trace_refuses_continuations ... ok
+test message_limit ... ok
+test trace_limit_and_close_frees_a_slot ... ok
+test retired_trace_stays_refused ... ok
+test zero_filter_bits_refuses_every_new_trace_after_a_retirement ... ok
+test close_trace ... ok
+test retirement_filter_is_identical_across_sdks ... ok
+test retirement_filter_uses_modulo_at_a_non_power_of_two_size ... ok
+test open_close_cycles_stay_within_the_bound_and_replays_stay_refused ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 53.61s
+
+     Running unittests src/lib.rs (target/debug/deps/interplane_lenshift-d5578f5a6b13fc29)
+
+running 19 tests
+test openai::tests::render_ok_and_error ... ok
+test qwen35::tests::trailing_text_noted_not_an_error ... ok
+test openai::tests::reasoning_and_legacy_function_call ... ok
+test qwen35::tests::plain_and_unknown_tool_parse_fine ... ok
+test qwen35::tests::reasoning_removed_and_digested ... ok
+test qwen35::tests::multiple_calls_and_indices ... ok
+test aien_legacy::tests::repairs_and_rejections ... ok
+test qwen35::tests::duplicate_key_and_empty_names_are_malformed_not_partial ... ok
+test qwen35::tests::json_guess_and_multiline ... ok
+test openai::tests::plain_answer_and_garbage_input ... ok
+test qwen35::tests::valid_single_call_and_source_digest ... ok
+test qwen35::tests::render_wraps_in_tool_response ... ok
+test qwen35::tests::hermes_json_variant ... ok
+test qwen35::tests::truncated_variants_are_partial_and_rejected ... ok
+test tests::tool_names_split_on_last_dot ... ok
+test tests::unknown_dialect_is_unsupported ... ok
+test openai::tests::single_call_with_digest_of_canonical_call ... ok
+test openai::tests::malformed_arguments_and_missing_name ... ok
+test aien_legacy::tests::fence_only_without_tag_and_render_shape ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/dialect_fixtures.rs (target/debug/deps/dialect_fixtures-e5e163176e710662)
+
+running 1 test
+test dialect_fixtures_match ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/interplane_probe-3ba983b230600c5f)
+
+running 10 tests
+test tests::profiles_follow_required_probes ... ok
+test tests::http_status_classification ... ok
+test tests::replay_reasoning_json_context_models ... ok
+test tests::chat_and_streaming_verdicts ... ok
+test tests::qwen35_text_probe_uses_the_lenshift_parser ... ok
+test tests::tool_verdicts ... ok
+test tests::urls_and_time ... ok
+test tests::dead_endpoint_fails_closed_never_passes ... ok
+test tests::chat_basic_request_body_is_pinned ... ok
+test tests::full_run_with_canned_endpoint_and_schema_valid_report ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running unittests src/main.rs (target/debug/deps/interplane_probe-5ea0bb0415ee26ba)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_conformance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_crossaxis
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_crossveil
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_lenshift
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests interplane_probe
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

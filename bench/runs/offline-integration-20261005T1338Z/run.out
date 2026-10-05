@@ -1,0 +1,14 @@
+pip-install rc=0
+schema-selfcheck rc=0
+fixture-validation rc=0
+bench-validate rc=0
+bench-validate-0.2x rc=0
+live-injection-offline rc=0
+stats-newcombe rc=0
+analyze-tests rc=0
+rust-fmt rc=0
+rust-clippy rc=0
+rust-test rc=0
+rust-negctl-tests rc=0
+rust-conformance rc=0
+py-pyflakes rc=0

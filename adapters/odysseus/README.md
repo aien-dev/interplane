@@ -39,13 +39,19 @@ and needs no change (the `odysseus_text` dialect is registered adapter-locally).
 * **Admin check.** Odysseus's `owner_is_admin_or_single_user` (`tool_security.py:237`) needs its auth
   state (`AuthManager`, config). The adapter takes an `admin` constructor flag instead (default `False`,
   fail closed) and applies Odysseus's own blocklists to it.
-* **Per-trace gate state.** The reference pipeline's call context carries only `trace_id`, `message_id`,
-  `parent_id`, `model`, `runtime_session`: no prior-result trust. The adapter keeps one real
-  `ToolRunSecurityContext` per `trace_id` and arms it with Odysseus's own `observe_tool_result`. A caller
-  that tracks results may also pass `trust` / `prior_trust` in the context (`external_untrusted` or
-  `workspace_untrusted` arms the gate), or set `external_context_seen=True` on the constructor.
-  Odysseus itself treats a workspace read as arming the gate, so a later `send_email` in the same trace
-  is `requires_approval`.
+* **Per-trace gate state, armed from exposure (0.3 cut E2).** The adapter keeps one real
+  `ToolRunSecurityContext` per `trace_id` and arms it two ways: Odysseus's own `observe_tool_result` on
+  every result it executes (Odysseus treats a workspace read as arming the gate), and the pipeline's
+  `CallContext.exposure`. An exposure floor below `user_supplied` (`workspace_untrusted` or
+  `external_untrusted`), or a missing or malformed exposure, arms the gate (fail closed); once armed it
+  stays armed for the trace. The pipeline computes exposure from its own input ledger, so content the
+  host registered (web, memory, documents, skills, tool descriptions) arms the gate even though Odysseus
+  never executed it. The caller-supplied `trust` / `prior_trust` hints of 0.1 are gone. A host registers
+  the user's request first (`demo.register_user_turn`); an empty ledger is `external_untrusted`, so
+  without it every effect in the trace is `requires_approval`. `external_context_seen=True` on the
+  constructor still arms every trace from the start. Evidence: `tests/test_injection_exposure.py`
+  (5 host-registered sources and a workspace read, against `send_email`, `write_file`, `web_fetch`:
+  all `requires_approval`, 0 executed; the same calls with only the user request are `authorized`).
 * **Result trust.** Odysseus's `ResultIntegrity` (`tool_capabilities.py:37-46`) has a `system` value that
   is not an INTERPLANE `TrustLevel`; the pipeline used to fold it to `external_untrusted` silently. The
   adapter now maps it explicitly: `system` (Odysseus's label for server-authored output) is

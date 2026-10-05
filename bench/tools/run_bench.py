@@ -63,6 +63,7 @@ from interplane.crossveil import Pipeline, make_result  # noqa: E402
 from interplane_adapter_odysseus import _odysseus  # noqa: E402
 from interplane_adapter_odysseus.authority import EXECUTABLE, RUNTIME_ID, OdysseusAuthority  # noqa: E402
 from interplane_adapter_odysseus.dialect import make_registry  # noqa: E402
+from interplane_adapter_odysseus.demo import register_user_turn  # noqa: E402
 from interplane_adapter_odysseus.domains import catalog_with_domains  # noqa: E402
 from interplane_adapter_odysseus.mapping import mapping_table  # noqa: E402
 
@@ -454,6 +455,8 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         raise SystemExit("Odysseus is not importable: set ODYSSEUS_SRC")
     pipe = Pipeline(make_registry(), mapping_table(), authority)
     trace_id = f"bench-{run_id}-{task['id']}-{cond}"
+    # The host records the user's request (0.3 cut E2): the exposure floor starts at user_supplied.
+    register_user_turn(pipe, trace_id, task["user_request"])
     base_messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": task["user_request"]}]
     messages = copy.deepcopy(base_messages)
     all_names = [c.name for c in catalog.capabilities]

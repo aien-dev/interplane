@@ -22,6 +22,7 @@ BENCH = HERE.parent
 sys.path.insert(0, str(HERE))
 import analyze  # noqa: E402
 import bench_eval  # noqa: E402
+import trust_run  # noqa: E402
 
 FIXTURE = HERE / "testdata" / "synthetic-run"
 QUAL = ["filesystem-002", "filesystem-003", "rare-002", "expansion-001", "expansion-002", "unknown_tool-001", "wrong_first_tool-001", "ambiguous-002"]
@@ -232,6 +233,82 @@ def test() -> None:
     print("analyze tests: PASS")
 
 
+def trust_gate_dir(out: Path, t1: dict, t3_rows: dict, t4_rows: dict, codes: dict | None = None) -> None:
+    """Minimal files trust_run.gates reads: verdicts, empty dumps and logs, empty matrices, leg exit codes."""
+    if codes is not None:
+        (out / "exit-codes.json").write_text(json.dumps(codes, sort_keys=True), encoding="utf-8")
+    for name, obj in (("t1-verdicts.json", t1), ("t2-verdicts.json", t1),
+                      ("t3-verdicts.json", {"rows": t3_rows, "summary": {"violations": 0, "content_derived": 0}}),
+                      ("t4-verdicts.json", {"rows": t4_rows, "summary": {"violations": 0, "content_derived": 0}}),
+                      ("n-matrix-t1.json", {}), ("n-matrix-t2.json", {})):
+        (out / name).write_text(json.dumps(obj, sort_keys=True), encoding="utf-8")
+    for d in ("dump-t1", "dump-t2"):
+        (out / d).mkdir()
+    for log in ("validate.log", "t1.log"):
+        (out / log).write_text("", encoding="utf-8")
+
+
+def test_trust_run_no_vacuous_gates() -> None:
+    """Gates X and E of trust_run must not pass on zero or partial rows (denominator zero is not a pass)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / "empty"
+        out.mkdir()
+        trust_gate_dir(out, {}, {}, {})
+        g = trust_run.gates(out)
+        assert g["X"]["pass"] is False, g["X"]
+        assert g["E"]["pass"] is False, g["E"]
+        assert g["offline_pass"] is False
+
+        rows = trust_run.expected_rows()
+        inj = set(trust_run.expected_injection_rows())
+        t3s, t4s = trust_run.frozen_subsets()
+        full = {n: ({"pass": True, "injection": {"violations": 0, "content_derived": 0}} if n in inj else {"pass": True}) for n in rows}
+        sub = lambda names: {n: {"pass": True} for n in names}  # noqa: E731
+        out = Path(tmp) / "full"
+        out.mkdir()
+        trust_gate_dir(out, full, sub(t3s), sub(t4s))
+        g = trust_run.gates(out)
+        assert len(rows) == 106 and len(inj) == 44, (len(rows), len(inj))
+        assert g["X"]["pass"] is True and g["E"]["pass"] is True, (g["X"], g["E"])
+
+        one_inj = sorted(inj)[0]
+        partial = {n: v for n, v in full.items() if n != one_inj}
+        out = Path(tmp) / "partial"
+        out.mkdir()
+        trust_gate_dir(out, partial, sub(t3s), sub(t4s))
+        g = trust_run.gates(out)
+        assert g["X"]["pass"] is False and g["X"]["missing_rows"] == [one_inj], g["X"]
+        assert g["E"]["pass"] is False, g["E"]
+
+        out = Path(tmp) / "t4-short"
+        out.mkdir()
+        trust_gate_dir(out, full, sub(t3s), sub([n for n in t4s if n != "injection/01-workspace-write"]))
+        assert trust_run.gates(out)["E"]["pass"] is False
+
+        # Right count, wrong cases: swap one frozen T4 injection case for one outside the subset.
+        outside = sorted({"injection/" + p.stem for p in (trust_run.ROOT / "conformance" / "fixtures" / "injection").glob("*.json")}
+                         - set(t4s))
+        assert outside, "need an injection fixture outside the T4 subset"
+        swapped = [n for n in t4s if n != "injection/01-workspace-write"] + [outside[0]]
+        out = Path(tmp) / "t4-swapped"
+        out.mkdir()
+        trust_gate_dir(out, full, sub(t3s), sub(swapped))
+        e = trust_run.gates(out)["E"]
+        assert e["pass"] is False and e["systems"]["T4"]["injection_cases"] == e["systems"]["T4"]["expected_injection_cases"], e
+        assert e["systems"]["T4"]["missing_injection_cases"] == ["injection/01-workspace-write"], e
+        assert e["systems"]["T4"]["unexpected_injection_cases"] == [outside[0]], e
+
+        # F: the trust-digest and fixture-validation legs must have run and exited 0.
+        ok = dict.fromkeys(("digest", "n1", "n2", "t1", "t2", "t3", "t4", "validate"), 0)
+        for name, codes in (("no-codes", None), ("digest-fail", {**ok, "digest": 1}), ("validate-fail", {**ok, "validate": 1}),
+                            ("codes-ok", ok)):
+            out = Path(tmp) / name
+            out.mkdir()
+            trust_gate_dir(out, full, sub(t3s), sub(t4s), codes)
+            assert trust_run.gates(out)["F"]["pass"] is (name == "codes-ok"), name
+    print("test_trust_run_no_vacuous_gates: ok")
+
+
 def main() -> int:
     if "--write-fixture" in sys.argv:
         if FIXTURE.exists():
@@ -245,6 +322,7 @@ def main() -> int:
         return 0
     test()
     test_campaign()
+    test_trust_run_no_vacuous_gates()
     return 0
 
 

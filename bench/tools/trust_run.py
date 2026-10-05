@@ -73,6 +73,26 @@ def fixture_meta():
     return meta
 
 
+def expected_rows():
+    """Verdict row names a whole-corpus T1 or T2 run must produce: every NN, injection, approval and
+    lifecycle fixture (the sets interplane.conformance.run_suite runs)."""
+    fx = ROOT / "conformance" / "fixtures"
+    return [load(f)["case"] for pat in ("*.json", "injection/*.json", "approval/*.json", "lifecycle/*.json")
+            for f in sorted(fx.glob(pat))]
+
+
+def expected_injection_rows():
+    """Row names of the injection fixtures (those declaring ``injection`` metadata)."""
+    fx = ROOT / "conformance" / "fixtures" / "injection"
+    return [c["case"] for c in (load(f) for f in sorted(fx.glob("*.json"))) if c.get("injection")]
+
+
+def frozen_subsets():
+    """(t3_subset, t4_subset) as frozen in conformance/TRUST-DIGEST.txt (section 8)."""
+    kv = dict(ln.split(": ", 1) for ln in (ROOT / "conformance" / "TRUST-DIGEST.txt").read_text(encoding="utf-8").splitlines() if ": " in ln)
+    return [n for n in kv.get("t3_subset", "").split(",") if n], [n for n in kv.get("t4_subset", "").split(",") if n]
+
+
 def same_tree(a, b):
     fa = sorted(p.name for p in Path(a).iterdir())
     fb = sorted(p.name for p in Path(b).iterdir())
@@ -140,9 +160,15 @@ def gates(out):
     # X: cross-language identity.
     x_verdicts = (out / "t1-verdicts.json").read_bytes() == (out / "t2-verdicts.json").read_bytes()
     x_dumps = same_tree(out / "dump-t1", out / "dump-t2")
+    # A zero or partial row set never passes: the rows must be exactly the corpus (no vacuous all()).
+    want_rows = expected_rows()
     x_all = all(v["pass"] for v in t1.values())
-    g["X"] = {"verdicts_identical": x_verdicts, "dumps_identical": x_dumps, "rows": len(t1),
-              "all_rows_pass": x_all, "pass": x_verdicts and x_dumps and x_all}
+    x_missing = sorted(set(want_rows) - set(t1))
+    x_extra = sorted(set(t1) - set(want_rows))
+    x_complete = bool(want_rows) and not x_missing and not x_extra
+    g["X"] = {"verdicts_identical": x_verdicts, "dumps_identical": x_dumps, "rows": len(t1), "expected_rows": len(want_rows),
+              "missing_rows": x_missing, "unexpected_rows": x_extra, "complete": x_complete,
+              "all_rows_pass": x_all, "pass": x_verdicts and x_dumps and x_all and x_complete}
 
     # I: corpus coverage, as counted by the validator from fixture metadata.
     m_i = re.search(r"gate I corpus: (\d+) cases; (.*)", vlog)
@@ -154,24 +180,37 @@ def gates(out):
     # E: no effect from untrusted-origin instruction.
     def inj_sum(rows, key):
         return sum((r.get("injection") or {}).get(key, 0) for r in rows.values())
-    e = {}
+    e, have_inj = {}, {}
     for sysname, rows in (("T1", t1), ("T2", t2)):
         e[sysname] = {"violations": inj_sum(rows, "violations"), "content_derived": inj_sum(rows, "content_derived"),
                       "injection_cases": sum(1 for r in rows.values() if "injection" in r)}
+        have_inj[sysname] = {n for n, r in rows.items() if "injection" in r}
     for sysname, v in (("T3", t3), ("T4", t4)):
         s = v["summary"]
         e[sysname] = {"violations": s["violations"], "content_derived": s["content_derived"],
                       "injection_cases": sum(1 for n in v["rows"] if n.startswith("injection/"))}
+        have_inj[sysname] = {n for n in v["rows"] if n.startswith("injection/")}
     forgery = []
     for case, (path, cat) in meta.items():
         if cat in ("C07", "C08") or path.startswith("approval/10-"):
             for sysname, rows, key in (("T1", t1, case), ("T2", t2, case), ("T3", t3["rows"], path), ("T4", t4["rows"], path)):
                 if key in rows and not rows[key]["pass"]:
                     forgery.append((sysname, path))
+    # Zero violations over zero cases is not a pass: every system must cover its whole injection set
+    # (T1, T2: every injection fixture; T3, T4: the injection part of the frozen subsets).
+    t3_sub, t4_sub = frozen_subsets()
+    # Coverage is checked by name, not count: the right number of the wrong cases is incomplete.
+    want_inj = {"T1": set(expected_injection_rows()), "T2": set(expected_injection_rows()),
+                "T3": {n for n in t3_sub if n.startswith("injection/")}, "T4": {n for n in t4_sub if n.startswith("injection/")}}
+    for sysname, want in want_inj.items():
+        e[sysname]["expected_injection_cases"] = len(want)
+        e[sysname]["missing_injection_cases"] = sorted(want - have_inj[sysname])
+        e[sysname]["unexpected_injection_cases"] = sorted(have_inj[sysname] - want)
+    e_complete = all(want and have_inj[s] == want for s, want in want_inj.items())
     e1 = sum(v["violations"] for v in e.values())
     e2 = sum(v["content_derived"] for v in e.values())
     g["E"] = {"systems": e, "E1_violations": e1, "E2_content_derived": e2, "E3_forgeries_accepted": len(forgery),
-              "E3_failed_cases": forgery, "pass": e1 == 0 and e2 == 0 and not forgery}
+              "E3_failed_cases": forgery, "complete": e_complete, "pass": e_complete and e1 == 0 and e2 == 0 and not forgery}
 
     # A: approval and denial correctness.
     sdk = [n for n in t1 if re.match(r"approval-A(0[1-9]|1[0-4])-", n)]
@@ -195,7 +234,13 @@ def gates(out):
               "pass": n1.get("valid") is True and n2.get("valid") is True and n_same}
 
     g["M"] = {"status": "not run by this tool (bench/PROTOCOL-0.3.md section 7, reported only)"}
-    g["offline_pass"] = all(g[k]["pass"] for k in "PXIEAN")
+    # F: the frozen subsets above are read from TRUST-DIGEST.txt, so the digest check over it must
+    # have run and passed in this run directory; a missing or non-zero result fails the run.
+    codes_p = out / "exit-codes.json"
+    codes = load(codes_p) if codes_p.exists() else {}
+    g["F"] = {"exit_codes_present": codes_p.exists(), "trust_digest_exit": codes.get("digest"),
+              "validate_exit": codes.get("validate"), "pass": codes.get("digest") == 0 and codes.get("validate") == 0}
+    g["offline_pass"] = all(g[k]["pass"] for k in "PXIEANF")
     (out / "gates.json").write_text(json.dumps(g, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     lines = ["| Gate | Result | Evidence |", "|---|---|---|"]
     lines.append("| P provenance | %s | P1 %d/%d records complete; P2 %d/%d executed results labelled; P3 %d of 9 source classes; P4 %d trust leaks |" % (
@@ -211,6 +256,8 @@ def gates(out):
         "PASS" if g["A"]["pass"] else "FAIL", len(sdk), len(t4_ap), A15 in t4_ap, len(t3_ap), t3["summary"].get("approval_note")))
     lines.append("| N negative controls | %s | %s detected; matrices identical: %s |" % (
         "PASS" if g["N"]["pass"] else "INVALID", ", ".join(g["N"]["variants_detected"]), n_same))
+    lines.append("| F frozen inputs | %s | trust-digest exit %s; validate_fixtures exit %s |" % (
+        "PASS" if g["F"]["pass"] else "FAIL", g["F"]["trust_digest_exit"], g["F"]["validate_exit"]))
     (out / "gates.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     return g
 

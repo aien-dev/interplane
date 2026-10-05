@@ -475,6 +475,7 @@ def main() -> int:
         import analyze
         shutil_copy = Path(td) / "b5bad"
         (shutil_copy / "receipts").mkdir(parents=True)
+        (shutil_copy / "manifest.json").write_text((o5 / "manifest.json").read_text())
         (shutil_copy / "receipts" / "ambiguous-925.B5.json").write_text(json.dumps(stripped))
         (shutil_copy / "receipts" / "ambiguous-926.B5.json").write_text((o5 / "receipts" / "ambiguous-926.B5.json").read_text())
         ld = analyze.load_run(shutil_copy, b5dir)

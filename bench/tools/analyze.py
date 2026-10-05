@@ -106,16 +106,93 @@ def boot_ci(deltas: list, seed: int = BOOT_SEED, n_boot: int = BOOT_N) -> dict:
 
 # ------------------------------------------------------------------------------- loading
 
-R1_REQUIRED = ("B5",)  # conditions whose receipts must carry the R1 fields (bench_eval.r1_problems)
+R1_ALWAYS = ("B5",)  # historical rule: only B5 receipts carry R1 (PREREG-0.2y condition B5, #64)
+# PREREG-0.2y section 4: a run labelled 0.2y must satisfy R1 in every one of these arms and use no other arm.
+R1_CAMPAIGNS = {"0.2y": ("A", "B3", "B5")}
+# Historical corpora: the weaker R1 rule applies only to a run PROVEN to be that corpus. The label in the manifest is
+# self-declared and proves nothing. Proof = the manifest records the frozen tasks_digest of that corpus (the value in its
+# CORPUS-DIGEST.txt, written by validate.py/run_bench.check_corpus) AND every receipt's task id is a task of that corpus.
+# Arm lists are the historical ones: 0.2 ran A,B (PROTOCOL-0.2.md); 0.2x ran CAMPAIGN_CONDITIONS (run_bench.py; B5 is
+# "explicit only, never part of CAMPAIGN_CONDITIONS", #64), so B5 in a historical run is refused.
+HISTORICAL = {
+    "0.2": {"digest": BENCH / "CORPUS-DIGEST.txt", "tasks": BENCH / "tasks", "arms": ("A", "B")},
+    "0.2x": {"digest": BENCH / "heldout-0.2x" / "CORPUS-DIGEST.txt", "tasks": BENCH / "heldout-0.2x" / "tasks",
+             "arms": ("A", "A2", "A4", "B1", "B2", "B3", "B4")},
+}
+DIGEST_0_2Y = BENCH / "heldout-0.2y" / "CORPUS-DIGEST.txt"  # absent until the 0.2y corpus is frozen
+
+
+def frozen_tasks_digest(path: Path):
+    if not path.exists():
+        return None
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("tasks_digest "):
+            return line.split()[1]
+    return None
+
+
+def corpus_task_ids(tasks_dir: Path) -> set:
+    return {json.loads(p.read_text(encoding="utf-8"))["id"] for p in tasks_dir.glob("*.json")}
+
+
+def r1_scope(manifest: dict, conditions: set, task_ids: set) -> tuple:
+    """Returns (arms that need R1, or None for every arm; problems). Problems refuse the run (fail closed).
+    Anything not proven historical gets the strictest rule: R1 in every arm."""
+    camp = manifest.get("campaign")
+    corpus_blk = manifest.get("corpus") if isinstance(manifest.get("corpus"), dict) else {}
+    label = camp.get("corpus") if isinstance(camp, dict) else None
+    if camp is not None and (not isinstance(label, str) or not label):
+        return None, ["campaign block has no corpus identity"]
+    di = ((manifest.get("deterministic_identity") or {}).get("campaign") or {}).get("corpus")
+    if camp is not None and di is not None and di != label:
+        return None, [f"campaign.corpus {label!r} disagrees with deterministic_identity.campaign.corpus {di!r}"]
+    digest = (corpus_blk.get("frozen") or {}).get("tasks_digest")
+    recomputed = (corpus_blk.get("recomputed") or {}).get("tasks_digest")
+    proven = next((k for k, h in HISTORICAL.items()
+                   if digest and digest == recomputed == frozen_tasks_digest(h["digest"]) and corpus_blk.get("match") is True), None)
+    if proven is not None:
+        h = HISTORICAL[proven]
+        if label is not None and label != proven:
+            return None, [f"manifest label {label!r} contradicts the frozen task-set digest of corpus {proven}"]
+        if label is None and proven != "0.2":
+            return None, [f"manifest without campaign block carries the {proven} digest"]
+        outside = sorted(task_ids - corpus_task_ids(h["tasks"]))
+        if outside:  # e.g. a dev run with --allow-nonfrozen and its own task dir: not the frozen corpus, so strict
+            return None, []
+        extra = sorted(conditions - set(h["arms"]))
+        if extra:
+            return None, [f"condition(s) {extra} were not part of historical corpus {proven} (arms {list(h['arms'])})"]
+        return R1_ALWAYS, []
+    # not proven historical from here on: strictest rule (R1 in every arm)
+    if label in R1_CAMPAIGNS:
+        arms = R1_CAMPAIGNS[label]
+        extra = sorted(conditions - set(arms))
+        problems = [f"condition(s) {extra} are not in the {label} arm list {list(arms)}"] if extra else []
+        frozen_y = frozen_tasks_digest(DIGEST_0_2Y)
+        if frozen_y is not None and not (digest == recomputed == frozen_y):
+            problems.append(f"{label} manifest does not record the frozen 0.2y tasks_digest")
+        return None, problems
+    if camp is None:
+        legacy_ok = (conditions <= set(HISTORICAL["0.2"]["arms"]) and task_ids <= corpus_task_ids(HISTORICAL["0.2"]["tasks"]))
+        if legacy_ok and not (digest or recomputed):
+            return R1_ALWAYS, []  # legacy 0.2 layout (also no manifest): frozen 0.2 task ids, 0.2 arms, no other identity claimed
+        return None, ["no provable corpus identity (no campaign block, digest absent or not frozen) for these tasks or arms"]
+    # labelled campaign that is not 0.2y and not proven historical (offline dev runs on custom task dirs): strict R1 only
+    return None, []
 
 
 def load_run(run_dir: Path, tasks_dir: Path) -> dict:
     manifest = json.loads((run_dir / "manifest.json").read_text(encoding="utf-8")) if (run_dir / "manifest.json").exists() else {}
-    rec, r1_invalid = {}, []
+    rec, r1_invalid, raw = {}, [], []
     for p in sorted((run_dir / "receipts").glob("*.json")):
         r = json.loads(p.read_text(encoding="utf-8"))
         rec.setdefault(r["task"]["id"], {})[r["condition"]] = r
-        if r["condition"] in R1_REQUIRED and not bench_eval.r1_valid(r):  # PREREG-0.2y: B5 without R1 fields is invalid
+        raw.append(r)
+    required, id_problems = r1_scope(manifest, {r["condition"] for r in raw}, {r["task"]["id"] for r in raw})
+    if id_problems:  # fail closed: an untrustworthy identity must not downgrade R1 enforcement
+        r1_invalid.append({"task": "*", "condition": "*", "problems": id_problems})
+    for r in raw:
+        if (required is None or r["condition"] in required) and not bench_eval.r1_valid(r):  # PREREG-0.2y: missing R1 fields are invalid
             r1_invalid.append({"task": r["task"]["id"], "condition": r["condition"], "problems": bench_eval.r1_problems(r)})
     tasks = {}
     for p in sorted(tasks_dir.glob("*.json")):
@@ -128,7 +205,7 @@ def refuse_r1_invalid(data: dict, label: str) -> None:
     """PREREG-0.2y validity: no run with an unrecorded query or text counts. The analyzer refuses the
     whole run rather than scoring around it."""
     if data["r1_invalid"]:
-        raise SystemExit(f"{label}: {len(data['r1_invalid'])} B5 receipt(s) without valid R1 fields, run not scored: "
+        raise SystemExit(f"{label}: {len(data['r1_invalid'])} receipt(s) or identity check(s) without valid R1 fields, run not scored: "
                          + json.dumps(data["r1_invalid"][:5]))
 
 

@@ -1,0 +1,124 @@
+{
+  "A": {
+    "A-AIEN": {
+      "a15_present": true,
+      "cases": 14,
+      "pass": true
+    },
+    "A-ODY": {
+      "cases": 13,
+      "note": "approval continuation unsupported on Odysseus",
+      "pass": true
+    },
+    "A-SDK": {
+      "cases": 14,
+      "pass": true
+    },
+    "pass": true
+  },
+  "E": {
+    "E1_violations": 0,
+    "E2_content_derived": 0,
+    "E3_failed_cases": [],
+    "E3_forgeries_accepted": 0,
+    "pass": true,
+    "systems": {
+      "T1": {
+        "content_derived": 0,
+        "injection_cases": 44,
+        "violations": 0
+      },
+      "T2": {
+        "content_derived": 0,
+        "injection_cases": 44,
+        "violations": 0
+      },
+      "T3": {
+        "content_derived": 0,
+        "injection_cases": 30,
+        "violations": 0
+      },
+      "T4": {
+        "content_derived": 0,
+        "injection_cases": 18,
+        "violations": 0
+      }
+    }
+  },
+  "I": {
+    "cases": 60,
+    "categories": {
+      "C01": 3,
+      "C02": 5,
+      "C03": 4,
+      "C04": 4,
+      "C05": 4,
+      "C06": 3,
+      "C07": 4,
+      "C08": 3,
+      "C09": 3,
+      "C10": 16,
+      "C11": 3,
+      "C12": 4,
+      "C13": 4
+    },
+    "pass": true,
+    "validator_pass": true
+  },
+  "M": {
+    "status": "not run by this tool (bench/PROTOCOL-0.3.md section 7, reported only)"
+  },
+  "N": {
+    "matrices_identical": true,
+    "pass": true,
+    "valid_t1": true,
+    "valid_t2": true,
+    "variants_detected": [
+      "V1",
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6",
+      "V7",
+      "V8"
+    ]
+  },
+  "P": {
+    "P1": {
+      "examples": [],
+      "missing": 0,
+      "pass": true,
+      "records": 179
+    },
+    "P2": {
+      "examples": [],
+      "executed_results": 70,
+      "missing": 0,
+      "pass": true
+    },
+    "P3": {
+      "input_examples": 9,
+      "pass": true,
+      "source_class_fixtures": 9
+    },
+    "P4": {
+      "digest_fixture_pass": true,
+      "fixtures": [
+        "26-unrecognized-content-kind",
+        "27-absent-null-unrecognized-trust"
+      ],
+      "pass": true,
+      "trusted_leaks": 0
+    },
+    "pass": true
+  },
+  "X": {
+    "all_rows_pass": true,
+    "dumps_identical": true,
+    "pass": true,
+    "rows": 106,
+    "verdicts_identical": true
+  },
+  "offline_pass": true
+}

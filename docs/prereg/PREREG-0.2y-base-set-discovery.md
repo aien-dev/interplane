@@ -1,6 +1,10 @@
 # INTERPLANE 0.2y: pre-registration for the held-out tool-discovery fix
 
-Status: **pre-registered, no run exists, no task exists yet.** Nothing below describes a result.
+Status: **closed, unevaluated** (2026-10-05). 0.2y authoring ended under amendment 4 item 16 after three attempts
+(non-file group 6, 3 and 3 of 24; `bench/heldout-0.2y/attempt-1`, `attempt-2`, `attempt-3`); the corpus was never
+frozen, no model under test received a request, and the fix in section 2 is not evaluated. See the outcome entry at
+the end of the amendment log. Any further study is a new pre-registration with its own identifier.
+Status at registration (kept): **pre-registered, no run exists, no task exists yet.** Nothing below describes a result.
 Written 2026-10-05 after the 0.2x campaign (`docs/REPORT-0.2x.md`, run
 `bench/runs/heldout-0.2x-20261005T0102Z`). The 0.2x held-out set is **spent**: it was used here to
 diagnose, so it is dev data from now on and never enters a 0.2y gate statistic. The 44 tasks of

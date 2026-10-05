@@ -100,6 +100,8 @@ A, B1 and B3 alike.
 
 Each failed receipt is labelled `attempt: 3` although two attempts ran (`prior_infra_failures`
 lists both); the label counts one too many when both fail. The data are correct.
+Fixed after publication: `attempt` now counts the runs of that condition. This run's receipts
+stay as recorded.
 
 ### Latency
 
@@ -147,5 +149,5 @@ is a candidate compatibility note for the backend. No upstream issue was filed.
 
 1. A trigger for wrong-domain tool use, or another mechanism that reaches `nopath` tasks, needs a
    new pre-registered protocol and a fresh held-out set before any claim.
-2. Fix the receipt `attempt` label in `bench/tools/run_bench.py`.
+2. Fix the receipt `attempt` label in `bench/tools/run_bench.py` (done after publication).
 3. A rule for failed baseline runs in the next protocol.

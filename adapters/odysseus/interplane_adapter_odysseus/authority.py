@@ -28,7 +28,7 @@ import logging
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
 
 from interplane.core import Catalog, CapabilityRequest, Decision, ToolResult
 from interplane.crossveil import RuntimeAuthority, make_result
@@ -44,6 +44,7 @@ APPROVAL_CONTINUATION = "approval continuation unsupported on Odysseus"
 EXECUTABLE = frozenset({"read_file", "ls", "glob", "grep"})
 _PATH_TOOLS = EXECUTABLE
 _UNTRUSTED = frozenset({"external_untrusted", "workspace_untrusted"})
+_TRUSTED_FLOORS = frozenset({"trusted_runtime", "user_supplied"})
 _MAX_REASON = 4096
 
 
@@ -132,7 +133,7 @@ class OdysseusAuthority(RuntimeAuthority):
         return text
 
     def _context_for(self, trace_id: str, ctx: dict):
-        """One Odysseus ToolRunSecurityContext per trace (the pipeline carries no prior results)."""
+        """One Odysseus ToolRunSecurityContext per trace, armed from the pipeline's exposure."""
         tc = self._ody.tool_capabilities
         with self._lock:
             sc = self._contexts.get(trace_id)
@@ -142,7 +143,7 @@ class OdysseusAuthority(RuntimeAuthority):
                     delegated_credential=self.delegated_credential,
                 )
                 self._contexts[trace_id] = sc
-            if _ctx_reports_untrusted(ctx):
+            if _exposure_untrusted(ctx):
                 sc.external_untrusted_context_seen = True  # monotonic: never disarmed
             return sc
 
@@ -351,17 +352,15 @@ class _Capture(logging.Handler):
         self.sink.append(record.getMessage())
 
 
-def _ctx_reports_untrusted(ctx: dict) -> bool:
-    """True when the CallContext says a prior result in the trace was untrusted.
+def _exposure_untrusted(ctx: dict) -> bool:
+    """True when the pipeline's exposure says the model could see untrusted content (0.3 cut E2).
 
-    The reference pipeline's context has no such field; a caller that tracks results itself may
-    pass ``trust`` (one level) or ``prior_trust`` (an iterable of levels).
+    ``ctx["exposure"]`` is computed by the pipeline from its own input ledger (CROSSVEIL.md Trust
+    rules 5 and 6), never by the model or the caller. A floor below ``user_supplied`` arms the gate,
+    as Odysseus arms it natively after any non-system tool result (tool_capabilities.py:506-536,
+    686-694). A missing or malformed exposure arms it too (fail closed).
     """
-    levels: list = []
-    one = ctx.get("trust")
-    if isinstance(one, str):
-        levels.append(one)
-    many = ctx.get("prior_trust")
-    if isinstance(many, Iterable) and not isinstance(many, (str, bytes)):
-        levels.extend(x for x in many if isinstance(x, str))
-    return any(level in _UNTRUSTED for level in levels)
+    exposure = ctx.get("exposure")
+    if not isinstance(exposure, dict):
+        return True
+    return exposure.get("floor") not in _TRUSTED_FLOORS

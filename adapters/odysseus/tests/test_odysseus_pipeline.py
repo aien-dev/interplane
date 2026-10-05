@@ -10,7 +10,7 @@ from interplane.crossveil import Pipeline
 
 from interplane_adapter_odysseus import dialect, mapping_table
 from interplane_adapter_odysseus.authority import NOT_EXECUTED, OdysseusAuthority
-from interplane_adapter_odysseus.demo import make_pipeline, openai_call
+from interplane_adapter_odysseus.demo import make_pipeline, openai_call, register_user_turn
 from interplane_adapter_odysseus.catalog import tool_names
 
 
@@ -73,6 +73,8 @@ def test_mutation_after_external_context_requires_approval(run):
 def test_a_read_arms_the_gate_for_later_calls_in_the_same_trace(ody, workspace):
     authority = OdysseusAuthority(str(workspace), admin=True)
     pipe = make_pipeline(authority)
+    register_user_turn(pipe, "tr", "read notes.txt")
+    register_user_turn(pipe, "other-trace", "send a mail")
     first = pipe.run_turn("openai", "m", openai_call("read_file", {"path": "notes.txt"}, "c1"), "tr", 0)
     assert first.results[0].status == "ok"
     second = pipe.run_turn("openai", "m", openai_call("send_email", {"to": "a@b.c", "subject": "s", "body": "b"}, "c2"), "tr", 1)
@@ -83,16 +85,29 @@ def test_a_read_arms_the_gate_for_later_calls_in_the_same_trace(ody, workspace):
     assert other.results[0].status == "error" and other.results[0].error.message == NOT_EXECUTED
 
 
-def test_context_trust_arms_the_gate(ody):
+def test_exposure_arms_the_gate(ody):
+    # 0.3 cut E2: the gate reads the pipeline's exposure floor; caller-supplied trust hints are gone.
     authority = OdysseusAuthority(admin=True)
     req = CapabilityRequest(
         request_id="r1", runtime="odysseus", capability="send_email",
         arguments={"to": "a@b.c", "subject": "s", "body": "b"}, tool=ToolRef(name="send_email"), mapping={},
     )
-    assert authority.decide(req, {"trace_id": "a"}).decision == "authorized"
-    assert authority.decide(req, {"trace_id": "b", "trust": "external_untrusted"}).decision == "requires_approval"
-    assert authority.decide(req, {"trace_id": "c", "prior_trust": ["trusted_runtime", "workspace_untrusted"]}).decision == "requires_approval"
-    assert authority.decide(req, {"trace_id": "d", "trust": "trusted_runtime"}).decision == "authorized"
+
+    def floor(trace, level):
+        return authority.decide(req, {"trace_id": trace, "exposure": {"inputs": ["i"], "floor": level}}).decision
+
+    assert floor("a", "user_supplied") == "authorized"
+    assert floor("b", "trusted_runtime") == "authorized"
+    assert floor("c", "workspace_untrusted") == "requires_approval"
+    assert floor("d", "external_untrusted") == "requires_approval"
+    assert floor("e", "not-a-level") == "requires_approval"
+    # fail closed: no exposure, or a malformed one, arms the gate
+    assert authority.decide(req, {"trace_id": "f"}).decision == "requires_approval"
+    assert authority.decide(req, {"trace_id": "g", "exposure": "user_supplied"}).decision == "requires_approval"
+    # the old caller-supplied hint no longer disarms anything
+    assert authority.decide(req, {"trace_id": "h", "trust": "trusted_runtime"}).decision == "requires_approval"
+    # monotonic per trace: once armed, a later trusted floor does not disarm it
+    assert floor("c", "user_supplied") == "requires_approval"
 
 
 def test_non_admin_blocked_tool_is_denied(run, ody):

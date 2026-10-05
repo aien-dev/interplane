@@ -8,7 +8,7 @@ sys.path.insert(0, str(ADAPTER))
 
 from interplane_adapter_odysseus import _odysseus  # noqa: E402
 from interplane_adapter_odysseus.authority import OdysseusAuthority  # noqa: E402
-from interplane_adapter_odysseus.demo import make_pipeline, openai_call  # noqa: E402
+from interplane_adapter_odysseus.demo import make_pipeline, openai_call, register_user_turn  # noqa: E402
 
 
 @pytest.fixture(scope="session")
@@ -54,6 +54,7 @@ def run(ody, workspace):
         kw.setdefault("admin", True)
         authority = CountingAuthority(str(workspace) if workspace_arg else None, **kw)
         pipe = make_pipeline(authority)
+        register_user_turn(pipe, "trace-x", "test request")
         out = pipe.run_turn("openai", "test-model", openai_call(name, args), "trace-x", 0)
         return authority, out.results[0], out.observed[0]
 

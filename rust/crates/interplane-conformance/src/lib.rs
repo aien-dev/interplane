@@ -24,6 +24,10 @@ pub struct CaseRun {
     pub results: Vec<Value>,
     /// The selection receipt after each `expand` step, in order.
     pub selections: Vec<Value>,
+    /// The trace's input ledger after the last step (0.3 cut P3), in registration order.
+    pub inputs: Vec<Value>,
+    /// `{request_id, inputs, floor}` the runtime saw in `CallContext` at `decide`, in order.
+    pub exposure: Vec<Value>,
 }
 
 /// Run one fixture document.
@@ -96,6 +100,8 @@ pub fn run_case(fx: &Value) -> CaseRun {
                 let (r, o) = p.admit_value(env);
                 results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
                 observed.push(o);
+            } else if step.get("input").is_some() && step.get("dialect").is_none() {
+                // host-only input registration: not implemented yet (red)
             } else if let Some(d) = step["dialect"].as_str() {
                 let model = step["model"].as_str().unwrap_or("");
                 let out = p.run_turn(d, model, &step["input"], &trace, turn);
@@ -122,6 +128,8 @@ pub fn run_case(fx: &Value) -> CaseRun {
         execute_calls: rt.execute_calls,
         results,
         selections,
+        inputs: vec![],
+        exposure: vec![],
     }
 }
 
@@ -187,6 +195,30 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
             errs.push("selections differ from expected".to_string());
         }
     }
+    if let Some(want) = exp.get("inputs").and_then(Value::as_array) {
+        // Subset match per record: a fixture may omit `content_digest` of an automatic record.
+        let ok = want.len() == run.inputs.len()
+            && want.iter().zip(&run.inputs).all(|(w, g)| {
+                w.as_object()
+                    .is_some_and(|o| o.iter().all(|(k, v)| g.get(k) == Some(v)))
+            });
+        if !ok {
+            errs.push(format!(
+                "inputs: expected {}, got {}",
+                canonicalize(&Value::Array(want.clone())),
+                canonicalize(&Value::Array(run.inputs.clone()))
+            ));
+        }
+    }
+    if let Some(want) = exp.get("exposure") {
+        if want != &Value::Array(run.exposure.clone()) {
+            errs.push(format!(
+                "exposure: expected {}, got {}",
+                canonicalize(want),
+                canonicalize(&Value::Array(run.exposure.clone()))
+            ));
+        }
+    }
     for c in exp["result_checks"].as_array().cloned().unwrap_or_default() {
         let rid = c["request_id"].as_str().unwrap_or("");
         let path = c["path"].as_str().unwrap_or("");
@@ -224,6 +256,12 @@ pub fn verdict(run: &CaseRun, errs: &[String]) -> Value {
     });
     if !run.selections.is_empty() {
         v["selections"] = Value::Array(run.selections.clone());
+    }
+    if !run.inputs.is_empty() {
+        v["inputs"] = Value::Array(run.inputs.clone());
+    }
+    if !run.exposure.is_empty() {
+        v["exposure"] = Value::Array(run.exposure.clone());
     }
     v
 }

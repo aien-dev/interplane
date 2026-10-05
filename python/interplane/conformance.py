@@ -66,6 +66,8 @@ def run_case(case: dict) -> dict:
             )
             selections.append(sel.to_dict())
             continue
+        if "input" in step and "dialect" not in step:
+            continue  # host-only input registration: not implemented yet (red)
         if "envelope" in step:
             result, record = pipe.admit_envelope(step["envelope"], turn=step.get("turn"))
             results.append(result)
@@ -82,6 +84,8 @@ def run_case(case: dict) -> dict:
         results.extend(out.results)
         observed.extend(r.to_dict() for r in out.observed)
         turns.append(out.to_dict())
+    inputs: list = []
+    exposure: list = []
     runtime = {
         "decide_calls": pipe.runtime.decide_calls,
         "execute_calls": pipe.runtime.execute_calls,
@@ -104,6 +108,15 @@ def run_case(case: dict) -> dict:
         problems.append("selections differ from expected")
     if "runtime" in expected and runtime != expected["runtime"]:
         problems.append(f"runtime {runtime!r} != {expected['runtime']!r}")
+    if "inputs" in expected:
+        want = expected["inputs"]
+        ok = len(want) == len(inputs) and all(
+            all(g.get(k) == v for k, v in w.items()) for w, g in zip(want, inputs)
+        )
+        if not ok:
+            problems.append(f"inputs {inputs!r} != {want!r}")
+    if "exposure" in expected and exposure != expected["exposure"]:
+        problems.append(f"exposure {exposure!r} != {expected['exposure']!r}")
     for check in expected.get("result_checks", []):
         match = next((r for r in results if r.request_id == check["request_id"]), None)
         try:
@@ -123,6 +136,8 @@ def run_case(case: dict) -> dict:
         "turns": turns,
         "runtime": runtime,
         "selections": selections,
+        "inputs": inputs,
+        "exposure": exposure,
         "problems": problems,
         "results": [canonical_result_payload(r) for r in results],
     }
@@ -213,13 +228,12 @@ def main(argv: Optional[list] = None) -> int:
         failed += err is not None
     total = len(verdicts) + len(lifecycle)
     print(f"{total - failed}/{total} passed")
-    out = {
-        k: {f: v[f] for f in ("pass", "observed", "turns", "runtime", "selections") if f in v}
-        for k, v in verdicts.items()
-    }
+    fields = ("pass", "observed", "turns", "runtime", "selections", "inputs", "exposure")
+    out = {k: {f: v[f] for f in fields if f in v} for k, v in verdicts.items()}
     for v in out.values():
-        if not v.get("selections"):
-            v.pop("selections", None)
+        for key in ("selections", "inputs", "exposure"):
+            if not v.get(key):
+                v.pop(key, None)
     out.update({k: {"pass": v["pass"], "steps": v["steps"]} for k, v in lifecycle.items()})
     Path(args.out).write_text(jcs(out) + "\n", encoding="utf-8")
     return 1 if failed else 0

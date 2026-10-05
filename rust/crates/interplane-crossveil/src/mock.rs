@@ -146,6 +146,9 @@ pub struct MockRuntime {
     /// Harness-only: `{request_id, inputs, floor}` of the `CallContext.exposure` seen at each
     /// `decide`, in order.
     pub seen_exposure: Vec<Value>,
+    /// Harness-only: the `expires_at` the mock mints in the approval of `delete_file` (a fixture's
+    /// `mock_approval.expires_at`). Never read from arguments, extensions or envelopes.
+    pub approval_expires_at: Option<String>,
 }
 
 impl MockRuntime {
@@ -241,7 +244,7 @@ impl RuntimeAuthority for MockRuntime {
                 d.approval = Some(Approval {
                     approval_id: format!("mock-approval-{}", req.request_id),
                     scope: Some("single_action".into()),
-                    expires_at: None,
+                    expires_at: self.approval_expires_at.clone(),
                     extensions: Map::new(),
                 });
                 d
@@ -331,6 +334,8 @@ impl RuntimeAuthority for MockRuntime {
                     rid,
                     json!({"path": path, "content": format!("mock content of {path}")}),
                 ),
+                // Reached only through an approved continuation; no filesystem is touched.
+                "delete_file" => ToolResult::ok(rid, json!({"path": path, "deleted": true})),
                 "list_dir" => {
                     ToolResult::ok(rid, json!({"path": path, "entries": ["a.txt", "b.txt"]}))
                 }

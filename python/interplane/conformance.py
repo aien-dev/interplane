@@ -19,7 +19,12 @@ from .core import (
     jcs,
 )
 from .crossaxis import expand, select
-from .crossveil import canonical_result_payload, default_pipeline
+from .crossveil import (
+    ContinuationRefused,
+    canonical_result_payload,
+    capability_request_digest,
+    default_pipeline,
+)
 
 # Capabilities the mock classes as effects (CORE.md has no effect-class column until cut E1; this is
 # the harness-local set).
@@ -37,6 +42,11 @@ class _Probe:
         self._variant = variant
         self.requests: list = []  # (request_id, capability, canonical arguments)
         self.executed: set = set()
+        # Harness-only (fixture `mock` step): the catalog digest reported instead of the runtime's.
+        self.catalog_override: Optional[str] = None
+        # Harness-only: true while a negative control re-admits an original request in place of a
+        # continuation.
+        self.readmit = False
 
     def __getattr__(self, name):
         return getattr(self._inner, name)
@@ -45,7 +55,7 @@ class _Probe:
         self.requests.append((req.request_id, req.capability, jcs(req.arguments)))
         d = self._inner.decide(req, ctx)
         if self._negctl is not None:
-            self._negctl.tamper_decision(self._variant, req, d)
+            self._negctl.tamper_decision(self._variant, req, d, self.readmit)
         return d
 
     def execute(self, req, decision, ctx):
@@ -53,7 +63,10 @@ class _Probe:
         return self._inner.execute(req, decision, ctx)
 
     def catalog(self):
-        return self._inner.catalog()
+        cat = self._inner.catalog()
+        if self.catalog_override is not None:
+            cat.catalog_digest = self.catalog_override
+        return cat
 
 
 def _judge(inj: dict, probe: _Probe, turns: list, envelopes: int) -> dict:
@@ -89,6 +102,86 @@ def _negctl(variant: Optional[str]):
     return conformance_negctl
 
 
+def _approval_decision(a: dict, rid: str, pend) -> Decision:
+    """The runtime's continuation decision for an ``approve`` step (CORE.md): built by the
+    fixture's host side, never by the pipeline."""
+    return Decision.from_dict(
+        {
+            "kind": "decision",
+            "request_id": rid,
+            "decision": a.get("decision", "authorized"),
+            "capability": pend.capability_request.capability if pend else None,
+            "authority": {"runtime": "mock", "policy_engine": "mock.policy"},
+            "approval": {"approval_id": a.get("approval_id", "")},
+        }
+    )
+
+
+def _approval_digest(a: dict, pend) -> str:
+    """The capability_request digest the host presents (CORE.md): the pending entry's own, or that
+    of the pending request with the step's ``arguments`` substituted, or the digest of ``null``."""
+    if pend is None:
+        return digest(None)
+    if "arguments" in a:
+        cap = pend.capability_request
+        cap.arguments = dict(a["arguments"])
+        return capability_request_digest(cap)
+    return pend.request_digest
+
+
+def _host_step(pipe, probe, nc, variant, case, trace_id, index, step, results, observed, continuations):
+    """An ``approve`` or ``cancel`` step: only the fixture's host side issues these."""
+    kind = "approve" if "approve" in step else "cancel"
+    a = step[kind]
+    rid = a["request_id"]
+    trace = a.get("trace_id", trace_id)
+    pend = pipe.pending_approval(trace, rid)
+    out = None
+    if kind == "approve" and variant == "V6":
+        orig = next(
+            (
+                s["envelope"]
+                for s in case["steps"]
+                if "envelope" in s and s["envelope"]["payload"].get("request_id") == rid
+            ),
+            None,
+        )
+        if orig is not None:
+            probe.readmit = True
+            nc.before_step(variant, pipe)
+            result, record = pipe.admit_envelope(orig)
+            probe.readmit = False
+            results.append(result)
+            observed.append(record.to_dict())
+            return
+    try:
+        if kind == "approve":
+            d = _approval_decision(a, rid, pend)
+            if nc is not None:
+                nc.approve_any_id(variant, pend, d)
+            out = pipe.continue_approval(
+                trace, rid, d, _approval_digest(a, pend), a.get("now", "2026-01-01T00:00:00Z")
+            )
+        else:
+            out = pipe.cancel_approval(trace, rid)
+    except ContinuationRefused as e:
+        reason = e.reason
+    after = pipe.pending_approval(trace, rid)
+    row = {
+        "step": index,
+        "kind": kind,
+        "request_id": rid,
+        "outcome": "refused" if out is None else "resolved",
+        "stage": after.state.value if after else None,
+        "reason": reason if out is None else None,
+        "message": out[0].error.message if out is not None and out[0].error else None,
+    }
+    if out is not None:
+        results.append(out[0])
+        observed.append(out[1].to_dict())
+    continuations.append(row)
+
+
 def run_case(case: dict, variant: Optional[str] = None) -> dict:
     """Run one fixture on a fresh pipeline and mock runtime; returns the verdict. ``variant``
     (``"V1"`` to ``"V6"``) applies a negative control and is for the test-only matrix."""
@@ -97,6 +190,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
     )
     pipe.runtime.provenance_overrides = case.get("mock_provenance", {})
+    pipe.runtime.approval_expires_at = case.get("mock_approval", {}).get("expires_at")
     probe = _Probe(pipe.runtime, nc, variant)
     pipe.runtime = probe
     name, trace_id = case["case"], case["trace_id"]
@@ -104,6 +198,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
     results: list = []
     turns: list = []
     selections: list = []
+    continuations: list = []
     sel_spec = case.get("selection")
     catalog = pipe.runtime.catalog()
     sel = None
@@ -114,7 +209,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
             sel_spec.get("max_capabilities"),
             sel_spec.get("always_include"),
         )
-    for step in case["steps"]:
+    for index, step in enumerate(case["steps"]):
         if nc is not None and ("envelope" in step or "dialect" in step):
             nc.before_step(variant, pipe)
         if "expand" in step:
@@ -127,6 +222,20 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
                 ex.get("max_added_per_expansion"),
             )
             selections.append(sel.to_dict())
+            continue
+        if "restart" in step:
+            # The pipeline is dropped and rebuilt over the same runtime: fresh ledger, no pending
+            # approvals.
+            pipe = default_pipeline(
+                Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
+            )
+            pipe.runtime = probe
+            continue
+        if "mock" in step:
+            probe.catalog_override = step["mock"].get("catalog_digest")
+            continue
+        if "approve" in step or "cancel" in step:
+            _host_step(pipe, probe, nc, variant, case, trace_id, index, step, results, observed, continuations)
             continue
         if "input" in step and "dialect" not in step:
             # host-only input registration (0.3 cut P3): never reachable from model input
@@ -189,6 +298,8 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         problems.append("selections differ from expected")
     if "runtime" in expected and runtime != expected["runtime"]:
         problems.append(f"runtime {runtime!r} != {expected['runtime']!r}")
+    if "continuations" in expected and continuations != expected["continuations"]:
+        problems.append(f"continuations {continuations!r} != {expected['continuations']!r}")
     if "inputs" in expected:
         want = expected["inputs"]
         ok = len(want) == len(inputs) and all(
@@ -227,6 +338,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         "inputs": inputs,
         "exposure": exposure,
         "injection": injection,
+        "continuations": continuations,
         "problems": problems,
         "results": [canonical_result_payload(r) for r in results],
     }
@@ -295,12 +407,20 @@ def load_injection_fixtures(fixtures_dir: str) -> list:
     ]
 
 
+def load_approval_fixtures(fixtures_dir: str) -> list:
+    """The ``approval/NN-*.json`` fixtures (0.3 cut A2), sorted by file name. Absent directory = none."""
+    return [
+        json.loads(p.read_text(encoding="utf-8"))
+        for p in sorted(Path(fixtures_dir, "approval").glob("*.json"))
+    ]
+
+
 def run_suite(fixtures_dir: str, variant: Optional[str] = None) -> tuple:
     """Run a whole fixtures directory: the NN cases, the injection cases, the lifecycle cases.
     Returns ``(verdicts, lifecycle, digest_errors)``; ``variant`` applies a negative control."""
     verdicts: dict = {}
     cases = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(Path(fixtures_dir).glob("*.json"))]
-    for case in cases + load_injection_fixtures(fixtures_dir):
+    for case in cases + load_injection_fixtures(fixtures_dir) + load_approval_fixtures(fixtures_dir):
         verdicts[case["case"]] = run_case(case, variant)
     lifecycle: dict = {}
     for path in sorted(Path(fixtures_dir, "lifecycle").glob("*.json")):
@@ -352,10 +472,20 @@ def main(argv: Optional[list] = None) -> int:
         failed += err is not None
     total = len(verdicts) + len(lifecycle)
     print(f"{total - failed}/{total} passed")
-    fields = ("pass", "observed", "turns", "runtime", "selections", "inputs", "exposure", "injection")
+    fields = (
+        "pass",
+        "observed",
+        "turns",
+        "runtime",
+        "selections",
+        "inputs",
+        "exposure",
+        "injection",
+        "continuations",
+    )
     out = {k: {f: v[f] for f in fields if f in v} for k, v in verdicts.items()}
     for v in out.values():
-        for key in ("selections", "inputs", "exposure", "injection"):
+        for key in ("selections", "inputs", "exposure", "injection", "continuations"):
             if not v.get(key):
                 v.pop(key, None)
     out.update({k: {"pass": v["pass"], "steps": v["steps"]} for k, v in lifecycle.items()})

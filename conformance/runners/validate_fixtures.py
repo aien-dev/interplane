@@ -10,7 +10,7 @@ Exit status is non-zero on any failure. Checks:
   * every digest fixture recomputes; InputRecord examples (one per source class) validate
   * negative control: a mutated envelope MUST fail validation
 """
-import copy, glob, hashlib, json, os, sys
+import copy, glob, hashlib, json, os, re, sys
 from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 from referencing.jsonschema import DRAFT202012
@@ -238,10 +238,54 @@ for p in sorted(glob.glob(os.path.join(FIX, "injection", "*.json"))):
     if not injection_problems({**f, "steps": f["steps"] + [{"approval": {"approval_id": "x"}}]}, "mutant"): fail("negative control: injection fixture with an approval step accepted")
     if not injection_problems({**f, "steps": [s for s in f["steps"] if "dialect" not in s]}, "mutant"): fail("negative control: injection fixture without an obeying model step accepted")
 if iseen != set(INJECTION): fail("injection cases missing/extra: %s" % sorted(iseen ^ set(INJECTION)))
+# ---- approval fixtures (0.3 cut A2, bench/PROTOCOL-0.3.md section 3.3): pipeline cases with host-side steps
+APPROVAL = {"%02d" % i for i in range(1, 15)}
+SHAPE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+CONT_KEYS = ["step", "kind", "request_id", "outcome", "stage", "reason", "message"]
+n_app = 0
+aseen = set()
+for p in sorted(glob.glob(os.path.join(FIX, "approval", "*.json"))):
+    f = load(p); aname = os.path.basename(p)[:-5]; n_app += 1; aseen.add(aname[:2])
+    w = "approval/" + aname
+    if f.get("case") != "approval-A%s-%s" % (aname[:2], aname[3:]): fail("%s: case slug %r" % (w, f.get("case")))
+    for k in ("description", "limits", "trace_id", "steps", "expected"):
+        if k not in f: fail("%s: missing %s" % (w, k))
+    exp = f.get("expected", {}); obs = exp.get("observed", [])
+    for i, o in enumerate(obs):
+        if list(o.keys()) != OBS_KEYS or o.get("result_digest") is not None: fail("%s: observed[%d] shape" % (w, i))
+    rt = exp.get("runtime", {})
+    if rt.get("decide_calls") != sum(1 for o in obs if o["decide_invoked"]) or rt.get("execute_calls") != sum(1 for o in obs if o["execute_invoked"]): fail("%s: runtime counts mismatch" % w)
+    if "mock_approval" in f and (set(f["mock_approval"]) != {"expires_at"} or not SHAPE.match(f["mock_approval"]["expires_at"])): fail("%s: mock_approval shape" % w)
+    conts = exp.get("continuations")
+    host = [(i, k) for i, s in enumerate(f.get("steps", [])) for k in ("approve", "cancel") if k in s]
+    if not isinstance(conts, list) or len(conts) != len(host): fail("%s: one continuations row per approve/cancel step" % w); conts = []
+    for row, (i, k) in zip(conts, host):
+        st = f["steps"][i][k]
+        if list(row) != CONT_KEYS or row["step"] != i or row["kind"] != k or row["request_id"] != st.get("request_id"): fail("%s: continuations row for step %d" % (w, i))
+        elif row["outcome"] == "refused":
+            if row["reason"] != "no_pending_approval" or row["message"] is not None or (row["stage"] is not None and row["stage"] not in STATES): fail("%s: refused row shape (step %d)" % (w, i))
+        elif row["outcome"] != "resolved" or row["reason"] is not None or row["stage"] not in STATES: fail("%s: resolved row shape (step %d)" % (w, i))
+    for i, s in enumerate(f.get("steps", [])):
+        if "envelope" in s: check(V_ENV, s["envelope"], "%s envelope" % w)
+        elif "dialect" in s and "input" in s: pass
+        elif "approve" in s:
+            a = s["approve"]
+            if not {"request_id", "approval_id"} <= set(a) or not set(a) <= {"request_id", "approval_id", "decision", "arguments", "now", "trace_id"}: fail("%s: approve step keys" % w)
+            if "now" in a and not SHAPE.match(a["now"]): fail("%s: approve.now shape" % w)
+        elif "cancel" in s:
+            if "request_id" not in s["cancel"] or not set(s["cancel"]) <= {"request_id", "trace_id"}: fail("%s: cancel step keys" % w)
+        elif s.get("restart") is True and len(s) == 1: pass
+        elif "mock" in s and set(s["mock"]) == {"catalog_digest"} and len(s) == 1: pass
+        else: fail("%s: unsupported step %d" % (w, i))
+    # only the host side issues approve/cancel: a model step or envelope must never carry one
+    for s in f.get("steps", []):
+        if ("envelope" in s or "dialect" in s) and any(k in s for k in ("approve", "cancel", "restart", "mock")): fail("%s: host step mixed into a model step" % w)
+        if s.get("envelope", {}).get("payload", {}).get("kind") == "decision": fail("%s: a decision envelope is not a continuation" % w)
+if aseen != APPROVAL: fail("approval cases missing/extra: %s" % sorted(aseen ^ APPROVAL))
 if not os.path.exists(os.path.join(ROOT, "conformance", "negative-controls.json")): fail("conformance/negative-controls.json missing")
 else:
     nc = load(os.path.join(ROOT, "conformance", "negative-controls.json"))
-    known = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "*.json"))} | {"lifecycle/" + os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "lifecycle", "*.json"))} | {"injection-" + n for n in INJECTION}
+    known = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "*.json"))} | {"lifecycle/" + os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "lifecycle", "*.json"))} | {"injection-" + n for n in INJECTION} | {"approval-A%s-%s" % (os.path.basename(x)[:2], os.path.basename(x)[3:-5]) for x in glob.glob(os.path.join(FIX, "approval", "*.json"))}
     if sorted(nc.get("variants", {})) != ["V1", "V2", "V3", "V4", "V5", "V6"]: fail("negative-controls.json must define V1 to V6")
     for v, row in nc.get("variants", {}).items():
         if not row.get("must_fail") or not set(row["must_fail"]) <= known: fail("negative-controls.json %s: must_fail names unknown cases" % v)
@@ -303,7 +347,7 @@ for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))
 
-print("conformance cases: %d, lifecycle cases: %d, injection cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_inj, n_env, n_dial, n_int, n_dig, len(have_in)))
+print("conformance cases: %d, lifecycle cases: %d, injection cases: %d, approval cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_inj, n_app, n_env, n_dial, n_int, n_dig, len(have_in)))
 if errors:
     print("FAIL (%d)" % len(errors)); [print(" -", e) for e in errors]; sys.exit(1)
 print("PASS")

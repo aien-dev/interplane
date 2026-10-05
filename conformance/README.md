@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V6) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`.
+- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V6) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -65,11 +65,28 @@ Trust is two axes (CROSSVEIL.md, `common.schema.json`): `provenance.trust` (Trus
 
 ## Lifecycle fixtures (approval continuation)
 
-The reference pipeline has no host continuation call yet (plan cut A2), so a second decision on a
-`requires_approval` request cannot be reached through `NN-slug` fixtures. The cases under
-`fixtures/lifecycle/` exercise that transition on the lifecycle state machine itself, in both SDKs.
-Both runners load them after the `NN-slug` cases and write one verdict row each, keyed
-`lifecycle/<slug>`. Total verdict rows: 30 (25 + 5).
+The cases under `fixtures/lifecycle/` exercise the REQUIRES_APPROVAL transition on the lifecycle
+state machine itself, in both SDKs (no pipeline, no mock runtime). Both runners load them after the
+`NN-slug` and injection cases and write one verdict row each, keyed `lifecycle/<slug>`.
+
+## Approval fixtures (cases A01 to A14)
+
+`fixtures/approval/` drives the host continuation calls of the pipeline (`continue_approval`,
+`cancel_approval`; `spec/CORE.md`, Approval continuation) through steps only the fixture's host side
+can issue: `approve`, `cancel`, `restart` (a fresh pipeline over the same mock runtime) and `mock`
+(the runtime's catalog digest changes). `mock_approval.expires_at` makes the mock mint an expiry.
+Each `approve` and `cancel` step adds one row to `expected.continuations` and, when resolved, one
+`ObservedRecord`; the verdict row of an approval case gains `continuations`. Rows of earlier cases
+are unchanged. Total verdict rows: 62 (40 + 3 injection + 14 approval + 5 lifecycle).
+
+Fail-closed readings taken where the protocol leaves room: a continuation that fails a binding check
+(wrong or foreign `approval_id`, changed arguments, expiry, changed catalog, decision value) on a
+request that is still pending DENIES it for good (A02, A03, A04, A05, A08, A14); a call with no live
+pending entry (unknown, already executed, cancelled, second continuation, after restart) is REFUSED
+and changes nothing (A06, A07, A09, A12). A07 therefore presents the spent id for a request that was
+never pending; the same id on a pending request is A03. Expiry compares the exact
+`YYYY-MM-DDTHH:MM:SSZ` shape as strings and treats anything else as expired. A continuation never
+calls `decide`, so its `ObservedRecord` has `decide_invoked` false.
 
 ## Cross-language verdict comparison
 

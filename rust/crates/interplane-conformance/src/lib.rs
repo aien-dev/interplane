@@ -1,14 +1,16 @@
 //! Conformance runner: executes `conformance/fixtures/NN-*.json` through a fresh pipeline and
 //! mock runtime per case and compares the result with `expected`.
-use std::path::Path;
-
+use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
+use std::path::Path;
+use std::rc::Rc;
 
 use interplane_core::{
     canonicalize, digest, CapabilityRequest, Catalog, Decision, Lifecycle, Limits, RequestLedger,
     ToolResult,
 };
 use interplane_crossaxis::{expand, select};
+use interplane_crossveil::pipeline::{capability_request_digest, PendingApproval};
 use interplane_crossveil::{
     mock_mapping_table, CallContext, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,
 };
@@ -38,6 +40,12 @@ struct Probe<'a> {
     /// `(request_id, capability, canonical arguments)` per `decide`, in order.
     requests: Vec<(String, String, String)>,
     executed: HashSet<String>,
+    /// Harness-only (fixture `mock` step): the catalog digest the runtime reports instead of its own.
+    catalog_override: Rc<RefCell<Option<String>>>,
+    /// Harness-only: true while a negative control re-admits an original request in place of a
+    /// continuation.
+    #[cfg_attr(not(feature = "negative-controls"), allow(dead_code))]
+    readmit: Rc<Cell<bool>>,
     #[cfg(feature = "negative-controls")]
     ctl: Ctl,
 }
@@ -55,7 +63,7 @@ impl RuntimeAuthority for Probe<'_> {
         #[allow(unused_mut)]
         let mut d = self.inner.decide(req, ctx);
         #[cfg(feature = "negative-controls")]
-        negctl::tamper_decision(self.ctl, req, &mut d);
+        negctl::tamper_decision(self.ctl, req, &mut d, self.readmit.get());
         d
     }
     fn execute(
@@ -68,7 +76,11 @@ impl RuntimeAuthority for Probe<'_> {
         self.inner.execute(req, decision, ctx)
     }
     fn catalog(&self) -> Catalog {
-        self.inner.catalog()
+        let mut c = self.inner.catalog();
+        if let Some(d) = self.catalog_override.borrow().clone() {
+            c.catalog_digest = Some(d);
+        }
+        c
     }
 }
 
@@ -91,6 +103,8 @@ pub struct CaseRun {
     /// The injection judge's counts, for fixtures with an `injection` block:
     /// `{injected_intents, violations, content_derived}`.
     pub injection: Option<Value>,
+    /// One row per host `approve` / `cancel` step (CORE.md, Approval continuation).
+    pub continuations: Vec<Value>,
 }
 
 /// Run one fixture document.
@@ -109,11 +123,15 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
     if let Some(o) = fx["mock_provenance"].as_object() {
         rt.provenance_overrides = o.clone();
     }
+    rt.approval_expires_at = fx["mock_approval"]["expires_at"]
+        .as_str()
+        .map(str::to_string);
     let mut observed = vec![];
     let mut turns = vec![];
     let mut results = vec![];
     let mut selections = vec![];
     let mut inputs: Vec<Value> = vec![];
+    let mut continuations: Vec<Value> = vec![];
     let catalog = rt.catalog();
     let mut sel = fx.get("selection").map(|spec| {
         let strings = |k: &str| -> Vec<String> {
@@ -138,24 +156,18 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
         inner: &mut rt,
         requests: vec![],
         executed: HashSet::new(),
+        catalog_override: Rc::new(RefCell::new(None)),
+        readmit: Rc::new(Cell::new(false)),
         #[cfg(feature = "negative-controls")]
         ctl,
     };
+    let catalog_override = probe.catalog_override.clone();
+    #[cfg(feature = "negative-controls")]
+    let readmit = probe.readmit.clone();
+    let steps = fx["steps"].as_array().cloned().unwrap_or_default();
     {
-        let mut p = Pipeline::new(
-            DialectRegistry::with_defaults(),
-            mock_mapping_table(),
-            &mut probe,
-            limits,
-            RequestLedger::new(),
-        );
-        p.message_prefix = format!("m-{case}");
-        if let Some(name) = fx["mapping_table"].as_str() {
-            if let Some(t) = interplane_crossveil::mock_table_by_name(name) {
-                p.table = t;
-            }
-        }
-        for step in fx["steps"].as_array().cloned().unwrap_or_default() {
+        let mut p = build_pipeline(&mut probe, &limits, &case, fx["mapping_table"].as_str());
+        for (step_ix, step) in steps.iter().enumerate() {
             let turn = step["turn"].as_u64().unwrap_or(0);
             if let Some(ex) = step.get("expand") {
                 if let Some(cur) = sel.take() {
@@ -190,6 +202,63 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
                 );
                 results.push(rv);
                 observed.push(o);
+            } else if step.get("restart").is_some() {
+                // The pipeline is dropped and rebuilt over the same runtime: fresh ledger, no
+                // pending approvals.
+                drop(p);
+                p = build_pipeline(&mut probe, &limits, &case, fx["mapping_table"].as_str());
+            } else if let Some(m) = step.get("mock") {
+                *catalog_override.borrow_mut() = m["catalog_digest"].as_str().map(str::to_string);
+            } else if let Some(a) = step.get("approve") {
+                let rid = a["request_id"].as_str().unwrap_or("");
+                let tr = a["trace_id"].as_str().unwrap_or(&trace);
+                let pend = p.pending_approval(tr, rid);
+                #[cfg(feature = "negative-controls")]
+                if is_v6(ctl) {
+                    if let Some(orig) = steps.iter().find_map(|s| {
+                        s.get("envelope")
+                            .filter(|e| e["payload"]["request_id"].as_str() == Some(rid))
+                    }) {
+                        readmit.set(true);
+                        negctl::before_step(ctl, &mut p);
+                        let (r, o) = p.admit_value(orig);
+                        readmit.set(false);
+                        results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
+                        observed.push(o);
+                        continue;
+                    }
+                }
+                #[allow(unused_mut)]
+                let mut d = approval_decision(a, rid, pend.as_ref());
+                #[cfg(feature = "negative-controls")]
+                negctl::approve_any_id(ctl, pend.as_ref(), &mut d);
+                let want_digest = approval_digest(a, pend.as_ref());
+                let now = a["now"].as_str().unwrap_or("2026-01-01T00:00:00Z");
+                let out = p.continue_approval(tr, rid, &d, &want_digest, now);
+                continuations.push(continuation_row(
+                    &p,
+                    step_ix,
+                    "approve",
+                    tr,
+                    rid,
+                    out,
+                    &mut results,
+                    &mut observed,
+                ));
+            } else if let Some(c) = step.get("cancel") {
+                let rid = c["request_id"].as_str().unwrap_or("");
+                let tr = c["trace_id"].as_str().unwrap_or(&trace);
+                let out = p.cancel_approval(tr, rid);
+                continuations.push(continuation_row(
+                    &p,
+                    step_ix,
+                    "cancel",
+                    tr,
+                    rid,
+                    out,
+                    &mut results,
+                    &mut observed,
+                ));
             } else if step.get("input").is_some() && step.get("dialect").is_none() {
                 // Host-only input registration (0.3 cut P3): never reachable from model input.
                 if let Ok(rec) = serde_json::from_value(step["input"].clone()) {
@@ -259,6 +328,91 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
             vec![]
         },
         injection,
+        continuations,
+    }
+}
+
+fn build_pipeline<'a>(
+    rt: &'a mut dyn RuntimeAuthority,
+    limits: &Limits,
+    case: &str,
+    table: Option<&str>,
+) -> Pipeline<'a> {
+    let mut p = Pipeline::new(
+        DialectRegistry::with_defaults(),
+        mock_mapping_table(),
+        rt,
+        *limits,
+        RequestLedger::new(),
+    );
+    p.message_prefix = format!("m-{case}");
+    if let Some(t) = table.and_then(interplane_crossveil::mock_table_by_name) {
+        p.table = t;
+    }
+    p
+}
+
+#[cfg(feature = "negative-controls")]
+fn is_v6(ctl: Ctl) -> bool {
+    ctl == Some(negctl::Variant::V6)
+}
+
+/// The runtime's continuation decision for an `approve` step (CORE.md): built by the fixture's
+/// host side, never by the pipeline.
+fn approval_decision(a: &Value, rid: &str, pend: Option<&PendingApproval>) -> Decision {
+    let v = json!({
+        "kind": "decision",
+        "request_id": rid,
+        "decision": a["decision"].as_str().unwrap_or("authorized"),
+        "capability": pend.map(|p| p.capability_request.capability.clone()),
+        "authority": {"runtime": "mock", "policy_engine": "mock.policy"},
+        "approval": {"approval_id": a["approval_id"].as_str().unwrap_or("")},
+    });
+    serde_json::from_value(v).expect("approve step builds a decision")
+}
+
+/// The capability_request digest the host presents (CORE.md): the pending entry's own, or that of
+/// the pending request with the step's `arguments` substituted, or the digest of `null`.
+fn approval_digest(a: &Value, pend: Option<&PendingApproval>) -> String {
+    match (pend, a.get("arguments")) {
+        (Some(p), Some(args)) => {
+            let mut c = p.capability_request.clone();
+            c.arguments = args.as_object().cloned().unwrap_or_default();
+            capability_request_digest(&c)
+        }
+        (Some(p), None) => p.request_digest.clone(),
+        (None, _) => digest(&Value::Null),
+    }
+}
+
+/// Record one continuation or cancel outcome: results, observed records, and the verdict row.
+#[allow(clippy::too_many_arguments)]
+fn continuation_row(
+    p: &Pipeline<'_>,
+    step: usize,
+    kind: &str,
+    trace: &str,
+    rid: &str,
+    out: Result<(ToolResult, ObservedRecord), interplane_crossveil::pipeline::Refusal>,
+    results: &mut Vec<Value>,
+    observed: &mut Vec<ObservedRecord>,
+) -> Value {
+    let stage = p
+        .pending_approval(trace, rid)
+        .map_or(Value::Null, |e| json!(e.state.name()));
+    match out {
+        Ok((r, o)) => {
+            let message = r
+                .error
+                .as_ref()
+                .map_or(Value::Null, |e| json!(e.message.clone()));
+            results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
+            observed.push(o);
+            json!({"step": step, "kind": kind, "request_id": rid, "outcome": "resolved",
+                "stage": stage, "reason": null, "message": message})
+        }
+        Err(e) => json!({"step": step, "kind": kind, "request_id": rid, "outcome": "refused",
+            "stage": stage, "reason": e.as_str(), "message": null}),
     }
 }
 
@@ -353,6 +507,15 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
     if let Some(want) = exp.get("selections") {
         if want != &Value::Array(run.selections.clone()) {
             errs.push("selections differ from expected".to_string());
+        }
+    }
+    if let Some(want) = exp.get("continuations") {
+        if want != &Value::Array(run.continuations.clone()) {
+            errs.push(format!(
+                "continuations: expected {}, got {}",
+                canonicalize(want),
+                canonicalize(&Value::Array(run.continuations.clone()))
+            ));
         }
     }
     if let Some(want) = exp.get("inputs").and_then(Value::as_array) {
@@ -451,6 +614,9 @@ pub fn verdict(run: &CaseRun, errs: &[String]) -> Value {
     if let Some(j) = &run.injection {
         v["injection"] = j.clone();
     }
+    if !run.continuations.is_empty() {
+        v["continuations"] = Value::Array(run.continuations.clone());
+    }
     v
 }
 
@@ -482,6 +648,15 @@ pub fn load_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
 /// Load `injection/NN-*.json` fixtures (0.3 cut I1), sorted by file name. Absent directory = none.
 pub fn load_injection_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
     let sub = dir.join("injection");
+    if !sub.is_dir() {
+        return Ok(vec![]);
+    }
+    load_fixtures(&sub)
+}
+
+/// Load `approval/NN-*.json` fixtures (0.3 cut A2), sorted by file name. Absent directory = none.
+pub fn load_approval_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
+    let sub = dir.join("approval");
     if !sub.is_dir() {
         return Ok(vec![]);
     }
@@ -667,10 +842,12 @@ pub fn run_suite(dir: &Path, ctl: Ctl) -> Result<Suite, String> {
     let mut rows = vec![];
     let mut outcomes = vec![];
     let injection = load_injection_fixtures(dir)?;
+    let approval = load_approval_fixtures(dir)?;
     for (tag, fx) in fixtures
         .iter()
         .map(|f| (None, f))
         .chain(injection.iter().map(|f| (Some("in"), f)))
+        .chain(approval.iter().map(|f| (Some("ap"), f)))
     {
         let run = run_case_with(fx, ctl);
         let errs = compare(fx, &run);

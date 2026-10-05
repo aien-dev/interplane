@@ -508,3 +508,78 @@ def test_input_registration_is_not_reachable_from_an_envelope():
     result, _ = pipe.admit_envelope(env)
     assert result.error.code == ErrorCode.MALFORMED_ENVELOPE
     assert pipe.inputs("t") == []
+
+
+# ---- host approval continuation (0.3 cut A2) ----
+
+PINNED_DIGEST = "sha256:be3ae35c3a1f72b4a403479b1f03589af2568892b47f58b48397fdcf2d7090a5"
+
+
+def _continuation(rid, aid, kind="authorized"):
+    return Decision.from_dict(
+        {
+            "kind": "decision",
+            "request_id": rid,
+            "decision": kind,
+            "capability": "delete_file",
+            "authority": {"runtime": "mock", "policy_engine": "mock.policy"},
+            "approval": {"approval_id": aid},
+        }
+    )
+
+
+def _pending_delete(pipe):
+    run(pipe, "delete_file", {"path": "/tmp/x"})
+    return pipe.pending_approval("t", "c1")
+
+
+def test_request_digest_is_pinned_and_matches_rust():
+    pa = _pending_delete(pipe_with(MockRuntime()))
+    assert pa.request_digest == PINNED_DIGEST
+    assert pa.approval_id == "mock-approval-c1"
+
+
+def test_continuation_executes_once_and_never_calls_decide():
+    from interplane.crossveil import ContinuationRefused
+
+    rt = MockRuntime()
+    pipe = pipe_with(rt)
+    pa = _pending_delete(pipe)
+    d = _continuation("c1", pa.approval_id)
+    res, rec = pipe.continue_approval("t", "c1", d, pa.request_digest, "2026-01-01T00:00:00Z")
+    assert res.status == "ok"
+    assert (rec.stage, rec.decide_invoked, rec.execute_invoked) == ("SUCCEEDED", False, True)
+    with pytest.raises(ContinuationRefused):
+        pipe.continue_approval("t", "c1", d, pa.request_digest, "2026-01-01T00:00:00Z")
+    assert (rt.decide_calls, rt.execute_calls) == (1, 1)
+
+
+@pytest.mark.parametrize(
+    "expires,now",
+    [
+        ("2026-06-01T00:00:00Z", "yesterday"),
+        ("2026-06-01", "2026-01-01T00:00:00Z"),
+        ("2026-06-01T00:00:00Z", "2026-06-01T00:00:00Z"),
+        ("2026-06-01T00:00:00Z", "2026-13-01T00:00:00Z"),
+    ],
+)
+def test_unreadable_clock_or_expiry_counts_as_expired(expires, now):
+    rt = MockRuntime()
+    rt.approval_expires_at = expires
+    pipe = pipe_with(rt)
+    pa = _pending_delete(pipe)
+    d = _continuation("c1", pa.approval_id)
+    res, _ = pipe.continue_approval("t", "c1", d, pa.request_digest, now)
+    assert res.status == "denied" and res.error.message == "approval expired"
+
+
+def test_continuation_leaves_the_request_ledger_alone_and_feeds_the_exposure_ledger():
+    pipe = pipe_with(MockRuntime())
+    pa = _pending_delete(pipe)
+    before = len(pipe.inputs("t"))
+    d = _continuation("c1", pa.approval_id)
+    _, rec = pipe.continue_approval("t", "c1", d, pa.request_digest, "2026-01-01T00:00:00Z")
+    assert len(pipe.inputs("t")) == before + 1
+    assert pipe.inputs("t")[-1]["content_digest"] == rec.result_digest
+    out = run(pipe, "delete_file", {"path": "/tmp/x"}, turn=1)
+    assert out.results[0].error.code == ErrorCode.DUPLICATE_REQUEST_ID

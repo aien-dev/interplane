@@ -1,0 +1,99 @@
+{
+  "case": "approval-A01-authorized-continuation",
+  "description": "delete_file requires approval. The host continues with the runtime-minted approval_id, the same capability_request and an unexpired approval: AUTHORIZED, execute 1.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-a01",
+  "mock_approval": {
+    "expires_at": "2026-06-01T00:00:00Z"
+  },
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-approval-A01-authorized-continuation-0",
+        "trace_id": "trace-a01",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "call_a01",
+          "tool": {
+            "namespace": null,
+            "name": "delete_file"
+          },
+          "arguments": {
+            "path": "/tmp/old.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "delete_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a01",
+        "approval_id": "mock-approval-call_a01"
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_a01",
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_a01",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": false,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "continuations": [
+      {
+        "step": 1,
+        "kind": "approve",
+        "request_id": "call_a01",
+        "outcome": "resolved",
+        "stage": "SUCCEEDED",
+        "reason": null,
+        "message": null
+      }
+    ]
+  }
+}

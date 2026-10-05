@@ -8,7 +8,9 @@ pub mod mock;
 pub mod pipeline;
 
 pub use mock::{mock_mapping_table, mock_mapping_table_stale, mock_table_by_name, MockRuntime};
-pub use pipeline::{ObservedRecord, Pipeline, TurnOutcome};
+pub use pipeline::{
+    capability_request_digest, ObservedRecord, PendingApproval, Pipeline, Refusal, TurnOutcome,
+};
 
 /// What the pipeline passes through, untouched, to the runtime callbacks.
 #[derive(Debug, Clone)]

@@ -979,6 +979,13 @@ class Lifecycle:
             return self._state
         raise LifecycleError(f"cannot decide in state {self._state.value}")
 
+    def cancel(self) -> State:
+        """REQUIRES_APPROVAL -> DENIED without a decision: a host cancel, or a continuation the
+        pipeline refused to honour (fail closed). It can only deny."""
+        self._require(State.REQUIRES_APPROVAL)
+        self._state = State.DENIED
+        return self._state
+
     def start_execution(self) -> State:
         self._require(State.AUTHORIZED)
         if self._decision is None or not self._decision.is_authorized:

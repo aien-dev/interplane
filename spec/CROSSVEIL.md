@@ -19,12 +19,41 @@ Rules the pipeline enforces (and conformance tests):
 3. A decision with an unknown `decision` value is treated as `denied` (`unknown_decision`).
 4. `requires_approval` returns to the model as `requires_approval`; only a later runtime decision
    that carries `approval.approval_id` minted by the runtime can turn it into `authorized`. Anything
-   a model puts in `arguments` or `extensions` is never read as approval.
+   a model puts in `arguments` or `extensions` is never read as approval. The later decision
+   arrives through a host-only continuation call (see below), never through the model's channel.
 5. Adapter exceptions in `decide` become `denied` with `runtime_unavailable`; in `execute` they become
    `error` with `execution_error`. Fail closed.
 6. The adapter, not INTERPLANE, decides the trust class of the returned data
    (`result.provenance.trust` and `result.provenance.content_kind`). Defaults when the adapter says
    nothing: `tool_result` + `unknown` (fail closed; see Crossveil Trust below).
+
+## Approval continuation (host-controlled)
+
+`requires_approval` is not the end of the road, but only the host can continue it. The pipeline
+exposes `continue_approval` and `cancel_approval` to the host process; nothing a model produced
+(`tool_request`, `arguments`, `extensions`, an envelope, free text) reaches them, and none of it is
+read as a grant. The normative contract is in `CORE.md` (Approval continuation); the rules are:
+
+1. **Correlation.** `trace_id` + `request_id` + the `approval_id` the runtime minted for that request
+   + the digest of the original `capability_request`. A continuation for changed arguments, another
+   capability, another request or an `approval_id` minted for something else is refused: the request
+   is DENIED and stays DENIED. The approval covers the exact effect that will run, not a class of
+   effects that sounds like it.
+2. **Expiry.** `approval.expires_at` as minted is checked against the host's clock. Expired is DENIED.
+3. **Catalog.** A runtime catalog that changed between pending and continuation is `stale_capability`
+   and DENIED.
+4. **Cancellation** by the host is DENIED and terminal.
+5. **Replay.** A second continuation of the same request, or of one that is no longer pending, is
+   refused and changes nothing. Continuation is a transition on the existing request, never a
+   re-admission, so `replayed_message` and `duplicate_request_id` stay on. A runtime's own
+   idempotency (a receipt ledger) is separate and is not used for this.
+6. **Restart.** Pending state is in memory. After a restart a pending request cannot be continued
+   (fail closed); the host starts a new request.
+7. `decide` is not called again at continuation, the pipeline still never builds an `authorized`
+   decision, and `execute` runs at most once per request.
+
+Evidence: cases A01 to A14 of `bench/PROTOCOL-0.3.md` (`conformance/fixtures/approval/`), identical
+verdicts in Rust and Python.
 
 ## State record
 

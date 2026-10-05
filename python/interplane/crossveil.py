@@ -6,6 +6,7 @@ never fabricates or caches a decision, and fails closed on every adapter fault.
 """
 
 import copy
+import re
 from dataclasses import dataclass, field
 from typing import Any, Optional, Protocol, runtime_checkable
 
@@ -232,6 +233,59 @@ _RANK_TRUST = {3: "trusted_runtime", 2: "user_supplied", 1: "workspace_untrusted
 _FAIL_CLOSED_EXPOSURE = {"inputs": [], "floor": "external_untrusted"}
 
 
+class ContinuationRefused(Exception):
+    """A host continuation or cancel was refused: nothing changed, nothing ran (CORE.md)."""
+
+    def __init__(self, reason: str = "no_pending_approval") -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
+@dataclass
+class PendingApproval:
+    """Read-only view of an approval entry, for the host."""
+
+    request_id: str
+    approval_id: str
+    expires_at: Optional[str]
+    request_digest: str
+    capability_request: CapabilityRequest
+    state: State
+
+
+@dataclass
+class _PendingEntry:
+    life: Lifecycle
+    cap_req: CapabilityRequest
+    ctx: dict
+    approval_id: str
+    expires_at: Optional[str]
+    request_digest: str
+    catalog_digest: Optional[str]
+
+
+def capability_request_digest(cap_req: CapabilityRequest) -> str:
+    """Digest that binds an approval to its exact capability_request (JCS, ``sha256:``)."""
+    return digest(cap_req.to_dict())
+
+
+_UTC = re.compile(r"\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z\Z", re.ASCII)
+
+
+def _utc_shape(value: Any) -> bool:
+    """``YYYY-MM-DDTHH:MM:SSZ`` (UTC, fixed width) with in-range fields."""
+    m = _UTC.match(value) if isinstance(value, str) else None
+    if m is None:
+        return False
+    _, month, day, hour, minute, second = (int(g) for g in m.groups())
+    return 1 <= month <= 12 and 1 <= day <= 31 and hour <= 23 and minute <= 59 and second <= 59
+
+
+def _approval_expired(expires_at: Any, now: Any) -> bool:
+    """Expired when ``now >= expires_at``; anything not of the exact shape counts as expired."""
+    return not _utc_shape(expires_at) or not _utc_shape(now) or now >= expires_at
+
+
 class Pipeline:
     """Reference pipeline: Lenshift.parse -> Core.admit -> CrossAxis.map -> decide -> execute."""
 
@@ -252,6 +306,9 @@ class Pipeline:
         self._seq: dict = {}
         self._pending: dict = {}  # trace_id -> True while results await a model continuation
         self._inputs: dict = {}  # trace_id -> [InputRecord, ...] in order (0.3 cut P3)
+        # (trace_id, request_id) -> _PendingEntry. Host-only: only continue_approval and
+        # cancel_approval read or change it; a new pipeline starts empty (0.3 cut A1/A2).
+        self._pending: dict = {}
 
     # -- input ledger and exposure (0.3 cut P3) -----------------------------------
     def register_input(self, record: Any) -> InputRecord:
@@ -289,6 +346,9 @@ class Pipeline:
 
     def _record_result(self, trace_id: str, result: ToolResult, rendered: Any) -> None:
         """Record a rendered result as an input of the trace (``parent_id`` = its request id)."""
+        self._push_result_input(trace_id, result, digest(rendered))
+
+    def _push_result_input(self, trace_id: str, result: ToolResult, content_digest: str) -> None:
         prov = result.provenance or {}
         ledger = self._inputs.setdefault(trace_id, [])
         n = sum(1 for r in ledger if r.input_id.startswith("in-auto-"))
@@ -303,7 +363,7 @@ class Pipeline:
                 trust=prov.get("trust") or DEFAULT_TRUST,
                 source=Party(kind="runtime", id=rid),
                 origin=f"runtime:{rid}",
-                content_digest=digest(rendered),
+                content_digest=content_digest,
                 trace_id=trace_id,
                 parent_id=result.request_id,
                 derived_from=[],
@@ -473,34 +533,7 @@ class Pipeline:
         value = decision.decision
 
         if state is State.AUTHORIZED:
-            life.start_execution()
-            self._emit(trace_id, "tool_execution_started", rid, turn)
-            try:
-                res = self.runtime.execute(copy.deepcopy(cap_req), decision, ctx)
-                if isinstance(res, dict):
-                    res = ToolResult.from_dict(res)
-                if not isinstance(res, ToolResult) or res.status not in (
-                    "ok",
-                    "error",
-                    "timed_out",
-                ):
-                    raise TypeError("execute returned an invalid result")
-                if res.status != "ok" and res.error is None:
-                    raise TypeError("failed result without an error")
-                res = _normalize_executed(res, rid, runtime_id, cap)
-            except Exception:  # noqa: BLE001 - fail closed
-                res = make_result(
-                    rid,
-                    "error",
-                    runtime=runtime_id,
-                    capability=cap,
-                    code=ErrorCode.EXECUTION_ERROR,
-                    message="execution failed",
-                    content_kind=DEFAULT_CONTENT_KIND,
-                    trust=DEFAULT_TRUST,
-                )
-            life.finish(res.status)
-            return self._complete(life, res, value, True, True, trace_id, turn)
+            return self._execute_authorized(life, cap_req, decision, ctx, True, trace_id, turn)
 
         reason = decision.reason or ""
         if state is State.REQUIRES_APPROVAL:
@@ -528,7 +561,155 @@ class Pipeline:
             message=reason,
             decision=decision,
         )
+        if state is State.REQUIRES_APPROVAL and decision.approval_id:
+            self._pending[(trace_id, rid)] = _PendingEntry(
+                life=life,
+                cap_req=copy.deepcopy(cap_req),
+                ctx=copy.deepcopy(ctx),
+                approval_id=decision.approval_id,
+                expires_at=(decision.approval or {}).get("expires_at"),
+                request_digest=capability_request_digest(cap_req),
+                catalog_digest=self._live_catalog_digest(),
+            )
         return self._complete(life, res, value, True, False, trace_id, turn)
+
+    def _live_catalog_digest(self) -> Optional[str]:
+        """The runtime's catalog digest now; None when the catalog cannot be read (fail closed)."""
+        try:
+            cat = self.runtime.catalog()
+            return cat.catalog_digest or cat.computed_digest()
+        except Exception:  # noqa: BLE001
+            return None
+
+    # -- host-only approval continuation (0.3 cut A1/A2) ---------------------------------
+    def pending_approval(self, trace_id: str, request_id: str) -> Optional[PendingApproval]:
+        """Host-only: read-only view of the approval entry for ``(trace_id, request_id)``. Not
+        reachable from model output or an envelope."""
+        p = self._pending.get((trace_id, request_id))
+        if p is None:
+            return None
+        return PendingApproval(
+            request_id=request_id,
+            approval_id=p.approval_id,
+            expires_at=p.expires_at,
+            request_digest=p.request_digest,
+            capability_request=copy.deepcopy(p.cap_req),
+            state=p.life.state,
+        )
+
+    def _live_pending(self, trace_id: str, request_id: str) -> _PendingEntry:
+        p = self._pending.get((trace_id, request_id))
+        if p is None or p.life.state is not State.REQUIRES_APPROVAL:
+            raise ContinuationRefused("no_pending_approval")
+        return p
+
+    def continue_approval(
+        self,
+        trace_id: str,
+        request_id: str,
+        decision: Decision,
+        request_digest: str,
+        now: str,
+    ) -> tuple:
+        """Host-only: continue a request that required approval; returns ``(ToolResult,
+        ObservedRecord)`` or raises ``ContinuationRefused``. ``decision`` is the runtime's own
+        continuation decision, ``request_digest`` the digest of the capability_request the host
+        believes was approved, ``now`` the host clock (``YYYY-MM-DDTHH:MM:SSZ``). The order of
+        checks is pinned in CORE.md (Approval continuation). A request with no live pending entry
+        is refused and nothing changes. A failed check on a pending entry denies it for good; only
+        ``authorized`` with everything matching executes, at most once. Never calls ``decide`` and
+        never touches the request ledger."""
+        p = self._live_pending(trace_id, request_id)
+        live = self._live_catalog_digest()
+        denial = None
+        if decision.request_id != request_id:
+            denial = (ErrorCode.UNKNOWN_DECISION, "unknown decision value: mismatched request_id")
+        elif decision.approval_id != p.approval_id:
+            denial = (ErrorCode.POLICY_DENIED, "approval refused: approval_id does not match")
+        elif request_digest != p.request_digest:
+            msg = "approval refused: capability_request digest does not match"
+            denial = (ErrorCode.POLICY_DENIED, msg)
+        elif p.expires_at is not None and _approval_expired(p.expires_at, now):
+            denial = (ErrorCode.POLICY_DENIED, "approval expired")
+        elif live is None or live != p.catalog_digest:
+            msg = "runtime catalog changed since approval was requested"
+            denial = (ErrorCode.STALE_CAPABILITY, msg)
+        elif decision.decision == "denied":
+            msg = decision.reason or "denied by runtime policy"
+            denial = (ErrorCode.POLICY_DENIED, msg)
+        elif decision.decision != "authorized":
+            denial = (ErrorCode.UNKNOWN_DECISION, f"unknown decision value: {decision.decision}")
+        self._emit(trace_id, "tool_decision", request_id, None, {"decision": decision.decision})
+        if denial is not None:
+            embed = decision if decision.decision == "denied" and denial[0] == ErrorCode.POLICY_DENIED else None
+            out = self._deny_pending(p, trace_id, denial[0], denial[1], embed)
+        else:
+            try:
+                state = p.life.apply_decision(decision)
+            except LifecycleError:
+                state = None
+            if state is State.AUTHORIZED:
+                out = self._execute_authorized(
+                    p.life, p.cap_req, decision, p.ctx, False, trace_id, None
+                )
+            else:
+                msg = "unknown decision value: mismatched request_id"
+                out = self._deny_pending(p, trace_id, ErrorCode.UNKNOWN_DECISION, msg, None)
+        self._push_result_input(trace_id, out[0], out[1].result_digest)
+        return out
+
+    def cancel_approval(self, trace_id: str, request_id: str) -> tuple:
+        """Host-only: cancel a pending approval; DENIED is terminal. Anything that is not pending
+        raises ``ContinuationRefused`` and nothing changes."""
+        p = self._live_pending(trace_id, request_id)
+        out = self._deny_pending(
+            p, trace_id, ErrorCode.POLICY_DENIED, "approval cancelled by host", None
+        )
+        self._push_result_input(trace_id, out[0], out[1].result_digest)
+        return out
+
+    def _deny_pending(self, p, trace_id, code, message, embed) -> tuple:
+        """REQUIRES_APPROVAL -> DENIED for a pending entry: result, record, event. No execute."""
+        p.life.cancel()
+        res = make_result(
+            p.cap_req.request_id,
+            "denied",
+            runtime=self._runtime_id(),
+            capability=p.cap_req.capability,
+            code=code,
+            message=message,
+            decision=embed,
+        )
+        return self._complete(p.life, res, "denied", False, False, trace_id, None)
+
+    def _execute_authorized(self, life, cap_req, decision, ctx, decided, trace_id, turn):
+        """AUTHORIZED -> EXECUTING -> terminal, shared by the first decision and a host
+        continuation. ``decided`` says whether ``decide`` ran in this call."""
+        rid, cap, runtime_id = cap_req.request_id, cap_req.capability, self._runtime_id()
+        life.start_execution()
+        self._emit(trace_id, "tool_execution_started", rid, turn)
+        try:
+            res = self.runtime.execute(copy.deepcopy(cap_req), decision, ctx)
+            if isinstance(res, dict):
+                res = ToolResult.from_dict(res)
+            if not isinstance(res, ToolResult) or res.status not in ("ok", "error", "timed_out"):
+                raise TypeError("execute returned an invalid result")
+            if res.status != "ok" and res.error is None:
+                raise TypeError("failed result without an error")
+            res = _normalize_executed(res, rid, runtime_id, cap)
+        except Exception:  # noqa: BLE001 - fail closed
+            res = make_result(
+                rid,
+                "error",
+                runtime=runtime_id,
+                capability=cap,
+                code=ErrorCode.EXECUTION_ERROR,
+                message="execution failed",
+                content_kind=DEFAULT_CONTENT_KIND,
+                trust=DEFAULT_TRUST,
+            )
+        life.finish(res.status)
+        return self._complete(life, res, "authorized", decided, True, trace_id, turn)
 
     def _fail_closed(self, life, trace_id, rid, cap, code, message, decision_value, turn):
         """Denial for a decide fault or an unknown decision value. The runtime was reached."""
@@ -819,6 +1000,9 @@ class MockRuntime:
         # an executed result in place of the defaults, as a mislabelling adapter would. Set by the
         # conformance runner from a fixture's mock_provenance; never read from model content.
         self.provenance_overrides: dict = {}
+        # Harness-only: the expires_at the mock mints in the approval of delete_file (a fixture's
+        # mock_approval.expires_at). Never read from arguments, extensions or envelopes.
+        self.approval_expires_at: Optional[str] = None
 
     def catalog(self) -> Catalog:
         return mock_catalog()
@@ -873,7 +1057,11 @@ class MockRuntime:
         if req.capability == "send_email":
             return self._decision(req, "denied", "mock policy: external side effects are denied")
         if req.capability == "delete_file":
-            approval = {"approval_id": f"mock-approval-{req.request_id}", "scope": "single_action"}
+            approval = {
+                "approval_id": f"mock-approval-{req.request_id}",
+                "scope": "single_action",
+                "expires_at": self.approval_expires_at,
+            }
             return self._decision(req, "requires_approval", None, approval)
         return self._decision(req, "authorized")
 
@@ -892,6 +1080,9 @@ class MockRuntime:
                 trust=trust,
             )
 
+        if cap == "delete_file":
+            # Reached only through an approved continuation; no filesystem is touched.
+            return ok({"path": args["path"], "deleted": True})
         if cap == "read_file":
             return ok({"path": args["path"], "content": f"mock content of {args['path']}"})
         if cap == "list_dir":

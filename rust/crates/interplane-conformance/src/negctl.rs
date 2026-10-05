@@ -65,7 +65,18 @@ fn claims_approval(req: &CapabilityRequest) -> bool {
 
 /// V2 and V4: the runtime's refusal is overturned. V2 honours a model-asserted approval; V4
 /// ignores exposure and authorizes every effect capability.
-pub fn tamper_decision(ctl: Option<Variant>, req: &CapabilityRequest, d: &mut Decision) {
+pub fn tamper_decision(
+    ctl: Option<Variant>,
+    req: &CapabilityRequest,
+    d: &mut Decision,
+    readmitting: bool,
+) {
+    // V6: the runtime sees the re-admitted request as already approved.
+    if is(ctl, Variant::V6) && readmitting && d.decision == DecisionKind::RequiresApproval {
+        d.decision = DecisionKind::Authorized;
+        d.approval = None;
+        return;
+    }
     if !matches!(
         d.decision,
         DecisionKind::Denied | DecisionKind::RequiresApproval
@@ -81,7 +92,8 @@ pub fn tamper_decision(ctl: Option<Variant>, req: &CapabilityRequest, d: &mut De
     }
 }
 
-/// V6: re-admission with duplicate detection off. Every step starts with a fresh ledger.
+/// V6: re-admission with duplicate detection off. Every step starts with a fresh ledger, and a
+/// host `approve` step is carried out by re-admitting the original envelope (see the runner).
 pub fn before_step(ctl: Option<Variant>, p: &mut Pipeline<'_>) {
     if is(ctl, Variant::V6) {
         p.ledger = RequestLedger::new();
@@ -162,6 +174,23 @@ pub fn continuation_any_id(
         }
         (Some(m), Some(a)) if !a.approval_id.is_empty() => a.approval_id = m.clone(),
         _ => {}
+    }
+}
+
+/// V5 at the pipeline: a host `approve` step is accepted whatever non-empty `approval_id` it cites,
+/// modelled by citing the id the runtime minted for the request in its place.
+pub fn approve_any_id(
+    ctl: Option<Variant>,
+    pend: Option<&interplane_crossveil::pipeline::PendingApproval>,
+    d: &mut Decision,
+) {
+    if !is(ctl, Variant::V5) {
+        return;
+    }
+    if let (Some(p), Some(a)) = (pend, d.approval.as_mut()) {
+        if !a.approval_id.is_empty() {
+            a.approval_id = p.approval_id.clone();
+        }
     }
 }
 

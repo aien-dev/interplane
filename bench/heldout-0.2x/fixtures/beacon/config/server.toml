@@ -1,0 +1,4 @@
+# Status server
+port = 9361
+bind = "0.0.0.0"
+workers = 3

@@ -12,11 +12,14 @@ Success delta theta = p_B - p_A = (f - g) / n.
 * ``mcnemar_exact``: two-sided exact binomial test on the discordant pairs (f, g), p = 1/2.
 
 Run ``python3 bench/tools/stats.py`` to self-test and print the gate feasibility table.
+``python3 bench/tools/stats.py --power`` prints the seeded power simulation behind the sample
+size of bench/PROTOCOL-0.2x.md (section 7).
 """
 
 from __future__ import annotations
 
 import math
+import random
 import sys
 
 Z95 = 1.959963984540054
@@ -121,7 +124,52 @@ def feasibility(n: int, max_discordant: int = 4) -> list:
     return rows
 
 
+def power(n: int, discordance: float, theta: float = 0.0, both_succeed: float = 0.75,
+          trials: int = 3000, seed: int = 1) -> float:
+    """Share of simulated paired runs in which the S criterion (``success_gate`` non_inferior)
+    holds. Each of ``n`` pairs is B-only with p = (discordance + theta) / 2, A-only with
+    p = (discordance - theta) / 2, both-succeed with ``both_succeed``, else both-fail.
+    Seeded, so the table is reproducible byte for byte."""
+    if discordance < abs(theta):
+        raise ValueError("discordance must be at least |theta|")
+    rng = random.Random(seed)
+    pf, pg = (discordance + theta) / 2, (discordance - theta) / 2
+    hits = 0
+    for _ in range(trials):
+        e = f = g = h = 0
+        for _ in range(n):
+            r = rng.random()
+            if r < pf:
+                f += 1
+            elif r < pf + pg:
+                g += 1
+            elif r < pf + pg + both_succeed:
+                e += 1
+            else:
+                h += 1
+        hits += success_gate(e, f, g, h)["non_inferior"]
+    return hits / trials
+
+
+POWER_NS = (60, 80, 100, 120, 150)
+POWER_DISCORDANCE = (0.08, 0.12, 0.16, 0.20)
+
+
+def power_table() -> None:
+    print("S criterion pass rate (seed 1, 3000 trials per cell, both-succeed 0.75)")
+    print("true delta 0 (power):     n  " + "  ".join(f"pd={d:.2f}" for d in POWER_DISCORDANCE))
+    for n in POWER_NS:
+        print(f"                       {n:>3}  " + "  ".join(f"{power(n, d):7.3f}" for d in POWER_DISCORDANCE))
+    print("true delta -0.10 (false pass rate at the margin):")
+    for n in POWER_NS:
+        print(f"                       {n:>3}  " + "  ".join(
+            f"{power(n, d, theta=-0.10):7.3f}" if d >= 0.10 else "    n/a" for d in POWER_DISCORDANCE))
+
+
 def main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--power":
+        power_table()
+        return 0
     bad = selftest()
     print(f"newcombe10 vs Newcombe 1998 Table III (method 10): {len(TABLE_III_M10) - len(bad)}/{len(TABLE_III_M10)} rows match")
     for b in bad:

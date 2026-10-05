@@ -30,6 +30,8 @@ jobs:
       - run: pip install -c constraints/ci-python.txt jsonschema
       - name: bench corpus structure, domain rule, coverage, digests (no model, no GPU)
         run: python bench/tools/validate.py --require-jsonschema
+      - name: 0.2x held-out corpus structure, coverage, composition, digests (no model, no GPU)
+        run: python bench/tools/validate.py --corpus 0.2x --require-jsonschema
       - name: pre-registered statistics reproduce Newcombe 1998 Table III
         run: python bench/tools/stats.py
       - name: analyzer tests and synthetic-run fixture (no model, no GPU)

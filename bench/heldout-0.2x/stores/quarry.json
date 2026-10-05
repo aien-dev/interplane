@@ -1,0 +1,39 @@
+{
+  "_note": "Private-data store for heldout-0.2x/fixtures/quarry (backends sim-1). Holds no expansion answer.",
+  "notes": [],
+  "memory": [
+    {
+      "id": "m-q1",
+      "category": "preference",
+      "text": "Prefers UTC times."
+    }
+  ],
+  "calendar": [
+    {
+      "uid": "ev-q1",
+      "summary": "Rota handover",
+      "dtstart": "2026-11-02T09:00",
+      "location": "Control room"
+    }
+  ],
+  "contacts": [
+    {
+      "uid": "c-q1",
+      "name": "Lena Varga",
+      "emails": [
+        "lena.varga@quarry.example"
+      ],
+      "phones": [
+        "+31 20 555 0144"
+      ]
+    }
+  ],
+  "documents": [],
+  "models": [
+    {
+      "name": "alert-scorer-1",
+      "endpoint": "local"
+    }
+  ],
+  "tokens": []
+}

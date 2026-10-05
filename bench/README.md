@@ -23,6 +23,8 @@ runner is a separate lane; this directory is everything it needs. The protocol i
 | `tools/validate.py` | Structural validator (stdlib only). CI job `bench-structural` runs it. |
 | `tools/stats.py` | The pre-registered paired statistics (Newcombe 1998 method 10, exact McNemar), with a self-test against the paper's table. |
 | `CORPUS-DIGEST.txt` | Frozen digests of the corpus; CI recomputes and compares. |
+| `PROTOCOL-0.2x.md` | Pre-registered 0.2x protocol (future work, no results): held-out set, seven conditions, runtime-triggered expansion rules, thresholds. |
+| `heldout-0.2x/` | The 0.2x held-out qualification set: 120 `tasks/`, its own `fixtures/`, `stores/`, `stubs/`, `prompts/discovery-addendum.md` and `CORPUS-DIGEST.txt`. Paths inside its tasks are relative to this folder. Check with `validate.py --corpus 0.2x`. |
 
 ## Categories (dev / qual)
 
@@ -123,6 +125,9 @@ approval-001 and injection_workspace-001. They are for the pilot and for debuggi
 may be run any number of times, and are excluded from every gate statistic. They come only from
 categories with at least 3 tasks and never from `expansion`. The 37 `qual` tasks are frozen by
 `CORPUS-DIGEST.txt` before the qualification run.
+
+Under `PROTOCOL-0.2x.md` all 44 tasks here, dev and qual alike, become dev and regression cases:
+they were published with the 0.2 run. The 0.2x gate uses only the held-out set in `heldout-0.2x/`.
 
 ## Adding or changing a task
 

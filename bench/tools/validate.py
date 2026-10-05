@@ -9,11 +9,14 @@ uncovered by the initial selection, all others covered), per-category rules, spl
 the frozen digests in bench/CORPUS-DIGEST.txt. Backend coverage (bench/stubs/backends.json, sim-1):
 every tool a task lists has a working backend, every simulator runs deterministically on every
 fixture, and no private-data store holds the answer of an expansion task on its fixture.
+``--corpus 0.2x`` applies the same checks to the held-out set bench/heldout-0.2x (PROTOCOL-0.2x.md)
+plus its fixed composition, against bench/heldout-0.2x/CORPUS-DIGEST.txt.
 
   python3 bench/tools/validate.py                  validate, compare digests
   python3 bench/tools/validate.py --write-digest   validate, then (re)write CORPUS-DIGEST.txt
   python3 bench/tools/validate.py --require-jsonschema   also validate with the jsonschema package
   python3 bench/tools/validate.py --derive "text"  print the requested_domains for a request
+  python3 bench/tools/validate.py --corpus 0.2x   validate the held-out set instead
 """
 
 from __future__ import annotations
@@ -33,13 +36,45 @@ REPO = BENCH.parent
 CATALOG_PATH = REPO / "adapters" / "odysseus" / "catalog.odysseus-2992bf6.json"
 SCHEMA_PATH = BENCH / "schema" / "task.schema.json"
 DOMAINS_PATH = BENCH / "domains.json"
-DIGEST_PATH = BENCH / "CORPUS-DIGEST.txt"
-PROTOCOL_PATH = BENCH / "PROTOCOL-0.2.md"
 # The reference adapter executes only these (adapters/odysseus/interplane_adapter_odysseus/authority.py).
 EXECUTABLE = frozenset({"read_file", "ls", "glob", "grep"})
-INPUT_ROOTS = ("domains.json", "prompts", "schema", "fixtures", "stubs", "tasks")
+# One entry per frozen corpus. 0.2 is the published corpus (now dev/regression only);
+# 0.2x is the held-out qualification set of bench/PROTOCOL-0.2x.md.
+CORPORA = {
+    "0.2": {
+        "root": BENCH,
+        "tasks": BENCH / "tasks",
+        "digest": BENCH / "CORPUS-DIGEST.txt",
+        "protocol": BENCH / "PROTOCOL-0.2.md",
+        "inputs": ("domains.json", "prompts", "schema", "fixtures", "stubs", "tasks"),
+        "stores": BENCH / "stubs" / "stores",
+        "header": "# INTERPLANE 0.2 bench corpus digests. Recomputed and compared by bench/tools/validate.py (CI job bench-structural).",
+    },
+    "0.2x": {
+        "root": BENCH / "heldout-0.2x",
+        "tasks": BENCH / "heldout-0.2x" / "tasks",
+        "digest": BENCH / "heldout-0.2x" / "CORPUS-DIGEST.txt",
+        "protocol": BENCH / "PROTOCOL-0.2x.md",
+        "inputs": ("domains.json", "prompts", "schema", "stubs/backends.json", "tools/sim_backends.py",
+                   "heldout-0.2x/fixtures", "heldout-0.2x/prompts", "heldout-0.2x/stores",
+                   "heldout-0.2x/stubs", "heldout-0.2x/tasks"),
+        "stores": BENCH / "heldout-0.2x" / "stores",
+        "header": "# INTERPLANE 0.2x held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2x (CI job bench-structural).",
+    },
+}
+DIGEST_PATH = CORPORA["0.2"]["digest"]
+PROTOCOL_PATH = CORPORA["0.2"]["protocol"]
+INPUT_ROOTS = CORPORA["0.2"]["inputs"]
 TOTAL_RANGE = (36, 44)
 DEV_RANGE = (6, 10)
+# 0.2x composition (PROTOCOL-0.2x.md section 3): fixed, all qual.
+HELDOUT_TOTAL = 120
+HELDOUT_EXPANSION_KINDS = {"named": 8, "path": 8, "nopath": 8}
+HELDOUT_CATEGORY_COUNTS = {
+    "filesystem": 12, "ambiguous": 8, "multidomain": 10, "rare": 8, "wrong_first_tool": 8,
+    "exec_failure": 8, "denied": 8, "approval": 8, "injection_workspace": 6, "injection_tool": 6,
+    "expansion": 24, "unknown_tool": 6, "sequential": 8,
+}
 
 
 # ---------------------------------------------------------------- minimal JSON Schema 2020-12
@@ -176,22 +211,24 @@ def manifest_digest(paths: list) -> str:
     return "sha256:" + hashlib.sha256(lines.encode("utf-8")).hexdigest()
 
 
-def digests() -> dict:
-    tasks = sorted((BENCH / "tasks").glob("*.json"))
+def digests(cfg: dict = CORPORA["0.2"]) -> dict:
+    tasks = sorted(cfg["tasks"].glob("*.json"))
     inputs: list = []
-    for root in INPUT_ROOTS:
+    for root in cfg["inputs"]:
         p = BENCH / root
         inputs += [p] if p.is_file() else [f for f in p.rglob("*") if f.is_file()]
     out = {"tasks_digest": manifest_digest(tasks), "inputs_digest": manifest_digest(inputs)}
-    if PROTOCOL_PATH.exists():
-        out["protocol_sha256"] = "sha256:" + file_sha(PROTOCOL_PATH)
+    if cfg["protocol"].exists():
+        out["protocol_sha256"] = "sha256:" + file_sha(cfg["protocol"])
     return out
 
 
-def render_digest(d: dict, counts: dict) -> str:
+def render_digest(d: dict, counts: dict, cfg: dict = CORPORA["0.2"]) -> str:
+    rel = cfg["tasks"].relative_to(BENCH).as_posix()
     lines = [
-        "# INTERPLANE 0.2 bench corpus digests. Recomputed and compared by bench/tools/validate.py (CI job bench-structural).",
-        "# tasks_digest: tasks/*.json; inputs_digest: domains.json, prompts/, schema/, fixtures/, stubs/, tasks/;",
+        cfg["header"],
+        f"# tasks_digest: {rel}/*.json; inputs_digest: " + ", ".join(
+            r + ("" if (BENCH / r).is_file() else "/") for r in cfg["inputs"]) + ";",
         "# each = sha256 over `sha256sum` lines in LC_ALL=C path order, paths relative to bench/.",
     ]
     lines += [f"{k} {v}" for k, v in d.items()]
@@ -199,10 +236,10 @@ def render_digest(d: dict, counts: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def read_digest_file() -> dict:
+def read_digest_file(cfg: dict = CORPORA["0.2"]) -> dict:
     out = {}
-    if DIGEST_PATH.exists():
-        for line in DIGEST_PATH.read_text(encoding="utf-8").splitlines():
+    if cfg["digest"].exists():
+        for line in cfg["digest"].read_text(encoding="utf-8").splitlines():
             if line and not line.startswith("#"):
                 key, _, val = line.partition(" ")
                 out[key] = val
@@ -270,16 +307,16 @@ def backend_errors(tasks: list, ctx: dict) -> list:
     for t in tasks:
         if t["category"] != "expansion":
             continue
-        hay = "\n".join(_strings(sb.load_store(t["workspace_fixture"]))).casefold()
+        hay = "\n".join(_strings(sb.load_store(t["workspace_fixture"], ctx["stores"]))).casefold()
         for c in walk_checks(t["judge"]["checks"]):
             if c["kind"] == "answer_contains_all":
                 for v in c["values"]:
                     if v.casefold() in hay:
-                        e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture']).name} contains the answer {v!r}")
+                        e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture'], ctx['stores']).name} contains the answer {v!r}")
             if c["kind"] == "answer_regex" and re.search(c["pattern"], hay):
-                e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture']).name} matches the answer regex")
-    known = {sb.store_path(t["workspace_fixture"]).name for t in tasks}
-    for p in sorted(sb.STORES_DIR.glob("*.json")):
+                e.append(f"{t['id']}: store {sb.store_path(t['workspace_fixture'], ctx['stores']).name} matches the answer regex")
+    known = {sb.store_path(t["workspace_fixture"], ctx["stores"]).name for t in tasks}
+    for p in sorted(ctx["stores"].glob("*.json")):
         if p.name not in known:
             e.append(f"store {p.name} belongs to no task fixture")
         else:
@@ -294,8 +331,8 @@ def backend_errors(tasks: list, ctx: dict) -> list:
         for _ in range(2):
             ws = tempfile.mkdtemp(prefix="interplane-simcheck-")
             try:
-                shutil.copytree(BENCH / fixture, ws, symlinks=True, dirs_exist_ok=True)
-                sess = sb.SimSession(ws, fixture, reg)
+                shutil.copytree(ctx["root"] / fixture, ws, symlinks=True, dirs_exist_ok=True)
+                sess = sb.SimSession(ws, fixture, reg, ctx["stores"])
                 run = []
                 for name, entry in sorted(tools.items()):
                     if entry["kind"] not in ("computed", "declared_failure"):
@@ -341,7 +378,7 @@ def task_errors(task: dict, path: Path, ctx: dict) -> list:
         e.append(f"id {tid} does not start with category {cat}")
     if task["system_prompt_ref"]["sha256"] != ctx["prompt_sha"]:
         e.append("system_prompt_ref.sha256 does not match prompts/system.md")
-    fixture = BENCH / task["workspace_fixture"]
+    fixture = ctx["root"] / task["workspace_fixture"]
     if not fixture.is_dir() or not any(fixture.rglob("*")):
         e.append(f"fixture {task['workspace_fixture']} missing or empty")
     catalog = ctx["catalog"]
@@ -371,7 +408,7 @@ def task_errors(task: dict, path: Path, ctx: dict) -> list:
     for cap, ref in task["stub_results"].items():
         if cap in EXECUTABLE:
             e.append(f"stub for {cap}: the reference adapter executes it; stubs are only for non-executed tools")
-        sp = BENCH / ref["path"]
+        sp = ctx["root"] / ref["path"]
         if not sp.is_file():
             e.append(f"stub {ref['path']} missing")
         elif not isinstance(json.loads(sp.read_text(encoding="utf-8")), dict):
@@ -453,12 +490,38 @@ def task_errors(task: dict, path: Path, ctx: dict) -> list:
     return e
 
 
+def heldout_errors(tasks: list, per: dict) -> list:
+    """Composition of the 0.2x held-out set, fixed by PROTOCOL-0.2x.md section 3."""
+    e: list = []
+    if len(tasks) != HELDOUT_TOTAL:
+        e.append(f"{len(tasks)} held-out tasks, expected exactly {HELDOUT_TOTAL}")
+    for t in tasks:
+        if t["split"] != "qual":
+            e.append(f"{t['id']}: every held-out task is qual")
+        notes = t.get("notes") or ""
+        if not re.match(r"heldout-0\.2x; template: [a-z0-9_.-]+(;|$)", notes):
+            e.append(f"{t['id']}: notes must start with 'heldout-0.2x; template: <name>'")
+        m = re.search(r"expansion_kind: ([a-z]+)", notes)
+        if t["category"] == "expansion" and (not m or m.group(1) not in HELDOUT_EXPANSION_KINDS):
+            e.append(f"{t['id']}: expansion task needs 'expansion_kind: named|path|nopath' in notes")
+    for c, cnt in per.items():
+        if cnt["qual"] != HELDOUT_CATEGORY_COUNTS.get(c, 0):
+            e.append(f"category {c}: {cnt['qual']} held-out tasks, protocol fixes {HELDOUT_CATEGORY_COUNTS.get(c, 0)}")
+    kinds = Counter(m.group(1) for t in tasks if t["category"] == "expansion"
+                    for m in [re.search(r"expansion_kind: ([a-z]+)", t.get("notes") or "")] if m)
+    if dict(kinds) != HELDOUT_EXPANSION_KINDS:
+        e.append(f"expansion kinds {dict(kinds)} != {HELDOUT_EXPANSION_KINDS}")
+    return e
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-digest", action="store_true")
     ap.add_argument("--require-jsonschema", action="store_true")
     ap.add_argument("--derive")
+    ap.add_argument("--corpus", choices=sorted(CORPORA), default="0.2")
     args = ap.parse_args(argv)
+    cfg = CORPORA[args.corpus]
     rule = load_rule()
     if args.derive is not None:
         print(json.dumps(derive_domains(args.derive, rule)))
@@ -471,6 +534,8 @@ def main(argv=None) -> int:
         "catalog": {c["name"] for c in record["capabilities"]},
         "tdom": tool_domains(),
         "prompt_sha": file_sha(BENCH / "prompts" / "system.md"),
+        "stores": cfg["stores"],
+        "root": cfg["root"],
     }
     errors: list = []
     if set(ctx["tdom"]) != ctx["catalog"]:
@@ -488,7 +553,7 @@ def main(argv=None) -> int:
             errors.append("--require-jsonschema given but the jsonschema package is not installed")
 
     tasks = []
-    for path in sorted((BENCH / "tasks").glob("*.json")):
+    for path in sorted(cfg["tasks"].glob("*.json")):
         try:
             task = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as err:
@@ -510,12 +575,15 @@ def main(argv=None) -> int:
     per = {c: Counter(t["split"] for t in tasks if t.get("category") == c) for c in cats}
     dev = [t for t in tasks if t.get("split") == "dev"]
     total = len(tasks)
-    if not TOTAL_RANGE[0] <= total <= TOTAL_RANGE[1]:
-        errors.append(f"{total} tasks, expected {TOTAL_RANGE[0]}-{TOTAL_RANGE[1]}")
-    if not DEV_RANGE[0] <= len(dev) <= DEV_RANGE[1]:
-        errors.append(f"{len(dev)} dev tasks, expected {DEV_RANGE[0]}-{DEV_RANGE[1]}")
-    if len({t["category"] for t in dev}) < 5:
-        errors.append("dev split must cover at least 5 categories")
+    if args.corpus == "0.2x":
+        errors += heldout_errors(tasks, per)
+    else:
+        if not TOTAL_RANGE[0] <= total <= TOTAL_RANGE[1]:
+            errors.append(f"{total} tasks, expected {TOTAL_RANGE[0]}-{TOTAL_RANGE[1]}")
+        if not DEV_RANGE[0] <= len(dev) <= DEV_RANGE[1]:
+            errors.append(f"{len(dev)} dev tasks, expected {DEV_RANGE[0]}-{DEV_RANGE[1]}")
+        if len({t["category"] for t in dev}) < 5:
+            errors.append("dev split must cover at least 5 categories")
     for c, cnt in per.items():
         if cnt["qual"] < 2:
             errors.append(f"category {c}: {cnt['qual']} qual tasks, need >= 2")
@@ -531,7 +599,7 @@ def main(argv=None) -> int:
         print(f"  {c:<20} {per[c]['dev']:>3} {per[c]['qual']:>4}")
     counts = {"total": total, "dev": len(dev), "qual": total - len(dev)}
     print(f"  {'total':<20} {counts['dev']:>3} {counts['qual']:>4}   ({total} tasks)")
-    d = digests()
+    d = digests(cfg)
     for k, v in d.items():
         print(f"{k} {v}")
     if errors:
@@ -540,13 +608,13 @@ def main(argv=None) -> int:
             print("  " + x)
         return 1
     if args.write_digest:
-        DIGEST_PATH.write_text(render_digest(d, counts), encoding="utf-8")
-        print(f"wrote {DIGEST_PATH.relative_to(REPO)}")
+        cfg["digest"].write_text(render_digest(d, counts, cfg), encoding="utf-8")
+        print(f"wrote {cfg['digest'].relative_to(REPO)}")
     else:
-        recorded = read_digest_file()
+        recorded = read_digest_file(cfg)
         bad = [k for k, v in d.items() if recorded.get(k) != v]
         if bad:
-            print(f"FAIL: digest mismatch vs CORPUS-DIGEST.txt for {bad} (run with --write-digest only for an intended corpus change)")
+            print(f"FAIL: digest mismatch vs {cfg['digest'].relative_to(BENCH)} for {bad} (run with --write-digest only for an intended corpus change)")
             return 1
     print(f"PASS: {total} tasks valid" + (" (schema also checked with jsonschema)" if jsv else ""))
     return 0

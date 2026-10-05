@@ -1,0 +1,3 @@
+# Pruning
+
+Recommended month: February

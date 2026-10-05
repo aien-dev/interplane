@@ -36,6 +36,13 @@ jobs:
         run: PYTHONPATH=python PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_live_injection.py
       - name: pre-registered statistics reproduce Newcombe 1998 Table III
         run: python bench/tools/stats.py
+      - name: 0.2y leakage lint, authoring-log replay, composition checks and P analyzer (synthetic data; no model, no GPU)
+        run: |
+          python bench/tools/test_lint_02y.py
+          python bench/tools/test_analyze_y.py
+          python bench/tools/test_authoring_02y.py
+          python bench/tools/test_assemble_02y.py
+          python bench/tools/assemble_02y.py --check-slots
       - name: analyzer tests and synthetic-run fixture (no model, no GPU)
         run: |
           python bench/tools/test_analyze.py

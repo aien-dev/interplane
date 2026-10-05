@@ -17,6 +17,9 @@ plus its fixed composition, against bench/heldout-0.2x/CORPUS-DIGEST.txt.
   python3 bench/tools/validate.py --require-jsonschema   also validate with the jsonschema package
   python3 bench/tools/validate.py --derive "text"  print the requested_domains for a request
   python3 bench/tools/validate.py --corpus 0.2x   validate the held-out set instead
+  python3 bench/tools/validate.py --corpus 0.2y   validate the 0.2y set: composition, leakage lint
+                                                  (bench/tools/lint_02y.py), authoring-log replay
+  python3 bench/tools/validate.py --corpus 0.2y-cal   the 30-task calibration set (same lint, one pool)
 """
 
 from __future__ import annotations
@@ -38,6 +41,7 @@ SCHEMA_PATH = BENCH / "schema" / "task.schema.json"
 DOMAINS_PATH = BENCH / "domains.json"
 # The reference adapter executes only these (adapters/odysseus/interplane_adapter_odysseus/authority.py).
 EXECUTABLE = frozenset({"read_file", "ls", "glob", "grep"})
+WORKSPACE_READ = ("ls", "glob", "grep", "read_file")
 # One entry per frozen corpus. 0.2 is the published corpus (now dev/regression only);
 # 0.2x is the held-out qualification set of bench/PROTOCOL-0.2x.md.
 CORPORA = {
@@ -62,6 +66,34 @@ CORPORA = {
         "header": "# INTERPLANE 0.2x held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2x (CI job bench-structural).",
     },
 }
+_Y_INPUTS = ("domains.json", "prompts", "schema", "stubs/backends.json", "tools/sim_backends.py", "tools/lint_02y.py", "tools/assemble_02y.py", "tools/authoring_02y.py")
+CORPORA["0.2y"] = {
+    "root": BENCH / "heldout-0.2y",
+    "tasks": BENCH / "heldout-0.2y" / "tasks",
+    "digest": BENCH / "heldout-0.2y" / "CORPUS-DIGEST.txt",
+    "protocol": REPO / "docs" / "prereg" / "PREREG-0.2y-base-set-discovery.md",
+    "inputs": _Y_INPUTS + ("heldout-0.2y/regression-slots.json", "heldout-0.2y/fixtures", "heldout-0.2y/stores", "heldout-0.2y/stubs", "heldout-0.2y/tasks",
+                           "heldout-0.2y/authoring-log.jsonl"),
+    "stores": BENCH / "heldout-0.2y" / "stores",
+    "header": "# INTERPLANE 0.2y held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2y (CI job bench-structural).",
+    "log": BENCH / "heldout-0.2y" / "authoring-log.jsonl",
+    "log_set": "target",
+}
+# The 30-task calibration set (PREREG-0.2y section 5): its own fixtures, stores, stubs, tasks and digest file.
+CORPORA["0.2y-cal"] = {
+    "root": BENCH / "heldout-0.2y" / "calibration",
+    "tasks": BENCH / "heldout-0.2y" / "calibration" / "tasks",
+    "digest": BENCH / "heldout-0.2y" / "calibration" / "CALIBRATION-DIGEST.txt",
+    "protocol": REPO / "docs" / "prereg" / "PREREG-0.2y-base-set-discovery.md",
+    "inputs": _Y_INPUTS + ("heldout-0.2y/calibration/fixtures", "heldout-0.2y/calibration/stores",
+                           "heldout-0.2y/calibration/stubs", "heldout-0.2y/calibration/tasks",
+                           "heldout-0.2y/authoring-log.jsonl"),
+    "stores": BENCH / "heldout-0.2y" / "calibration" / "stores",
+    "header": "# INTERPLANE 0.2y calibration set digests (30 discovery_needed tasks, condition A only). Recomputed by bench/tools/validate.py --corpus 0.2y-cal.",
+    "log": BENCH / "heldout-0.2y" / "authoring-log.jsonl",
+    "log_set": "calibration",
+}
+Y_CORPORA = ("0.2y", "0.2y-cal")
 DIGEST_PATH = CORPORA["0.2"]["digest"]
 PROTOCOL_PATH = CORPORA["0.2"]["protocol"]
 INPUT_ROOTS = CORPORA["0.2"]["inputs"]
@@ -75,6 +107,40 @@ HELDOUT_CATEGORY_COUNTS = {
     "exec_failure": 8, "denied": 8, "approval": 8, "injection_workspace": 6, "injection_tool": 6,
     "expansion": 24, "unknown_tool": 6, "sequential": 8,
 }
+# 0.2y composition (PREREG-0.2y section 5): 48 discovery_needed (24 non-file domain, 24 default) plus 72 regression
+# tasks drawn from the 0.2x categories other than expansion in proportion to the 0.2x counts.
+Y_TOTAL = 120
+Y_DISCOVERY = {"nonfile": 24, "default": 24}
+Y_REGRESSION_TOTAL = 72
+Y_CALIBRATION_TOTAL = 30
+
+
+def regression_counts(counts: dict = None, total: int = Y_REGRESSION_TOTAL) -> dict:
+    """Per-category counts of the regression tasks: ``total`` split over the non-expansion categories in
+    proportion to ``counts`` (0.2x section 3). Largest remainder; ties go to the larger 0.2x count, then to
+    the category order of the 0.2x table. Exact integer arithmetic (Fractions), no rounding of floats."""
+    from fractions import Fraction
+
+    counts = HELDOUT_CATEGORY_COUNTS if counts is None else counts
+    base = {c: n for c, n in counts.items() if c != "expansion"}
+    denom = sum(base.values())
+    exact = {c: Fraction(total * n, denom) for c, n in base.items()}
+    out = {c: int(x) for c, x in exact.items()}
+    order = {c: i for i, c in enumerate(base)}
+    spare = total - sum(out.values())
+    ranked = sorted(base, key=lambda c: (-(exact[c] - out[c]), -base[c], order[c]))
+    for c in ranked[:spare]:
+        out[c] += 1
+    return out
+
+
+def note_field(task: dict, key: str):
+    m = re.search(r"(?:^|; )" + re.escape(key) + r": ([a-z0-9_.-]+)", task.get("notes") or "")
+    return m.group(1) if m else None
+
+
+def is_discovery(task: dict) -> bool:
+    return note_field(task, "kind") == "discovery_needed"
 
 
 # ---------------------------------------------------------------- minimal JSON Schema 2020-12
@@ -305,7 +371,7 @@ def backend_errors(tasks: list, ctx: dict) -> list:
 
     # Expansion tasks must stay expansion tasks: no private store on their fixture holds the answer.
     for t in tasks:
-        if t["category"] != "expansion":
+        if t["category"] != "expansion" and not is_discovery(t):
             continue
         hay = "\n".join(_strings(sb.load_store(t["workspace_fixture"], ctx["stores"]))).casefold()
         for c in walk_checks(t["judge"]["checks"]):
@@ -421,7 +487,26 @@ def task_errors(task: dict, path: Path, ctx: dict) -> list:
     cov = covered(task, selected)
     kinds = {c["kind"] for c in walk_checks(task["judge"]["checks"])}
     top = {c["kind"] for c in task["judge"]["checks"]}
-    if cat == "expansion":
+    if ctx.get("y") and is_discovery(task):
+        # 0.2y discovery_needed: non-file group is uncovered by the B3 selection by construction, default group is covered.
+        grp = note_field(task, "group")
+        if grp == "nonfile" and cov:
+            e.append("non-file discovery task is covered by the initial condition-B selection (it must be uncovered)")
+        if grp == "default" and not cov:
+            e.append("default-group discovery task is not covered by the initial condition-B selection")
+        if task["required_capabilities"]:
+            e.append("discovery_needed task must not require a capability (answers sit in workspace files)")
+        base = set(WORKSPACE_READ)
+        if not task["allowed_alternatives"] or any(not set(g) <= base for g in task["allowed_alternatives"]):
+            e.append("discovery_needed alternatives must be workspace-read tools only (ls, glob, grep, read_file)")
+        hay = "\n".join(p.read_text(encoding="utf-8", errors="replace") for p in fixture.rglob("*") if p.is_file()).casefold()
+        wanted = [v for c in walk_checks(task["judge"]["checks"]) if c["kind"] == "answer_contains_all" for v in c["values"]]
+        if not wanted:
+            e.append("discovery_needed task needs an answer_contains_all check")
+        for v in wanted:
+            if v.casefold() not in hay:
+                e.append(f"discovery_needed answer {v!r} does not occur in its fixture (unsolvable)")
+    elif cat == "expansion":
         if cov:
             e.append("expansion task is already covered by the initial condition-B selection")
         if "expansion_occurred" not in top:
@@ -514,6 +599,142 @@ def heldout_errors(tasks: list, per: dict) -> list:
     return e
 
 
+def _fixture_files(root: Path, name: str) -> list:
+    d = root / name
+    return sorted({p.name for p in d.rglob("*") if p.is_file()}) if d.is_dir() else []
+
+
+def log_entries(cfg: dict) -> tuple:
+    """(entries of this corpus's set, errors) from heldout-0.2y/authoring-log.jsonl."""
+    path = cfg["log"]
+    if not path.is_file():
+        return [], [f"{path.name} is missing"]
+    out, errs = [], []
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            rec = json.loads(line)
+        except json.JSONDecodeError as err:
+            errs.append(f"authoring-log.jsonl line {i}: invalid JSON: {err}")
+            continue
+        if rec.get("set") == cfg["log_set"]:
+            out.append(rec)
+    return out, errs
+
+
+def regression_slot_errors(reg: list, ctx: dict) -> list:
+    """Regression tasks must equal what assemble_02y builds from the frozen slot table and the author's request text."""
+    import assemble_02y as asm
+
+    e: list = []
+    path = asm.SLOTS_PATH
+    table = asm.gen_slots()
+    if not path.is_file() or path.read_text(encoding="utf-8") != asm.dumps(table):
+        e.append("heldout-0.2y/regression-slots.json is missing or differs from assemble_02y.gen_slots()")
+    slots = {s["id"]: s for s in table["slots"]}
+    seen = set()
+    for t in reg:
+        sid = note_field(t, "slot")
+        if sid not in slots:
+            e.append(f"{t['id']}: notes need 'slot: rs-NNN' naming a slot of regression-slots.json")
+            continue
+        if sid in seen:
+            e.append(f"{t['id']}: slot {sid} used twice")
+        seen.add(sid)
+        want = asm.task_of(slots[sid], t["user_request"], ctx["rule"], ctx["prompt_sha"])
+        if t != want:
+            diff = sorted(k for k in set(t) | set(want) if t.get(k) != want.get(k))
+            e.append(f"{t['id']}: differs from the task assembled from slot {sid} in {diff}")
+        for m in slots[sid]["must_contain"]:
+            if m.lower() not in t["user_request"].lower():
+                e.append(f"{t['id']}: request does not contain {m!r} required by slot {sid}")
+    return e
+
+
+def heldout_y_errors(tasks: list, per: dict, ctx: dict, cfg: dict, calibration: bool) -> list:
+    """0.2y composition, leakage lint and authoring-log replay (PREREG-0.2y section 5)."""
+    import lint_02y as lint
+
+    e: list = []
+    cat_total = Y_CALIBRATION_TOTAL if calibration else Y_TOTAL
+    if len(tasks) != cat_total:
+        e.append(f"{len(tasks)} tasks, expected exactly {cat_total}")
+    notes_re = r"heldout-0\.2y; template: [a-z0-9_.-]+; kind: (regression|discovery_needed)(;|$)"
+    disc = [t for t in tasks if is_discovery(t)]
+    reg = [t for t in tasks if note_field(t, "kind") == "regression"]
+    for t in tasks:
+        if t["split"] != "qual":
+            e.append(f"{t['id']}: every 0.2y task is qual")
+        if not re.match(notes_re, t.get("notes") or ""):
+            e.append(f"{t['id']}: notes must start with 'heldout-0.2y; template: <name>; kind: regression|discovery_needed'")
+        if t["category"] == "expansion":
+            e.append(f"{t['id']}: 0.2y has no expansion category (discovery_needed tasks replace it)")
+    if len(disc) + len(reg) != len(tasks):
+        e.append("every task must have kind regression or discovery_needed in its notes")
+    if calibration:
+        if reg:
+            e.append("the calibration set holds discovery_needed tasks only")
+    else:
+        if len(disc) != sum(Y_DISCOVERY.values()):
+            e.append(f"{len(disc)} discovery_needed tasks, expected {sum(Y_DISCOVERY.values())}")
+        got = Counter(t["category"] for t in reg)
+        want = regression_counts()
+        if dict(got) != {c: n for c, n in want.items()}:
+            e.append(f"regression counts {dict(sorted(got.items()))} != {dict(sorted(want.items()))} (0.2x section 3, largest remainder)")
+
+    catalog, rule, tdom = ctx["catalog"], ctx["rule"], ctx["tdom"]
+    groups = Counter()
+    task_by_req: dict = {}
+    for t in disc:
+        fx = Path(t["workspace_fixture"]).name
+        res = lint.lint_request(t["user_request"], catalog, rule, _fixture_files(ctx["root"] / "fixtures", fx), tdom)
+        if not res["ok"]:
+            e.append(f"{t['id']}: leakage lint rejects the request: " + "; ".join(res["messages"]) + " [" + ",".join(res["codes"]) + "]")
+        else:
+            groups[res["group"]] += 1
+            if note_field(t, "group") != res["group"]:
+                e.append(f"{t['id']}: notes group {note_field(t, 'group')!r} != derived {res['group']!r}")
+        req = note_field(t, "request")
+        if not req:
+            e.append(f"{t['id']}: discovery_needed notes need 'request: q-NNNN' (its authoring-log id)")
+        elif req in task_by_req:
+            e.append(f"{t['id']}: request {req} also used by {task_by_req[req]}")
+        else:
+            task_by_req[req] = t["id"]
+    if not calibration:
+        for g, n in Y_DISCOVERY.items():
+            if groups[g] != n:
+                e.append(f"{groups[g]} discovery_needed tasks derive group {g}, expected exactly {n}")
+        if groups["nonfile"] < Y_DISCOVERY["nonfile"]:
+            e.append(f"fewer than {Y_DISCOVERY['nonfile']} discovery_needed tasks derive a non-file domain: the corpus is not frozen")
+
+    if not calibration:
+        e += regression_slot_errors(reg, ctx)
+
+    entries, errs = log_entries(cfg)
+    e += errs
+    fixtures = {d.name: _fixture_files(ctx["root"] / "fixtures", d.name) for d in sorted((ctx["root"] / "fixtures").glob("*")) if d.is_dir()}
+    if entries:
+        rp = lint.replay(entries, catalog, rule, fixtures, tdom,
+                         groups=("any",) if calibration else ("nonfile", "default"),
+                         target={"any": Y_CALIBRATION_TOTAL} if calibration else None)
+        e += rp["errors"]
+        if sorted(rp["accepted"]) != sorted(task_by_req):
+            e.append(f"tasks reference requests {sorted(task_by_req)} but the log accepted {sorted(rp['accepted'])}")
+        by_id = {x["id"]: x for x in entries}
+        for req, tid in task_by_req.items():
+            ent = by_id.get(req)
+            tk = next(t for t in disc if t["id"] == tid)
+            if ent is not None and ent["request"] != tk["user_request"]:
+                e.append(f"{tid}: user_request differs from the logged request {req}")
+            if ent is not None and ent.get("fixture") != Path(tk["workspace_fixture"]).name:
+                e.append(f"{tid}: fixture {Path(tk['workspace_fixture']).name!r} != the log's fixture {ent.get('fixture')!r} for {req}")
+    elif not errs:
+        e.append("authoring log has no entries for this set")
+    return e
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write-digest", action="store_true")
@@ -530,6 +751,7 @@ def main(argv=None) -> int:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     record = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     ctx = {
+        "y": args.corpus in Y_CORPORA,
         "rule": rule,
         "catalog": {c["name"] for c in record["capabilities"]},
         "tdom": tool_domains(),
@@ -577,6 +799,9 @@ def main(argv=None) -> int:
     total = len(tasks)
     if args.corpus == "0.2x":
         errors += heldout_errors(tasks, per)
+    elif args.corpus in Y_CORPORA:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        errors += heldout_y_errors(tasks, per, ctx, cfg, args.corpus == "0.2y-cal")
     else:
         if not TOTAL_RANGE[0] <= total <= TOTAL_RANGE[1]:
             errors.append(f"{total} tasks, expected {TOTAL_RANGE[0]}-{TOTAL_RANGE[1]}")
@@ -584,15 +809,16 @@ def main(argv=None) -> int:
             errors.append(f"{len(dev)} dev tasks, expected {DEV_RANGE[0]}-{DEV_RANGE[1]}")
         if len({t["category"] for t in dev}) < 5:
             errors.append("dev split must cover at least 5 categories")
-    for c, cnt in per.items():
-        if cnt["qual"] < 2:
-            errors.append(f"category {c}: {cnt['qual']} qual tasks, need >= 2")
-        if cnt["dev"] and cnt["dev"] + cnt["qual"] < 3:
-            errors.append(f"category {c}: dev tasks drawn from a category with fewer than 3 tasks")
-    if per["expansion"]["dev"]:
-        errors.append("expansion tasks must all be qual (omission criterion 2 rests on them)")
-    if per["expansion"]["qual"] < 4:
-        errors.append("need >= 4 qual expansion tasks")
+    if args.corpus not in Y_CORPORA:  # 0.2y fixes its composition in heldout_y_errors
+        for c, cnt in per.items():
+            if cnt["qual"] < 2:
+                errors.append(f"category {c}: {cnt['qual']} qual tasks, need >= 2")
+            if cnt["dev"] and cnt["dev"] + cnt["qual"] < 3:
+                errors.append(f"category {c}: dev tasks drawn from a category with fewer than 3 tasks")
+        if per["expansion"]["dev"]:
+            errors.append("expansion tasks must all be qual (omission criterion 2 rests on them)")
+        if per["expansion"]["qual"] < 4:
+            errors.append("need >= 4 qual expansion tasks")
 
     print("category              dev qual")
     for c in cats:

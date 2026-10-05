@@ -136,6 +136,15 @@ impl Lifecycle {
             from => Err(LifecycleError::Illegal { from }),
         }
     }
+    /// REQUIRES_APPROVAL -> DENIED without a decision: a host cancel, or a continuation the
+    /// pipeline refused to honour (fail closed). It can only deny, so it is the one way out of
+    /// REQUIRES_APPROVAL that is not a runtime decision and still cannot authorize anything.
+    pub fn cancel(&mut self) -> Result<State, LifecycleError> {
+        match self.state {
+            State::RequiresApproval => self.set(State::Denied),
+            from => Err(LifecycleError::Illegal { from }),
+        }
+    }
     /// AUTHORIZED -> EXECUTING; needs the authorized decision itself.
     pub fn begin_execution(&mut self, d: &Decision) -> Result<State, LifecycleError> {
         if d.request_id != self.request_id {

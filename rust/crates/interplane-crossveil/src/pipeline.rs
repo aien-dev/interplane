@@ -40,6 +40,91 @@ pub struct TurnOutcome {
     pub partial: bool,
 }
 
+/// Why a host continuation or cancel was refused: nothing changed, nothing ran.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Refusal {
+    /// No pending approval for the call: unknown request, already executed, denied or
+    /// cancelled, a second continuation, or a pipeline created after a restart.
+    NoPendingApproval,
+}
+
+impl Refusal {
+    /// The reason string pinned in CORE.md (verdict `continuations[].reason`).
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Refusal::NoPendingApproval => "no_pending_approval",
+        }
+    }
+}
+
+/// Read-only view of an approval entry, for the host (cut A2).
+#[derive(Debug, Clone)]
+pub struct PendingApproval {
+    pub request_id: String,
+    pub approval_id: String,
+    pub expires_at: Option<String>,
+    /// Digest of the `capability_request` exactly as it was sent to `decide`.
+    pub request_digest: String,
+    pub capability_request: CapabilityRequest,
+    pub state: State,
+}
+
+/// Digest that binds an approval to its exact `capability_request` (JCS, `sha256:`).
+pub fn capability_request_digest(cap: &CapabilityRequest) -> String {
+    digest(&serde_json::to_value(cap).unwrap_or(Value::Null))
+}
+
+/// `YYYY-MM-DDTHH:MM:SSZ` (UTC, fixed width) with in-range fields, so string order is time order.
+fn utc_shape(s: &str) -> bool {
+    let b = s.as_bytes();
+    if b.len() != 20 || b[4] != b'-' || b[7] != b'-' || b[10] != b'T' {
+        return false;
+    }
+    if b[13] != b':' || b[16] != b':' || b[19] != b'Z' {
+        return false;
+    }
+    let num = |i: usize, n: usize| -> Option<u32> {
+        let d = &b[i..i + n];
+        d.iter()
+            .all(u8::is_ascii_digit)
+            .then(|| d.iter().fold(0, |a, c| a * 10 + u32::from(c - b'0')))
+    };
+    matches!(
+        (
+            num(5, 2),
+            num(8, 2),
+            num(11, 2),
+            num(14, 2),
+            num(17, 2),
+            num(0, 4)
+        ),
+        (
+            Some(1..=12),
+            Some(1..=31),
+            Some(0..=23),
+            Some(0..=59),
+            Some(0..=59),
+            Some(_)
+        )
+    )
+}
+
+/// Expired when `now >= expires_at`. A value that is not of the exact shape counts as expired.
+fn approval_expired(expires_at: &str, now: &str) -> bool {
+    !utc_shape(expires_at) || !utc_shape(now) || now >= expires_at
+}
+
+/// A request waiting for the host (REQUIRES_APPROVAL), or what became of it. Memory only.
+struct PendingEntry {
+    lc: Lifecycle,
+    cap: CapabilityRequest,
+    ctx: CallContext,
+    approval_id: String,
+    expires_at: Option<String>,
+    request_digest: String,
+    catalog_digest: String,
+}
+
 /// The pipeline. Holds no decision memory: every request is decided by the runtime.
 pub struct Pipeline<'a> {
     pub registry: DialectRegistry,
@@ -56,6 +141,9 @@ pub struct Pipeline<'a> {
     turn: Option<u64>,
     /// Per trace: every input that has been placed in front of the model, in order (cut P3).
     inputs: HashMap<String, Vec<InputRecord>>,
+    /// Approval entries by `(trace_id, request_id)` (cut A1/A2). Host-only: only the continuation
+    /// and cancel calls below read or change them, and a new pipeline starts empty.
+    pending: HashMap<(String, String), PendingEntry>,
 }
 
 /// Position in the trust order; `unknown` and anything unrecognized rank as `external_untrusted`.
@@ -189,6 +277,7 @@ impl<'a> Pipeline<'a> {
             seq: HashMap::new(),
             turn: None,
             inputs: HashMap::new(),
+            pending: HashMap::new(),
         }
     }
 
@@ -233,6 +322,10 @@ impl<'a> Pipeline<'a> {
     /// Record a rendered result as an input of the trace (`parent_id` = its request id). The
     /// trust and kind are the runtime's normalized provenance; absent means `unknown`.
     fn record_result(&mut self, trace: &str, r: &ToolResult, rendered: &Value) {
+        self.push_result_input(trace, r, digest(rendered));
+    }
+
+    fn push_result_input(&mut self, trace: &str, r: &ToolResult, content_digest: String) {
         let prov = r.provenance.as_ref();
         let ledger = self.inputs.entry(trace.to_string()).or_default();
         let mut n = ledger
@@ -252,7 +345,7 @@ impl<'a> Pipeline<'a> {
                 .unwrap_or(TrustLevel::Undetermined),
             source: Party::new("runtime", self.runtime.runtime_id()),
             origin: format!("runtime:{}", self.runtime.runtime_id()),
-            content_digest: digest(rendered),
+            content_digest,
             trace_id: trace.to_string(),
             parent_id: r.request_id.clone(),
             derived_from: vec![],
@@ -531,6 +624,7 @@ impl<'a> Pipeline<'a> {
             r.provenance = Some(reached(&cap));
             r
         };
+        let mut pending_entry: Option<PendingEntry> = None;
         let (result, dstr) = match state {
             State::Denied if !decision.decision.is_known() => (
                 non_exec(
@@ -556,6 +650,24 @@ impl<'a> Pipeline<'a> {
                     .as_ref()
                     .map(|a| a.approval_id.as_str())
                     .unwrap_or("");
+                if !id.is_empty() {
+                    let live = catalog
+                        .catalog_digest
+                        .clone()
+                        .unwrap_or_else(|| catalog.compute_digest());
+                    pending_entry = Some(PendingEntry {
+                        lc: lc.clone(),
+                        cap: cap.clone(),
+                        ctx: ctx.clone(),
+                        approval_id: id.to_string(),
+                        expires_at: decision
+                            .approval
+                            .as_ref()
+                            .and_then(|a| a.expires_at.clone()),
+                        request_digest: capability_request_digest(&cap),
+                        catalog_digest: live,
+                    });
+                }
                 (
                     non_exec(
                         ResultStatus::RequiresApproval,
@@ -585,40 +697,238 @@ impl<'a> Pipeline<'a> {
                 "invalid".into(),
             ),
             State::Authorized => {
-                let _ = lc.begin_execution(&decision);
-                self.emit(&trace, EventKind::ToolExecutionStarted, Some(&rid));
-                let ran = catch_unwind(AssertUnwindSafe(|| {
-                    self.runtime.execute(&cap, &decision, ctx)
-                }));
-                let mut r = match ran {
-                    Ok(r) => normalize(r, &cap),
-                    Err(_) => {
-                        let mut r = ToolResult::failed(
-                            Some(&rid),
-                            ResultStatus::Error,
-                            ErrorCode::ExecutionError,
-                            "runtime authority raised an error",
-                        );
-                        r.provenance = Some(reached(&cap));
-                        r
-                    }
-                };
-                let end = match r.status {
-                    ResultStatus::Ok => State::Succeeded,
-                    ResultStatus::TimedOut => State::TimedOut,
-                    _ => State::Failed,
-                };
-                let _ = lc.finish(end);
-                r.request_id = Some(rid.clone());
-                let o = rec(Some(&rid), lc.state(), Some("authorized"), &r, true, true);
-                self.emit_outcome(&trace, &r);
-                return (r, o);
+                return self.execute_authorized(&mut lc, &cap, &decision, ctx, true);
             }
             _ => unreachable!("apply_decision from MAPPED only yields the states above"),
         };
         let o = rec(Some(&rid), state, Some(&dstr), &result, true, false);
         self.emit_outcome(&trace, &result);
+        if let Some(p) = pending_entry {
+            self.pending.insert((trace, rid), p);
+        }
         (result, o)
+    }
+
+    /// AUTHORIZED -> EXECUTING -> terminal, shared by the first decision and a host continuation.
+    /// `decided` says whether `decide` ran in this call (it does not at a continuation).
+    fn execute_authorized(
+        &mut self,
+        lc: &mut Lifecycle,
+        cap: &CapabilityRequest,
+        decision: &Decision,
+        ctx: &CallContext,
+        decided: bool,
+    ) -> (ToolResult, ObservedRecord) {
+        let trace = ctx.trace_id.clone();
+        let rid = cap.request_id.clone();
+        let _ = lc.begin_execution(decision);
+        self.emit(&trace, EventKind::ToolExecutionStarted, Some(&rid));
+        let ran = catch_unwind(AssertUnwindSafe(|| {
+            self.runtime.execute(cap, decision, ctx)
+        }));
+        let mut r = match ran {
+            Ok(r) => normalize(r, cap),
+            Err(_) => {
+                let mut r = ToolResult::failed(
+                    Some(&rid),
+                    ResultStatus::Error,
+                    ErrorCode::ExecutionError,
+                    "runtime authority raised an error",
+                );
+                r.provenance = Some(ResultProvenance {
+                    runtime: Some(self.runtime.runtime_id().to_string()),
+                    capability: Some(cap.capability.clone()),
+                    content_kind: None,
+                    trust: None,
+                    ..Default::default()
+                });
+                r
+            }
+        };
+        let end = match r.status {
+            ResultStatus::Ok => State::Succeeded,
+            ResultStatus::TimedOut => State::TimedOut,
+            _ => State::Failed,
+        };
+        let _ = lc.finish(end);
+        r.request_id = Some(rid.clone());
+        let o = rec(
+            Some(&rid),
+            lc.state(),
+            Some("authorized"),
+            &r,
+            decided,
+            true,
+        );
+        self.emit_outcome(&trace, &r);
+        (r, o)
+    }
+
+    /// Host-only (cut A2): read-only view of the approval entry for `(trace_id, request_id)`.
+    /// Not reachable from model output or an envelope.
+    pub fn pending_approval(&self, trace: &str, request_id: &str) -> Option<PendingApproval> {
+        self.pending
+            .get(&(trace.to_string(), request_id.to_string()))
+            .map(|p| PendingApproval {
+                request_id: request_id.to_string(),
+                approval_id: p.approval_id.clone(),
+                expires_at: p.expires_at.clone(),
+                request_digest: p.request_digest.clone(),
+                capability_request: p.cap.clone(),
+                state: p.lc.state(),
+            })
+    }
+
+    /// Host-only (cut A2): continue a request that required approval. `decision` is the
+    /// runtime's own continuation decision, `request_digest` the digest of the
+    /// `capability_request` the host believes was approved, `now` the host clock
+    /// (`YYYY-MM-DDTHH:MM:SSZ`). The order of checks is pinned in CORE.md (Approval continuation).
+    /// A request with no live pending entry is refused and nothing changes. A failed check on a
+    /// pending entry denies it for good; only `authorized` with everything matching executes,
+    /// at most once. This never calls `decide` and never touches the request ledger.
+    pub fn continue_approval(
+        &mut self,
+        trace: &str,
+        request_id: &str,
+        decision: &Decision,
+        request_digest: &str,
+        now: &str,
+    ) -> Result<(ToolResult, ObservedRecord), Refusal> {
+        let key = (trace.to_string(), request_id.to_string());
+        let mut p = match self.pending.remove(&key) {
+            Some(p) if p.lc.state() == State::RequiresApproval => p,
+            Some(p) => {
+                self.pending.insert(key, p);
+                return Err(Refusal::NoPendingApproval);
+            }
+            None => return Err(Refusal::NoPendingApproval),
+        };
+        let live = {
+            let c = self.runtime.catalog();
+            c.catalog_digest
+                .clone()
+                .unwrap_or_else(|| c.compute_digest())
+        };
+        let cited = decision.approval.as_ref().map(|a| a.approval_id.as_str());
+        let denial: Option<(ErrorCode, String)> = if decision.request_id != request_id {
+            Some((
+                ErrorCode::UnknownDecision,
+                "unknown decision value: mismatched request_id".into(),
+            ))
+        } else if cited != Some(p.approval_id.as_str()) {
+            Some((
+                ErrorCode::PolicyDenied,
+                "approval refused: approval_id does not match".into(),
+            ))
+        } else if request_digest != p.request_digest {
+            Some((
+                ErrorCode::PolicyDenied,
+                "approval refused: capability_request digest does not match".into(),
+            ))
+        } else if p
+            .expires_at
+            .as_deref()
+            .is_some_and(|e| approval_expired(e, now))
+        {
+            Some((ErrorCode::PolicyDenied, "approval expired".into()))
+        } else if live != p.catalog_digest {
+            Some((
+                ErrorCode::StaleCapability,
+                "runtime catalog changed since approval was requested".into(),
+            ))
+        } else {
+            match &decision.decision {
+                DecisionKind::Authorized => None,
+                DecisionKind::Denied => Some((
+                    ErrorCode::PolicyDenied,
+                    decision
+                        .reason
+                        .clone()
+                        .unwrap_or_else(|| "denied by runtime policy".into()),
+                )),
+                other => Some((
+                    ErrorCode::UnknownDecision,
+                    format!("unknown decision value: {}", other.as_str()),
+                )),
+            }
+        };
+        self.emit(trace, EventKind::ToolDecision, Some(request_id));
+        let (r, o) = match denial {
+            Some((code, msg)) => {
+                let embed =
+                    code == ErrorCode::PolicyDenied && decision.decision == DecisionKind::Denied;
+                self.deny_pending(&mut p, trace, code, &msg, embed.then_some(decision))
+            }
+            None => match p.lc.apply_decision(decision) {
+                Ok(State::Authorized) => {
+                    let (cap, ctx) = (p.cap.clone(), p.ctx.clone());
+                    self.execute_authorized(&mut p.lc, &cap, decision, &ctx, false)
+                }
+                _ => self.deny_pending(
+                    &mut p,
+                    trace,
+                    ErrorCode::UnknownDecision,
+                    "unknown decision value: mismatched request_id",
+                    None,
+                ),
+            },
+        };
+        self.push_result_input(trace, &r, r.result_digest());
+        self.pending.insert(key, p);
+        Ok((r, o))
+    }
+
+    /// Host-only (cut A2): cancel a pending approval. DENIED is terminal. Anything that is not
+    /// pending is refused and nothing changes.
+    pub fn cancel_approval(
+        &mut self,
+        trace: &str,
+        request_id: &str,
+    ) -> Result<(ToolResult, ObservedRecord), Refusal> {
+        let key = (trace.to_string(), request_id.to_string());
+        let mut p = match self.pending.remove(&key) {
+            Some(p) if p.lc.state() == State::RequiresApproval => p,
+            Some(p) => {
+                self.pending.insert(key, p);
+                return Err(Refusal::NoPendingApproval);
+            }
+            None => return Err(Refusal::NoPendingApproval),
+        };
+        let (r, o) = self.deny_pending(
+            &mut p,
+            trace,
+            ErrorCode::PolicyDenied,
+            "approval cancelled by host",
+            None,
+        );
+        self.push_result_input(trace, &r, r.result_digest());
+        self.pending.insert(key, p);
+        Ok((r, o))
+    }
+
+    /// REQUIRES_APPROVAL -> DENIED for a pending entry: result, record and event. Execute is not called.
+    fn deny_pending(
+        &mut self,
+        p: &mut PendingEntry,
+        trace: &str,
+        code: ErrorCode,
+        msg: &str,
+        embed: Option<&Decision>,
+    ) -> (ToolResult, ObservedRecord) {
+        let _ = p.lc.cancel();
+        let rid = p.cap.request_id.clone();
+        let mut r = ToolResult::failed(Some(&rid), ResultStatus::Denied, code, msg);
+        r.decision = embed.cloned();
+        r.provenance = Some(ResultProvenance {
+            runtime: Some(self.runtime.runtime_id().to_string()),
+            capability: Some(p.cap.capability.clone()),
+            content_kind: None,
+            trust: None,
+            ..Default::default()
+        });
+        let o = rec(Some(&rid), State::Denied, Some("denied"), &r, false, false);
+        self.emit_outcome(trace, &r);
+        (r, o)
     }
 
     /// Parse one model turn with a dialect, push every call through the pipeline, render results.

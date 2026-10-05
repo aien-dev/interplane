@@ -73,7 +73,7 @@ reach. No model-writable field is read as a grant and none is added that could b
 an envelope whose payload kind is `decision` is still refused at admission.
 
 ```
-continue_approval(trace_id, decision, request_digest, now) -> resolved(result, ObservedRecord) | refused(reason)
+continue_approval(trace_id, request_id, decision, request_digest, now) -> resolved(result, ObservedRecord) | refused(reason)
 cancel_approval(trace_id, request_id)              -> resolved(result, ObservedRecord) | refused(reason)
 pending_approval(trace_id, request_id)             -> read-only view of the pending entry, or none
 ```
@@ -111,8 +111,8 @@ another request is refused as described below.
    that fixed width, string order is time order. The approval is expired when `now >= expires_at`.
    An `expires_at` that is present but not of that shape, or a `now` that is not, counts as expired.
 6. The live catalog digest equals the one stored at pending time.
-7. The decision value: `authorized` executes; every other value is DENIED, an unknown value with
-   `unknown_decision`.
+7. The decision value: `authorized` executes; `denied` is DENIED; every other value (unknown, or
+   not a valid continuation such as `requires_approval`) is DENIED with `unknown_decision`.
 
 A failure at steps 2 to 6 on a live pending entry is a **denial**: the request goes to DENIED, which
 is terminal, execute is not called, and the host must start a new request. (A wrong or foreign id
@@ -149,8 +149,8 @@ reused here.
 **Restart.** The pending table lives in the pipeline instance. After a restart no request is
 pending, every continuation is refused, and the host starts a new request.
 
-**Exposure.** The executed result of a continuation is recorded in the trace's input ledger the same
-way a rendered result is (`parent_id` is the request id, `content_digest` is the digest of the
+**Exposure.** The result of every resolved continuation or cancel (executed, denied or cancelled) is
+recorded in the trace's input ledger the same way a rendered result is (`parent_id` is the request id, `content_digest` is the digest of the
 canonical result payload), so what the model sees next stays inside its exposure floor.
 
 Invariants (every implementation must enforce; conformance tests check them):

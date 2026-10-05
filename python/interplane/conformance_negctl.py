@@ -24,10 +24,15 @@ def _claims_approval(req) -> bool:
     return claim(req.arguments) or claim(req.extensions)
 
 
-def tamper_decision(variant: Optional[str], req, decision) -> None:
-    """V2 honours a model-asserted approval; V4 ignores exposure and authorizes every effect."""
+def tamper_decision(variant: Optional[str], req, decision, readmitting: bool = False) -> None:
+    """V2 honours a model-asserted approval; V4 ignores exposure and authorizes every effect; V6's
+    runtime sees a re-admitted request as already approved."""
     from .conformance import EFFECT_CAPABILITIES
 
+    if variant == "V6" and readmitting and decision.decision == "requires_approval":
+        decision.decision = "authorized"
+        decision.approval = None
+        return
     if decision.decision not in ("denied", "requires_approval"):
         return
     if (variant == "V2" and _claims_approval(req)) or (
@@ -39,7 +44,8 @@ def tamper_decision(variant: Optional[str], req, decision) -> None:
 
 
 def before_step(variant: Optional[str], pipe) -> None:
-    """V6: re-admission with duplicate detection off. Every step starts with a fresh ledger."""
+    """V6: re-admission with duplicate detection off. Every step starts with a fresh ledger, and a
+    host ``approve`` step is carried out by re-admitting the original envelope (see the runner)."""
     if variant == "V6":
         pipe.ledger = RequestLedger()
 
@@ -102,6 +108,15 @@ def continuation_any_id(variant: Optional[str], minted: dict, rid: str, decision
         minted[rid] = decision.approval.get("approval_id")
     elif decision.approval.get("approval_id"):
         decision.approval["approval_id"] = minted[rid]
+
+
+def approve_any_id(variant: Optional[str], pend, decision) -> None:
+    """V5 at the pipeline: a host ``approve`` step is accepted whatever non-empty ``approval_id`` it
+    cites, modelled by citing the id the runtime minted for the request in its place."""
+    if variant != "V5" or pend is None or not isinstance(decision.approval, dict):
+        return
+    if decision.approval.get("approval_id"):
+        decision.approval["approval_id"] = pend.approval_id
 
 
 def matrix(fixtures_dir: str, spec_path: str) -> dict:

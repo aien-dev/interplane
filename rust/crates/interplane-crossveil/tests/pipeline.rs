@@ -417,3 +417,112 @@ fn input_registration_is_not_reachable_from_an_envelope() {
     assert_eq!(res.error.unwrap().code, ErrorCode::MalformedEnvelope);
     assert!(p.inputs("t").is_empty());
 }
+
+// ---- host approval continuation (0.3 cut A2) ----
+
+const PINNED_DIGEST: &str =
+    "sha256:be3ae35c3a1f72b4a403479b1f03589af2568892b47f58b48397fdcf2d7090a5";
+
+fn continuation(rid: &str, aid: &str, kind: &str) -> Decision {
+    serde_json::from_value(json!({
+        "kind": "decision", "request_id": rid, "decision": kind, "capability": "delete_file",
+        "authority": {"runtime": "mock", "policy_engine": "mock.policy"},
+        "approval": {"approval_id": aid}
+    }))
+    .expect("decision")
+}
+
+fn pending_delete(p: &mut Pipeline<'_>) -> PendingApproval {
+    p.run_turn(
+        "openai",
+        "m",
+        &turn(vec![call("c1", "delete_file", json!({"path": "/tmp/x"}))]),
+        "t",
+        0,
+    );
+    p.pending_approval("t", "c1").expect("pending")
+}
+
+#[test]
+fn request_digest_is_pinned_and_matches_python() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt);
+    let pa = pending_delete(&mut p);
+    assert_eq!(pa.request_digest, PINNED_DIGEST);
+    assert_eq!(pa.state, State::RequiresApproval);
+    assert_eq!(pa.approval_id, "mock-approval-c1");
+}
+
+#[test]
+fn continuation_executes_once_and_never_calls_decide() {
+    let mut rt = MockRuntime::new();
+    let (r, o) = {
+        let mut p = pipe(&mut rt);
+        let pa = pending_delete(&mut p);
+        let d = continuation("c1", &pa.approval_id, "authorized");
+        let (r, o) = p
+            .continue_approval("t", "c1", &d, &pa.request_digest, "2026-01-01T00:00:00Z")
+            .expect("resolved");
+        assert!(p
+            .continue_approval("t", "c1", &d, &pa.request_digest, "2026-01-01T00:00:00Z")
+            .is_err());
+        (r, o)
+    };
+    assert_eq!(r.status, ResultStatus::Ok);
+    assert_eq!(
+        (o.stage.as_str(), o.decide_invoked, o.execute_invoked),
+        ("SUCCEEDED", false, true)
+    );
+    assert_eq!((rt.decide_calls, rt.execute_calls), (1, 1));
+}
+
+#[test]
+fn unreadable_clock_or_expiry_counts_as_expired() {
+    for (expires, now) in [
+        ("2026-06-01T00:00:00Z", "yesterday"),
+        ("2026-06-01", "2026-01-01T00:00:00Z"),
+        ("2026-06-01T00:00:00Z", "2026-06-01T00:00:00Z"),
+        ("2026-06-01T00:00:00Z", "2026-13-01T00:00:00Z"),
+    ] {
+        let mut rt = MockRuntime::new();
+        rt.approval_expires_at = Some(expires.into());
+        let mut p = pipe(&mut rt);
+        let pa = pending_delete(&mut p);
+        let d = continuation("c1", &pa.approval_id, "authorized");
+        let (r, _) = p
+            .continue_approval("t", "c1", &d, &pa.request_digest, now)
+            .expect("resolved");
+        assert_eq!(r.status, ResultStatus::Denied, "{expires} vs {now}");
+        assert_eq!(r.error.unwrap().message, "approval expired");
+    }
+}
+
+#[test]
+fn continuation_leaves_the_request_ledger_alone_and_feeds_the_exposure_ledger() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt);
+    let pa = pending_delete(&mut p);
+    let before = p.inputs("t").len();
+    let d = continuation("c1", &pa.approval_id, "authorized");
+    let (_, o) = p
+        .continue_approval("t", "c1", &d, &pa.request_digest, "2026-01-01T00:00:00Z")
+        .expect("resolved");
+    assert_eq!(p.inputs("t").len(), before + 1);
+    // the ledger entry carries the canonical result digest (duration nulled), as in Python
+    assert_eq!(
+        p.inputs("t").last().unwrap().content_digest,
+        o.result_digest
+    );
+    // the same request id is still a duplicate: continuation is not an admission
+    let out = p.run_turn(
+        "openai",
+        "m",
+        &turn(vec![call("c1", "delete_file", json!({"path": "/tmp/x"}))]),
+        "t",
+        1,
+    );
+    assert_eq!(
+        out.results[0].error.as_ref().unwrap().code,
+        ErrorCode::DuplicateRequestId
+    );
+}

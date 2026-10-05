@@ -394,6 +394,7 @@ def test_no_public_path_to_authorized_without_runtime_decision():
     public = [n for n in dir(Lifecycle) if not n.startswith("_")]
     assert sorted(public) == [
         "apply_decision",
+        "cancel",
         "decision",
         "finish",
         "map",

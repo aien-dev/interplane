@@ -593,3 +593,21 @@ fn exposure_roundtrips_inside_provenance_extensions() {
     let ex: Exposure = serde_json::from_value(p["provenance"]["exposure"].clone()).unwrap();
     assert_eq!(ex.floor, TrustLevel::Undetermined);
 }
+
+#[test]
+fn cancel_only_leaves_requires_approval_and_only_to_denied() {
+    let mut l = Lifecycle::new("r");
+    assert!(l.cancel().is_err());
+    l.map().unwrap();
+    assert!(l.cancel().is_err());
+    let d: Decision = serde_json::from_value(serde_json::json!({
+        "kind": "decision", "request_id": "r", "decision": "requires_approval",
+        "authority": {"runtime": "m", "policy_engine": "p"},
+        "approval": {"approval_id": "a1"}
+    }))
+    .unwrap();
+    l.apply_decision(&d).unwrap();
+    assert_eq!(l.cancel(), Ok(State::Denied));
+    assert!(l.cancel().is_err());
+    assert_eq!(l.state(), State::Denied);
+}

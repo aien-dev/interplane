@@ -68,7 +68,7 @@ proposal are never flattened into indistinguishable text. Rules:
    `message_id` or `request_id` that produced it; `null` for host-registered inputs) and
    `derived_from` (`input_id`s it was computed from; may be empty). The runtime assigns `trust`.
    Content the model itself generated is `content_kind = model_generated` with trust
-   `external_untrusted`. The nine source classes are workspace, web, memory, document, skill
+   `external_untrusted`; the pipeline never records it on its own (rule 7). The nine source classes are workspace, web, memory, document, skill
    (including tool descriptions), tool output, external provider, runtime-generated and user
    request; `conformance/fixtures/input/` holds one schema-valid example of each.
 6. **Exposure** is the optional `provenance.exposure` on a `tool_request`:
@@ -85,6 +85,36 @@ proposal are never flattened into indistinguishable text. Rules:
    to `decide` and `execute`, carry the ledger as it stood when the turn began. Exposure fails
    closed: an empty ledger, an input of unknown or unrecognized trust, and an input whose
    `derived_from` names an id the ledger does not hold all count as `external_untrusted`.
+7. **Source classes.** The trust each class receives, and who records it. `Recorded by` is the
+   pipeline when it renders a result, otherwise the host through `register_input`. A class that
+   can originate outside the workspace is `external_untrusted`; where the runtime cannot tell, it
+   labels the weaker value (never the stronger).
+
+   | Source class | `content_kind` | `trust` | Recorded by | Mock source |
+   |---|---|---|---|---|
+   | workspace | workspace_content | workspace_untrusted | host | file input (case 31) |
+   | web | web_content | external_untrusted | pipeline | `web_fetch` (32) |
+   | memory | memory | workspace_untrusted | pipeline | `recall_memory` (33) |
+   | document | document | external_untrusted | pipeline | `read_document` (34) |
+   | skill, tool description | skill | external_untrusted | host (descriptions), pipeline (`load_skill`) | `load_skill`, description input (35) |
+   | tool output | tool_result | adapter's value, `unknown` if absent | pipeline | `list_dir` (36) |
+   | external provider | external_provider | external_untrusted | pipeline | `call_provider` (37) |
+   | runtime-generated | runtime_instruction | trusted_runtime | host | system prompt (38) |
+   | user request | user_request | user_supplied | host | operator input (39) |
+   | model-generated | model_generated | external_untrusted | host | earlier model text (40) |
+
+   Skills and tool descriptions are `external_untrusted`, not `workspace_untrusted` (P2's example
+   said otherwise): a third-party skill or a tool server's description is authored outside the
+   workspace and is read by the model as instruction-shaped text. A host that knows a skill file
+   was written inside the workspace may register it as `workspace_untrusted`; the mock cannot tell,
+   so it labels `external_untrusted`. Memory stays `workspace_untrusted` because the runtime wrote
+   it; a memory entry distilled from external content names that content in `derived_from`.
+   The pipeline does not record the model's own prior text. When a host feeds earlier model output
+   back into the context it registers it as `model_generated` / `external_untrusted` (`parent_id`
+   null, `derived_from` naming what the model had seen if known). Recording it automatically would
+   make the floor of every multi-turn trace `external_untrusted` by construction and hide real
+   exposure changes; an unregistered model turn is a host omission, visible as a ledger that lacks
+   it (case 40).
 
 Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
 `invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose

@@ -44,7 +44,7 @@ fn verdicts_are_deterministic() {
 fn expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected() {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
     let all = load_fixtures(&dir).unwrap();
-    assert_eq!(all.len(), 30);
+    assert_eq!(all.len(), 40);
     let mut fx = all
         .into_iter()
         .find(|f| f["case"] == "24-expansion-requested-excluded")

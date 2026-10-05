@@ -1,0 +1,79 @@
+{
+  "case": "36-source-class-tool-output",
+  "description": "Source class tool-output: list_dir carries no provenance, so the result is tool_result with trust unknown. The pipeline records the rendered result as an InputRecord with every required field (parent_id is the request_id); the host registered nothing, so the exposure floor fails closed to external_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-36",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_36a",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_36a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "tool_result",
+        "trust": "unknown",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-36",
+        "parent_id": "call_36a",
+        "derived_from": [],
+        "content_digest": "sha256:ce7835c7183cf4cb2d2a349d99d6f7fa2080b08518f3f6568d869020e1455395"
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_36a",
+        "inputs": [],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

@@ -158,6 +158,9 @@ def test_select_and_measure():
         "send_email": "domain_mismatch",
         "web_fetch": "domain_mismatch",
         "recall_memory": "domain_mismatch",
+        "read_document": "domain_mismatch",
+        "load_skill": "domain_mismatch",
+        "call_provider": "domain_mismatch",
     }
     sel2, caps2 = select(cat, ["filesystem"], 3, ["fail_tool"], renderer=openai_tools_renderer)
     assert [c.name for c in caps2] == ["fail_tool", "append_note", "delete_file"]
@@ -166,7 +169,7 @@ def test_select_and_measure():
     _, caps3 = select(cat, ["filesystem"], 1, ["fail_tool", "slow_tool"])
     assert [c.name for c in caps3] == ["fail_tool", "slow_tool"]
     m = sel2.measure
-    assert m["full_count"] == 10 and m["selected_count"] == 3
+    assert m["full_count"] == 13 and m["selected_count"] == 3
     assert m["selected_rendered_bytes"] < m["full_rendered_bytes"]
     assert sel2.catalog_digest == cat.computed_digest()
     assert measure(cat.capabilities, [], lambda c: "")["selected_rendered_bytes"] == 0

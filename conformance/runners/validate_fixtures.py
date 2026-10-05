@@ -73,7 +73,8 @@ REQUIRED = {
  "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result",
  "24-expansion-requested-excluded","25-expansion-refused-by-bound",
  "26-unrecognized-content-kind","27-absent-null-unrecognized-trust",
- "28-input-ledger-continues","29-input-derived-from","30-input-forged-exposure"}
+ "28-input-ledger-continues","29-input-derived-from","30-input-forged-exposure",
+ "31-source-class-workspace","32-source-class-web","33-source-class-memory","34-source-class-document","35-source-class-skill","36-source-class-tool-output","37-source-class-external-provider","38-source-class-runtime-generated","39-source-class-user-request","40-source-class-model-generated"}
 OBS_KEYS = ["request_id","stage","decision","status","error_code","decide_invoked","execute_invoked","result_digest"]
 n_env = n_cases = 0
 neg_done = False

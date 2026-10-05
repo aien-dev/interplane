@@ -1,0 +1,111 @@
+{
+  "case": "35-source-class-skill",
+  "description": "Source class skill, both forms. A tool description is registered by the host as a skill input; the mock labels it external_untrusted because a third-party tool server can author it (CROSSVEIL source-class table). load_skill returns skill text, recorded automatically. The floor is external_untrusted, never workspace_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-35",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-35-tooldesc",
+        "content_kind": "skill",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock-skills"
+        },
+        "origin": "runtime:mock-tool-description:read_file",
+        "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "trace_id": "trace-35",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_35a",
+            "type": "function",
+            "function": {
+              "name": "load_skill",
+              "arguments": "{\"name\": \"deploy\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_35a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-35-tooldesc",
+        "content_kind": "skill",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock-skills"
+        },
+        "origin": "runtime:mock-tool-description:read_file",
+        "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+        "trace_id": "trace-35",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "skill",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-35",
+        "parent_id": "call_35a",
+        "derived_from": [],
+        "content_digest": "sha256:094e2b08174dea7db0152f5163198f58776fa109eaa63b2a4001c1e41508c879"
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_35a",
+        "inputs": [
+          "in-35-tooldesc"
+        ],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

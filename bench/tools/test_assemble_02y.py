@@ -125,5 +125,30 @@ class Assembly(unittest.TestCase):
             self.assertTrue(V.regression_slot_errors(reg, ctx))
 
 
+class Discovery(unittest.TestCase):
+    ENTRIES = [
+        {"id": "q-0001", "request": "Who is on duty in March?", "fixture": "beacon", "answer": ["Ines"], "template": "duty", "group": "default", "status": "accepted"},
+        {"id": "q-0002", "request": "Who is on duty in April?", "fixture": "beacon", "answer": ["Ola"], "template": "duty", "group": "default", "status": "discarded_surplus"},
+        {"id": "q-0003", "request": "Who is on duty in May?", "fixture": "beacon", "answer": ["Eva", "Lund"], "template": "duty", "group": "nonfile", "status": "accepted"},
+    ]
+
+    def test_only_accepted_entries_become_tasks_in_log_order(self):
+        with tempfile.TemporaryDirectory() as d:
+            tasks = A.assemble_discovery(self.ENTRIES, Path(d))
+            self.assertEqual(sorted(tasks), ["ambiguous-101", "ambiguous-102"])
+            t = tasks["ambiguous-102"]
+            self.assertIn("request: q-0003", t["notes"])
+            self.assertIn("group: nonfile", t["notes"])
+            self.assertEqual(t["judge"]["checks"][0]["values"], ["Eva", "Lund"])
+            self.assertEqual(t["required_capabilities"], [])
+            self.assertTrue((Path(d) / "tasks" / "ambiguous-101.json").is_file())
+
+    def test_same_bytes_twice(self):
+        with tempfile.TemporaryDirectory() as a, tempfile.TemporaryDirectory() as b:
+            A.assemble_discovery(self.ENTRIES, Path(a))
+            A.assemble_discovery(self.ENTRIES, Path(b))
+            self.assertEqual(tree_hash(Path(a)), tree_hash(Path(b)))
+
+
 if __name__ == "__main__":
     unittest.main()

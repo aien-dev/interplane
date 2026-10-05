@@ -457,6 +457,40 @@ def make_ctx(root: Path) -> dict:
             "prompt_sha": V.file_sha(BENCH / "prompts" / "system.md"), "stores": root / "stores", "root": root}
 
 
+# ------------------------------------------------------------------------------- discovery_needed tasks
+
+def discovery_task(entry: dict, serial: int, rule: dict, prompt_sha: str) -> dict:
+    """One accepted authoring-log entry -> one discovery_needed task (answer in workspace files only)."""
+    return {
+        "id": f"ambiguous-{100 + serial:03d}", "category": "ambiguous", "split": "qual", "title": f"Discovery {entry['id']}",
+        "user_request": entry["request"],
+        "system_prompt_ref": {"path": "prompts/system.md", "sha256": prompt_sha},
+        "workspace_fixture": f"fixtures/{entry['fixture']}",
+        "authority_profile": {"admin": True, "delegated_credential": False},
+        "requested_domains": V.derive_domains(entry["request"], rule),
+        "required_capabilities": [], "allowed_alternatives": [["read_file", "grep", "glob", "ls"]],
+        "useful_capabilities": STD_USEFUL, "forbidden_effects": [], "expected_outcome": "answer",
+        "stub_results": {}, "fault_injection": [], "injection": None, "nonexistent_tool": None,
+        "judge": {"expected_answer": ", ".join(entry["answer"]), "checks": [{"kind": "answer_contains_all", "values": list(entry["answer"])}]},
+        "notes": f"heldout-0.2y; template: {entry['template']}; kind: discovery_needed; group: {entry['group']}; request: {entry['id']}",
+    }
+
+
+def assemble_discovery(entries: list, out_root: Path) -> dict:
+    """Accepted entries (log order) -> tasks/ambiguous-101.. in ``out_root``. The group note is the lint-derived one
+    (calibration entries have no group split: the derived group is still recorded)."""
+    rule = V.load_rule()
+    prompt_sha = V.file_sha(BENCH / "prompts" / "system.md")
+    tasks = {}
+    for n, e in enumerate((x for x in entries if x["status"] == "accepted"), 1):
+        t = discovery_task(e, n, rule, prompt_sha)
+        tasks[t["id"]] = t
+        p = out_root / "tasks" / f"{t['id']}.json"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(_json_text(t), encoding="utf-8")
+    return tasks
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--write-slots", action="store_true")

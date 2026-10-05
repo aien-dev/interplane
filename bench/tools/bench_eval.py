@@ -210,12 +210,21 @@ def r1_problems(receipt: dict) -> list:
     query string of every discovery call. Returns the problems found; an empty list means valid.
     A B5 receipt with any problem is invalid (the analyzer must exclude the run)."""
     bad = []
+    if not receipt.get("rounds"):
+        bad.append("no rounds recorded")
     for r in receipt.get("rounds") or []:
         if not isinstance(r.get("text"), str):
             bad.append(f"round {r.get('round')}: no text")
     for c in receipt.get("calls") or []:
-        if c.get("discovery") and "query" not in c:
-            bad.append(f"round {c.get('round')} call {c.get('index')}: discovery call without query")
+        if not c.get("discovery"):
+            continue
+        where = f"round {c.get('round')} call {c.get('index')}"
+        if "query" not in c:
+            bad.append(f"{where}: discovery call without query")
+        elif not isinstance(c["query"], str) and c.get("error_code") != "invalid_arguments":
+            # a non-string query is valid only as the model's own malformed call, which the
+            # runner records as an invalid_arguments error; anything else is a recording fault
+            bad.append(f"{where}: query is not a string and the call is not an invalid_arguments error")
     return bad
 
 

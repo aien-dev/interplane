@@ -124,6 +124,14 @@ def load_run(run_dir: Path, tasks_dir: Path) -> dict:
     return {"manifest": manifest, "receipts": rec, "tasks": tasks, "r1_invalid": r1_invalid}
 
 
+def refuse_r1_invalid(data: dict, label: str) -> None:
+    """PREREG-0.2y validity: no run with an unrecorded query or text counts. The analyzer refuses the
+    whole run rather than scoring around it."""
+    if data["r1_invalid"]:
+        raise SystemExit(f"{label}: {len(data['r1_invalid'])} B5 receipt(s) without valid R1 fields, run not scored: "
+                         + json.dumps(data["r1_invalid"][:5]))
+
+
 def pair_class(a: bool, b: bool) -> str:
     return "both" if a and b else ("B_only" if b else ("A_only" if a else "neither"))
 
@@ -256,6 +264,7 @@ def gates(rows: list, expected_n: int) -> dict:
 
 def build(run_dir: Path, tasks_dir: Path, exclude: list, exclude_reason: str) -> dict:
     data = load_run(run_dir, tasks_dir)
+    refuse_r1_invalid(data, run_dir.name)
     tasks, rec = data["tasks"], data["receipts"]
     rows = []
     for tid in sorted(rec):
@@ -595,6 +604,8 @@ def build_campaign(gate_dir: Path, stab_dirs: list, tasks_dir: Path) -> dict:
     for i, d in enumerate(stab_dirs):
         runs[f"stability{i + 1}"] = load_run(d, tasks_dir)
         labels[f"stability{i + 1}"] = d.name
+    for k, r in runs.items():
+        refuse_r1_invalid(r, labels[k])
     out: dict = {"kind": "interplane_bench_campaign_summary", "gate_seed_dir": labels["gate"],
                  "stability_dirs": [labels[k] for k in labels if k != "gate"], "arms": {}}
     out["blocks"] = {k: {"seed": (r["manifest"].get("campaign") or {}).get("seed"),

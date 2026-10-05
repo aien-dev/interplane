@@ -480,6 +480,21 @@ def main() -> int:
         ld = analyze.load_run(shutil_copy, b5dir)
         assert [x["task"] for x in ld["r1_invalid"]] == ["ambiguous-925"] and ld["r1_invalid"][0]["condition"] == "B5"
         assert analyze.load_run(o5, b5dir)["r1_invalid"] == []
+        # the analyzer refuses a run holding an invalid B5 receipt instead of scoring around it
+        try:
+            analyze.build(shutil_copy, b5dir, [], "")
+            raise AssertionError("build scored a run with an invalid B5 receipt")
+        except SystemExit as e:
+            assert "without valid R1 fields" in str(e), e
+        # no rounds is invalid; a non-string query is valid only as a recorded invalid_arguments call
+        assert bench_eval.r1_problems({"rounds": [], "calls": []}) == ["no rounds recorded"]
+        assert not bench_eval.r1_valid({k: v for k, v in r5.items() if k != "rounds"})
+        nullq = copy.deepcopy(r5)
+        nc = [c for c in nullq["calls"] if c["discovery"]][0]
+        nc["query"] = None
+        assert not bench_eval.r1_valid(nullq), "a null query on an ok call must be invalid"
+        nc["status"], nc["error_code"] = "error", "invalid_arguments"
+        assert bench_eval.r1_valid(nullq), "the model's own malformed call, recorded as such, is valid"
         # the base set is verified against the catalog: a name the catalog lacks refuses the run
         saved_sets = dict(run_bench.BASE_SETS)
         run_bench.BASE_SETS["B5"] = base5 + ["no_such_tool"]

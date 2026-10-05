@@ -606,7 +606,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
                        "status": "ok", "error_code": None, "executed": False, "result_digest": None,
                        "result_trust": "trusted_runtime", "result_content_kind": "discovery", "exposed": None,
                        "synthetic": None, "discovery": True,
-                       "query": q if isinstance(q, str) else None}  # R1: the discovery query string
+                       "query": q}  # R1: the discovery query exactly as the model sent it (None if absent)
                 if not isinstance(q, str) or not q.strip():
                     content = {"error": "query must be a non-empty string"}
                     rec["status"], rec["error_code"] = "error", "invalid_arguments"

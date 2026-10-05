@@ -1,8 +1,8 @@
 corpus: conformance/fixtures
-corpus_files: 74
-corpus_digest: sha256:a7d1223baa7c5337800286fb1e3015c2cb942779af2c8798908498120c5718af
+corpus_files: 90
+corpus_digest: sha256:e92edd624b7e3f00a6127466961a1c21531750e42cfca8714268b93e4e4b9952
 negative_controls: conformance/negative-controls.json
-negative_controls_sha256: sha256:fe938879fa9fa5d53038254795814244a6e8c923e63b5f7f975d40bc4f8bd1c1
+negative_controls_sha256: sha256:f603f074091641edfbe6f1c83131cf7ffc8f6947568dd6230b1030bb5b282569
 protocol: bench/PROTOCOL-0.3.md
 protocol_sha256: sha256:c87c72e6cef4627c40bf7766e7e02cc92e96666667d0fb53d3f63b066f7a6ca2
 t3_subset: []

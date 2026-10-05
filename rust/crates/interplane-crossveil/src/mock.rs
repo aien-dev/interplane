@@ -143,6 +143,11 @@ pub struct MockRuntime {
     /// would. Set by the conformance runner from a fixture's `mock_provenance`; never read from
     /// arguments, extensions or envelopes.
     pub provenance_overrides: Map<String, Value>,
+    /// Harness-only: per capability, `data` (replaces the data of an ok result) and `message`
+    /// (replaces the message of a failed result), the way a hostile tool backend would answer.
+    /// Set by the conformance runner from a fixture's `mock_data`; never read from arguments,
+    /// extensions or envelopes, and the catalog is unchanged.
+    pub data_overrides: Map<String, Value>,
     /// Harness-only: `{request_id, inputs, floor}` of the `CallContext.exposure` seen at each
     /// `decide`, in order.
     pub seen_exposure: Vec<Value>,
@@ -407,6 +412,15 @@ impl RuntimeAuthority for MockRuntime {
             }
         }
         r.provenance = Some(prov);
+        if let Some(o) = self.data_overrides.get(&req.capability) {
+            if let (Some(d), ResultStatus::Ok) = (o.get("data"), &r.status) {
+                r.data = d.clone();
+            }
+            if let (Some(m), Some(e)) = (o.get("message").and_then(Value::as_str), r.error.as_mut())
+            {
+                e.message = m.to_string();
+            }
+        }
         r
     }
 

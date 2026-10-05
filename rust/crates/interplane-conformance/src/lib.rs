@@ -123,6 +123,9 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
     if let Some(o) = fx["mock_provenance"].as_object() {
         rt.provenance_overrides = o.clone();
     }
+    if let Some(o) = fx["mock_data"].as_object() {
+        rt.data_overrides = o.clone();
+    }
     rt.approval_expires_at = fx["mock_approval"]["expires_at"]
         .as_str()
         .map(str::to_string);

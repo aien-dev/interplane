@@ -40,6 +40,7 @@ RUNTIME_ID = "odysseus"
 POLICY_ENGINE = "odysseus.tool_capabilities"
 NOT_AVAILABLE = "odysseus runtime not available"
 NOT_EXECUTED = "not executed by the reference adapter"
+APPROVAL_CONTINUATION = "approval continuation unsupported on Odysseus"
 EXECUTABLE = frozenset({"read_file", "ls", "glob", "grep"})
 _PATH_TOOLS = EXECUTABLE
 _UNTRUSTED = frozenset({"external_untrusted", "workspace_untrusted"})
@@ -199,11 +200,16 @@ class OdysseusAuthority(RuntimeAuthority):
                 req,
                 "requires_approval",
                 reason,
-                approval={
-                    "approval_id": f"odysseus-pending-{req.request_id}",
-                    "scope": "single_action",
+                # No approval id is minted: the pipeline keeps no pending entry for a request whose
+                # requires_approval carries none, so every host continuation is refused
+                # (no_pending_approval) and nothing can execute through an approval. Odysseus's
+                # sealed approvals are task or chat scoped and bound to owner, session and run, which
+                # INTERPLANE's single-effect continuation cannot express (see the README).
+                approval=None,
+                runtime_state={
+                    "vocabulary": "odysseus.tool_gate",
+                    "values": [reason, APPROVAL_CONTINUATION],
                 },
-                runtime_state={"vocabulary": "odysseus.tool_gate", "values": [reason]},
             )
 
         # 2. admin gates (tool_execution.py:1064-1080)
@@ -258,6 +264,8 @@ class OdysseusAuthority(RuntimeAuthority):
 
     def execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
         name, rid = req.capability, req.request_id
+        if decision.decision != "authorized":  # fail closed: only an authorized decision executes
+            return self._error(rid, name, NOT_EXECUTED)
         if self._ody is None:
             return self._error(rid, name, NOT_AVAILABLE)
         if name not in EXECUTABLE:

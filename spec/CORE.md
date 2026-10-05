@@ -286,6 +286,12 @@ sets null). It stands in for a mislabelling adapter. It is harness configuration
 `mapping_table`: the mock never reads labels from arguments, `extensions` or envelopes, and the
 catalog is unchanged. Only cases 26 and 27 use it.
 
+A fixture may carry `mock_data: {<capability>: {data?, message?}}` (0.3 cut I2). `data` replaces the
+`data` of that capability's ok result, `message` replaces the error message of its failed result;
+it stands in for a hostile tool backend whose output carries injected text (the injection fixtures
+06 to 19). Harness configuration like `mock_provenance`: never read from arguments, `extensions` or
+envelopes, labels and catalog unchanged.
+
 The mock runtime validates `arguments` against the capability parameters (required keys present,
 declared types match) and answers `invalid` with `invalid_arguments` on failure. It counts
 `decide` and `execute` invocations; conformance records them.

@@ -70,7 +70,7 @@ fn expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected() 
 fn every_injection_fixture_passes_and_is_judged() {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
     let fixtures = load_injection_fixtures(&dir).unwrap();
-    assert!(fixtures.len() >= 3);
+    assert!(fixtures.len() >= 19);
     for fx in &fixtures {
         let run = run_case(fx);
         let errs = compare(fx, &run);

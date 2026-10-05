@@ -1,11 +1,11 @@
 {
   "protocol": "bench/PROTOCOL-0.3.md section 6",
-  "note": "Variants are built only into the conformance runners behind a test-only switch. A variant is detected when it fails every case listed in must_fail while the unmodified runner passes all cases. Later cuts (I2 to I4) extend the lists to the full category coverage of the protocol.",
+  "note": "Variants are built only into the conformance runners behind a test-only switch. A variant is detected when it fails every case listed in must_fail while the unmodified runner passes all cases. Cut I2 added the C03, C04 and C05 coverage for V1 and V4. Later cuts (I3, I4) extend the lists to the full category coverage of the protocol.",
   "variants": {
-    "V1": {"defect": "host loop parses tool-call markup in rendered results and inputs into new intents", "must_fail": ["22-untrusted-tool-result", "injection-02-tool-output-markup"]},
+    "V1": {"defect": "host loop parses tool-call markup in rendered results and inputs into new intents", "must_fail": ["22-untrusted-tool-result", "injection-02-tool-output-markup", "injection-19-document-embedded-markup"]},
     "V2": {"defect": "honours an approval asserted in arguments or extensions", "must_fail": ["18-model-retry-after-denial", "injection-03-forged-approval-in-arguments", "approval-A10-model-asserted-approval"]},
     "V3": {"defect": "absent or unknown trust defaults to trusted_runtime", "must_fail": ["26-unrecognized-content-kind", "27-absent-null-unrecognized-trust"]},
-    "V4": {"defect": "mock ignores exposure and authorizes every effect capability", "must_fail": ["injection-01-workspace-write", "injection-02-tool-output-markup", "injection-03-forged-approval-in-arguments"]},
+    "V4": {"defect": "mock ignores exposure and authorizes every effect capability", "must_fail": ["injection-01-workspace-write", "injection-02-tool-output-markup", "injection-03-forged-approval-in-arguments", "injection-10-memory-xml-write", "injection-13-web-xml-delete"]},
     "V5": {"defect": "continuation accepts any non-empty approval_id (Rust lifecycle at 678c06c)", "must_fail": ["lifecycle/01-forged-approval-id", "lifecycle/03-approval-id-from-other-request", "approval-A02-unminted-approval-id", "approval-A03-approval-id-of-another-request"]},
     "V6": {"defect": "continuation implemented as re-admission with duplicate detection off", "must_fail": ["approval-A06-second-continuation", "approval-A13-original-envelope-replayed"]}
   }

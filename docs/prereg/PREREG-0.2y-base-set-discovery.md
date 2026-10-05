@@ -10,7 +10,7 @@ every change goes in section 11 with date and reason.
 ## 1. Diagnosis (from the 0.2x receipts; nothing re-run)
 
 Target: the 8 `nopath` expansion tasks (`expansion-117` to `-124`), recovered 0 of 8 in all four
-arms (`docs/REPORT-0.2x.md`, O2 per kind table). Source: `seed-4x/receipts/expansion-11x.*.json`.
+arms (`docs/REPORT-0.2x.md`, O2 per kind table). Source: `seed-42/`, `seed-43/` and `seed-44/` `receipts/expansion-11x.*.json`.
 
 | question | answer | evidence | strength |
 |---|---|---|---|
@@ -96,14 +96,41 @@ natural-language user requests. The author does **not** receive: the catalog or 
 fixture content.
 
 **Leakage prevention (enforced by a new `validate.py --corpus 0.2y` lint, stdlib only).** A task
-is rejected if its `user_request` contains any of: a catalog capability name or any token of one
-(split on `_ . -`, length >= 3, the lint uses the recorded 71-name catalog), the words `file`,
-`path`, `grep`, `search tool`, `tool`, `function`, `command`, an extension from
+is rejected if its `user_request` contains any of: a catalog capability name, any token of one
+(split on `_ . -`, length >= 3, the lint uses the recorded 71-name catalog) **that is not itself a
+`domains.json` keyword**, the words `file`,
+`path`, `grep`, `search tool`, `tool`, `function`, `command` (these stay banned even where they are
+keywords), an extension from
 `domains.json` `filename_pattern` plus `.rst .adoc .org .tsv .conf .xml .html`, a path separator,
 or a name that equals a fixture file name. The lint also records the `domain_match` derivation per
 task and fails the corpus if fewer than 24 `discovery_needed` tasks derive a non-file domain, or if
 any discovery-needed task derives the filesystem domain with a keyword other than the default.
 Task authors are told only the lint's failure messages, never the word lists, until freeze.
+
+Why the keyword exemption (measured 2026-10-05, before any task exists): 34 of the 94 non-file
+keywords in `domains.json` are also name tokens of the 71-name catalog (for example `email`,
+`notes`, `models`, `calendar`, `tasks`, `plan`, `chat`), and the only `research` keyword is one, so
+without the exemption the lint would reject most wrong-domain requests the design requires. A
+keyword is the everyday word a user says ("check my email"), which is exactly how 117 to 124
+misled the selector; a full capability name or a non-keyword name token (`manage`, `list`,
+`served`...) would still name a tool and stays banned.
+
+**How the 24 wrong-domain and 24 default tasks are obtained (no content-based selection).**
+- The brief asks for 36 `discovery_needed` requests "phrased the way someone talks about their
+  everyday work: mail, meetings, contacts, to-dos, notes, chats, models, memory, documents,
+  images" and 36 phrased "as a plain question about something in their project". The brief
+  names these life areas only, never a keyword list, a tool or the selector.
+- The lint runs on every request in task-id order. A request is accepted into the non-file group
+  if it passes the leakage rules and derives exactly one non-file domain, into the default group if
+  it passes and derives the default list, and is otherwise discarded with its lint message
+  recorded. Each group takes the first 24 accepted in id order; the rest are discarded unrun.
+- If a group has fewer than 24 after one pass, the author gets one top-up request: "write k more
+  requests of the same kind" plus the lint messages of the discarded ones (no word list), and the
+  same rule runs on the new ids. At most three top-ups; if a group is still short, the corpus is not
+  frozen, the shortfall is reported, and the authoring rules are revised under section 11 before a
+  fresh authoring round.
+- Every request ever written, accepted or discarded, and its lint message is kept in
+  `heldout-0.2y/authoring-log.jsonl`. No person or model picks tasks by reading their content.
 
 **Solvability calibration (before freeze, on a separate 30-task calibration set).** The same
 author writes 30 extra `discovery_needed` tasks on different fixtures. Condition A is run on them
@@ -186,3 +213,8 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
   no run exists. Items still to be built before freeze: condition B5 and R1 in the runner,
   `validate.py --corpus 0.2y`, `AUTHORING.md`, the 30-task calibration set and its A run, the
   extended analyzer for P, and the frozen `CORPUS-DIGEST.txt`.
+- 2026-10-05 (review, before any task or run exists): the leakage lint exempts name tokens that are
+  also `domains.json` keywords (34 of 94 collide; without it the 24 wrong-domain tasks could not
+  pass), and section 5 now fixes how the 24 wrong-domain and 24 default tasks are authored,
+  accepted in id order, topped up and logged. Diagnosis source paths corrected to `seed-42/` to
+  `seed-44/`. Thresholds, arms and sample size unchanged.

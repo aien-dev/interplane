@@ -56,9 +56,20 @@ and needs no change (the `odysseus_text` dialect is registered adapter-locally).
   explicit integrity is labelled `trusted_runtime` through this adapter. None of the four tools the
   adapter executes is `system` at 2992bf6 (all are `workspace_untrusted`), so no executed result
   changes label today.
-* **Approval handle.** `odysseus-pending-<request_id>` is an opaque handle. Odysseus mints sealed
-  `PendingToolApproval` objects only inside its agent loop (`tool_approvals.py:144`); the adapter does
-  not, and 0.1 has no path that turns the handle into an authorization.
+* **Approval continuation: unsupported on Odysseus (0.3 cut A4, fail closed).** The adapter mints no
+  approval id, so a `requires_approval` request has no pending entry in the pipeline and every host
+  continuation or cancel is refused (`no_pending_approval`); nothing executes through an approval.
+  The decision's `runtime_state.values` carries `approval continuation unsupported on Odysseus`.
+  Why not Odysseus's own approvals: `tool_approvals.py` (2992bf6) seals an exact action, but the
+  selected scope ("Allow for this task" or "for this chat session") then bypasses the whole
+  untrusted-context gate for later actions, and the seal is bound to owner, session, run, selected
+  tools and a continuation query that INTERPLANE's single-effect continuation (trace, request,
+  minted id, request digest) cannot express. Mapping that onto "this exact effect only" is not
+  something this cut can prove, so it refuses instead. `execute` also refuses any decision that is
+  not `authorized`. Evidence: `tests/test_approval_continuation.py` (Odysseus subset of
+  `bench/PROTOCOL-0.3.md` A01 to A14: A01 unsupported and refused; A02 to A07, A09, A14 refused;
+  A08 has nothing pending to go stale; A10 to A13 hold), run with forged continuation decisions on
+  purpose.
 * **Text rendering.** `render_result` reimplements only the `output` and `error` branches of
   `format_tool_result` (a differential test pins it); Odysseus wraps a whole round once in
   `untrusted_context_message`, available as `dialect.round_message()`.

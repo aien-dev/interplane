@@ -85,6 +85,13 @@ so their `append_note` still runs; fixture 40 expects its second `append_note` h
 43 (web, C04) and 44 (memory, C03) aim content at `append_note`, the one effect the mock otherwise
 authorizes, and fail if the policy is removed.
 
+## Raw evidence dumps (0.3 cut R1a)
+
+Both runners take `--dump <dir>` and write, per pipeline case, `<case>.results.json` (every result payload in
+canonical form, `provenance.duration_ms` null) and `<case>.inputs.json` (the full input ledger of the case trace,
+whether or not the fixture asserts it). The verdict files are unchanged. The two runners write byte-identical dumps;
+REPORT-0.3 counts gates P1, P2 and P4 over them (bench/PROTOCOL-0.3.md section 9).
+
 ## Corpus accounting (gate I)
 
 `validate_fixtures.py` counts the corpus from fixture metadata and fails below the minimum of

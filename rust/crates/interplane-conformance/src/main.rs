@@ -108,12 +108,25 @@ fn run(dir: &std::path::Path, out: Option<PathBuf>, dump: Option<PathBuf>, ctl: 
         for e in &o.errs {
             println!("       - {e}");
         }
+        if let (Some(d), Some(ledger)) = (&dump, &o.ledger) {
+            let _ = std::fs::create_dir_all(d);
+            let path = d.join(format!("{}.inputs.json", o.name));
+            if let Err(e) = std::fs::write(
+                &path,
+                canonicalize(&serde_json::Value::Array(ledger.clone())) + "\n",
+            ) {
+                eprintln!("cannot write {}: {e}", path.display());
+                return ExitCode::from(2);
+            }
+        }
         if let (Some(d), Some(results)) = (&dump, &o.results) {
             let _ = std::fs::create_dir_all(d);
             let path = d.join(format!("{}.results.json", o.name));
             if let Err(e) = std::fs::write(
                 &path,
-                canonicalize(&serde_json::Value::Array(results.clone())) + "\n",
+                canonicalize(&serde_json::Value::Array(
+                    results.iter().map(canonical_result).collect(),
+                )) + "\n",
             ) {
                 eprintln!("cannot write {}: {e}", path.display());
                 return ExitCode::from(2);
@@ -133,4 +146,17 @@ fn run(dir: &std::path::Path, out: Option<PathBuf>, dump: Option<PathBuf>, ctl: 
     } else {
         ExitCode::SUCCESS
     }
+}
+
+/// The canonical result payload (CORE.md): `provenance.duration_ms` is set to null, so the dump is
+/// byte-identical across runners.
+fn canonical_result(r: &serde_json::Value) -> serde_json::Value {
+    let mut r = r.clone();
+    if let Some(p) = r
+        .get_mut("provenance")
+        .and_then(serde_json::Value::as_object_mut)
+    {
+        p.insert("duration_ms".into(), serde_json::Value::Null);
+    }
+    r
 }

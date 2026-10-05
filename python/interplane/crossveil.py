@@ -724,6 +724,8 @@ class Pipeline:
                 capability=cap,
                 code=ErrorCode.EXECUTION_ERROR,
                 message="runtime returned a result for another request",
+                content_kind="tool_result",
+                trust="unknown",
             )
         except Exception:  # noqa: BLE001 - fail closed
             res = make_result(
@@ -733,6 +735,8 @@ class Pipeline:
                 capability=cap,
                 code=ErrorCode.EXECUTION_ERROR,
                 message="runtime authority raised an error",
+                content_kind="tool_result",
+                trust="unknown",
             )
         life.finish(res.status)
         return self._complete(life, res, "authorized", decided, True, trace_id, turn)

@@ -356,6 +356,13 @@ class Pipeline:
             return ErrorCode.SESSION_LIMIT_EXCEEDED, msg
         return None
 
+    def _note_refused_request(self, trace_id: str, request_id: str) -> None:
+        """Record a request id for a call that is already refused (``run_turn``'s malformed and
+        over-the-turn-limit calls), unless that would break a session limit. Its result cites the
+        id, so a later call may not reuse it (``request_id`` is unique within a trace)."""
+        if self._request_refusal(trace_id) is None and self._can_hold(trace_id):
+            self.ledger.admit_request_id(trace_id, request_id)
+
     def close_trace(self, trace_id: str) -> None:
         """Host-only: drop everything the pipeline keeps for the trace (ledger ids, inputs,
         approval entries, event sequence, events) and refuse any later message, request, input or
@@ -901,12 +908,14 @@ class Pipeline:
         for ordinal, (index, kind, item) in enumerate(calls):
             if kind == "rejected":
                 rid = request_id_for(getattr(item, "call_id", None), trace_id, turn, index)
+                self._note_refused_request(trace_id, rid)
                 self._emit(trace_id, "tool_request", rid, turn)
                 rej = self._rejected(
                     rid, ErrorCode.MALFORMED_TOOL_CALL, trace_id, item.get("message"), turn
                 )
                 pairs.append((None, *rej))
             elif ordinal >= self.limits.max_requests_per_turn:
+                self._note_refused_request(trace_id, item.request_id)
                 self._emit(trace_id, "tool_request", item.request_id, turn)
                 rej = self._rejected(
                     item.request_id,

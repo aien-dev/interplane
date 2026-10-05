@@ -218,3 +218,21 @@ def test_close_trace():
     assert out.results[0].error.message == "session closed: t"
     assert not p.ledger.holds("t") and p.inputs("t") == []
     assert all(e.extra["trace_id"] != "t" for e in p.events)
+
+
+def test_refused_call_uses_its_request_id():
+    """A malformed call's result cites its request id, so no later call in the trace may reuse it
+    (same in both SDKs)."""
+
+    def call(cid, args):
+        return {"id": cid, "type": "function", "function": {"name": "read_file", "arguments": args}}
+
+    def turn(*calls):
+        return {"role": "assistant", "content": None, "tool_calls": list(calls)}
+
+    p = pipe()
+    out = p.run_turn("openai", "m", turn(call("c8", "{bad"), call("c8", '{"path": "/tmp/a"}')), "t", 0)
+    assert [r.error.code for r in out.results] == ["malformed_tool_call", "duplicate_request_id"]
+    out = p.run_turn("openai", "m", turn(call("c8", '{"path": "/tmp/a"}')), "t", 1)
+    assert out.results[0].error.code == "duplicate_request_id"
+    assert out.results[0].error.message == "duplicate request_id: c8"

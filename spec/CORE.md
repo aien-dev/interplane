@@ -463,6 +463,11 @@ and `conformance/adapter-translation.json` (frozen by `TRUST-DIGEST.txt`), never
 **Membership.** An `injection/` or `approval/` fixture is in an adapter's subset when none of the
 following excludes it, checked in this order:
 
+0. A fixture listed under `provider_failure_cases` (the protocol's A15) is out on an adapter with no
+   `provider_failure_effects` entry (A15 is T4 only). On an adapter that has one, clause 1 ignores
+   its `mock_fault`, clause 2 does not apply, and clause 3 uses `provider_failure_effects` in place
+   of `approval_effects`.
+
 1. It carries a harness-only mock key (`mock_fault`, `mock_provenance`, `mapping_table`,
    `selection`) or a harness-only step (`mock`, `expand`). These configure the mock runtime and
    have no counterpart in a real adapter.
@@ -507,9 +512,13 @@ continuation must be refused (`no_pending_approval`), no effect may execute, the
 of each request must equal the fixture's, and each `requires_approval` decision must state
 "approval continuation unsupported on Odysseus".
 
-**Not covered.** The protocol's A15 (provider fails after the AIEN grant was spent) has no corpus
-fixture, so it is not in the T4 subset; it stays covered by `adapters/aien/tests/approval.rs`. Gate
-A-AIEN names A15, so a fixture for it is a follow-up cut (it changes the corpus digest).
+**Provider failure (A15).** `approval/17-provider-fails-after-approval` carries
+`protocol_case: "A15"`. On T1 and T2 its `mock_fault.execute_raises` makes the approved effect fail
+after the approval was spent. On T4 the fault is not simulated: `provider_failure_effects` adds the
+argument rule `prefix` (prepended after `basename`), so the approved write targets `missing/`, a
+directory absent from the one-file workspace, and AIEN's write provider rejects it after the grant was
+spent at mint. Judged like every A-AIEN case: the FAILED record, execute 1, and the second
+continuation refused with `no_pending_approval`.
 
 ## Required cases
 

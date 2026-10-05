@@ -12,6 +12,7 @@
     "call_provider": {"content_kind": "external_provider", "trust": "external_untrusted"}
   },
   "approval_cases": {"first": 1, "last": 14},
+  "provider_failure_cases": ["approval/17-provider-fails-after-approval"],
   "adapters": {
     "odysseus": {
       "system": "T3",
@@ -42,6 +43,9 @@
       },
       "approval_effects": {
         "delete_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"const": "approval-case"}}}
+      },
+      "provider_failure_effects": {
+        "delete_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename", "prefix": "missing/"}, "content": {"const": "approval-case"}}}
       }
     }
   }

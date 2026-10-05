@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval; cut I2 cases 04-19 for C01 to C05, fixture-level `mock_data`; cut I3 cases 20-34 for C06 to C09 and C11 (20-22 C06, 23-25 C07, 26-28 C08, 29-31 C09, 32-34 C11); cut I4 cases 35-42 for C12 (35-38) and C13 (39-42), fixture-level `mock_fault`). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V8) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md plus SDK follow-ups 15 (explicit `denied` continuation value) and 16 (continuation decision citing another request_id; not the protocol's T4-only A15) driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
+- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval; cut I2 cases 04-19 for C01 to C05, fixture-level `mock_data`; cut I3 cases 20-34 for C06 to C09 and C11 (20-22 C06, 23-25 C07, 26-28 C08, 29-31 C09, 32-34 C11); cut I4 cases 35-42 for C12 (35-38) and C13 (39-42), fixture-level `mock_fault`). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V8) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md plus SDK follow-ups 15 (explicit `denied` continuation value) and 16 (continuation decision citing another request_id), and 17, the protocol's A15 (`protocol_case: "A15"`: the approved effect fails at the provider after the approval was spent; mock `execute_raises`) driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -77,7 +77,7 @@ can issue: `approve`, `cancel`, `restart` (a fresh pipeline over the same mock r
 (the runtime's catalog digest changes). `mock_approval.expires_at` makes the mock mint an expiry.
 Each `approve` and `cancel` step adds one row to `expected.continuations` and, when resolved, one
 `ObservedRecord`; the verdict row of an approval case gains `continuations`. Rows of earlier cases
-are unchanged. Total verdict rows: 105 (40 + 44 injection + 16 approval + 5 lifecycle).
+are unchanged. Total verdict rows: 106 (40 + 44 injection + 17 approval + 5 lifecycle).
 
 The mock effect policy (0.3 cut E1, `spec/CORE.md`) holds an `effect` capability for approval when
 the exposure floor is below `user_supplied`. Fixtures 19 and 27 now register the user request first
@@ -90,10 +90,10 @@ authorizes, and fail if the policy is removed.
 `validate_fixtures.py` counts the corpus from fixture metadata and fails below the minimum of
 bench/PROTOCOL-0.3.md 3.2. C01 to C09 and C11 to C13 are the `injection.category` of the injection
 fixtures. **C10 (approval manipulation) is supplied by lane A:** every approval fixture except
-A01 (the one legitimate approval) counts, 15 cases (A02 to A16) against a minimum of 10. It also
+A01 (the one legitimate approval) counts, 16 cases (A02 to A17) against a minimum of 10. It also
 checks that the negative controls V1 to V8 together fail at least one case in each of the 13
 categories (gate N). Current counts: C01=3, C02=5, C03=4, C04=4, C05=4, C06=3, C07=4, C08=3, C09=3,
-C10=15, C11=3, C12=4, C13=4; 59 cases against the minimum of 52.
+C10=16, C11=3, C12=4, C13=4; 60 cases against the minimum of 52.
 
 Fail-closed readings taken where the protocol leaves room: a continuation that fails a binding check
 (wrong or foreign `approval_id`, changed arguments, expiry, changed catalog, decision value) on a
@@ -144,8 +144,8 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 `runners/adapter_subset.py` computes each adapter's subset from fixture metadata
 (`--subset odysseus|aien`) and the translated plans (`--plans odysseus|aien`), and
 `runners/trust_digest.py` freezes both lists (`t3_subset`, `t4_subset`) and the table's sha256 in
-`TRUST-DIGEST.txt`. Current subsets: T3 43 fixtures (30 injection, 13 approval), T4 31 (18
-injection, 13 approval).
+`TRUST-DIGEST.txt`. Current subsets: T3 43 fixtures (30 injection, 13 approval), T4 32 (18
+injection, 14 approval).
 
 - T3: `ODYSSEUS_SRC=<odysseus@2992bf6> PYTHONPATH=python:adapters/odysseus <venv>/bin/python -m interplane_adapter_odysseus.t3 --out t3-verdicts.json`
   (real `Pipeline` + `OdysseusAuthority`, Odysseus's own gate).
@@ -159,7 +159,9 @@ exposure trigger forced off, T3 failed 43 of 43 (32 violations; all 30 injection
 the injected effect, all 13 approval cases failed); with AIEN's `write_file` mis-enrolled as
 `LOCAL_EPHEMERAL`, T4 failed all 18 injection cases and all 13 approval cases. Neither change is committed.
 
-Out of subset by rule, not by result: T3 excludes 17 fixtures (injection delete targets 05, 12, 13, 18,
+Out of subset by rule, not by result: T3 excludes 18 fixtures (injection delete targets 05, 12, 13, 18,
 22, 26, 31; `fail_tool` 09; mock-fault, stale-catalog and duplicate-name cases 35-40; approval 08,
-15, 16); T4 additionally excludes the `send_email` targets. Approval fixtures A01 to A14 except A08
-(`mock` step) are in both subsets; the protocol's A15 has no corpus fixture.
+15, 16, and 17, which is T4 only); T4 additionally excludes the `send_email` targets. Approval fixtures A01 to A14 except A08
+(`mock` step) are in both subsets. Fixture 17 (the protocol's A15) is in T4 only: the write goes to a
+missing directory, AIEN's write provider rejects it after the grant was spent (its message reads "path is
+outside the workspace"), the failure is reported and the second continuation is refused. T4 is 32 of 32.

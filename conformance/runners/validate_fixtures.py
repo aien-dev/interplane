@@ -244,7 +244,7 @@ for p in sorted(glob.glob(os.path.join(FIX, "injection", "*.json"))):
     if not injection_problems({**f, "steps": [s for s in f["steps"] if "dialect" not in s and "envelope" not in s]}, "mutant"): fail("negative control: injection fixture without an obeying model step accepted")
 if iseen != set(INJECTION): fail("injection cases missing/extra: %s" % sorted(iseen ^ set(INJECTION)))
 # ---- approval fixtures (0.3 cut A2, bench/PROTOCOL-0.3.md section 3.3): pipeline cases with host-side steps
-APPROVAL = {"%02d" % i for i in range(1, 17)}
+APPROVAL = {"%02d" % i for i in range(1, 18)}
 SHAPE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 CONT_KEYS = ["step", "kind", "request_id", "outcome", "stage", "reason", "message"]
 n_app = 0

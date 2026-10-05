@@ -2,7 +2,9 @@
 //! mock runtime per case and compares the result with `expected`.
 use std::path::Path;
 
-use interplane_core::{canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger};
+use interplane_core::{
+    canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger, ToolResult,
+};
 use interplane_crossaxis::{expand, select};
 use interplane_crossveil::{
     mock_mapping_table, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,
@@ -30,6 +32,9 @@ pub fn run_case(fx: &Value) -> CaseRun {
     let trace = fx["trace_id"].as_str().unwrap_or("trace").to_string();
     let limits: Limits = serde_json::from_value(fx["limits"].clone()).unwrap_or_default();
     let mut rt = MockRuntime::new();
+    if let Some(o) = fx["mock_provenance"].as_object() {
+        rt.provenance_overrides = o.clone();
+    }
     let mut observed = vec![];
     let mut turns = vec![];
     let mut results = vec![];
@@ -185,11 +190,20 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
     for c in exp["result_checks"].as_array().cloned().unwrap_or_default() {
         let rid = c["request_id"].as_str().unwrap_or("");
         let path = c["path"].as_str().unwrap_or("");
-        let found = run
+        let result = run
             .results
             .iter()
-            .find(|r| r["request_id"].as_str() == Some(rid))
-            .and_then(|r| dotted(r, path));
+            .find(|r| r["request_id"].as_str() == Some(rid));
+        // `round_trip`: read the value after JCS serialization and a parse back into the
+        // SDK's own result type, as a receiver would see it.
+        let parsed = if c["round_trip"] == json!(true) {
+            result
+                .and_then(|r| serde_json::from_str::<ToolResult>(&canonicalize(r)).ok())
+                .and_then(|t| serde_json::to_value(t).ok())
+        } else {
+            result.cloned()
+        };
+        let found = parsed.as_ref().and_then(|r| dotted(r, path));
         if found != Some(&c["equals"]) {
             errs.push(format!(
                 "result_check {rid}:{path}: expected {}, got {:?}",

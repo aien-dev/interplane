@@ -5,7 +5,7 @@ Protocol version is `MAJOR.MINOR` and appears in every envelope as `interplane_v
 | Change | Effect on version | Receiver behaviour |
 |---|---|---|
 | New optional field | MINOR | Older receivers ignore it. It must be safe to ignore. |
-| New enum value in a non-authority enum (`event`, `ErrorCode`, `Origin`) | MINOR | Receivers tolerate unknown values where the spec says so. |
+| New enum value in a non-authority enum (`event`, `ErrorCode`, `ContentKind`) | MINOR | Receivers tolerate unknown values where the spec says so. |
 | New value in an authority enum (`decision`, `TrustLevel`) | MAJOR | Unknown decision values are treated as `denied`. Unknown trust levels are treated as `external_untrusted`. Never default to authorization. |
 | Required field added or removed, field type changed, semantic change | MAJOR | Receiver rejects the envelope with `unsupported_version` if MAJOR differs from what it implements. |
 | Dialect parser change that alters canonical output for an existing fixture | parser_version MAJOR (per dialect) | Recorded in `provenance.parser_version`. Fixture expectations are re-pinned. |

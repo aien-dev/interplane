@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from .core import Decision, Lifecycle, LifecycleError, Limits, ProtocolError, jcs
+from .core import Decision, Lifecycle, LifecycleError, Limits, ProtocolError, ToolResult, jcs
 from .crossaxis import expand, select
 from .crossveil import canonical_result_payload, default_pipeline
 
@@ -27,6 +27,7 @@ def run_case(case: dict) -> dict:
     pipe = default_pipeline(
         Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
     )
+    pipe.runtime.provenance_overrides = case.get("mock_provenance", {})
     name, trace_id = case["case"], case["trace_id"]
     observed: list = []
     results: list = []
@@ -95,7 +96,11 @@ def run_case(case: dict) -> dict:
     for check in expected.get("result_checks", []):
         match = next((r for r in results if r.request_id == check["request_id"]), None)
         try:
-            actual = _dig(match.to_dict(), check["path"])
+            payload = match.to_dict()
+            if check.get("round_trip") is True:
+                # as a receiver sees it: JCS bytes parsed back into the SDK's own result type
+                payload = ToolResult.from_dict(json.loads(jcs(payload))).to_dict()
+            actual = _dig(payload, check["path"])
         except (AttributeError, KeyError, IndexError, ValueError):
             problems.append(f"result_check {check['request_id']} {check['path']}: missing")
             continue

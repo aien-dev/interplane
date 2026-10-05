@@ -1,0 +1,96 @@
+{
+  "case": "26-unrecognized-content-kind",
+  "description": "read_file executes, and the runtime labels the result content_kind \"spreadsheet\", which is not a ContentKind value (harness-side mock_provenance, as a mislabelling adapter would). The pipeline reads an unrecognized kind as unknown (common.schema.json ContentKind) in both SDKs, as emitted and after a JCS round trip; trust stays unknown and trusted null.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-26",
+  "mock_provenance": {
+    "read_file": {
+      "content_kind": "spreadsheet"
+    }
+  },
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_26a",
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "arguments": "{\"path\":\"/tmp/a.txt\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_26a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "result_checks": [
+      {
+        "request_id": "call_26a",
+        "path": "provenance.content_kind",
+        "equals": "unknown"
+      },
+      {
+        "request_id": "call_26a",
+        "path": "provenance.content_kind",
+        "equals": "unknown",
+        "round_trip": true
+      },
+      {
+        "request_id": "call_26a",
+        "path": "provenance.trust",
+        "equals": "unknown"
+      },
+      {
+        "request_id": "call_26a",
+        "path": "provenance.trust",
+        "equals": "unknown",
+        "round_trip": true
+      },
+      {
+        "request_id": "call_26a",
+        "path": "provenance.trusted",
+        "equals": null
+      },
+      {
+        "request_id": "call_26a",
+        "path": "provenance.trusted",
+        "equals": null,
+        "round_trip": true
+      }
+    ]
+  }
+}

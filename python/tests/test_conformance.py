@@ -35,7 +35,8 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
     }
     assert text == jcs({**data, **life}) + "\n"
     assert all(o["result_digest"] for v in data.values() for o in v["observed"])
-    assert "30/30" in capsys.readouterr().out or len(CASES) + len(LIFECYCLE) != 30
+    total = len(CASES) + len(LIFECYCLE)
+    assert f"{total}/{total}" in capsys.readouterr().out
 
 
 @pytest.mark.skipif(not LIFECYCLE, reason="no lifecycle fixtures")

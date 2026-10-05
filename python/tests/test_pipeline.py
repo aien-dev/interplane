@@ -430,3 +430,22 @@ def test_untrusted_results_render_as_data():
         "workspace_untrusted",
         "memory",
     )
+
+
+@pytest.mark.parametrize(
+    "label, want",
+    [
+        ({"content_kind": "spreadsheet"}, ("unknown", "unknown", None)),
+        ({"content_kind": 7, "trust": ["trusted_runtime"]}, ("unknown", "external_untrusted", False)),
+        ({"content_kind": {"k": 1}, "trust": "sorta_trusted"}, ("unknown", "external_untrusted", False)),
+        ({"trust": None, "trusted": True}, ("tool_result", "unknown", None)),
+    ],
+)
+def test_unrecognized_or_unparseable_labels_never_become_trusted(label, want):
+    # An adapter's label the SDK cannot read: unrecognized or non-string content_kind is
+    # unknown (as in Rust, pipeline.rs normalize), unrecognized or non-string trust is
+    # external_untrusted, absent/null trust is unknown; the adapter's own trusted flag is ignored.
+    p = default_pipeline()
+    p.runtime.provenance_overrides = {"read_file": label}
+    prov = run(p, "read_file", {"path": "/a"}).results[0].provenance
+    assert (prov["content_kind"], prov["trust"], prov["trusted"]) == want

@@ -103,7 +103,10 @@ forced to `null`. Before the runtime is reached, `provenance.runtime` and `capab
 execute (denied, requires_approval, not_found, invalid, unknown decision, decide fault),
 `provenance.runtime` and `capability` are set and `content_kind`, `trust` and `trusted` are `null`:
 no data was produced, so there is no content to classify. The defaults `tool_result` / `unknown`
-apply only to executed results whose runtime said nothing about their content.
+apply only to executed results whose runtime said nothing about their content (absent or null).
+On an executed result, a `content_kind` the pipeline does not recognize (or a non-string) becomes
+`unknown`, a `trust` it does not recognize (or a non-string) becomes `external_untrusted`, and an
+adapter-supplied `trusted` is replaced by the value derived from `trust`.
 
 Error messages (pinned; `<x>` substituted; no other text):
 
@@ -177,6 +180,13 @@ A second table `mock-table-stale` is identical but carries `catalog_digest: "sha
 `passthrough: true`). Canonical `filesystem.stat` maps to `stat_file` (rule `alias:filesystem.stat`),
 which the mock runtime does **not** have, so the runtime answers `not_found`. Any other name is
 `unknown_capability`.
+
+A fixture may carry `mock_provenance: {<capability>: {content_kind?, trust?, trusted?}}`. The
+runner copies it into the mock before the pipeline runs, and the mock's executed result for that
+capability reports those provenance values in place of the table's (a key present with `null`
+sets null). It stands in for a mislabelling adapter. It is harness configuration, like
+`mapping_table`: the mock never reads labels from arguments, `extensions` or envelopes, and the
+catalog is unchanged. Only cases 26 and 27 use it.
 
 The mock runtime validates `arguments` against the capability parameters (required keys present,
 declared types match) and answers `invalid` with `invalid_arguments` on failure. It counts
@@ -269,6 +279,8 @@ to null. Rust and Python runners must emit byte-identical `observed` arrays.
 | 21 | stale capability mapping (table built against catalog digest `sha256:0000…`) | `rejected`, `stale_capability`, decide 0 |
 | 22 | untrusted tool result (`web_fetch` content carries tool-call markup) | ok; `provenance.trust = external_untrusted`, `content_kind = web_content`; the rendered tool message contains the markup verbatim; a following `continues` turn parses the model's text only, and 0 new intents come from the result |
 | 23 | untrusted memory result (`recall_memory`) | ok; trust `workspace_untrusted`, kind `memory`; rendered as data |
+| 26 | unrecognized `content_kind` (`read_file` labelled `spreadsheet` via `mock_provenance`) | ok; kind `unknown`, trust `unknown`, `trusted` null, also after a JCS round trip |
+| 27 | absent, null and unrecognized trust (`read_file` trust absent with `trusted: true`; `list_dir` trust null; `append_note` trust `sorta_trusted`) | absent and null: `unknown`, `trusted` null; unrecognized: `external_untrusted`, `trusted` false; also after a JCS round trip |
 
 Plus Lenshift dialect fixtures under `dialects/fixtures/<dialect>/` with expected canonical output
 (see `LENSHIFT.md`) and one JCS digest fixture under `conformance/fixtures/digest/`.

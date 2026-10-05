@@ -4,7 +4,7 @@
 Exit status is non-zero on any failure. Checks:
   * every explicit envelope step validates against envelope.schema.json
   * every intent in dialects/fixtures validates against intent.schema.json
-  * fixture shape, 25 required cases, filename == case slug
+  * fixture shape, 27 required cases, filename == case slug
   * lifecycle/ fixtures: required set, shape, minting decisions valid against decision.schema.json
   * expected.runtime counts agree with the observed records
   * the JCS digest fixture recomputes
@@ -70,7 +70,8 @@ REQUIRED = {
  "10-multiple-sequential-calls","11-model-continuation","12-unsupported-dialect","13-unsupported-version",
  "14-unknown-fields","15-oversized-arguments","16-duplicate-request-ids","17-replay","18-model-retry-after-denial",
  "19-valid-write-request","20-missing-required-argument","21-stale-capability-mapping","22-untrusted-tool-result","23-untrusted-memory-result",
- "24-expansion-requested-excluded","25-expansion-refused-by-bound"}
+ "24-expansion-requested-excluded","25-expansion-refused-by-bound",
+ "26-unrecognized-content-kind","27-absent-null-unrecognized-trust"}
 OBS_KEYS = ["request_id","stage","decision","status","error_code","decide_invoked","execute_invoked","result_digest"]
 n_env = n_cases = 0
 neg_done = False
@@ -104,7 +105,7 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
             if ev.get("kind") not in ("requested_excluded", "discovery_hit"): fail("%s: bad evidence kind" % name)
         else: fail("%s: step %s has neither envelope nor dialect+input" % (name, s.get("turn")))
     for c in exp.get("result_checks", []):
-        if set(c) != {"request_id", "path", "equals"} or c["request_id"] not in {o["request_id"] for o in obs}:
+        if set(c) - {"round_trip"} != {"request_id", "path", "equals"} or c.get("round_trip", True) is not True or c["request_id"] not in {o["request_id"] for o in obs}:
             fail("%s: malformed result_check %s" % (name, c))
     if ("selection" in f) != (name[:2] in ("24", "25")): fail("%s: selection block only in cases 24-25" % name)
     if "selection" in f:
@@ -117,6 +118,15 @@ for p in sorted(glob.glob(os.path.join(FIX, "*.json"))):
                 fail("%s: selections[%d] selection_digest does not recompute" % (name, i))
             if i and sel.get("parent_digest") != sels[i - 1].get("selection_digest"): fail("%s: parent_digest chain broken at %d" % (name, i))
     if ("mapping_table" in f) != name.startswith("21"): fail("%s: mapping_table present only in case 21" % name)
+    if ("mock_provenance" in f) != (name[:2] in ("26", "27")): fail("%s: mock_provenance present only in cases 26-27" % name)
+    for cap, o in f.get("mock_provenance", {}).items():
+        if not set(o) <= {"content_kind", "trust", "trusted"}: fail("%s: mock_provenance.%s keys %s" % (name, cap, sorted(o)))
+    if name[:2] in ("26", "27"):
+        rt_paths = {(c["request_id"], c["path"]) for c in exp.get("result_checks", []) if c.get("round_trip")}
+        plain = {(c["request_id"], c["path"]) for c in exp.get("result_checks", []) if not c.get("round_trip")}
+        if not plain or rt_paths != plain: fail("%s: every provenance check must also be checked after a JCS round trip" % name)
+        for c in exp.get("result_checks", []):
+            if c["path"] == "provenance.trusted" and c["equals"] is True: fail("%s: trusted must never be true here" % name)
     if name.startswith("21") and f.get("mapping_table") != "mock-table-stale": fail("21: mapping_table must be mock-table-stale")
     if name[:2] in ("19", "22", "23", "20", "21"):
         want = {"19": ("SUCCEEDED", "ok"), "20": ("REJECTED", "rejected"), "21": ("REJECTED", "rejected"),

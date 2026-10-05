@@ -273,7 +273,7 @@ class OdysseusAuthority(RuntimeAuthority):
         except Exception as err:  # noqa: BLE001 - reported as an execution error, not raised
             return self._error(rid, name, f"{name}: {type(err).__name__}")
         ms = int((time.monotonic() - started) * 1000)
-        trust = "trusted_runtime" if self.workspace_trusted else self._integrity(name, block.content)
+        trust = "trusted_runtime" if self.workspace_trusted else self._integrity(name, block.content, raw)
         sc = self._context_for(str(ctx.get("trace_id")), {})
         sc.observe_tool_result(name, raw, block.content)  # Odysseus decides what arms the gate
         ok = isinstance(raw, dict) and not raw.get("error") and raw.get("exit_code") in (None, 0)
@@ -289,9 +289,23 @@ class OdysseusAuthority(RuntimeAuthority):
             trust=trust, duration_ms=ms,
         )
 
-    def _integrity(self, name: str, content: str) -> str:
-        caps = self._ody.tool_capabilities.capabilities_for_action(name, content)
-        return caps.result_integrity.value  # system | workspace_untrusted | external_untrusted
+    def _integrity(self, name: str, content: str, raw: Any = None) -> str:
+        """Odysseus's result integrity as a TrustLevel.
+
+        ``workspace_untrusted`` and ``external_untrusted`` carry over. ``system`` is Odysseus's
+        label for server-authored output and its default for a registered tool
+        (tool_capabilities.py:37-46 at 2992bf6): it maps to ``trusted_runtime``, unless
+        Odysseus's own ``tool_result_should_arm_gate`` (:506-528) says this result carries
+        non-system content (the producer set ``untrusted_content``), then ``external_untrusted``.
+        Any other value is ``external_untrusted``.
+        """
+        tc = self._ody.tool_capabilities
+        value = tc.capabilities_for_action(name, content).result_integrity.value
+        if value == "system":
+            if raw is not None and tc.tool_result_should_arm_gate(name, raw, content):
+                return "external_untrusted"
+            return "trusted_runtime"
+        return value if value in _UNTRUSTED else "external_untrusted"
 
     def _error(self, rid: str, name: str, message: str) -> ToolResult:
         return make_result(

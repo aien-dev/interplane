@@ -3,6 +3,7 @@
 ## Unreleased (0.3, Trust lane)
 
 - Security: the Rust lifecycle now accepts an approval continuation only with the `approval_id` the runtime minted for that request, as Python already did; before, any non-empty id was accepted. A non-`authorized` continuation value with the minted id is DENIED in both SDKs. Lifecycle conformance cases `lifecycle/01-05`; 30/30 byte-identical.
+- Trust vocabulary reconciled (plan cut P1, gaps G1-G3): CROSSVEIL.md default is `tool_result` + `unknown` (the undefined `untrusted_tool_content` and `origin` are gone), VERSIONING.md lists `ContentKind` in place of the undefined `Origin`. Python now reads an unrecognized or non-string `content_kind` as `unknown`, as Rust did; non-string trust is `external_untrusted`. Odysseus `system` result integrity maps to `trusted_runtime` unless Odysseus's own gate marks the result untrusted. Conformance cases 26, 27 (with a harness-only `mock_provenance` seam and JCS round-trip checks); 32/32 byte-identical together with lifecycle/01-05.
 
 ## Unreleased (0.2, CrossAxis lane)
 

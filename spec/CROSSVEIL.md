@@ -23,7 +23,8 @@ Rules the pipeline enforces (and conformance tests):
 5. Adapter exceptions in `decide` become `denied` with `runtime_unavailable`; in `execute` they become
    `error` with `execution_error`. Fail closed.
 6. The adapter, not INTERPLANE, decides the trust class of the returned data
-   (`result.provenance.trust`, `origin`). Default when the adapter says nothing: `untrusted_tool_content` (fail closed).
+   (`result.provenance.trust` and `result.provenance.content_kind`). Defaults when the adapter says
+   nothing: `tool_result` + `unknown` (fail closed; see Crossveil Trust below).
 
 ## State record
 
@@ -46,11 +47,19 @@ proposal are never flattened into indistinguishable text. Rules:
 1. Absent or unparseable trust is `unknown`, which receivers treat like `external_untrusted`.
    Inability to determine trust is never converted into trust.
 2. Adapters set `result.provenance.content_kind` and `trust` on every result. Defaults when the
-   runtime says nothing: `tool_result` + `unknown`.
+   runtime says nothing (absent or null): `tool_result` + `unknown`. A `content_kind` string the
+   receiver does not recognize, or a non-string value, is `unknown`. A `trust` string it does not
+   recognize, or a non-string value, is `external_untrusted`. `trusted` is always derived from
+   `trust` (CORE.md) and an adapter-supplied `trusted` is never read, so unknown provenance never
+   becomes trusted by being serialized and read back (conformance cases 26 and 27).
 3. Results are rendered back to the model as data. The pipeline never parses tool-call markup inside
    a result into a new intent (conformance cases 22 and 23 carry such markup as an injection probe).
-4. Odysseus's `metadata.trusted`/`source` and its `untrusted_context_message` map onto these axes;
-   AIEN's aegis-runtime has no equivalent today and the adapter fills in `unknown` honestly.
+4. Odysseus's `metadata.trusted`/`source` and its `untrusted_context_message` map onto these axes.
+   Its `ResultIntegrity` maps explicitly: `workspace_untrusted` and `external_untrusted` carry over;
+   `system` (server-authored output) is `trusted_runtime` unless Odysseus's own
+   `tool_result_should_arm_gate` marks the result as carrying non-system content, then
+   `external_untrusted`. AIEN's aegis-runtime has no equivalent today and the adapter fills in
+   `unknown` honestly.
 
 Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
 `invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose

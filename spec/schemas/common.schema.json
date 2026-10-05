@@ -238,7 +238,7 @@
         "external_provider",
         "unknown"
       ],
-      "description": "What a piece of model-visible material is. Unknown values are treated as unknown."
+      "description": "What a piece of model-visible material is. On an executed result an absent or null kind is tool_result. A value the receiver does not recognize (or a non-string) is treated as unknown."
     },
     "TrustLevel": {
       "type": "string",
@@ -249,7 +249,7 @@
         "external_untrusted",
         "unknown"
       ],
-      "description": "How much the runtime trusts the material. Only the runtime assigns it; a model cannot raise it. Inability to determine trust is `unknown`, never silently trusted. Unknown enum values are treated as external_untrusted."
+      "description": "How much the runtime trusts the material. Only the runtime assigns it; a model cannot raise it. Inability to determine trust (absent or null) is `unknown`, never silently trusted. A value the receiver does not recognize (or a non-string) is treated as external_untrusted. `trusted` is derived from this level and is never true for unknown or unrecognized values."
     }
   }
 }

@@ -21,7 +21,8 @@ HERE = Path(__file__).resolve().parent
 BENCH = HERE.parent
 sys.path.insert(0, str(HERE))
 import lint_02y as L  # noqa: E402
-import validate as V  # noqa: E402
+import validate as V
+import assemble_02y as A  # noqa: E402
 
 RULE = V.load_rule()
 CATALOG = sorted(c["name"] for c in json.loads(V.CATALOG_PATH.read_text(encoding="utf-8"))["capabilities"])
@@ -48,7 +49,7 @@ class RejectionRules(unittest.TestCase):
         self.assertTrue(r["derived"]["default_used"])
 
     def test_catalog_name_rejected(self):
-        self.assertEqual(self.codes("Use read_file now"), ["LEAK_TOOL_NAME"])
+        self.assertIn("LEAK_TOOL_NAME", self.codes("Use read_file now"))
         self.assertIn("LEAK_TOOL_NAME", self.codes("Can you glob that for me?"))
         self.assertIn("LEAK_TOOL_NAME", self.codes("Run bash on it"))
 
@@ -95,6 +96,26 @@ class RejectionRules(unittest.TestCase):
         # a file-name-shaped token derives the filesystem domain
         r = lint("Who wrote rota.ini")
         self.assertIn("DOMAIN_FILE_KEYWORD", r["codes"])
+
+    def test_adversarial_spellings_are_rejected(self):
+        for req in ("F I L E count", "f\u0456le count", "fi\u200ble count", "a\uff0fb", "my_file_q3", "f.i.l.e count",
+                    "a\u2215b", "a\u29f8b", "Check my \uff46ile", "R E A D _ F I L E now"):
+            r = lint(req)
+            self.assertFalse(r["ok"], (req, r["codes"]))
+        self.assertIn("NON_ASCII", self.codes("f\u0456le count"))
+        self.assertIn("NON_ASCII", self.codes("fi\u200ble count"))
+        self.assertIn("PATH_SEPARATOR", self.codes("a\uff0fb"))
+        self.assertIn("PATH_SEPARATOR", self.codes("a\u2215b"))
+        self.assertIn("BANNED_WORD", self.codes("F I L E count"))
+        self.assertIn("BANNED_WORD", self.codes("my_file_q3"))
+        self.assertTrue(lint("Check my email about the lighthouse")["ok"])
+        self.assertTrue(lint("Which supplier does the harbour crew order lanterns from?")["ok"])
+
+    def test_selector_codes_share_one_generic_message(self):
+        msgs = {L.AUTHOR_MESSAGES[c] for c in ("DOMAIN_FILE_KEYWORD", "DOMAIN_MULTI", "DOMAIN_FILE_TOOLS")}
+        self.assertEqual(msgs, {"Set aside by an automatic check."})
+        self.assertEqual(lint("Who owns the project?")["messages"], ["Set aside by an automatic check."])
+        self.assertEqual(lint("Who owns the project?")["codes"], ["DOMAIN_FILE_KEYWORD"])  # the precise code stays in the log
 
     def test_messages_never_reveal_words(self):
         r = lint("Please manage the board, see notes.md")
@@ -209,44 +230,49 @@ class Replay(unittest.TestCase):
         errs = replay(ents)["errors"]
         self.assertTrue(any("group default: 20 accepted, need exactly 24" in x for x in errs), errs)
 
+    def top_up(self, nid, rnd, n, valid, brief="question"):
+        out = []
+        for i in range(n):
+            text = default_request(200 + nid + i) if valid else f"Use read_file to check item {nid + i}"
+            out.append({"id": f"q-{nid + i:04d}", "round": rnd, "brief": brief, "request": text, "fixture": "f1", "set": "target"})
+        return out
+
     def test_one_top_up_fills_a_short_group_and_uses_the_matching_brief(self):
-        first = sized(36, 20)
-        top = [{"id": f"q-{73 + i:04d}", "round": 1, "brief": "question", "request": default_request(40 + i), "fixture": "f1", "set": "target"}
-               for i in range(6)]
-        ents = decide(first + top)
+        ents = decide(sized(36, 20) + self.top_up(73, 1, 12, True))
         res = replay(ents)
         self.assertEqual(res["errors"], [])
         self.assertEqual(res["counts"]["default"], 24)
 
     def test_top_up_with_the_wrong_brief_or_no_shortage_fails(self):
         first = sized(36, 20)
-        top = [{"id": "q-0073", "round": 1, "brief": "everyday", "request": nonfile_request(50), "fixture": "f1", "set": "target"}]
-        self.assertTrue(any("does not match a short group" in x for x in replay(decide(first + top))["errors"]))
+        wrong = self.top_up(73, 1, 12, False, brief="everyday")
+        self.assertTrue(any("does not match a short group" in x for x in replay(decide(first + wrong))["errors"]))
         full = make_entries()
-        top = [{"id": "q-0073", "round": 1, "brief": "question", "request": default_request(60), "fixture": "f1", "set": "target"}]
-        self.assertTrue(any("no group was short" in x for x in replay(decide(full + top))["errors"]))
+        self.assertTrue(any("no group was short" in x for x in replay(decide(full + self.top_up(73, 1, 12, True)))["errors"]))
+
+    def test_top_up_sizes_must_be_12_24_36(self):
+        errs = replay(decide(sized(36, 20) + self.top_up(73, 1, 6, True)))["errors"]
+        self.assertTrue(any("top-up round 1, brief 'question': 6 requests, expected 12" in x for x in errs), errs)
 
     def test_more_than_three_top_ups_fails(self):
-        ents = sized(36, 10)
+        ents = sized(36, 0)
         nid = 73
         for rnd in range(1, 5):
-            for _ in range(2):
-                ents.append({"id": f"q-{nid:04d}", "round": rnd, "brief": "question", "request": f"Use read_file to check item {nid}",
-                             "fixture": "f1", "set": "target"})
-                nid += 1
+            ents += self.top_up(nid, rnd, 12 * rnd, False)
+            nid += 12 * rnd
         errs = replay(decide(ents))["errors"]
         self.assertTrue(any("4 top-up rounds, at most 3 allowed" in x for x in errs), errs)
 
     def test_three_top_ups_are_allowed(self):
-        ents = sized(36, 10)
-        nid = 73
-        for rnd in range(1, 4):
-            for _ in range(5):
-                ents.append({"id": f"q-{nid:04d}", "round": rnd, "brief": "question", "request": default_request(100 + nid), "fixture": "f1", "set": "target"})
-                nid += 1
+        ents = sized(36, 5) + self.top_up(73, 1, 12, False) + self.top_up(85, 2, 24, False) + self.top_up(109, 3, 36, True)
         res = replay(decide(ents))
         self.assertEqual(res["errors"], [])
         self.assertEqual(res["counts"]["default"], 24)
+
+    def test_unknown_fixture_is_an_error(self):
+        ents = decide(make_entries())
+        ents[0]["fixture"] = "nope"
+        self.assertTrue(any("unknown fixture 'nope'" in x for x in replay(ents)["errors"]))
 
     def test_out_of_order_ids_and_bad_first_pass_fail(self):
         ents = decide(make_entries())
@@ -285,23 +311,14 @@ def build_synthetic(root: Path, mutate=None):
     """A complete synthetic heldout-0.2y tree: 0.2x fixtures/stores/stubs, 72 regression tasks cut from the 0.2x
     tasks, 48 discovery_needed tasks built from expansion-117, and the log that produced them."""
     x = BENCH / "heldout-0.2x"
-    for d in ("fixtures", "stores", "stubs"):
-        shutil.copytree(x / d, root / d)
-    (root / "tasks").mkdir()
+    for d in ("fixtures", "stores"):
+        (root / d).mkdir()
+    shutil.copytree(x / "fixtures" / "beacon", root / "fixtures" / "beacon")
+    shutil.copy(x / "stores" / "beacon.json", root / "stores" / "beacon.json")
+    (root / "stubs").mkdir()
     src = [json.loads(p.read_text(encoding="utf-8")) for p in sorted((x / "tasks").glob("*.json"))]
-    want = V.regression_counts()
-    used = {c: 0 for c in want}
-    n = 0
-    for t in src:
-        c = t["category"]
-        if c == "expansion" or used.get(c, 99) >= want[c]:
-            continue
-        used[c] += 1
-        n += 1
-        new = copy.deepcopy(t)
-        new["id"] = f"{c}-{used[c]:03d}"
-        new["notes"] = f"heldout-0.2y; template: syn-{new['id']}; kind: regression"
-        (root / "tasks" / f"{new['id']}.json").write_text(json.dumps(new), encoding="utf-8")
+    table = A.gen_slots()
+    A.assemble(table, [{"slot": s["id"], "request": "Please help: " + " ".join(s["must_contain"]) + " " + s["need"]} for s in table["slots"]], root)
     entries = decide(make_entries(nonfile=36, default=36))
     for e in entries:
         e["fixture"] = "beacon"

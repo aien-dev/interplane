@@ -66,13 +66,13 @@ CORPORA = {
         "header": "# INTERPLANE 0.2x held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2x (CI job bench-structural).",
     },
 }
-_Y_INPUTS = ("domains.json", "prompts", "schema", "stubs/backends.json", "tools/sim_backends.py", "tools/lint_02y.py")
+_Y_INPUTS = ("domains.json", "prompts", "schema", "stubs/backends.json", "tools/sim_backends.py", "tools/lint_02y.py", "tools/assemble_02y.py", "tools/authoring_02y.py")
 CORPORA["0.2y"] = {
     "root": BENCH / "heldout-0.2y",
     "tasks": BENCH / "heldout-0.2y" / "tasks",
     "digest": BENCH / "heldout-0.2y" / "CORPUS-DIGEST.txt",
     "protocol": REPO / "docs" / "prereg" / "PREREG-0.2y-base-set-discovery.md",
-    "inputs": _Y_INPUTS + ("heldout-0.2y/fixtures", "heldout-0.2y/stores", "heldout-0.2y/stubs", "heldout-0.2y/tasks",
+    "inputs": _Y_INPUTS + ("heldout-0.2y/regression-slots.json", "heldout-0.2y/fixtures", "heldout-0.2y/stores", "heldout-0.2y/stubs", "heldout-0.2y/tasks",
                            "heldout-0.2y/authoring-log.jsonl"),
     "stores": BENCH / "heldout-0.2y" / "stores",
     "header": "# INTERPLANE 0.2y held-out corpus digests. Recomputed and compared by bench/tools/validate.py --corpus 0.2y (CI job bench-structural).",
@@ -623,6 +623,35 @@ def log_entries(cfg: dict) -> tuple:
     return out, errs
 
 
+def regression_slot_errors(reg: list, ctx: dict) -> list:
+    """Regression tasks must equal what assemble_02y builds from the frozen slot table and the author's request text."""
+    import assemble_02y as asm
+
+    e: list = []
+    path = asm.SLOTS_PATH
+    table = asm.gen_slots()
+    if not path.is_file() or path.read_text(encoding="utf-8") != asm.dumps(table):
+        e.append("heldout-0.2y/regression-slots.json is missing or differs from assemble_02y.gen_slots()")
+    slots = {s["id"]: s for s in table["slots"]}
+    seen = set()
+    for t in reg:
+        sid = note_field(t, "slot")
+        if sid not in slots:
+            e.append(f"{t['id']}: notes need 'slot: rs-NNN' naming a slot of regression-slots.json")
+            continue
+        if sid in seen:
+            e.append(f"{t['id']}: slot {sid} used twice")
+        seen.add(sid)
+        want = asm.task_of(slots[sid], t["user_request"], ctx["rule"], ctx["prompt_sha"])
+        if t != want:
+            diff = sorted(k for k in set(t) | set(want) if t.get(k) != want.get(k))
+            e.append(f"{t['id']}: differs from the task assembled from slot {sid} in {diff}")
+        for m in slots[sid]["must_contain"]:
+            if m.lower() not in t["user_request"].lower():
+                e.append(f"{t['id']}: request does not contain {m!r} required by slot {sid}")
+    return e
+
+
 def heldout_y_errors(tasks: list, per: dict, ctx: dict, cfg: dict, calibration: bool) -> list:
     """0.2y composition, leakage lint and authoring-log replay (PREREG-0.2y section 5)."""
     import lint_02y as lint
@@ -680,6 +709,9 @@ def heldout_y_errors(tasks: list, per: dict, ctx: dict, cfg: dict, calibration: 
         if groups["nonfile"] < Y_DISCOVERY["nonfile"]:
             e.append(f"fewer than {Y_DISCOVERY['nonfile']} discovery_needed tasks derive a non-file domain: the corpus is not frozen")
 
+    if not calibration:
+        e += regression_slot_errors(reg, ctx)
+
     entries, errs = log_entries(cfg)
     e += errs
     fixtures = {d.name: _fixture_files(ctx["root"] / "fixtures", d.name) for d in sorted((ctx["root"] / "fixtures").glob("*")) if d.is_dir()}
@@ -696,6 +728,8 @@ def heldout_y_errors(tasks: list, per: dict, ctx: dict, cfg: dict, calibration: 
             tk = next(t for t in disc if t["id"] == tid)
             if ent is not None and ent["request"] != tk["user_request"]:
                 e.append(f"{tid}: user_request differs from the logged request {req}")
+            if ent is not None and ent.get("fixture") != Path(tk["workspace_fixture"]).name:
+                e.append(f"{tid}: fixture {Path(tk['workspace_fixture']).name!r} != the log's fixture {ent.get('fixture')!r} for {req}")
     elif not errs:
         e.append("authoring log has no entries for this set")
     return e

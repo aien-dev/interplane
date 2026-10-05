@@ -219,3 +219,26 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
   pass), and section 5 now fixes how the 24 wrong-domain and 24 default tasks are authored,
   accepted in id order, topped up (with the brief that feeds the short group) and logged. Diagnosis source paths corrected to `seed-42/` to
   `seed-44/`. Thresholds, arms and sample size unchanged.
+- 2026-10-05 (amendment 2, review of PR #66; before any fixture, request or task exists and before any
+  authoring call). Deviations from section 5, each with its reason; thresholds, arms and sample size unchanged:
+  1. Code-only requests (one derived domain, `code`) are excluded from the non-file group
+     (`DOMAIN_FILE_TOOLS`): the code domain already shows `glob`, `grep`, `read_file`, so the task would not be uncovered.
+  2. The always-banned words also ban their plurals: a plural leaks the same selector.
+  3. Lint hardening for discovery requests (stricter than section 5): NFKC and casefold, any non-ASCII letter or
+     zero-width/format character rejected, collapsed forms ("F I L E", "f.i.l.e") and `_ . -` split forms checked,
+     any Unicode slash or backslash is a path separator: otherwise a spelling trick passes a selector word.
+  4. The lint applies to discovery requests only, not the 72 regression requests: those categories name files and
+     tools by design and the author has no catalog.
+  5. Every selector rejection shows the author one generic message, the precise code stays in the log: specific
+     messages would teach the author the selector.
+  6. Top-up sizes are 12, 24, 36 (rounds 1 to 3): section 5 says only "k more".
+  7. The 72 regression counts use largest remainder with ties to the larger 0.2x count, then the 0.2x table order:
+     section 5 says "in proportion" without a tie rule.
+  8. Regression tasks are built by a deterministic assembler from a frozen slot table
+     (`bench/heldout-0.2y/regression-slots.json`); the author writes request text only. This replaces "the author
+     receives the task JSON schema" for them, because the schema carries catalog names the author must not know;
+     answers are slot-fixed because the author never sees the world.
+  9. The author sees facts as id plus sentence (no file or path); briefs E and Q use disjoint fact subsets;
+     the pool is 6 workspaces of 40 or more facts and is enlarged deterministically if it cannot cover base
+     requests plus maximum top-ups: removes a path leak and a shared-fact overlap.
+  10. Calibration tasks pool both groups (first 30 passing in id order): section 5 gives no group split for them.

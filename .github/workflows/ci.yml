@@ -40,6 +40,9 @@ jobs:
         run: |
           python bench/tools/test_lint_02y.py
           python bench/tools/test_analyze_y.py
+          python bench/tools/test_authoring_02y.py
+          python bench/tools/test_assemble_02y.py
+          python bench/tools/assemble_02y.py --check-slots
       - name: analyzer tests and synthetic-run fixture (no model, no GPU)
         run: |
           python bench/tools/test_analyze.py

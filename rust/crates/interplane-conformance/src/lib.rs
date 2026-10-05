@@ -161,6 +161,8 @@ pub struct CaseRun {
     pub selections: Vec<Value>,
     /// The trace's input ledger after the last step (0.3 cut P3), in registration order.
     pub inputs: Vec<Value>,
+    /// The full input ledger, whether or not the case asserts it (dump only, gate P evidence).
+    pub ledger: Vec<Value>,
     /// `{request_id, inputs, floor}` the runtime saw in `CallContext` at `decide`, in order.
     pub exposure: Vec<Value>,
     /// The injection judge's counts, for fixtures with an `injection` block:
@@ -197,6 +199,7 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
     let mut results = vec![];
     let mut selections = vec![];
     let mut inputs: Vec<Value> = vec![];
+    let mut ledger: Vec<Value> = vec![];
     let mut continuations: Vec<Value> = vec![];
     let catalog = rt.catalog();
     let mut sel = fx.get("selection").map(|spec| {
@@ -360,13 +363,14 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
                 observed.extend(out.records);
             }
         }
+        ledger = p
+            .inputs(&trace)
+            .iter()
+            .map(|r| serde_json::to_value(r).unwrap_or(Value::Null))
+            .collect();
         // Reported only for cases that assert them, so older verdicts keep their shape.
         if fx["expected"].get("inputs").is_some() {
-            inputs = p
-                .inputs(&trace)
-                .iter()
-                .map(|r| serde_json::to_value(r).unwrap_or(Value::Null))
-                .collect();
+            inputs = ledger.clone();
         }
     }
     let Probe {
@@ -389,6 +393,7 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
         results,
         selections,
         inputs,
+        ledger,
         exposure: if fx["expected"].get("exposure").is_some() {
             rt.seen_exposure.clone()
         } else {
@@ -878,6 +883,8 @@ pub struct Outcome {
     pub name: String,
     pub errs: Vec<String>,
     pub results: Option<Vec<Value>>,
+    /// The case's full input ledger (dump only).
+    pub ledger: Option<Vec<Value>>,
 }
 
 /// Every case of a fixtures directory, in verdict order: the `NN-*` cases, the `injection/` cases,
@@ -928,6 +935,7 @@ pub fn run_suite(dir: &Path, ctl: Ctl) -> Result<Suite, String> {
             name: run.case.clone(),
             errs,
             results: Some(run.results.clone()),
+            ledger: Some(run.ledger.clone()),
         });
     }
     for fx in &load_lifecycle_fixtures(dir)? {
@@ -942,6 +950,7 @@ pub fn run_suite(dir: &Path, ctl: Ctl) -> Result<Suite, String> {
             name: case,
             errs,
             results: None,
+            ledger: None,
         });
     }
     for (name, err) in check_digest_fixtures(dir) {
@@ -950,6 +959,7 @@ pub fn run_suite(dir: &Path, ctl: Ctl) -> Result<Suite, String> {
             name,
             errs: err.into_iter().collect(),
             results: None,
+            ledger: None,
         });
     }
     Ok(Suite { rows, outcomes })

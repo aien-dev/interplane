@@ -298,8 +298,9 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         results.extend(out.results)
         observed.extend(r.to_dict() for r in out.observed)
         turns.append(out.to_dict())
+    ledger = pipe.inputs(trace_id)
     # Reported only for cases that assert them, so older verdicts keep their shape.
-    inputs = pipe.inputs(trace_id) if "inputs" in case["expected"] else []
+    inputs = ledger if "inputs" in case["expected"] else []
     exposure = pipe.runtime.seen_exposure if "exposure" in case["expected"] else []
     if nc is not None:
         nc.finish(variant, results, inputs)
@@ -372,6 +373,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         "continuations": continuations,
         "problems": problems,
         "results": [canonical_result_payload(r) for r in results],
+        "ledger": list(ledger),
     }
 
 
@@ -490,6 +492,7 @@ def main(argv: Optional[list] = None) -> int:
         d.mkdir(parents=True, exist_ok=True)
         for name, verdict in verdicts.items():
             (d / f"{name}.results.json").write_text(jcs(verdict["results"]) + "\n", encoding="utf-8")
+            (d / f"{name}.inputs.json").write_text(jcs(verdict["ledger"]) + "\n", encoding="utf-8")
     failed = 0
     for name, v in sorted({**verdicts, **lifecycle}.items()):
         print(f"{'PASS' if v['pass'] else 'FAIL'}  {name}")

@@ -748,8 +748,10 @@ impl<'a> Pipeline<'a> {
                 r.provenance = Some(ResultProvenance {
                     runtime: Some(self.runtime.runtime_id().to_string()),
                     capability: Some(cap.capability.clone()),
-                    content_kind: None,
-                    trust: None,
+                    // Synthesized by the pipeline: labelled as the schema reads a null label.
+                    content_kind: Some(ContentKind::ToolResult),
+                    trust: Some(TrustLevel::Undetermined),
+                    trusted: TrustLevel::Undetermined.trusted_flag(),
                     ..Default::default()
                 });
                 r
@@ -765,8 +767,10 @@ impl<'a> Pipeline<'a> {
                 r.provenance = Some(ResultProvenance {
                     runtime: Some(self.runtime.runtime_id().to_string()),
                     capability: Some(cap.capability.clone()),
-                    content_kind: None,
-                    trust: None,
+                    // Synthesized by the pipeline: labelled as the schema reads a null label.
+                    content_kind: Some(ContentKind::ToolResult),
+                    trust: Some(TrustLevel::Undetermined),
+                    trusted: TrustLevel::Undetermined.trusted_flag(),
                     ..Default::default()
                 });
                 r

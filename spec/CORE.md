@@ -205,8 +205,10 @@ back as untrusted for identity and consistency:
   `unknown decision value: mismatched request_id`, execute 0.
 - An `execute` that raises, or returns a result citing another `request_id`, gives a FAILED request
   with `execution_error`; the foreign result and its data are dropped. Messages:
-  `runtime authority raised an error` and `runtime returned a result for another request`; no
-  data was produced, so `content_kind`, `trust` and `trusted` are `null`.
+  `runtime authority raised an error` and `runtime returned a result for another request`. No
+  data was produced; the pipeline labels the result `tool_result` + `unknown` (`trusted` null), the
+  reading the schema gives a null label on an executed result, so gate P2 of bench/PROTOCOL-0.3.md
+  (every executed result labelled) holds (0.3 cut R1a; before it the labels were `null`).
 - A call to a capability the catalog advertises more than once with different definitions (the
   `description` or `parameters` differ) is REJECTED with `stale_capability` and the message
   `capability is advertised more than once with different definitions`, before `decide` (Jan 8975

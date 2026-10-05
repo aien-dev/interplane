@@ -37,8 +37,10 @@ by an OpenAI-compatible `/v1/chat/completions` (non-streamed, or streamed and as
 caller; dialect `openai_stream` below assembles a stream).
 
 - `tool_calls[i].function.name` -> raw_name; `tool_calls[i].id` -> source_call_id.
-- `function.arguments` is a JSON string: parse; must be an object. Not JSON -> `malformed_tool_call`
-  "arguments is not valid JSON". JSON but not an object -> `malformed_tool_call` "arguments is not an object".
+- `function.arguments` is a JSON string: parse; must be an object. Not JSON, absent, or not a string
+  (an already-decoded object, as Ollama's own `/api/chat` sends, is not the OpenAI-compatible form)
+  -> `malformed_tool_call` "arguments is not valid JSON". JSON but not an object ->
+  `malformed_tool_call` "arguments is not an object".
 - Missing or empty name -> `malformed_tool_call`.
 - `content` -> text (null -> ""). `reasoning_content` / `reasoning` -> reasoning_digest.
 - Legacy `function_call` (single) is accepted as one call with no id.
@@ -217,7 +219,8 @@ Required qwen35 fixtures: valid single call; multiple calls; malformed (unclosed
 reasoning plus call; plain answer with no tool; unknown tool name (parses fine); partial/truncated
 call; multi-line parameter value; JSON-typed parameter; hermes_json form. Required aien_legacy fixtures: valid single call; multiple calls; reasoning plus call; repaired bracket; repaired missing braces; trailing comma (rejected); single quotes (rejected); unterminated (rejected, partial); fenced json fallback; placeholder name (rejected); missing arguments; arguments not object; plain answer. Required openai fixtures:
 single; multiple; arguments not JSON; arguments not object; missing name; reasoning_content present;
-plain answer; legacy function_call.
+plain answer; legacy function_call; arguments as a decoded object (rejected); arguments not a string
+(rejected).
 
 Fixture provenance: inputs are constructed from the official template grammar, not captured from a
 live model, until the qualification run under `qualification/` captures real outputs and pins them.

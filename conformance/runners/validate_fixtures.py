@@ -345,7 +345,8 @@ for p in sorted(glob.glob(os.path.join(ROOT, "dialects", "fixtures", "*", "*.jso
         if it["provenance"].get("source_digest") is not None: fail("%s: source_digest must be null" % where)
     if V_INTENT.is_valid({**e["intents"][0], "kind": "result"}) if e.get("intents") else False:
         fail("negative control: wrong kind validated")
-req = {"openai": {"single","multiple","arguments_not_json","arguments_not_object","missing_name","reasoning_content_present","plain_answer","legacy_function_call"},
+req = {"openai": {"single","multiple","arguments_not_json","arguments_not_object","missing_name","reasoning_content_present","plain_answer","legacy_function_call","arguments_decoded_object","arguments_not_string"},
+       "openai_stream": {"assembled-arguments-not-json","capture-llamacpp-no-reasoning","capture-llamacpp-reasoning","capture-ollama-no-reasoning","capture-ollama-reasoning","capture-sglang-no-reasoning","capture-sglang-reasoning","crlf-comments-no-space","cut-after-complete-arguments","cut-mid-arguments","error-chunk-not-json","error-conflicting-name","error-event-after-done","error-fragment-without-index","error-input-not-text","error-second-choice","finish-length","fragmented-call","plain-text-cut","plain-text-stop","sglang-null-repeats","two-calls-interleaved","unterminated-last-event"},
        "qwen35": {"valid_single_call","multiple_calls","malformed_unclosed_function","reasoning_plus_call","plain_answer","unknown_tool_name","partial_truncated_call","multiline_parameter","json_typed_parameter","hermes_json"},
        "aien_legacy": {"valid_single_call","multiple_calls","reasoning_plus_call","repaired_bracket","repaired_missing_braces","trailing_comma_rejected","single_quotes_rejected","unterminated_rejected","fenced_json_fallback","placeholder_name_rejected","missing_arguments","arguments_not_object","plain_answer"}}
 for dia, names in req.items():

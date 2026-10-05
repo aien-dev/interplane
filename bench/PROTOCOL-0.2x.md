@@ -108,7 +108,7 @@ baseline that shares the arm's model, prompt and generation settings:
 
 The policy runs host-side in the bench runner and uses only the CrossAxis primitives that exist
 today: `discover` and `expand` (`python/interplane/crossaxis.py:456` and `:476`, with the same
-contract in `rust/crates/interplane-crossaxis/src/lib.rs`). It looks only at events the pipeline
+contract at `rust/crates/interplane-crossaxis/src/lib.rs:473` and `:507`). It looks only at events the pipeline
 already records for each call: the `error_code`, the `capability`, the `exposed` flag and the
 `status`.
 
@@ -117,7 +117,7 @@ already records for each call: the `error_code`, the `capability`, the `exposed`
 | id | observable event | action |
 |---|---|---|
 | T1 unknown tool | `error_code = unknown_capability` (name not in the mapping table), or `capability_not_found` for a name not in the catalog | catalog search: `discover(catalog, selection, token)` for each token of the requested name split on `_ . -` with length ≥ 3. Hits are united, sorted and cut at 8, then `expand(..., {"kind": "discovery_hit", "query": <name>, "names": hits})` |
-| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), whatever the decision | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409`) |
+| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), unless the call was denied or held for approval (N1, N2) | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409`) |
 | T3 typed missing capability | `error_code` is `capability_not_found` or `stale_capability` for a name that **is** in the catalog | widen the domain: `expand(..., {"kind": "requested_excluded", "name": cap, "include_domain_siblings": true})` |
 
 For an unexposed catalog tool (T2), the catalog search the plan asks for reduces to an exact-name
@@ -135,8 +135,13 @@ T1 is the case where the search is not exact.
 - N4. Exposure never re-executes or retries the original request, including writes. The call that
   fired the trigger already went through the pipeline once, and its result is what the model sees.
   The host never issues a call on the model's behalf.
-- N5. `invalid_arguments`, `execution_error` and `execution_timeout` do not trigger. They are the
-  model's or the tool's problem, not a missing capability.
+- N5. `invalid_arguments`, `execution_error` and `execution_timeout` are not missing-capability
+  failures and never fire T3. They are the model's or the tool's problem. An unexposed call that
+  fails this way still fires T2, because the model asked for a tool it could not see.
+
+In B1, B2 and B4, T2 keeps its exact 0.2 behaviour, which also exposes a capability after a denied
+or pending call (the call itself stays denied or pending). N1 and N2 as trigger rules apply to
+B3, so B1 stays the 0.2 mechanism unchanged.
 
 **Caps.**
 
@@ -144,8 +149,9 @@ T1 is the case where the search is not exact.
   added per expansion (`max_added_per_expansion`). These are the CrossAxis bounds recorded in
   `selector.expansion`, the same as 0.2.
 - Exposed schema budget: the rendered tool list of any round stays within **30 %** of the
-  full-catalog rendered bytes of the same task (the A round-1 `tools_bytes`). Over-budget
-  candidates are refused with reason `schema_budget`. 30 % is the T threshold restated as a hard
+  full-catalog rendered bytes of the same task (the A round-1 `tools_bytes`). An expansion whose
+  result would exceed the budget is not applied, and every name it would have added is recorded as
+  refused with reason `schema_budget`. 30 % is the T threshold restated as a hard
   cap, so arm 3 cannot pass O1 by exposing everything. The cap can be met on every expansion task.
   Measured offline with `openai_tools_renderer` against the 59024-byte full catalog, the worst
   case over the 24 held-out and 5 dev expansion tasks is:
@@ -153,14 +159,17 @@ T1 is the case where the search is not exact.
   - round 1 plus `read_file` (T2): 0.187;
   - round 1 plus a full `read_file` domain widening (T3, 8 added): 0.256.
 - Rounds: `MAX_ROUNDS = 8`, unchanged.
-- Retries: each (trigger, name) pair is acted on at most once per run. A repeat is recorded with
-  `refused: duplicate_trigger` and adds nothing.
-- When a cap is exhausted, the host appends one fixed note to that call's tool result: "No further
+- Retries: each (trigger, name) pair is acted on at most once per run. A repeat is logged in
+  `runtime_triggers` as `duplicate_trigger` and adds nothing.
+- When a trigger adds nothing because a cap refused its candidates (`max_expansions`,
+  `max_added_per_expansion` or `schema_budget`), the host appends one fixed note to that call's tool result: "No further
   tools can be made available in this conversation. Answer with the tools you have, or tell the
   user what is missing." The model may then state the limitation or ask the user (`ask_user` is
   always exposed). The host takes no other action.
 
-**Receipts.** Every trigger, including refused and capped ones, writes an expansion event with:
+**Receipts.** Every trigger decision is logged in the run's `runtime_triggers`, including calls
+suppressed by N1 or N2, duplicates and searches with no hits. Every attempted expansion also
+appears in `expansions`, which the judge and the 0.2 metrics read. An expansion event carries:
 `trigger` (T1, T2 or T3), the call index and round, the triggering `error_code` or `exposed` flag,
 the previous selection digest and exposed names, the new selection digest and added names, the
 refused names with reasons, the remaining budget (expansions left, bytes left), and a `reason`
@@ -268,7 +277,7 @@ For each arm: T, S (with the paired table), O1 and O2 as in section 6. Also:
 - O1 and O2 per expansion kind;
 - results per template;
 - trigger counts by id;
-- refusals by reason, including `schema_budget` and `duplicate_trigger`;
+- refusals by reason, including `schema_budget`, and `duplicate_trigger` and suppressed (N1, N2) counts;
 - cap-exhausted notes;
 - the fragile flag;
 - latency validity.

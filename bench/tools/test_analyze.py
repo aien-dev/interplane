@@ -130,11 +130,16 @@ def campaign_receipt(task: dict, cond: str, seed: int, rng: random.Random, recov
     return rc
 
 
+def frozen_corpus_block(name: str) -> dict:
+    d = analyze.frozen_tasks_digest(analyze.HISTORICAL[name]["digest"])
+    return {"frozen": {"tasks_digest": d}, "recomputed": {"tasks_digest": d}, "match": True}
+
+
 def write_campaign_block(out: Path, subset: dict, seed: int, recover: dict) -> None:
     """recover: (cond, expansion kind) -> bool for this block; default True."""
     rng = random.Random(seed)
     (out / "receipts").mkdir(parents=True, exist_ok=True)
-    (out / "manifest.json").write_text(json.dumps({"campaign": {"seed": seed, "corpus": "0.2x"}, "corpus": {"match": True}, "latency_validity": {"valid": True, "reasons": []},
+    (out / "manifest.json").write_text(json.dumps({"campaign": {"seed": seed, "corpus": "0.2x"}, "corpus": frozen_corpus_block("0.2x"), "latency_validity": {"valid": True, "reasons": []},
                                                    "deterministic_identity": {"identity_digest": f"sha256:synthetic-{seed}"}}, sort_keys=True) + "\n")
     for k, t in subset.items():
         for cond in CONDS7:
@@ -214,14 +219,18 @@ def r1_receipt(cond: str, tid: str = "t-1", *, text: bool = True, query: bool = 
     return r
 
 
-def write_r1_run(out: Path, corpus, receipts: list, *, campaign: bool = True, di_corpus=None) -> Path:
+def write_r1_run(out: Path, label, receipts: list, *, digest=None, campaign: bool = True, di_corpus=None, manifest: bool = True) -> Path:
+    """digest: name of a historical corpus whose frozen digest block the manifest records (or None)."""
     (out / "receipts").mkdir(parents=True)
-    m: dict = {"kind": "x"}
-    if campaign:
-        m["campaign"] = {"corpus": corpus, "seed": 42} if corpus is not None else {"seed": 42}
-    if di_corpus is not None:
-        m["deterministic_identity"] = {"campaign": {"corpus": di_corpus}}
-    (out / "manifest.json").write_text(json.dumps(m))
+    if manifest:
+        m: dict = {"kind": "x"}
+        if campaign:
+            m["campaign"] = {"corpus": label, "seed": 42} if label is not None else {"seed": 42}
+        if digest:
+            m["corpus"] = frozen_corpus_block(digest)
+        if di_corpus is not None:
+            m["deterministic_identity"] = {"campaign": {"corpus": di_corpus}}
+        (out / "manifest.json").write_text(json.dumps(m))
     for i, r in enumerate(receipts):
         (out / "receipts" / f"{r['task']['id']}.{r['condition']}.{i}.json").write_text(json.dumps(r))
     return out
@@ -229,50 +238,68 @@ def write_r1_run(out: Path, corpus, receipts: list, *, campaign: bool = True, di
 
 def test_r1_scope() -> None:
     tdir = BENCH / "tasks"
+    hx = sorted(analyze.corpus_task_ids(analyze.HISTORICAL["0.2x"]["tasks"]))[:3]  # real frozen 0.2x task ids
+    h2 = sorted(analyze.corpus_task_ids(analyze.HISTORICAL["0.2"]["tasks"]))[:3]   # real frozen 0.2 task ids
+    fresh = ["fresh-y-1", "fresh-y-2", "fresh-y-3"]                                 # ids in no frozen corpus (0.2y-like)
+    assert not set(fresh) & (set(hx) | set(h2))
     with tempfile.TemporaryDirectory() as td:
         td = Path(td)
         n = [0]
 
-        def load(corpus, receipts, **kw):
+        def load(label, receipts, **kw):
             n[0] += 1
-            return analyze.load_run(write_r1_run(td / f"r{n[0]}", corpus, receipts, **kw), tdir)
+            return analyze.load_run(write_r1_run(td / f"r{n[0]}", label, receipts, **kw), tdir)
 
         def bad(d):
             return sorted((x["task"], x["condition"]) for x in d["r1_invalid"])
 
+        def arms(ids, conds=("A", "B3", "B5"), **kw):
+            return [r1_receipt(c, i, **kw.get(c, {})) for c, i in zip(conds, ids)]
+
         # (e) complete valid receipts in every 0.2y arm pass
-        full = [r1_receipt(c, f"t-{c}") for c in ("A", "B3", "B5")]
-        assert load("0.2y", full)["r1_invalid"] == []
-        # (a) missing round text in arm A is invalid under 0.2y, but valid for the historical 0.2x corpus (original rule: B5 only)
-        a_notext = [r1_receipt("A", "t-A", text=False), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5")]
-        assert bad(load("0.2y", a_notext)) == [("t-A", "A")]
-        # (f) historical 0.2x receipts without R1 fields still validate; B5 is still enforced there
-        hist = [r1_receipt(c, f"t-{c}", text=False, query=False) for c in ("A", "B3")]
-        assert load("0.2x", hist)["r1_invalid"] == []
-        assert bad(load("0.2x", hist + [r1_receipt("B5", "t-B5", text=False)])) == [("t-B5", "B5")]
-        # 0.2 layout (no campaign block, conditions A and B only) is legacy and unchanged
-        legacy = [r1_receipt("A", "t-A", text=False), r1_receipt("B", "t-B", text=False, query=False)]
-        assert load(None, legacy, campaign=False)["r1_invalid"] == []
-        # (b) missing discovery queries in B3, (c) in B5
-        assert bad(load("0.2y", [r1_receipt("A"), r1_receipt("B3", "t-B3", query=False), r1_receipt("B5", "t-B5")])) == [("t-B3", "B3")]
-        assert bad(load("0.2y", [r1_receipt("A"), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5", query=False)])) == [("t-B5", "B5")]
-        # (d) malformed recording: raw non-string query is valid only as an invalid_arguments error, in any 0.2y arm
-        ok_bad_args = [r1_receipt("A"), r1_receipt("B3", "t-B3", bad_query=(None, "invalid_arguments")), r1_receipt("B5", "t-B5", bad_query=(7, "invalid_arguments"))]
-        assert load("0.2y", ok_bad_args)["r1_invalid"] == []
-        for arm in ("B3", "B5"):
-            rs = [r1_receipt("A"), r1_receipt("B3", "t-B3"), r1_receipt("B5", "t-B5")]
-            rs = [r1_receipt(arm, f"t-{arm}", bad_query=(["x"], "ok")) if r["condition"] == arm else r for r in rs]
-            assert bad(load("0.2y", rs)) == [(f"t-{arm}", arm)], arm
-        # (g) fail closed on identity: never silently historical
-        for label, d in (("campaign block without corpus", load(None, full)),
-                         ("unknown corpus", load("0.3", full)),
-                         ("disagreeing identity", load("0.2y", full, di_corpus="0.2x")),
-                         ("no manifest campaign, non-0.2 arms", load(None, full, campaign=False)),
-                         ("arm outside the 0.2y list", load("0.2y", full + [r1_receipt("B1", "t-B1")]))):
+        assert load("0.2y", arms(fresh))["r1_invalid"] == []
+        # (a) missing round text in arm A, (b) missing queries in B3, (c) in B5: invalid under 0.2y
+        assert bad(load("0.2y", arms(fresh, A={"text": False}))) == [(fresh[0], "A")]
+        assert bad(load("0.2y", arms(fresh, B3={"query": False}))) == [(fresh[1], "B3")]
+        assert bad(load("0.2y", arms(fresh, B5={"query": False}))) == [(fresh[2], "B5")]
+        # (d) a raw non-string query is valid only as an invalid_arguments error, in any 0.2y arm
+        assert load("0.2y", arms(fresh, B3={"bad_query": (None, "invalid_arguments")}, B5={"bad_query": (7, "invalid_arguments")}))["r1_invalid"] == []
+        for arm, i in (("B3", 1), ("B5", 2)):
+            assert bad(load("0.2y", arms(fresh, **{arm: {"bad_query": (["x"], "ok")}}))) == [(fresh[i], arm)], arm
+        # (f) real historical runs (frozen digest recorded, ids in the frozen corpus) keep the original rule
+        hist7 = [r1_receipt(c, hx[0], text=False, query=False) for c in ("A", "A2", "B1", "B3")]
+        hist7[1]["task"]["id"] = hx[1]
+        hist7[2]["task"]["id"] = hx[2]
+        assert load("0.2x", hist7, digest="0.2x")["r1_invalid"] == []
+        assert load("0.2", [r1_receipt("A", h2[0], text=False), r1_receipt("B", h2[1], text=False, query=False)],
+                    digest="0.2")["r1_invalid"] == []
+        assert load(None, [r1_receipt("A", h2[0], text=False), r1_receipt("B", h2[1], text=False)], campaign=False, digest="0.2")["r1_invalid"] == []
+        # legacy without any manifest: only frozen 0.2 ids and 0.2 arms
+        assert load(None, [r1_receipt("A", h2[0], text=False), r1_receipt("B", h2[1], text=False)], manifest=False)["r1_invalid"] == []
+        # B5 in a historical 0.2x run is refused (B5 was never part of 0.2x; run_bench.py CAMPAIGN_CONDITIONS, #64)
+        d = load("0.2x", hist7 + [r1_receipt("B5", hx[0])], digest="0.2x")
+        assert any("not part of historical corpus 0.2x" in x["problems"][0] for x in d["r1_invalid"]), d["r1_invalid"]
+        # even a historical run still enforces R1 on B5 receipts that are present in a legal arm set
+        # (0.2x has no B5, so this is covered by the refusal above)
+        # MISLABEL: a 0.2y-like run (fresh ids, no frozen digest) labelled 0.2x or 0.2 gets the strict rule, not the weak one
+        for lab in ("0.2x", "0.2"):
+            assert bad(load(lab, arms(fresh, A={"text": False}, B3={"query": False}))) == [(fresh[0], "A"), (fresh[1], "B3")], lab
+            assert bad(load(lab, arms(fresh, A={"text": False}, B3={"query": False}), digest="0.2x" if lab == "0.2x" else "0.2")) == \
+                [(fresh[0], "A"), (fresh[1], "B3")], lab  # even carrying a real frozen digest: ids are not in that corpus
+        # a 0.2y run carrying the 0.2x digest but labelled 0.2x, with 0.2x-id receipts of another label, is refused
+        d = load("0.2", [r1_receipt("A", hx[0], text=False)], digest="0.2x")
+        assert any("contradicts the frozen task-set digest" in x["problems"][0] for x in d["r1_invalid"])
+        # no-manifest and no-campaign runs of non-historical tasks are refused, A-only included
+        assert any(x["task"] == "*" for x in load(None, [r1_receipt("A", fresh[0])], manifest=False)["r1_invalid"])
+        assert any(x["task"] == "*" for x in load(None, [r1_receipt("A", fresh[0])], campaign=False)["r1_invalid"])
+        # fail closed on identity
+        for label, d in (("campaign block without corpus", load(None, arms(fresh))),
+                         ("disagreeing identity", load("0.2y", arms(fresh), di_corpus="0.2x")),
+                         ("arm outside the 0.2y list", load("0.2y", arms(fresh) + [r1_receipt("B1", "t-B1")]))):
             assert any(x["task"] == "*" or x["condition"] == "B1" for x in d["r1_invalid"]), label
-        assert load("0.2y", full, di_corpus="0.2y")["r1_invalid"] == []
+        assert load("0.2y", arms(fresh), di_corpus="0.2y")["r1_invalid"] == []
         # (h) one invalid 0.2y receipt refuses the whole run, in build and in the campaign path (non-zero exit)
-        badrun = write_r1_run(td / "bad", "0.2y", [r1_receipt("A", "t-A"), r1_receipt("B3", "t-B3", query=False), r1_receipt("B5", "t-B5")])
+        badrun = write_r1_run(td / "bad", "0.2y", arms(fresh, B3={"query": False}))
         for call in (lambda: analyze.build(badrun, tdir, [], ""),
                      lambda: analyze.build_campaign(badrun, [], tdir),
                      lambda: analyze.main([str(badrun), "--out", str(td / "o")])):

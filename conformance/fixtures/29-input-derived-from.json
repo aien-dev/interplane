@@ -183,7 +183,8 @@
         "origin": "runtime:mock",
         "trace_id": "trace-29",
         "parent_id": "call_29a",
-        "derived_from": []
+        "derived_from": [],
+        "content_digest": "sha256:57eede4dba9330a0aa51027b0780dd01b7fe516f32f7c98d99171db9e7dacafc"
       },
       {
         "input_id": "in-29-orphan",
@@ -200,6 +201,20 @@
         "derived_from": [
           "in-29-missing"
         ]
+      },
+      {
+        "input_id": "in-auto-1",
+        "content_kind": "tool_result",
+        "trust": "unknown",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "content_digest": "sha256:583fa4b8bc4fc388ec6c552c756ca0047f6fe190a7cf095880cd7ab26eb18862",
+        "trace_id": "trace-29",
+        "parent_id": "call_29b",
+        "derived_from": []
       }
     ],
     "exposure": [

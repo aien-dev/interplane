@@ -67,7 +67,12 @@ def run_case(case: dict) -> dict:
             selections.append(sel.to_dict())
             continue
         if "input" in step and "dialect" not in step:
-            continue  # host-only input registration: not implemented yet (red)
+            # host-only input registration (0.3 cut P3): never reachable from model input
+            try:
+                pipe.register_input(step["input"])
+            except (ValueError, ProtocolError):
+                pass
+            continue
         if "envelope" in step:
             result, record = pipe.admit_envelope(step["envelope"], turn=step.get("turn"))
             results.append(result)
@@ -84,8 +89,9 @@ def run_case(case: dict) -> dict:
         results.extend(out.results)
         observed.extend(r.to_dict() for r in out.observed)
         turns.append(out.to_dict())
-    inputs: list = []
-    exposure: list = []
+    # Reported only for cases that assert them, so older verdicts keep their shape.
+    inputs = pipe.inputs(trace_id) if "inputs" in case["expected"] else []
+    exposure = pipe.runtime.seen_exposure if "exposure" in case["expected"] else []
     runtime = {
         "decide_calls": pipe.runtime.decide_calls,
         "execute_calls": pipe.runtime.execute_calls,

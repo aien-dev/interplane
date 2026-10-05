@@ -6,7 +6,7 @@ use interplane_core::*;
 use interplane_crossaxis::{coerce_arguments, MappingTable};
 use interplane_lenshift::{DialectRegistry, ParseContext, RejectedCall};
 use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+use serde_json::{json, Map, Value};
 
 use crate::{CallContext, RuntimeAuthority};
 
@@ -54,6 +54,27 @@ pub struct Pipeline<'a> {
     pub timestamp: String,
     seq: HashMap<String, u64>,
     turn: Option<u64>,
+    /// Per trace: every input that has been placed in front of the model, in order (cut P3).
+    inputs: HashMap<String, Vec<InputRecord>>,
+}
+
+/// Position in the trust order; `unknown` and anything unrecognized rank as `external_untrusted`.
+fn trust_rank(t: &TrustLevel) -> u8 {
+    match t {
+        TrustLevel::TrustedRuntime => 3,
+        TrustLevel::UserSupplied => 2,
+        TrustLevel::WorkspaceUntrusted => 1,
+        _ => 0,
+    }
+}
+
+fn rank_trust(rank: u8) -> TrustLevel {
+    match rank {
+        3 => TrustLevel::TrustedRuntime,
+        2 => TrustLevel::UserSupplied,
+        1 => TrustLevel::WorkspaceUntrusted,
+        _ => TrustLevel::ExternalUntrusted,
+    }
 }
 
 fn rec(
@@ -167,7 +188,76 @@ impl<'a> Pipeline<'a> {
             timestamp: "2026-01-01T00:00:00Z".into(),
             seq: HashMap::new(),
             turn: None,
+            inputs: HashMap::new(),
         }
+    }
+
+    /// Host-only: register an input (user request, workspace file, memory hit, skill, ...) placed
+    /// in front of the model on `rec.trace_id`, before the turn that can see it. This is not
+    /// reachable from model output or from an admitted envelope: those paths never call it.
+    /// Refuses a duplicate `input_id` on the trace.
+    pub fn register_input(&mut self, rec: InputRecord) -> Result<(), String> {
+        let ledger = self.inputs.entry(rec.trace_id.clone()).or_default();
+        if ledger.iter().any(|r| r.input_id == rec.input_id) {
+            return Err(format!("duplicate input_id: {}", rec.input_id));
+        }
+        ledger.push(rec);
+        Ok(())
+    }
+
+    /// The trace's input ledger, in registration order.
+    pub fn inputs(&self, trace: &str) -> &[InputRecord] {
+        self.inputs.get(trace).map(Vec::as_slice).unwrap_or(&[])
+    }
+
+    /// Exposure computed from the ledger. Fails closed: an empty ledger means the host told us
+    /// nothing about what the model saw, an input with unknown trust ranks as `external_untrusted`,
+    /// and an input derived from an id the ledger does not hold counts as `external_untrusted`.
+    pub fn exposure_for(&self, trace: &str) -> Exposure {
+        let ledger = self.inputs(trace);
+        let mut floor = if ledger.is_empty() { 0 } else { 3 };
+        for r in ledger {
+            let traced = r
+                .derived_from
+                .iter()
+                .all(|d| ledger.iter().any(|o| &o.input_id == d));
+            floor = floor.min(if traced { trust_rank(&r.trust) } else { 0 });
+        }
+        Exposure {
+            inputs: ledger.iter().map(|r| r.input_id.clone()).collect(),
+            floor: rank_trust(floor),
+            extensions: Map::new(),
+        }
+    }
+
+    /// Record a rendered result as an input of the trace (`parent_id` = its request id). The
+    /// trust and kind are the runtime's normalized provenance; absent means `unknown`.
+    fn record_result(&mut self, trace: &str, r: &ToolResult, rendered: &Value) {
+        let prov = r.provenance.as_ref();
+        let ledger = self.inputs.entry(trace.to_string()).or_default();
+        let mut n = ledger
+            .iter()
+            .filter(|o| o.input_id.starts_with("in-auto-"))
+            .count();
+        while ledger.iter().any(|o| o.input_id == format!("in-auto-{n}")) {
+            n += 1;
+        }
+        ledger.push(InputRecord {
+            input_id: format!("in-auto-{n}"),
+            content_kind: prov
+                .and_then(|p| p.content_kind.clone())
+                .unwrap_or(ContentKind::Undetermined),
+            trust: prov
+                .and_then(|p| p.trust.clone())
+                .unwrap_or(TrustLevel::Undetermined),
+            source: Party::new("runtime", self.runtime.runtime_id()),
+            origin: format!("runtime:{}", self.runtime.runtime_id()),
+            content_digest: digest(rendered),
+            trace_id: trace.to_string(),
+            parent_id: r.request_id.clone(),
+            derived_from: vec![],
+            extensions: Map::new(),
+        });
     }
 
     fn emit(&mut self, trace: &str, event: EventKind, request_id: Option<&str>) {
@@ -246,18 +336,19 @@ impl<'a> Pipeline<'a> {
                 return self.reject(&trace, peek.as_deref(), ErrorCode::MalformedEnvelope, &msg);
             }
         };
-        self.admit_checked(&env, Some(v))
+        self.admit_checked(&env, Some(v), None)
     }
 
     /// Admit a parsed envelope. Order: version, structure, replay, duplicate, size, map, decide, execute.
     pub fn admit_envelope(&mut self, env: &Envelope) -> (ToolResult, ObservedRecord) {
-        self.admit_checked(env, None)
+        self.admit_checked(env, None, None)
     }
 
     fn admit_checked(
         &mut self,
         env: &Envelope,
         raw: Option<&Value>,
+        turn_exposure: Option<&Exposure>,
     ) -> (ToolResult, ObservedRecord) {
         let trace = env.trace_id.clone();
         let raw_v = match raw {
@@ -292,7 +383,7 @@ impl<'a> Pipeline<'a> {
             let msg = format!("replayed message_id: {}", env.message_id);
             return self.reject(&trace, peek.as_deref(), ErrorCode::ReplayedMessage, &msg);
         }
-        let req = match env.parse_payload() {
+        let mut req = match env.parse_payload() {
             Ok(Payload::ToolRequest(t)) => t,
             _ => {
                 return self.reject(
@@ -314,12 +405,24 @@ impl<'a> Pipeline<'a> {
             let msg = format!("arguments exceed {} bytes", self.limits.max_argument_bytes);
             return self.reject(&trace, Some(&rid), ErrorCode::OversizedArguments, &msg);
         }
+        // Exposure is the pipeline's own: whatever the model or envelope claimed is overwritten.
+        let exposure = match turn_exposure {
+            Some(e) => e.clone(),
+            None => self.exposure_for(&trace),
+        };
+        req.provenance.extensions.insert(
+            "exposure".into(),
+            serde_json::to_value(&exposure).unwrap_or_else(
+                |_| json!({"inputs": [], "floor": TrustLevel::ExternalUntrusted.as_str()}),
+            ),
+        );
         let ctx = CallContext {
             trace_id: trace.clone(),
             message_id: env.message_id.clone(),
             parent_id: env.parent_id.clone(),
             model: env.source.clone(),
             session: None,
+            exposure: Some(exposure),
         };
         self.run_request(&req, &ctx)
     }
@@ -558,6 +661,14 @@ impl<'a> Pipeline<'a> {
                 return out;
             }
         };
+        let mut parsed = parsed;
+        let exposure = self.exposure_for(trace_id);
+        for intent in &mut parsed.intents {
+            intent.provenance.extensions.insert(
+                "exposure".into(),
+                serde_json::to_value(&exposure).unwrap_or(Value::Null),
+            );
+        }
         out.text = parsed.text.clone();
         out.partial = parsed.partial;
         out.outcome = if !parsed.intents.is_empty() {
@@ -626,7 +737,7 @@ impl<'a> Pipeline<'a> {
                             Party::new("runtime", self.runtime.runtime_id()),
                             serde_json::to_value(intent).unwrap_or(Value::Null),
                         );
-                        self.admit_envelope(&env)
+                        self.admit_checked(&env, None, Some(&exposure))
                     };
                     n += 1;
                     out.rendered.push(self.render(dialect, &res, Some(intent)));
@@ -634,6 +745,10 @@ impl<'a> Pipeline<'a> {
                     out.records.push(o);
                 }
             }
+        }
+        // Everything rendered back to the model is visible to its next turn.
+        for (res, rendered) in out.results.clone().iter().zip(&out.rendered) {
+            self.record_result(trace_id, res, rendered);
         }
         if out.intents.is_empty() && parsed.intents.is_empty() && parsed.rejected.is_empty() {
             self.emit(trace_id, EventKind::Complete, None);

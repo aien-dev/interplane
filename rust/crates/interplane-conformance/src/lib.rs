@@ -43,6 +43,7 @@ pub fn run_case(fx: &Value) -> CaseRun {
     let mut turns = vec![];
     let mut results = vec![];
     let mut selections = vec![];
+    let mut inputs: Vec<Value> = vec![];
     let catalog = rt.catalog();
     let mut sel = fx.get("selection").map(|spec| {
         let strings = |k: &str| -> Vec<String> {
@@ -101,7 +102,10 @@ pub fn run_case(fx: &Value) -> CaseRun {
                 results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
                 observed.push(o);
             } else if step.get("input").is_some() && step.get("dialect").is_none() {
-                // host-only input registration: not implemented yet (red)
+                // Host-only input registration (0.3 cut P3): never reachable from model input.
+                if let Ok(rec) = serde_json::from_value(step["input"].clone()) {
+                    let _ = p.register_input(rec);
+                }
             } else if let Some(d) = step["dialect"].as_str() {
                 let model = step["model"].as_str().unwrap_or("");
                 let out = p.run_turn(d, model, &step["input"], &trace, turn);
@@ -119,6 +123,14 @@ pub fn run_case(fx: &Value) -> CaseRun {
                 observed.extend(out.records);
             }
         }
+        // Reported only for cases that assert them, so older verdicts keep their shape.
+        if fx["expected"].get("inputs").is_some() {
+            inputs = p
+                .inputs(&trace)
+                .iter()
+                .map(|r| serde_json::to_value(r).unwrap_or(Value::Null))
+                .collect();
+        }
     }
     CaseRun {
         case,
@@ -128,8 +140,12 @@ pub fn run_case(fx: &Value) -> CaseRun {
         execute_calls: rt.execute_calls,
         results,
         selections,
-        inputs: vec![],
-        exposure: vec![],
+        inputs,
+        exposure: if fx["expected"].get("exposure").is_some() {
+            rt.seen_exposure.clone()
+        } else {
+            vec![]
+        },
     }
 }
 

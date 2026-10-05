@@ -23,9 +23,11 @@ from .core import (
     ErrorCode,
     ErrorInfo,
     Event,
+    InputRecord,
     Lifecycle,
     LifecycleError,
     Limits,
+    Party,
     RequestLedger,
     State,
     ToolRef,
@@ -225,6 +227,11 @@ def canonical_result_payload(result: ToolResult) -> dict:
     return payload
 
 
+_TRUST_RANK = {"trusted_runtime": 3, "user_supplied": 2, "workspace_untrusted": 1}
+_RANK_TRUST = {3: "trusted_runtime", 2: "user_supplied", 1: "workspace_untrusted"}
+_FAIL_CLOSED_EXPOSURE = {"inputs": [], "floor": "external_untrusted"}
+
+
 class Pipeline:
     """Reference pipeline: Lenshift.parse -> Core.admit -> CrossAxis.map -> decide -> execute."""
 
@@ -244,6 +251,64 @@ class Pipeline:
         self.events: list = []
         self._seq: dict = {}
         self._pending: dict = {}  # trace_id -> True while results await a model continuation
+        self._inputs: dict = {}  # trace_id -> [InputRecord, ...] in order (0.3 cut P3)
+
+    # -- input ledger and exposure (0.3 cut P3) -----------------------------------
+    def register_input(self, record: Any) -> InputRecord:
+        """Host-only: register an input placed in front of the model on ``record.trace_id``, before
+        the turn that can see it. Never called from model output or an admitted envelope. Raises
+        ``ValueError`` on a duplicate ``input_id`` for the trace."""
+        rec = record if isinstance(record, InputRecord) else InputRecord.from_dict(record)
+        ledger = self._inputs.setdefault(rec.trace_id, [])
+        if any(r.input_id == rec.input_id for r in ledger):
+            raise ValueError(f"duplicate input_id: {rec.input_id}")
+        ledger.append(copy.deepcopy(rec))
+        return rec
+
+    def inputs(self, trace_id: str) -> list:
+        """The trace's input ledger as dicts, in registration order."""
+        return [r.to_dict() for r in self._inputs.get(trace_id, [])]
+
+    def exposure_for(self, trace_id: str) -> dict:
+        """Exposure computed from the ledger. Fails closed: an empty ledger, an input of unknown
+        trust, an input derived from an id the ledger does not hold, or any error all give
+        ``external_untrusted``."""
+        try:
+            ledger = self._inputs.get(trace_id, [])
+            ids = {r.input_id for r in ledger}
+            floor = 3 if ledger else 0
+            for r in ledger:
+                traced = all(d in ids for d in r.derived_from)
+                floor = min(floor, _TRUST_RANK.get(r.trust, 0) if traced else 0)
+            return {
+                "inputs": [r.input_id for r in ledger],
+                "floor": _RANK_TRUST.get(floor, "external_untrusted"),
+            }
+        except Exception:  # noqa: BLE001 - fail closed
+            return copy.deepcopy(_FAIL_CLOSED_EXPOSURE)
+
+    def _record_result(self, trace_id: str, result: ToolResult, rendered: Any) -> None:
+        """Record a rendered result as an input of the trace (``parent_id`` = its request id)."""
+        prov = result.provenance or {}
+        ledger = self._inputs.setdefault(trace_id, [])
+        n = sum(1 for r in ledger if r.input_id.startswith("in-auto-"))
+        taken = {r.input_id for r in ledger}
+        while f"in-auto-{n}" in taken:
+            n += 1
+        rid = self._runtime_id() or "runtime"
+        ledger.append(
+            InputRecord(
+                input_id=f"in-auto-{n}",
+                content_kind=prov.get("content_kind") or "unknown",
+                trust=prov.get("trust") or DEFAULT_TRUST,
+                source=Party(kind="runtime", id=rid),
+                origin=f"runtime:{rid}",
+                content_digest=digest(rendered),
+                trace_id=trace_id,
+                parent_id=result.request_id,
+                derived_from=[],
+            )
+        )
 
     # -- events (RelayLine) -------------------------------------------------
 
@@ -277,6 +342,9 @@ class Pipeline:
         return result, record
 
     def admit_envelope(self, env: Any, *, turn: Optional[int] = None) -> tuple:
+        return self._admit(env, turn, None)
+
+    def _admit(self, env: Any, turn: Optional[int], turn_exposure: Optional[dict]) -> tuple:
         """Admit one envelope. Returns ``(ToolResult, ObservedRecord)``.
 
         A valid envelope means structurally understandable, never authorized. Order: version,
@@ -319,7 +387,11 @@ class Pipeline:
         if self.limits.arguments_oversized(payload["arguments"]):
             msg = f"arguments exceed {self.limits.max_argument_bytes} bytes"
             return self._rejected(rid, ErrorCode.OVERSIZED_ARGUMENTS, trace_id, msg, turn)
-        return self._process(Envelope.from_dict(env), ToolRequest.from_dict(payload), turn)
+        intent = ToolRequest.from_dict(payload)
+        # Exposure is the pipeline's own: whatever the model or envelope claimed is overwritten.
+        exposure = turn_exposure if turn_exposure is not None else self.exposure_for(trace_id)
+        intent.provenance["exposure"] = copy.deepcopy(exposure)
+        return self._process(Envelope.from_dict(env), intent, turn)
 
     def _stale(self, cap_req: CapabilityRequest) -> bool:
         pinned = cap_req.mapping.get("catalog_digest")
@@ -365,6 +437,7 @@ class Pipeline:
             "parent_id": envelope.parent_id,
             "model": envelope.source,
             "runtime_session": None,
+            "exposure": copy.deepcopy(intent.provenance["exposure"]),
         }
         runtime_id = self._runtime_id()
         cap = cap_req.capability
@@ -512,6 +585,9 @@ class Pipeline:
             out.outcome, out.error_code = "rejected", err.code
             self._emit(trace_id, "tool_error", None, turn, {"error_code": err.code})
             return out
+        exposure = self.exposure_for(trace_id)
+        for it in parsed.intents:
+            it.provenance["exposure"] = copy.deepcopy(exposure)
         out.text = parsed.text
         out.intents, out.rejected = len(parsed.intents), len(parsed.rejected)
         if parsed.reasoning_digest:
@@ -561,12 +637,13 @@ class Pipeline:
                     "destination": {"kind": "runtime", "id": self._runtime_id() or "runtime"},
                     "payload": item.to_dict(),
                 }
-                pairs.append((item, *self.admit_envelope(envelope, turn=turn)))
+                pairs.append((item, *self._admit(envelope, turn, exposure)))
                 position += 1
         for intent, result, record in pairs:
             out.results.append(result)
             out.observed.append(record)
             out.rendered.append(module.render_result(result, intent))
+            self._record_result(trace_id, result, out.rendered[-1])
         if out.intents:
             out.outcome = "tool_request"
         elif out.rejected:
@@ -721,6 +798,8 @@ class MockRuntime:
     def __init__(self) -> None:
         self.decide_calls = 0
         self.execute_calls = 0
+        # Harness-only: {request_id, inputs, floor} of ctx["exposure"] seen at each decide.
+        self.seen_exposure: list = []
         # Harness-only: per capability, provenance keys (content_kind, trust, trusted) reported on
         # an executed result in place of the defaults, as a mislabelling adapter would. Set by the
         # conformance runner from a fixture's mock_provenance; never read from model content.
@@ -763,6 +842,11 @@ class MockRuntime:
 
     def decide(self, req: CapabilityRequest, ctx: dict) -> Decision:
         self.decide_calls += 1
+        exp = ctx.get("exposure")
+        if exp is not None:
+            self.seen_exposure.append(
+                {"request_id": req.request_id, "inputs": exp["inputs"], "floor": exp["floor"]}
+            )
         spec = _MOCK_CAPS.get(req.capability)
         if spec is None:
             return self._decision(req, "not_found", f"unknown capability: {req.capability}")

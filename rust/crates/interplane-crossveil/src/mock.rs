@@ -125,6 +125,9 @@ pub struct MockRuntime {
     /// would. Set by the conformance runner from a fixture's `mock_provenance`; never read from
     /// arguments, extensions or envelopes.
     pub provenance_overrides: Map<String, Value>,
+    /// Harness-only: `{request_id, inputs, floor}` of the `CallContext.exposure` seen at each
+    /// `decide`, in order.
+    pub seen_exposure: Vec<Value>,
 }
 
 impl MockRuntime {
@@ -175,8 +178,15 @@ impl RuntimeAuthority for MockRuntime {
         "mock"
     }
 
-    fn decide(&mut self, req: &CapabilityRequest, _ctx: &CallContext) -> Decision {
+    fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
         self.decide_calls += 1;
+        if let Some(e) = &ctx.exposure {
+            self.seen_exposure.push(json!({
+                "request_id": req.request_id,
+                "inputs": e.inputs,
+                "floor": e.floor.as_str(),
+            }));
+        }
         let Some(spec) = SPECS.iter().find(|s| s.cap == req.capability) else {
             return self.decision(
                 req,

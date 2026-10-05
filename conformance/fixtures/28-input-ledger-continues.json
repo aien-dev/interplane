@@ -168,7 +168,8 @@
         "origin": "runtime:mock",
         "trace_id": "trace-28",
         "parent_id": "call_28a",
-        "derived_from": []
+        "derived_from": [],
+        "content_digest": "sha256:a095be98e2fcb65b663206008baae917b76dc4d058e970147acc4a83a5d2aedc"
       },
       {
         "input_id": "in-auto-1",
@@ -181,7 +182,8 @@
         "origin": "runtime:mock",
         "trace_id": "trace-28",
         "parent_id": "call_28b",
-        "derived_from": []
+        "derived_from": [],
+        "content_digest": "sha256:b47a780a310060ded4fe2f28ef1e492c38d6aeda9642a553c7655b38e5185f49"
       },
       {
         "input_id": "in-auto-2",
@@ -194,7 +196,8 @@
         "origin": "runtime:mock",
         "trace_id": "trace-28",
         "parent_id": "call_28c",
-        "derived_from": []
+        "derived_from": [],
+        "content_digest": "sha256:f3c9007bb6e656c560f57d1a752ca2fdda1f1829aca02dd2247eea370fa8f540"
       }
     ],
     "exposure": [

@@ -42,19 +42,11 @@ TOP_UP_STEP = 12  # a top-up call in round r asks for 12 * r requests (12, 24, 3
 FIRST_PASS_PER_BRIEF = 36
 
 GENERIC_MESSAGE = "Set aside by an automatic check."
-AUTHOR_MESSAGES = {
-    "LEAK_TOOL_NAME": "The request names a tool.",
-    "LEAK_TOOL_TOKEN": "The request uses a word that belongs to a tool name.",
-    "BANNED_WORD": "The request uses a word that is not allowed.",
-    "EXTENSION": "The request contains a file extension.",
-    "PATH_SEPARATOR": "The request contains a path separator.",
-    "FIXTURE_NAME": "The request contains the name of a file in the workspace.",
-    "NON_ASCII": "The request contains an unusual character.",
-    # the three selector codes show the author one generic text; the precise code stays in the log only
-    "DOMAIN_FILE_KEYWORD": GENERIC_MESSAGE,
-    "DOMAIN_MULTI": GENERIC_MESSAGE,
-    "DOMAIN_FILE_TOOLS": GENERIC_MESSAGE,
-}
+# One text for every rejection: the author is told neither which rule fired nor what the lint is about.
+# The precise code stays in the log (``codes``, ``detail``) only.
+AUTHOR_MESSAGES = {c: GENERIC_MESSAGE for c in (
+    "LEAK_TOOL_NAME", "LEAK_TOOL_TOKEN", "BANNED_WORD", "EXTENSION", "PATH_SEPARATOR", "FIXTURE_NAME", "NON_ASCII",
+    "DOMAIN_FILE_KEYWORD", "DOMAIN_MULTI", "DOMAIN_FILE_TOOLS")}
 SLASH_NAMES = ("SOLIDUS", "SLASH", "BACKSLASH")
 
 
@@ -65,18 +57,19 @@ def normalize(request: str) -> str:
 
 def hidden_or_non_ascii(request: str) -> list:
     """Characters that are not plain ASCII letters: any non-ASCII letter and any format character
-    (Unicode category Cf: zero-width space, joiners, bidi marks, soft hyphen). Checked on the raw
+    (Unicode category Cf: zero-width space, joiners, bidi marks, soft hyphen) and any combining mark
+    (Mn, Mc: an accent that sits on a letter, as in f + U+0301 + ile). Checked on the raw
     text and on its NFKC form, so a fullwidth letter cannot hide behind the normalisation."""
     bad = []
     for ch in sorted(set(request) | set(unicodedata.normalize("NFKC", request))):
         cat = unicodedata.category(ch)
-        if cat == "Cf" or (ord(ch) > 127 and cat.startswith("L")):
+        if cat == "Cf" or cat in ("Mn", "Mc") or (ord(ch) > 127 and cat.startswith("L")):
             bad.append(f"U+{ord(ch):04X}")
     return bad
 
 
 def is_path_separator(ch: str) -> bool:
-    if ch in "/\\":
+    if ch in "/\\\u2216":  # U+2216 SET MINUS draws a backslash
         return True
     return ord(ch) > 127 and any(n in unicodedata.name(ch, "") for n in SLASH_NAMES)
 

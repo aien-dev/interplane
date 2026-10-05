@@ -158,8 +158,8 @@ Write new requests, not rewrites of earlier ones, and use only facts that no ear
 ```
 
 `{MESSAGES}` is the list of the author-facing message of the discarded requests of that brief type. Every
-selector rejection (`DOMAIN_FILE_KEYWORD`, `DOMAIN_MULTI`, `DOMAIN_FILE_TOOLS`) shows the same generic text
-("Set aside by an automatic check."); the precise code stays in `authoring-log.jsonl` only. Never the request text,
+rejection, of any kind, shows the same generic text ("Set aside by an automatic check."); the precise code
+stays in `authoring-log.jsonl` only. Never the request text,
 never the word, extension or tool lists. New requests continue the id numbering.
 
 ### 4.4 Regression tasks (72), one call per category, from the frozen slot table
@@ -173,8 +173,7 @@ and an everyday-language `need` phrase (`author_view`), in one call for all 72 s
 ```text
 Below are {N} short descriptions of things a person wants from a personal assistant. For each one write the
 request exactly as the person would type it: one or two sentences of ordinary speech. Where a description puts
-a word or file name in quotes or names a person, a place or a file, keep it in the request. Do not explain, do not
-mention tools, tests or benchmarks.
+a word or file name in quotes or names a person, a place or a file, keep it in the request. Do not explain or comment.
 
 {SLOTS}
 
@@ -227,8 +226,8 @@ written before any task, fixture or request exists). None changes a threshold, a
 3. **Plurals.** The always-banned words also ban their plural.
 4. **Hardened lint.** NFKC and casefold first; any non-ASCII letter or format (zero-width) character rejects; a
    collapsed form ("F I L E", "f.i.l.e") and a form with `_ . -` read as spaces are also checked; any Unicode slash
-   or backslash is a path separator. Reason: a discovery request must not hand the model a hidden selector.
-5. **Selector codes are hidden.** One generic author message for all selector rejections.
+   or backslash is a path separator; combining marks (Mn, Mc) are rejected. Reason: a discovery request must not hand the model a hidden selector.
+5. **Rejection codes are hidden.** One generic author message for every rejection, word-class and selector alike.
 6. **Top-up size.** 12, 24, 36 for rounds 1, 2, 3 (the pre-registration says "k more").
 7. **Count tie-break.** The 72 regression counts use largest remainder; ties go to the larger 0.2x count, then the
    0.2x table order.

@@ -66,5 +66,16 @@ class Authoring(unittest.TestCase):
         self.assertTrue(errs[0].startswith("a-001") and errs[1].startswith("a-002"))
 
 
+class BriefsAreClean(unittest.TestCase):
+    def test_no_author_facing_brief_says_tool(self):
+        import re
+        text = (Path(__file__).resolve().parent.parent / "heldout-0.2y" / "AUTHORING.md").read_text(encoding="utf-8")
+        sec = text[text.index("## 4. Verbatim briefs"):text.index("## 5. Procedure")]
+        blocks = re.findall(r"```text\n(.*?)```", sec, flags=re.S)
+        self.assertGreaterEqual(len(blocks), 5)  # 4.1, 4.2 E and Q, 4.3 paragraph, 4.4
+        for b in blocks:
+            self.assertNotIn("tool", b.lower(), b[:80])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

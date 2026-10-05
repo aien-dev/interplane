@@ -98,18 +98,38 @@ class RejectionRules(unittest.TestCase):
         self.assertIn("DOMAIN_FILE_KEYWORD", r["codes"])
 
     def test_adversarial_spellings_are_rejected(self):
-        for req in ("F I L E count", "f\u0456le count", "fi\u200ble count", "a\uff0fb", "my_file_q3", "f.i.l.e count",
-                    "a\u2215b", "a\u29f8b", "Check my \uff46ile", "R E A D _ F I L E now"):
+        base = "How many lanterns arrive on Friday"
+        self.assertEqual(lint(base + "?")["codes"], [])
+        # each variant has no other trigger than the spelling; the exact code is asserted
+        cases = [
+            ("How many F I L E lanterns arrive on Friday?", "BANNED_WORD"),
+            ("How many lanterns arrive in the f.i.l.e on Friday?", "BANNED_WORD"),
+            ("How many my_file_q3 lanterns arrive on Friday?", "BANNED_WORD"),
+            ("How many lanterns arrive on Friday? P A T H", "BANNED_WORD"),
+            ("How many lanterns arrive on Friday? t-o-o-l", "BANNED_WORD"),
+            ("How many f\u0456le lanterns arrive on Friday?", "NON_ASCII"),
+            ("How many fi\u200ble lanterns arrive on Friday?", "NON_ASCII"),
+            ("How many lanterns f\u0301ile arrive on Friday?", "NON_ASCII"),
+            ("How many lanterns f\u0903ile arrive on Friday?", "NON_ASCII"),
+            (base + " a\uff0fb?", "PATH_SEPARATOR"),
+            (base + " a\u2215b?", "PATH_SEPARATOR"),
+            (base + " a\u29f8b?", "PATH_SEPARATOR"),
+            (base + " a\u2216b?", "PATH_SEPARATOR"),
+            (base + "? R E A D _ F I L E", "LEAK_TOOL_NAME"),
+        ]
+        for req, code in cases:
             r = lint(req)
             self.assertFalse(r["ok"], (req, r["codes"]))
-        self.assertIn("NON_ASCII", self.codes("f\u0456le count"))
-        self.assertIn("NON_ASCII", self.codes("fi\u200ble count"))
-        self.assertIn("PATH_SEPARATOR", self.codes("a\uff0fb"))
-        self.assertIn("PATH_SEPARATOR", self.codes("a\u2215b"))
-        self.assertIn("BANNED_WORD", self.codes("F I L E count"))
-        self.assertIn("BANNED_WORD", self.codes("my_file_q3"))
+            self.assertEqual(r["codes"], [code], req)
+        self.assertIn("NON_ASCII", self.codes("Check my \uff46ile"))
         self.assertTrue(lint("Check my email about the lighthouse")["ok"])
         self.assertTrue(lint("Which supplier does the harbour crew order lanterns from?")["ok"])
+        self.assertTrue(lint("Who wrote the company profile?")["ok"])  # no squashed-substring check: "profile" is fine
+
+    def test_known_limits_are_accepted(self):
+        # documented in the section 11 amendment: single-space splits inside a word and run-together forms
+        self.assertEqual(lint("How many fil e lanterns arrive on Friday?")["codes"], [])
+        self.assertEqual(lint("How many lanterns arrive on Friday? filepath")["codes"], [])
 
     def test_selector_codes_share_one_generic_message(self):
         msgs = {L.AUTHOR_MESSAGES[c] for c in ("DOMAIN_FILE_KEYWORD", "DOMAIN_MULTI", "DOMAIN_FILE_TOOLS")}

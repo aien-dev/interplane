@@ -1,0 +1,24 @@
+{
+  "_note": "Private-data store for fixtures/lanternfish (backends sim-1). It must not contain the answer of any expansion task on this fixture (validate.py checks this), so those tasks still need the workspace files. Bo Reyes's address matches stubs/contact-bo.json.",
+  "notes": [
+    {"id": "a3f09c21", "title": "Ideas", "note_type": "note", "content": "Try a darker palette for the tide chart.", "label": "", "archived": false},
+    {"id": "b71e4d08", "title": "Groceries", "note_type": "checklist", "checklist_items": [{"text": "coffee", "done": false}, {"text": "bread", "done": true}], "label": "home", "archived": false}
+  ],
+  "memory": [
+    {"id": "m-4c2e", "category": "preference", "text": "Prefers answers with metric units."}
+  ],
+  "calendar": [
+    {"uid": "ev-9d1a", "summary": "Dentist", "dtstart": "2026-11-03T09:00", "location": "Harbour clinic"}
+  ],
+  "contacts": [
+    {"uid": "c-5e7b", "name": "Bo Reyes", "emails": ["bo.reyes@harbourmail.example"], "phones": []}
+  ],
+  "documents": [
+    {"id": "doc-1f2a", "title": "Meeting agenda draft", "language": "markdown", "snippet": "Agenda: budget, hiring."}
+  ],
+  "models": [
+    {"name": "qwen3.5:9b", "endpoint": "local"},
+    {"name": "whisper-large-v3", "endpoint": "local"}
+  ],
+  "tokens": []
+}

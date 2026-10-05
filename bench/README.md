@@ -17,6 +17,9 @@ runner is a separate lane; this directory is everything it needs. The protocol i
 | `prompts/system.md` | The one system prompt for every task and both conditions (digest pinned in each task). |
 | `fixtures/<name>/` | Small workspaces, copied byte-for-byte into a fresh temp dir per run. |
 | `stubs/<name>.json` | Fixed results for read-only Odysseus tools the reference adapter does not execute. |
+| `stubs/backends.json` | Simulated backends `sim-1`: for every tool a task lists, which backend answers it after Odysseus authorizes the call, and its documented semantics. |
+| `stubs/stores/<fixture>.json` | Private-data stores (notes, memory, calendar, contacts, editor documents, models, tokens) read by the `sim-1` backends. A fixture without a file has empty stores. |
+| `tools/sim_backends.py` | The `sim-1` simulators (stdlib only), shared by the runner and the validator. |
 | `tools/validate.py` | Structural validator (stdlib only). CI job `bench-structural` runs it. |
 | `tools/stats.py` | The pre-registered paired statistics (Newcombe 1998 method 10, exact McNemar), with a self-test against the paper's table. |
 | `CORPUS-DIGEST.txt` | Frozen digests of the corpus; CI recomputes and compares. |
@@ -80,7 +83,25 @@ reference and is never used for judging.
 - **Only `read_file`, `ls`, `glob` and `grep` execute.** The reference adapter executes only these
   four. Every other authorized tool returns `execution_error` "not executed by the reference
   adapter". Rare and multidomain tasks therefore use `stub_results` for the read-only private
-  tools they need. The catalog has no stat, hash, count or git tool, so none is used.
+  tools they need. The catalog has no stat, hash, count or git tool, so none is used. This is
+  the 0.2 behaviour (`run_bench.py --backends reference`, the default). The 0.2 run analysis
+  (`runs/qual-20261004T2207Z-analysis/error-classification.md`) found 80 of 87 execution errors
+  came from this gap.
+- **Simulated backends `sim-1` (`--backends sim-1`, added after the 0.2 run).** Every tool any task
+  lists now has a backend in `stubs/backends.json`. Per authorized call the order is: the task's
+  `fault_injection`, the task's `stub_results`, the registry, the reference adapter. Kinds:
+  `executable` (the four above), `odysseus_handler` (`get_workspace`: Odysseus's own handler; the
+  workspace sits at a fixed temp path so its text is stable), `computed` (deterministic
+  simulators over the fixture's store or the run's workspace copy; writes stay in the run), and
+  `declared_failure` (`bash`, `python`: always the same documented error, because shell output
+  cannot be simulated deterministically). `validate.py` fails when a task lists a tool with no
+  backend, when an answer or recovery task lists a `declared_failure` tool, when a simulator is
+  not deterministic on some fixture, or when a store holds the answer of an expansion task on its
+  fixture (that would make expansion unnecessary). Tools no task lists keep the reference
+  behaviour. Intended failures (`fault_injection`, the missing path in `exec_failure-003`) are
+  unchanged. Before `sim-1`, 39 of 44 tasks (33 of 37 qual) listed a tool without a working
+  backend; with it, 1 (`approval-003`, whose `bash`/`python` alternatives are meant to stop at
+  approval).
 - **Denials come from Odysseus's own gates:**
   - The caller must be an admin to read files at all. `NON_ADMIN_BLOCKED_TOOLS` includes
     `read_file`, `ls`, `grep` and `glob`, so a non-admin cannot read the workspace and then be
@@ -135,4 +156,8 @@ exist.
   and the analyzer. `tools/analyze.py <run-dir>` (stdlib only, no inference) writes
   `summary.json`, `summary.md` and `tasks.csv`, byte-identically for the same input.
 - Offline tests: `tools/test_analyze.py` (stdlib, runs in CI against a checked-in synthetic run)
-  and `tools/test_runner_offline.py` (a scripted fake endpoint; needs the Odysseus venv).
+  and `tools/test_runner_offline.py` (a scripted fake endpoint; needs the Odysseus venv; also runs
+  every `sim-1` backend kind twice and checks the results are identical).
+- Corpus digests: adding `stubs/backends.json` and `stubs/stores/` changed `inputs_digest` in
+  `CORPUS-DIGEST.txt`. `tasks_digest` and `protocol_sha256` are unchanged. The 0.2 runs carry the
+  digests they ran against in their own `manifest.json`, which is unchanged.

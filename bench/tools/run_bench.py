@@ -48,6 +48,7 @@ for _p in (REPO / "python", REPO / "adapters" / "odysseus", BENCH / "tools"):
         sys.path.insert(0, str(_p))
 
 import bench_eval  # noqa: E402
+import sim_backends  # noqa: E402
 from interplane.core import jcs, sha256_hex  # noqa: E402
 from interplane.crossaxis import (  # noqa: E402
     ExpansionError,
@@ -186,17 +187,19 @@ class BenchAuthority(OdysseusAuthority):
 
     ``decide`` is inherited untouched, so Odysseus's gate always decides. ``execute`` is reached
     only for an authorized request; this subclass then returns the task's deterministic fault, or
-    the task's stub for read-only tools the reference adapter does not execute, and feeds the
+    the task's stub for read-only tools the reference adapter does not execute, or (with
+    ``--backends sim-1``) the simulated backend from ``bench/stubs/backends.json``, and feeds the
     result to Odysseus's own ``observe_tool_result`` exactly like a real result.
     """
 
-    def __init__(self, workspace: str, task: dict, stubs: dict, **kw):
+    def __init__(self, workspace: str, task: dict, stubs: dict, sim=None, **kw):
         super().__init__(workspace, admin=task["authority_profile"]["admin"],
                          delegated_credential=task["authority_profile"]["delegated_credential"], **kw)
         self._stubs = stubs
         self._faults = task["fault_injection"]
+        self._sim = sim  # sim_backends.SimSession, or None for the 0.2 reference backends
         self._auth_counts: Counter = Counter()
-        self.bench_events: dict = {}  # request_id -> "fault" | "stub"
+        self.bench_events: dict = {}  # request_id -> "fault" | "stub" | "sim" | "sim_handler" | "sim_declared_failure"
 
     def _fault_for(self, name: str, k: int):
         for f in self._faults:
@@ -229,7 +232,29 @@ class BenchAuthority(OdysseusAuthority):
         if name in self._stubs:
             self.bench_events[req.request_id] = "stub"
             return self._synthetic(req, ctx, copy.deepcopy(self._stubs[name]), ok=True)
+        kind = self._sim.kind(name) if self._sim is not None else None
+        if kind == "odysseus_handler":
+            block, message = self._block(name, req.arguments)
+            if block is None:
+                return self._error(req.request_id, name, message or "odysseus rejected the tool call")
+            try:
+                raw = self._run_handler(name, block.content)
+            except Exception as err:  # noqa: BLE001 - reported as an execution error, not raised
+                raw = {"error": f"{name}: {type(err).__name__}", "exit_code": 1}
+            if not isinstance(raw, dict):
+                raw = {"error": f"{name}: handler returned no result", "exit_code": 1}
+            self.bench_events[req.request_id] = "sim_handler"
+            return self._synthetic(req, ctx, raw, ok=raw_ok(raw))
+        if kind in ("computed", "declared_failure"):
+            raw = self._sim.call(name, req.arguments)
+            self.bench_events[req.request_id] = "sim" if kind == "computed" else "sim_declared_failure"
+            return self._synthetic(req, ctx, raw, ok=raw_ok(raw))
         return super().execute(req, decision, ctx)
+
+
+def raw_ok(raw: dict) -> bool:
+    """Same success rule as OdysseusAuthority.execute: no error and exit code 0 or absent."""
+    return not raw.get("error") and raw.get("exit_code") in (None, 0)
 
 
 # ------------------------------------------------------------------------------- one run
@@ -254,7 +279,13 @@ def parse_args_of(tc) -> tuple:
 
 
 def run_condition(cx: dict, task: dict, cond: str, run_id: str) -> dict:
-    ws = tempfile.mkdtemp(prefix="interplane-bench-")
+    if cx["backends"] == "sim-1":
+        # Fixed path, so get_workspace's text is identical on every run (runs are sequential).
+        ws = os.path.join(tempfile.gettempdir(), "interplane-bench-ws", f"{task['id']}.{cond}")
+        shutil.rmtree(ws, ignore_errors=True)
+        os.makedirs(ws)
+    else:
+        ws = tempfile.mkdtemp(prefix="interplane-bench-")
     try:
         shutil.copytree(cx["bench"] / task["workspace_fixture"], ws, symlinks=True, dirs_exist_ok=True)
         return _run(cx, task, cond, run_id, ws)
@@ -266,7 +297,8 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
     client, catalog, by_name = cx["client"], cx["catalog"], cx["by_name"]
     stubs = {cap: json.loads((cx["bench"] / s["path"]).read_text(encoding="utf-8"))
              for cap, s in task["stub_results"].items()}
-    authority = BenchAuthority(ws, task, stubs)
+    sim = sim_backends.SimSession(ws, task["workspace_fixture"], cx["backend_registry"]) if cx["backends"] == "sim-1" else None
+    authority = BenchAuthority(ws, task, stubs, sim=sim)
     if not authority.available:
         raise SystemExit("Odysseus is not importable: set ODYSSEUS_SRC")
     pipe = Pipeline(make_registry(), mapping_table(), authority)
@@ -615,8 +647,17 @@ def build_identity(cx: dict, tasks: list) -> dict:
         "system_prompt_digest": text_sha(cx["system_prompt"]), "generation": cx["generation"],
         "per_task": per,
     }
+    if cx["backends"] != "reference":  # the 0.2 reference identity stays byte-identical
+        ident["backends"] = backends_identity(cx)
     ident["identity_digest"] = digest_of(ident)
     return ident
+
+
+def backends_identity(cx: dict) -> dict:
+    stores = sorted(sim_backends.STORES_DIR.glob("*.json"))
+    return {"mode": cx["backends"], "registry_sha256": file_sha(sim_backends.BACKENDS_PATH),
+            "sim_backends_sha256": file_sha(Path(sim_backends.__file__)),
+            "stores": {p.name: file_sha(p) for p in stores}}
 
 
 def make_cx(args, tasks_dir: Path) -> dict:
@@ -628,6 +669,8 @@ def make_cx(args, tasks_dir: Path) -> dict:
         "bench": BENCH, "tasks_dir": tasks_dir, "catalog": catalog, "by_name": {c.name: c for c in catalog.capabilities},
         "system_prompt": sp, "client": client, "counter": LiveCounter(client), "max_rounds": args.max_rounds,
         "fixture_digests": {f: tree_digest(BENCH / f) for f in fixtures},
+        "backends": args.backends,
+        "backend_registry": sim_backends.load_backends() if args.backends == "sim-1" else None,
         "generation": {"temperature": args.temperature, "seed": args.seed, "max_tokens": args.max_tokens,
                        "timeout_s": args.timeout, "max_rounds": args.max_rounds, "dialect": "openai"},
     }
@@ -679,6 +722,9 @@ def main(argv=None) -> int:
     ap.add_argument("--no-warmup", action="store_true")
     ap.add_argument("--tasks-dir", default=str(BENCH / "tasks"))
     ap.add_argument("--allow-nonfrozen", action="store_true", help="offline tests with synthetic tasks only")
+    ap.add_argument("--backends", choices=["reference", "sim-1"], default="reference",
+                    help="reference = 0.2 behaviour (only read_file/ls/glob/grep and task stubs execute); "
+                         "sim-1 = bench/stubs/backends.json simulated backends")
     args = ap.parse_args(argv)
 
     out = Path(args.out)
@@ -731,6 +777,7 @@ def main(argv=None) -> int:
                       "evidence": ["requested_excluded", "discovery_hit"]},
         "catalog": {"digest": identity["catalog_digest"], "capabilities": identity["catalog_capabilities"]},
         "corpus": corpus, "system_prompt_digest": identity["system_prompt_digest"], "generation": cx["generation"],
+        "backends": identity.get("backends", {"mode": "reference"}),
         "order_rule": "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)",
         "deterministic_identity": identity,
     }

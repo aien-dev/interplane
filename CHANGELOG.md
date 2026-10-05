@@ -13,6 +13,7 @@
 - 0.2 report: `docs/REPORT-0.2.md`. Pre-registered gate verdict FAIL (O1 0.865, O2 0/5; T 0.877 and S pass).
 - Qwen3.5-9B qualified on llama.cpp b11398 and SGLang 0.5.20 (both probes 14/14); Rust probe aligned with the Python probe.
 - Benchmark corpus (44 tasks), protocol, paired runner and analyzer; run `qual-20261004T2207Z`.
+- Bench simulated backends `sim-1` (`bench/stubs/backends.json`, `run_bench.py --backends sim-1`): every tool a task lists executes deterministically after Odysseus authorizes it; `validate.py` checks coverage, determinism and that stores do not leak expansion answers. Default stays the 0.2 reference behaviour; `inputs_digest` updated.
 - AIEN adapter on the real `EffectAuthority` path (sovereign-core #203, #204, pinned 6554aac), single-use approval tests.
 
 - `selection.measure`: `rendered_bytes` and an optional unit-disciplined `tokens` block (`bytes`, `tokens_model_reported`, `tokens_endpoint_tokenizer`, `tokens_estimated`); `TokenCounter` with `BytesOnly` and `EstimatedTokens` (estimator v1) in both languages.

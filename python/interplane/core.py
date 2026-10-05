@@ -572,6 +572,17 @@ class Catalog(Model):
         return None
 
 
+    def ambiguous(self, name: str) -> bool:
+        """True when ``name`` is advertised more than once with different definitions (the
+        description or the parameters differ), so a call cannot be tied to one definition."""
+        defs = {
+            jcs({"description": c.description, "parameters": c.parameters})
+            for c in self.capabilities
+            if c.name == name
+        }
+        return len(defs) > 1
+
+
 @dataclass
 class Selection(Model):
     KIND = "selection"

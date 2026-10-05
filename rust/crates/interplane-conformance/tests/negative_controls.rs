@@ -47,5 +47,5 @@ fn variant_names_round_trip() {
     for v in Variant::ALL {
         assert_eq!(Variant::parse(v.name()), Some(v));
     }
-    assert_eq!(Variant::parse("V7"), None);
+    assert_eq!(Variant::parse("V9"), None);
 }

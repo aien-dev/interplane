@@ -1,4 +1,4 @@
-"""Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) and the injection judge."""
+"""Negative controls V1 to V8 (bench/PROTOCOL-0.3.md section 6) and the injection judge."""
 
 import subprocess
 import sys
@@ -35,7 +35,7 @@ def test_matrix_detects_every_variant():
     m = matrix(str(CONF), str(SPEC))
     assert m["baseline_failed"] == []
     assert m["valid"] is True, m
-    assert sorted(m["variants"]) == sorted(VARIANTS) == ["V1", "V2", "V3", "V4", "V5", "V6"]
+    assert sorted(m["variants"]) == sorted(VARIANTS) == ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8"]
     for name, row in m["variants"].items():
         assert row["detected"] and row["failed"], name
 

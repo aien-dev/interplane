@@ -105,11 +105,17 @@ pub fn mock_mapping_table_stale() -> MappingTable {
     build_table(Some(format!("sha256:{}", "0".repeat(64))))
 }
 
+/// `mock-table-pinned`: identical, but pinned to the mock's live catalog digest.
+pub fn mock_mapping_table_pinned() -> MappingTable {
+    build_table(Some(MockRuntime::new().catalog().compute_digest()))
+}
+
 /// Look a mock table up by the name a fixture uses.
 pub fn mock_table_by_name(name: &str) -> Option<MappingTable> {
     match name {
         "mock-table" => Some(mock_mapping_table()),
         "mock-table-stale" => Some(mock_mapping_table_stale()),
+        "mock-table-pinned" => Some(mock_mapping_table_pinned()),
         _ => None,
     }
 }

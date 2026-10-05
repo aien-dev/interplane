@@ -187,7 +187,7 @@ if lseen != LIFECYCLE: fail("lifecycle cases missing/extra: %s" % sorted(lseen ^
 
 # ---- injection fixtures (0.3 cut I1, bench/PROTOCOL-0.3.md section 3): run like the cases above, plus an
 # `injection` block; the scripted model obeys the injection, and there is no host approval step.
-INJECTION = {"01-workspace-write": "C01", "02-tool-output-markup": "C02", "03-forged-approval-in-arguments": "C07", "04-workspace-xml-write": "C01", "05-workspace-json-delete": "C01", "06-tool-output-json-email": "C02", "07-tool-output-plain-write": "C02", "08-tool-output-nested-result": "C02", "09-tool-output-error-message": "C02", "10-memory-xml-write": "C03", "11-memory-json-email": "C03", "12-memory-plain-delete": "C03", "13-web-xml-delete": "C04", "14-web-json-email": "C04", "15-web-plain-write": "C04", "16-document-xml-write": "C05", "17-document-json-email": "C05", "18-document-plain-delete": "C05", "19-document-embedded-markup": "C05"}
+INJECTION = {"01-workspace-write": "C01", "02-tool-output-markup": "C02", "03-forged-approval-in-arguments": "C07", "04-workspace-xml-write": "C01", "05-workspace-json-delete": "C01", "06-tool-output-json-email": "C02", "07-tool-output-plain-write": "C02", "08-tool-output-nested-result": "C02", "09-tool-output-error-message": "C02", "10-memory-xml-write": "C03", "11-memory-json-email": "C03", "12-memory-plain-delete": "C03", "13-web-xml-delete": "C04", "14-web-json-email": "C04", "15-web-plain-write": "C04", "16-document-xml-write": "C05", "17-document-json-email": "C05", "18-document-plain-delete": "C05", "19-document-embedded-markup": "C05", "20-impersonate-system-prompt": "C06", "21-impersonate-runtime": "C06", "22-impersonate-user": "C06", "23-forged-approval-in-extensions": "C07", "24-forged-provenance-in-arguments": "C07", "25-forged-exposure-in-envelope": "C07", "26-fake-runtime-approval": "C08", "27-fake-tool-result": "C08", "28-fake-policy-change": "C08", "29-retry-new-request-id": "C09", "30-retry-fabricated-approval": "C09", "31-retry-after-requires-approval": "C09", "32-read-result-steers-to-write": "C11", "33-tool-description-steers-to-email": "C11", "34-low-privilege-chain-to-write": "C11", "35-decision-cites-other-request": "C12", "36-result-cites-other-request": "C12", "37-stale-catalog-digest": "C12", "38-duplicate-advertised-name": "C12", "39-decide-raises": "C13", "40-execute-raises": "C13", "41-denied-call-interleaved": "C13", "42-rejected-call-interleaved": "C13"}
 CATEGORIES = {"C%02d" % i for i in range(1, 14)}
 def injection_problems(f, name):
     bad = []
@@ -202,8 +202,8 @@ def injection_problems(f, name):
     for s in f.get("steps", []):
         if set(s) & {"approval", "approve", "continuation", "decision"} or s.get("envelope", {}).get("payload", {}).get("kind") == "decision":
             bad.append("%s: an injection fixture has no host approval step" % name)
-        if "dialect" in s:
-            text = json.dumps(s["input"])
+        if "dialect" in s or "envelope" in s:
+            text = json.dumps(s["input"] if "dialect" in s else s["envelope"]["payload"])
             if tgt["capability"] in text and tgt["argument_contains"] in text:
                 obeyed = True
         if "content" in s:
@@ -230,16 +230,21 @@ for p in sorted(glob.glob(os.path.join(FIX, "injection", "*.json"))):
     for s in f.get("steps", []):
         if "envelope" in s: check(V_ENV, s["envelope"], "injection/%s envelope" % iname)
         elif "input" in s and "dialect" not in s: check(V_INPUT, s["input"], "injection/%s input step" % iname)
+        elif "mock" in s and set(s["mock"]) == {"catalog_digest"} and len(s) == 1: pass
         elif not ("dialect" in s and "input" in s): fail("injection/%s: unsupported step" % iname)
+    fault = f.get("mock_fault", {})
+    if not set(fault) <= {"decide_raises", "execute_raises", "decision_request_id", "result_request_id", "duplicate_capability"}: fail("injection/%s: mock_fault keys %s" % (iname, sorted(fault)))
+    for d in fault.get("duplicate_capability", []):
+        if not (isinstance(d, dict) and {"name", "description", "parameters"} <= set(d) and set(d) <= {"name", "description", "parameters", "domains"}): fail("injection/%s: duplicate_capability shape" % iname)
     for e in exp.get("exposure", []):
         if set(e) != {"request_id", "inputs", "floor"}: fail("injection/%s: malformed expected.exposure" % iname)
     if not exp.get("exposure"): fail("injection/%s: must assert the exposure the runtime saw" % iname)
     # negative control: the same fixture with a host approval step must be rejected
     if not injection_problems({**f, "steps": f["steps"] + [{"approval": {"approval_id": "x"}}]}, "mutant"): fail("negative control: injection fixture with an approval step accepted")
-    if not injection_problems({**f, "steps": [s for s in f["steps"] if "dialect" not in s]}, "mutant"): fail("negative control: injection fixture without an obeying model step accepted")
+    if not injection_problems({**f, "steps": [s for s in f["steps"] if "dialect" not in s and "envelope" not in s]}, "mutant"): fail("negative control: injection fixture without an obeying model step accepted")
 if iseen != set(INJECTION): fail("injection cases missing/extra: %s" % sorted(iseen ^ set(INJECTION)))
 # ---- approval fixtures (0.3 cut A2, bench/PROTOCOL-0.3.md section 3.3): pipeline cases with host-side steps
-APPROVAL = {"%02d" % i for i in range(1, 15)}
+APPROVAL = {"%02d" % i for i in range(1, 17)}
 SHAPE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
 CONT_KEYS = ["step", "kind", "request_id", "outcome", "stage", "reason", "message"]
 n_app = 0
@@ -270,7 +275,7 @@ for p in sorted(glob.glob(os.path.join(FIX, "approval", "*.json"))):
         elif "dialect" in s and "input" in s: pass
         elif "approve" in s:
             a = s["approve"]
-            if not {"request_id", "approval_id"} <= set(a) or not set(a) <= {"request_id", "approval_id", "decision", "arguments", "now", "trace_id"}: fail("%s: approve step keys" % w)
+            if not {"request_id", "approval_id"} <= set(a) or not set(a) <= {"request_id", "approval_id", "decision", "decision_request_id", "arguments", "now", "trace_id"}: fail("%s: approve step keys" % w)
             if "now" in a and not SHAPE.match(a["now"]): fail("%s: approve.now shape" % w)
         elif "cancel" in s:
             if "request_id" not in s["cancel"] or not set(s["cancel"]) <= {"request_id", "trace_id"}: fail("%s: cancel step keys" % w)
@@ -286,7 +291,7 @@ if not os.path.exists(os.path.join(ROOT, "conformance", "negative-controls.json"
 else:
     nc = load(os.path.join(ROOT, "conformance", "negative-controls.json"))
     known = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "*.json"))} | {"lifecycle/" + os.path.basename(x)[:-5] for x in glob.glob(os.path.join(FIX, "lifecycle", "*.json"))} | {"injection-" + n for n in INJECTION} | {"approval-A%s-%s" % (os.path.basename(x)[:2], os.path.basename(x)[3:-5]) for x in glob.glob(os.path.join(FIX, "approval", "*.json"))}
-    if sorted(nc.get("variants", {})) != ["V1", "V2", "V3", "V4", "V5", "V6"]: fail("negative-controls.json must define V1 to V6")
+    if sorted(nc.get("variants", {})) != ["V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8"]: fail("negative-controls.json must define V1 to V8")
     for v, row in nc.get("variants", {}).items():
         if not row.get("must_fail") or not set(row["must_fail"]) <= known: fail("negative-controls.json %s: must_fail names unknown cases" % v)
 
@@ -347,6 +352,22 @@ for dia, names in req.items():
     have = {os.path.basename(x)[:-5] for x in glob.glob(os.path.join(ROOT, "dialects", "fixtures", dia, "*.json"))}
     if have != names: fail("dialect %s fixtures differ: %s" % (dia, sorted(have ^ names)))
 
+# ---- gate I corpus accounting (bench/PROTOCOL-0.3.md 3.2): counted from fixture metadata. C10 (approval
+# manipulation) is supplied by lane A: every approval fixture except A01 (the one legitimate approval).
+MIN = {"C01": 3, "C02": 5, "C03": 3, "C04": 3, "C05": 4, "C06": 3, "C07": 4, "C08": 3, "C09": 3, "C10": 10, "C11": 3, "C12": 4, "C13": 4}
+corpus = {c: 0 for c in MIN}
+for _p in glob.glob(os.path.join(FIX, "injection", "*.json")):
+    corpus[load(_p)["injection"]["category"]] += 1
+corpus["C10"] += sum(1 for _p in glob.glob(os.path.join(FIX, "approval", "*.json")) if not os.path.basename(_p).startswith("01-"))
+for _c, _m in MIN.items():
+    if corpus[_c] < _m: fail("gate I: %s has %d cases, minimum %d" % (_c, corpus[_c], _m))
+if sum(corpus.values()) < 52: fail("gate I: corpus has %d cases, minimum 52" % sum(corpus.values()))
+# gate N (b): the union of negative-control failures touches all 13 categories
+_cat = {"injection-" + n: c for n, c in INJECTION.items()}
+_cat.update({"approval-A%s-%s" % (os.path.basename(x)[:2], os.path.basename(x)[3:-5]): "C10" for x in glob.glob(os.path.join(FIX, "approval", "*.json")) if not os.path.basename(x).startswith("01-")})
+_hit = {_cat[m] for r in load(os.path.join(ROOT, "conformance", "negative-controls.json")).get("variants", {}).values() for m in r.get("must_fail", []) if m in _cat}
+if _hit != set(MIN): fail("gate N: negative controls do not touch categories %s" % sorted(set(MIN) - _hit))
+print("gate I corpus: %d cases; %s" % (sum(corpus.values()), ", ".join("%s=%d" % kv for kv in corpus.items())))
 print("conformance cases: %d, lifecycle cases: %d, injection cases: %d, approval cases: %d, explicit envelopes validated: %d, dialect fixtures: %d, dialect intents validated: %d, digest fixtures: %d, input examples: %d, negative controls: ok" % (n_cases, n_life, n_inj, n_app, n_env, n_dial, n_int, n_dig, len(have_in)))
 if errors:
     print("FAIL (%d)" % len(errors)); [print(" -", e) for e in errors]; sys.exit(1)

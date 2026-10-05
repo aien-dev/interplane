@@ -233,6 +233,10 @@ _RANK_TRUST = {3: "trusted_runtime", 2: "user_supplied", 1: "workspace_untrusted
 _FAIL_CLOSED_EXPOSURE = {"inputs": [], "floor": "external_untrusted"}
 
 
+class _ForeignResult(Exception):
+    """An execute result that cites another request (internal)."""
+
+
 class ContinuationRefused(Exception):
     """A host continuation or cancel was refused: nothing changed, nothing ran (CORE.md)."""
 
@@ -476,9 +480,15 @@ class Pipeline:
             msg = "mapping table catalog digest does not match runtime catalog"
             return self._rejected(rid, ErrorCode.STALE_CAPABILITY, trace_id, msg, turn)
         try:
-            descriptor = self.runtime.catalog().get(cap_req.capability)
+            catalog = self.runtime.catalog()
+            descriptor = catalog.get(cap_req.capability)
+            ambiguous = catalog.ambiguous(cap_req.capability)
         except Exception:  # noqa: BLE001 - a broken catalog only disables coercion
-            descriptor = None
+            descriptor, ambiguous = None, False
+        if ambiguous:
+            # The definition the model read may not be the one this call routes to (Jan 8975).
+            msg = "capability is advertised more than once with different definitions"
+            return self._rejected(rid, ErrorCode.STALE_CAPABILITY, trace_id, msg, turn)
         if descriptor is not None:
             cap_req.arguments, coerced = coerce_arguments(cap_req.arguments, descriptor.parameters)
             if coerced:
@@ -508,17 +518,23 @@ class Pipeline:
         except Exception:  # noqa: BLE001 - fail closed on any adapter fault
             msg = "runtime authority raised an error"
             return self._fail_closed(
-                life, trace_id, rid, cap, ErrorCode.RUNTIME_UNAVAILABLE, msg, None, turn
+                life, trace_id, rid, cap, ErrorCode.RUNTIME_UNAVAILABLE, msg, "denied", turn
             )
         try:
             decision = Decision.from_dict(raw) if isinstance(raw, dict) else raw
-            if not isinstance(decision, Decision) or decision.request_id != rid:
-                raise TypeError("not a Decision for this request")
+            if not isinstance(decision, Decision):
+                raise TypeError("not a Decision")
         except Exception:  # noqa: BLE001
             value = getattr(raw, "decision", None) or (
                 raw.get("decision") if isinstance(raw, dict) else ""
             )
             msg = f"unknown decision value: {value}"
+            return self._fail_closed(
+                life, trace_id, rid, cap, ErrorCode.UNKNOWN_DECISION, msg, "denied", turn
+            )
+        if decision.request_id != rid:
+            # A decision citing another request is never applied: nothing in it can be trusted.
+            msg = "unknown decision value: mismatched request_id"
             return self._fail_closed(
                 life, trace_id, rid, cap, ErrorCode.UNKNOWN_DECISION, msg, "denied", turn
             )
@@ -694,9 +710,21 @@ class Pipeline:
                 res = ToolResult.from_dict(res)
             if not isinstance(res, ToolResult) or res.status not in ("ok", "error", "timed_out"):
                 raise TypeError("execute returned an invalid result")
+            if res.request_id != rid:
+                raise _ForeignResult()
             if res.status != "ok" and res.error is None:
                 raise TypeError("failed result without an error")
             res = _normalize_executed(res, rid, runtime_id, cap)
+        except _ForeignResult:
+            # A result for another request is never attached to this one, and its data is dropped.
+            res = make_result(
+                rid,
+                "error",
+                runtime=runtime_id,
+                capability=cap,
+                code=ErrorCode.EXECUTION_ERROR,
+                message="runtime returned a result for another request",
+            )
         except Exception:  # noqa: BLE001 - fail closed
             res = make_result(
                 rid,
@@ -704,9 +732,7 @@ class Pipeline:
                 runtime=runtime_id,
                 capability=cap,
                 code=ErrorCode.EXECUTION_ERROR,
-                message="execution failed",
-                content_kind=DEFAULT_CONTENT_KIND,
-                trust=DEFAULT_TRUST,
+                message="runtime authority raised an error",
             )
         life.finish(res.status)
         return self._complete(life, res, "authorized", decided, True, trace_id, turn)
@@ -945,8 +971,9 @@ STALE_DIGEST = "sha256:" + "0" * 64
 
 
 def mock_mapping_table(name: str = "mock-table") -> MappingTable:
-    """``mock-table`` or ``mock-table-stale`` (same rules, pinned to an outdated catalog digest)."""
-    if name not in ("mock-table", "mock-table-stale"):
+    """``mock-table``; ``mock-table-stale`` (same rules, pinned to an outdated catalog digest); or
+    ``mock-table-pinned`` (same rules, pinned to the mock's live catalog digest)."""
+    if name not in ("mock-table", "mock-table-stale", "mock-table-pinned"):
         raise ValueError(f"unknown mock mapping table: {name}")
     rules = []
     for cap, (ns, canon, *_rest) in _MOCK_CAPS.items():
@@ -978,6 +1005,8 @@ def mock_mapping_table(name: str = "mock-table") -> MappingTable:
     table = {"runtime": "mock", "table_version": "1", "rules": rules}
     if name == "mock-table-stale":
         table["catalog_digest"] = STALE_DIGEST
+    elif name == "mock-table-pinned":
+        table["catalog_digest"] = mock_catalog().catalog_digest
     return MappingTable.from_dict(table)
 
 

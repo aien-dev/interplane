@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::jcs::digest;
+use crate::jcs::{canonicalize, digest};
 
 string_enum! {
     /// `common.schema.json#/$defs/ErrorCode`. Unknown strings are kept (non-authority enum).
@@ -595,6 +595,23 @@ pub struct Catalog {
 impl Catalog {
     /// Order-independent SHA-256 over capability names and schema digests: the sorted list of
     /// `[name, schema_digest or digest(parameters)]` pairs, canonicalized.
+    /// True when `name` is advertised more than once with different definitions (the description
+    /// or the parameters differ), so a call cannot be tied to one definition.
+    pub fn is_ambiguous(&self, name: &str) -> bool {
+        let defs: std::collections::HashSet<String> = self
+            .capabilities
+            .iter()
+            .filter(|c| c.name == name)
+            .map(|c| {
+                canonicalize(&serde_json::json!({
+                    "description": c.description,
+                    "parameters": c.parameters,
+                }))
+            })
+            .collect();
+        defs.len() > 1
+    }
+
     pub fn compute_digest(&self) -> String {
         let mut pairs: Vec<(String, String)> = self
             .capabilities

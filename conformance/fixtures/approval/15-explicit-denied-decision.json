@@ -1,0 +1,97 @@
+{
+  "case": "approval-A15-explicit-denied-decision",
+  "description": "The runtime's continuation decision carries the explicit value denied, with the right approval_id and a matching request_id: DENIED with policy_denied, execute 0. Denied is a known value; it is not treated as unknown.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-a15",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-approval-A15-explicit-denied-decision-0",
+        "trace_id": "trace-a15",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "call_a15",
+          "tool": {
+            "namespace": null,
+            "name": "delete_file"
+          },
+          "arguments": {
+            "path": "/tmp/old.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "delete_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a15",
+        "approval_id": "mock-approval-call_a15",
+        "decision": "denied"
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_a15",
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_a15",
+        "stage": "DENIED",
+        "decision": "denied",
+        "status": "denied",
+        "error_code": "policy_denied",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 0
+    },
+    "continuations": [
+      {
+        "step": 1,
+        "kind": "approve",
+        "request_id": "call_a15",
+        "outcome": "resolved",
+        "stage": "DENIED",
+        "reason": null,
+        "message": "denied by runtime policy"
+      }
+    ]
+  }
+}

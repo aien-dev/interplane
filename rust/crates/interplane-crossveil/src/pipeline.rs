@@ -561,6 +561,16 @@ impl<'a> Pipeline<'a> {
                 );
             }
         }
+        if catalog.is_ambiguous(&cap.capability) {
+            // The definition the model read may not be the one this call routes to (Jan 8975).
+            let _ = lc.reject();
+            return self.reject(
+                &trace,
+                Some(&rid),
+                ErrorCode::StaleCapability,
+                "capability is advertised more than once with different definitions",
+            );
+        }
         if let Some(d) = catalog
             .capabilities
             .iter()
@@ -727,6 +737,23 @@ impl<'a> Pipeline<'a> {
             self.runtime.execute(cap, decision, ctx)
         }));
         let mut r = match ran {
+            // A result for another request is never attached to this one; its data is dropped.
+            Ok(r) if r.request_id.as_deref() != Some(rid.as_str()) => {
+                let mut r = ToolResult::failed(
+                    Some(&rid),
+                    ResultStatus::Error,
+                    ErrorCode::ExecutionError,
+                    "runtime returned a result for another request",
+                );
+                r.provenance = Some(ResultProvenance {
+                    runtime: Some(self.runtime.runtime_id().to_string()),
+                    capability: Some(cap.capability.clone()),
+                    content_kind: None,
+                    trust: None,
+                    ..Default::default()
+                });
+                r
+            }
             Ok(r) => normalize(r, cap),
             Err(_) => {
                 let mut r = ToolResult::failed(

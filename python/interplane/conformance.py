@@ -1,12 +1,14 @@
 """Conformance runner: ``interplane-conformance <fixtures_dir> --out <verdicts.json>``."""
 
 import argparse
+import copy
 import json
 import sys
 from pathlib import Path
 from typing import Any, Optional
 
 from .core import (
+    CapabilityDescriptor,
     Decision,
     Exposure,
     InputRecord,
@@ -36,8 +38,11 @@ class _Probe:
     injection judge can say what ran. Behaves exactly like the mock unless a negative control is
     selected (test-only, imported lazily from ``conformance_negctl``)."""
 
-    def __init__(self, inner, negctl=None, variant=None) -> None:
+    def __init__(self, inner, negctl=None, variant=None, fault=None) -> None:
         self._inner = inner
+        # Harness-only fixture `mock_fault` (cut I4): adapter faults and identity or catalog
+        # defects the way a broken adapter would produce them. Never read from model content.
+        self._fault = fault or {}
         self._negctl = negctl
         self._variant = variant
         self.requests: list = []  # (request_id, capability, canonical arguments)
@@ -51,21 +56,46 @@ class _Probe:
     def __getattr__(self, name):
         return getattr(self._inner, name)
 
+    def _skips(self, name: str) -> bool:
+        """Negative controls V7 and V8 switch an adapter defect on or off from the outside."""
+        return self._negctl is not None and getattr(self._negctl, name)(self._variant)
+
     def decide(self, req, ctx):
         self.requests.append((req.request_id, req.capability, jcs(req.arguments)))
+        raises = req.capability in self._fault.get("decide_raises", [])
+        if raises and not self._skips("fail_open"):
+            self._inner.decide_calls += 1  # the adapter was reached, then raised
+            raise RuntimeError("adapter fault in decide")
         d = self._inner.decide(req, ctx)
+        if raises:
+            d.decision, d.reason, d.approval = "authorized", None, None
+        other = self._fault.get("decision_request_id", {}).get(req.capability)
+        if other and not self._skips("skips_identity"):
+            d.request_id = other
         if self._negctl is not None:
             self._negctl.tamper_decision(self._variant, req, d, self.readmit)
         return d
 
     def execute(self, req, decision, ctx):
         self.executed.add(req.request_id)
-        return self._inner.execute(req, decision, ctx)
+        if req.capability in self._fault.get("execute_raises", []) and not self._skips("fail_open"):
+            self._inner.execute_calls += 1  # the adapter was reached, then raised
+            raise RuntimeError("adapter fault in execute")
+        res = self._inner.execute(req, decision, ctx)
+        other = self._fault.get("result_request_id", {}).get(req.capability)
+        if other and not self._skips("skips_identity"):
+            res.request_id = other
+        return res
 
     def catalog(self):
         cat = self._inner.catalog()
-        if self.catalog_override is not None:
+        for extra in self._fault.get("duplicate_capability", []):
+            if not self._skips("skips_identity"):
+                cat.capabilities.append(CapabilityDescriptor.from_dict(copy.deepcopy(extra)))
+        if self.catalog_override is not None and not self._skips("skips_identity"):
             cat.catalog_digest = self.catalog_override
+        elif cat.capabilities and self._fault.get("duplicate_capability"):
+            cat.catalog_digest = cat.computed_digest()
         return cat
 
 
@@ -108,7 +138,7 @@ def _approval_decision(a: dict, rid: str, pend) -> Decision:
     return Decision.from_dict(
         {
             "kind": "decision",
-            "request_id": rid,
+            "request_id": a.get("decision_request_id", rid),
             "decision": a.get("decision", "authorized"),
             "capability": pend.capability_request.capability if pend else None,
             "authority": {"runtime": "mock", "policy_engine": "mock.policy"},
@@ -184,7 +214,7 @@ def _host_step(pipe, probe, nc, variant, case, trace_id, index, step, results, o
 
 def run_case(case: dict, variant: Optional[str] = None) -> dict:
     """Run one fixture on a fresh pipeline and mock runtime; returns the verdict. ``variant``
-    (``"V1"`` to ``"V6"``) applies a negative control and is for the test-only matrix."""
+    (``"V1"`` to ``"V8"``) applies a negative control and is for the test-only matrix."""
     nc = _negctl(variant)
     pipe = default_pipeline(
         Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
@@ -192,7 +222,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
     pipe.runtime.provenance_overrides = case.get("mock_provenance", {})
     pipe.runtime.data_overrides = case.get("mock_data", {})
     pipe.runtime.approval_expires_at = case.get("mock_approval", {}).get("expires_at")
-    probe = _Probe(pipe.runtime, nc, variant)
+    probe = _Probe(pipe.runtime, nc, variant, case.get("mock_fault"))
     pipe.runtime = probe
     name, trace_id = case["case"], case["trace_id"]
     observed: list = []
@@ -435,7 +465,7 @@ def main(argv: Optional[list] = None) -> int:
     ap.add_argument("fixtures_dir")
     ap.add_argument("--out")
     ap.add_argument("--dump", help="directory for per-case canonical result payloads")
-    ap.add_argument("--variant", help="test-only: apply negative control V1 to V6")
+    ap.add_argument("--variant", help="test-only: apply negative control V1 to V8")
     ap.add_argument("--matrix", help="test-only: write the negative-control matrix here")
     args = ap.parse_args(argv)
     if args.matrix:
@@ -452,7 +482,7 @@ def main(argv: Optional[list] = None) -> int:
         from .conformance_negctl import VARIANTS
 
         if args.variant not in VARIANTS:
-            ap.error("unknown variant (V1 to V6)")
+            ap.error("unknown variant (V1 to V8)")
         print(f"[NEGCTL_BUILT_IN] NEGATIVE CONTROL {args.variant}: failures below are expected")
     verdicts, lifecycle, digests = run_suite(args.fixtures_dir, args.variant)
     if args.dump:

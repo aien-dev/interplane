@@ -14,8 +14,9 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@6554aac7d81b04c91202e6bb0c90d258c8a07f04` (main after PR #204 merged,
-which adds single-use approvals on top of the PR #203 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
+`aien-dev/aien-sovereign-core@0c1d249f2d119c7c2d726a2d252dc913e6185d28` (main after PR #207 merged,
+which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
+authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
 (`../aien-protocols/crates/*`). The build therefore expects this layout next to the INTERPLANE
 checkout:
@@ -100,7 +101,7 @@ so they stay pending until continued. `with_effects(name, bits)` re-declares a s
 deny); AIEN's authority decides from the new bits.
 
 **Spend point (limit).** AIEN spends the grant when it mints the effect, inside `present_approval`,
-not when the provider runs it, and aien-mcp at 6554aac has no way to give a spent grant back. So the
+not when the provider runs it, and aien-mcp at 0c1d249 has no way to give a spent grant back. So the
 grant is gone before the pipeline's own checks (digest, expiry string, catalog) and before the
 provider call. Outcomes, all tested in `tests/approval.rs`:
 
@@ -164,9 +165,30 @@ the published value, so `stale_capability` protection reuses AIEN's digest.
 
 ## Provenance
 
-Successful reads carry `content_kind: workspace_content`, `trust: workspace_untrusted`.
-`with_trusted_workspace(true)` switches to `trusted_runtime`. Non-executed outcomes carry null
-content kind and trust, as CORE.md requires.
+Results are labelled by what they are (0.3 cut E4, CROSSVEIL.md rule 7):
+
+| Capability | `content_kind` | `trust` |
+|---|---|---|
+| `read_file` | workspace_content | workspace_untrusted |
+| `list_dir` | tool_result | workspace_untrusted |
+| `write_file` (after approval) | tool_result | trusted_runtime (AIEN's receipt plus the adapter's acknowledgement) |
+| anything else | tool_result | external_untrusted |
+
+`with_trusted_workspace(true)` lifts the two reads to `trusted_runtime`. Non-executed outcomes carry
+null content kind and trust, as CORE.md requires.
+
+## Exposure (0.3 cut E4)
+
+`decide` hands the pipeline's `CallContext.exposure` to AIEN (`EffectLane::with_exposure`,
+sovereign-core #207) in AIEN's own `Exposure` / `TrustLevel` types, and keeps it per request so the
+grant presented later is checked against what the model saw when it asked. AIEN's
+`EffectClassAuthority` holds every effect class for approval when the floor is below `user_supplied`
+or exposure is absent; its reason then names exposure. AIEN already required approval for those
+effect classes, so the visible change is the reason and the explicit rule, not a new block. A host
+registers the user's request first; with an empty ledger the floor is `external_untrusted`.
+Evidence: `tests/exposure.rs` (5 host-registered untrusted sources and a workspace read, against
+`write_file` and `bash_eval`: all held, 0 executed, nothing written). A `bash_eval` outside the
+catalogued forms is refused earlier by the AEGIS gate.
 
 ## Build and test
 

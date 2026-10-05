@@ -104,6 +104,10 @@ seed 42) runs after the 0.2x campaign frees the GPU. Tool: `bench/tools/live_inj
   use the mock fault, T3 has no provider-failure mapping).
 - Any real model's behaviour (gate M is reported, never gated), any dialect other than `openai`
   in the live leg, any backend other than those named.
+- Gate X proves identity only for behaviour the corpus exercises. After the run, two Rust/Python
+  differences outside the corpus were found and fixed: non-string `openai` `arguments` (PR #45) and
+  whether a call refused in `run_turn` uses its `request_id` (PR #47). Neither touches a 0.3
+  fixture; both now have tests in both SDKs. Fixtures for them belong to the next corpus revision.
 - Local development checks of T4 before the run used AIEN sibling checkouts that were not at the
   pins. The qualifying run and CI used pinned checkouts made by `adapters/aien/setup-siblings.sh`.
 
@@ -132,6 +136,9 @@ No upstream PR, issue or comment was made for 0.3. Upstream actions remain pendi
   hands it exposure and the approver's decision and nothing else.
 
 ## Next step (future work, NOT results)
+
+Done after the run, outside this report's evidence: streamed-response assembly (dialect
+`openai_stream`, PR #44) and session state limits with `close_trace` (PR #46), plan item 6.
 
 1. Gate M live leg once the GPU is free, appended to this report.
 2. 0.2x campaign results (`bench/PROTOCOL-0.2x.md`), its own report.

@@ -12,6 +12,7 @@ from interplane.crossveil import (
     ContinuationRefused,
     MockRuntime,
     Pipeline,
+    _RetiredFilter,
     mock_mapping_table,
 )
 
@@ -244,6 +245,12 @@ def test_refused_call_uses_its_request_id():
 CYCLES = 100_000
 # Fresh ids f0..f39 a 32-bit filter holding r0..r7 refuses (sha256 positions, CORE.md).
 RETIRED_FILTER_PARITY = [6, 18, 19, 28, 30, 31, 37, 38]
+# Fresh ids f0..f199 a 37-bit filter holding r0..r7 refuses. 37 is not a power of two, so an
+# implementation that masks instead of taking the modulo refuses a different set.
+RETIRED_FILTER_PARITY_37 = [0, 58, 61, 63, 70, 92, 102, 103, 111, 116, 121, 128, 147, 152, 154, 157, 159, 161, 183, 194]
+# Filter positions at 1009 bits, computed from the CORE.md rule with sha256sum, outside both SDKs.
+RETIRED_FILTER_POSITIONS_1009 = [("r0", [20, 106, 629, 750]), ("f6", [278, 703, 321, 847]),
+                                 ("trace-\u00e9", [733, 695, 298, 954])]
 
 
 def open_and_close(p, trace):
@@ -343,6 +350,23 @@ def test_retirement_filter_is_identical_across_sdks():
     assert all(admit(p, f"r{i}", "m2", "r2") == closed(f"r{i}") for i in range(8))
     refused = [i for i in range(40) if admit(p, f"f{i}", "m1", "r1")[1] == "session_closed"]
     assert refused == RETIRED_FILTER_PARITY
+
+
+def test_retirement_filter_uses_modulo_at_a_non_power_of_two_size():
+    p = pipe(max_closed_traces=0, retired_filter_bits=37)
+    for i in range(8):
+        open_and_close(p, f"r{i}")
+    assert p.closed_trace_state() == (0, 5)
+    refused = [i for i in range(200) if admit(p, f"f{i}", "m1", "r1")[1] == "session_closed"]
+    assert refused == RETIRED_FILTER_PARITY_37
+
+
+def test_retirement_filter_positions_match_the_spec_vector():
+    f = _RetiredFilter(1009)
+    assert [(t, f._positions(t)) for t, _ in RETIRED_FILTER_POSITIONS_1009] == RETIRED_FILTER_POSITIONS_1009
+    f.add("r0")
+    # Bit p is bit p mod 8, least significant first, of byte p div 8.
+    assert [i for i in range(1009) if f.data[i >> 3] >> (i & 7) & 1] == [20, 106, 629, 750]
 
 
 def test_open_close_cycles_stay_within_the_bound_and_replays_stay_refused():

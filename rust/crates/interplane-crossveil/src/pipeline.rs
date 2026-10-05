@@ -1379,3 +1379,30 @@ fn normalize(mut r: ToolResult, cap: &CapabilityRequest) -> ToolResult {
     p.trust = Some(trust);
     r
 }
+
+#[cfg(test)]
+mod tests {
+    use super::RetiredFilter;
+
+    /// Filter positions at 1009 bits, computed from the CORE.md rule with sha256sum, outside both
+    /// SDKs (same literals as python/tests/test_session_limits.py).
+    const RETIRED_FILTER_POSITIONS_1009: [(&str, [usize; 4]); 3] = [
+        ("r0", [20, 106, 629, 750]),
+        ("f6", [278, 703, 321, 847]),
+        ("trace-\u{e9}", [733, 695, 298, 954]),
+    ];
+
+    #[test]
+    fn retirement_filter_positions_match_the_spec_vector() {
+        let mut f = RetiredFilter::new(1009);
+        for (t, want) in RETIRED_FILTER_POSITIONS_1009 {
+            assert_eq!(f.positions(t), want, "{t}");
+        }
+        f.add("r0");
+        // Bit p is bit p mod 8, least significant first, of byte p div 8.
+        let set: Vec<usize> = (0..1009)
+            .filter(|&i| f.data[i >> 3] >> (i & 7) & 1 == 1)
+            .collect();
+        assert_eq!(set, [20, 106, 629, 750]);
+    }
+}

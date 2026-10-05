@@ -304,6 +304,11 @@ fn refused_call_uses_its_request_id() {
 const CYCLES: usize = 100_000;
 /// Fresh ids f0..f39 a 32-bit filter holding r0..r7 refuses (sha256 positions, CORE.md).
 const RETIRED_FILTER_PARITY: [usize; 8] = [6, 18, 19, 28, 30, 31, 37, 38];
+/// Fresh ids f0..f199 a 37-bit filter holding r0..r7 refuses. 37 is not a power of two, so an
+/// implementation that masks instead of taking the modulo refuses a different set.
+const RETIRED_FILTER_PARITY_37: [usize; 20] = [
+    0, 58, 61, 63, 70, 92, 102, 103, 111, 116, 121, 128, 147, 152, 154, 157, 159, 161, 183, 194,
+];
 
 fn open_and_close(p: &mut Pipeline<'_>, trace: &str) {
     assert_eq!(admit(p, trace, "m1", "r1"), ok());
@@ -433,6 +438,22 @@ fn retirement_filter_is_identical_across_sdks() {
         })
         .collect();
     assert_eq!(refused, RETIRED_FILTER_PARITY);
+}
+
+#[test]
+fn retirement_filter_uses_modulo_at_a_non_power_of_two_size() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, limits(0, 37));
+    for i in 0..8 {
+        open_and_close(&mut p, &format!("r{i}"));
+    }
+    assert_eq!(p.closed_trace_state(), (0, 5));
+    let refused: Vec<usize> = (0..200)
+        .filter(|i| {
+            admit(&mut p, &format!("f{i}"), "m1", "r1").1.as_deref() == Some("session_closed")
+        })
+        .collect();
+    assert_eq!(refused, RETIRED_FILTER_PARITY_37);
 }
 
 #[test]

@@ -75,7 +75,10 @@ The closed ids are kept in bounded state, and a closed trace is never admitted a
 
 A trace is closed when its id is in the window, or when it holds no state and the filter matches it.
 The filter positions of an id are the first four big-endian 32-bit words of `sha256(trace_id as
-UTF-8)`, each modulo `retired_filter_bits`; the filter matches when all four bits are set. The
+UTF-8)`, each modulo `retired_filter_bits` (a true modulo, also at sizes that are not a power of
+two); bit `p` is bit `p mod 8`, least significant first, of filter byte `floor(p / 8)`. The filter
+matches when all four bits are set. Both SDKs test the same position vector at 1009 bits and the
+same refusals at 37 bits. The
 filter never forgets an id, so every closed or retired id stays refused for the pipeline's lifetime
 (no replay of any previously closed trace is admitted). It can also match an id that was never used:
 that trace is refused `session_closed` (a false refusal, fail closed). After `R` retirements the
@@ -85,8 +88,11 @@ holds state is never refused by the filter (a retired id can never hold state ag
 held trace can only be false). With `retired_filter_bits` 0 the filter matches every id once
 anything was retired: every trace that holds no state is then refused. The state that closing keeps
 is therefore at most `max_closed_traces` ids plus `ceil(retired_filter_bits / 8)` bytes, whatever
-the number of closes; a host that sees false refusals rise starts a new pipeline (approvals pending
-in the old one are then refused, case A12). Both SDKs expose this state as `closed_trace_state()`
+the number of closes. This state lives in the pipeline's memory only; it is not persisted. A host
+that sees false refusals rise and starts a new pipeline (approvals pending in the old one are then
+refused, case A12) therefore also forgets every closed id, and the new pipeline admits a replay of
+any trace closed in the old one. Such a host must keep the old pipeline's trace ids out of the new
+one itself (for example a fresh trace-id namespace per pipeline). Both SDKs expose this state as `closed_trace_state()`
 `(ids held exactly, filter bytes)`.
 
 `session_limit_exceeded` and `session_closed` are `ErrorCode` values (a MINOR addition,

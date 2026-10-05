@@ -7,7 +7,7 @@ authority machinery. License: AGPL-3.0-or-later (see `LICENSE`). Design: `docs/a
 could mistake for its own decision: no `AuthorizedEffect`, no `DoctrineDecision`, no
 `SafetyDecision`. `authorized` appears only when AIEN's own gate returned `Ok` for a read, or when AIEN's
 `EffectLane::authorize` minted an `AuthorizedEffect` after AIEN's `EffectClassAuthority` said Allow.
-`requires_approval` and `denied` carry AIEN's reason. No approval id is invented: grants come only from AIEN's `ApprovalDesk` and are
+`requires_approval` and `denied` carry AIEN's reason. The approval id on `requires_approval` is an adapter handle with no authority: grants come only from AIEN's `ApprovalDesk` and are
 spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 `conformance/` and no AIEN repository is modified.
 
@@ -75,20 +75,48 @@ stage intent (a speculation-safe local-ephemeral tool cannot be staged by AIEN, 
 | Deny (EXTERNAL_IRREVERSIBLE, unknown tool or bits, stale intent) | `denied` with AIEN's reason | no |
 | Contain | `denied` with AIEN's reason | no |
 
-Approvals (aien-mcp single-use grants, PR #204): `requires_approval` is a pending handle (the
-intent digest). The host's approver calls `AienAuthority::issue_approval(req, expires_at)`, which
-issues a grant through AIEN's own `ApprovalDesk` bound to that exact effect, then
-`present_approval(request_id, grant, now)`; the next `decide` spends it through
-`EffectLane::authorize_approved`. Refusals (`Unknown`, `Mismatch`, `Consumed`, `Expired`) come
-back as `denied` with `approval refused: <variant>`. A spent grant presented again for the same
-completed request is a replay: AIEN's ledger returns the existing receipt (via
-`authorize_and_execute_approved`) and nothing re-executes. Limit: the interplane `Pipeline` has no
-field that carries a grant, so grants are presented on the adapter, not on the wire, and the tests
-drive `decide`/`execute` directly. The stock `write_file` and `bash_eval` descriptors are
-WORLD_MUTATION, so they stay pending until a grant is presented.
-`with_effects(name, bits)` re-declares a stock capability's `ToolEffects` (used by tests with a
-LOCAL_EPHEMERAL temp-dir write and an EXTERNAL_IRREVERSIBLE deny); AIEN's authority decides from
-the new bits.
+Approvals (aien-mcp single-use grants, PR #204), routed through the host-only continuation API
+(0.3 cut A3, `spec/CORE.md` "Approval continuation"). `decide` never reads a grant: a
+`requires_approval` answer stays pending and carries `approval.approval_id`, a handle this adapter
+mints (`aien-approval:<request_id>:<intent digest prefix>`) so the host can correlate the
+continuation; the handle carries no authority (the authority is the grant AIEN's desk issues, whose
+id is private to aien-mcp). Nothing in `arguments`, `extensions`, the envelope or model text is read
+as a grant. The host's approver calls `AienAuthority::issue_approval(req, expires_at)`, which issues
+a grant through AIEN's `ApprovalDesk` bound to that exact effect, then
+`AienAuthority::present_approval(req, &grant, now)`, which spends it through
+`EffectLane::authorize_approved` and returns the runtime's continuation decision (citing the minted
+id). That decision goes to `Pipeline::continue_approval`. Because the pipeline borrows its runtime
+for its whole life, hosts wrap the adapter in `AienShared` (give the pipeline a clone) and call
+`AienShared::continue_approval(&mut pipeline, trace, request_id, &grant, now_epoch, now)`, which
+reads the request and digest from the pipeline's own pending entry, runs the continuation, and
+drops any minted effect the pipeline did not run. Refusals (`Unknown`, `Mismatch`, `Consumed`,
+`Expired`) come back as `denied` with `approval refused: <variant>` and the pipeline denies the
+request for good (terminal; the host starts a new request). A spent grant presented again for the
+same completed effect is a replay at the adapter: AIEN's ledger returns the existing receipt
+(`authorize_and_execute_approved`) and nothing re-executes; through the pipeline a second
+continuation is refused first. The stock `write_file` and `bash_eval` descriptors are WORLD_MUTATION,
+so they stay pending until continued. `with_effects(name, bits)` re-declares a stock capability's
+`ToolEffects` (used by tests with a LOCAL_EPHEMERAL temp-dir write and an EXTERNAL_IRREVERSIBLE
+deny); AIEN's authority decides from the new bits.
+
+**Spend point (limit).** AIEN spends the grant when it mints the effect, inside `present_approval`,
+not when the provider runs it, and aien-mcp at 6554aac has no way to give a spent grant back. So the
+grant is gone before the pipeline's own checks (digest, expiry string, catalog) and before the
+provider call. Outcomes, all tested in `tests/approval.rs`:
+
+| What fails after the mint | What happens | Second effect? |
+|---|---|---|
+| the pipeline refuses the continuation (wrong digest, stale clock, catalog change) | `denied` reported; the minted effect is dropped (`discard_unexecuted`); the grant stays `Consumed` | no: nothing ran |
+| the provider rejects the call (`CallOutcome::Rejected`, e.g. missing directory) | `error` reported; AIEN removes the ledger entry; the grant stays `Consumed`, the request is terminal | no: the host recovers with a new request and a new grant after fixing the cause |
+| the provider outcome is unknown (`Uncertain` or a wire error) | `error` reported; AIEN's ledger keeps `Uncertain`; the same effect (same idempotency key) is `ReconciliationRequired` for any later grant (`broker.rs` `execute_effect`) | no, but it needs reconciliation by the host; not exercised by a test because the in-process provider cannot return `Uncertain` |
+
+What AIEN cannot do: reserve a grant and commit it only when the effect runs, so a refusal between
+mint and execute burns an approval that bought nothing, and the human approves again. That costs a
+re-approval, never a duplicate effect. Recorded as a limit; a sovereign-core issue is drafted in the
+PR body (not filed). Other limits: grants and the minted handles live in memory only (restart: no
+pending request, fail closed); the minted `approval.expires_at` is left empty, so expiry is AIEN's
+(`now >= expires_at` against the epoch the host passes), and the pipeline's string clock is a
+second, separate check; the desk is separated from other desks by handle discipline, not by type.
 
 ## Reimplemented, and why
 

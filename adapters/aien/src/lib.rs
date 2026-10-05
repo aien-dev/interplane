@@ -5,9 +5,11 @@
 //! translation of an answer AIEN produced: an `Ok` from AIEN's gate for a read, or an
 //! `AuthorizedEffect` that `aien_mcp::EffectLane::authorize` minted after AIEN's own
 //! `EffectClassAuthority` said Allow. `requires_approval` and `denied` carry AIEN's reason.
+use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::path::{Component, Path, PathBuf};
+use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 
@@ -23,7 +25,7 @@ use aien_mcp::{
 };
 use interplane_core::*;
 use interplane_crossaxis::MappingTable;
-use interplane_crossveil::{CallContext, RuntimeAuthority};
+use interplane_crossveil::{CallContext, ObservedRecord, Pipeline, Refusal, RuntimeAuthority};
 use serde_json::{json, Map, Value};
 
 /// Runtime id carried in every decision, result and catalog.
@@ -120,8 +122,9 @@ pub struct AienAuthority {
     authorized: HashMap<String, AuthorizedEffect<EffectIntent>>,
     /// AIEN's approver handle for the enrolled broker.
     desk: Option<ApprovalDesk>,
-    /// Grants presented per request id (with the host-supplied `now`), spent by `decide`.
-    grants: HashMap<String, (ApprovalGrant, u64)>,
+    /// The approval id this adapter minted when `decide` answered `requires_approval`, per request id.
+    /// A correlation handle only; the authority is the grant AIEN's desk issues.
+    minted: HashMap<String, String>,
     /// Receipts AIEN's ledger returned for a replayed request, handed back by `execute`.
     replayed: HashMap<String, EffectReceipt>,
     provider: ProviderId,
@@ -171,7 +174,7 @@ impl AienAuthority {
             effect_lane: EffectLane::new(aien_mcp::McpBroker::new()),
             authorized: HashMap::new(),
             desk: None,
-            grants: HashMap::new(),
+            minted: HashMap::new(),
             replayed: HashMap::new(),
             provider: ProviderId::new("interplane-reference"),
             runtime,
@@ -319,14 +322,117 @@ impl AienAuthority {
         Ok(desk.issue(&intent, scope, expires_at))
     }
 
-    /// Present a grant for `request_id`; the next `decide` for that request spends it through
-    /// `EffectLane::authorize_approved`. `now` is host-supplied (aien-mcp reads no clock).
-    pub fn present_approval(&mut self, request_id: &str, grant: ApprovalGrant, now: u64) {
-        self.grants.insert(request_id.to_string(), (grant, now));
+    /// Host-only (cut A3): the approval channel. The approver calls this with a grant it got from
+    /// [`Self::issue_approval`]; the result is the runtime's own continuation decision for the
+    /// request, to be handed to `Pipeline::continue_approval` (or the [`AienShared::continue_approval`]
+    /// helper, which does both and cleans up). It is the only place a grant is spent: `decide`
+    /// never reads one, so nothing the model writes can stand in for a grant.
+    ///
+    /// Spend point: AIEN spends the grant here, when `EffectLane::authorize_approved` mints the
+    /// effect, not when the provider runs it. Outcomes: the pipeline then runs the effect once
+    /// (`execute`); if the pipeline refuses the continuation (stale digest or clock) the minted
+    /// effect is dropped by `discard_unexecuted` and nothing runs; if the provider rejects the call
+    /// AIEN's ledger entry is removed, and if the provider outcome is unknown the ledger keeps
+    /// `Uncertain`. In every case the same grant is `Consumed` or the same effect is reported
+    /// `ReconciliationRequired`; a second effect never runs silently. `now` is host-supplied
+    /// epoch time (aien-mcp reads no clock).
+    pub fn present_approval(
+        &mut self,
+        req: &CapabilityRequest,
+        grant: &ApprovalGrant,
+        now: u64,
+    ) -> Decision {
+        let rid = req.request_id.as_str().to_string();
+        let Some(approval_id) = self.minted.get(&rid).cloned() else {
+            return self.decision(
+                req,
+                DecisionKind::Denied,
+                Some("approval refused: no approval was requested for this request"),
+                ENGINE_EFFECT,
+            );
+        };
+        let refuse = |s: &Self, why: String| {
+            let mut d = s.decision(req, DecisionKind::Denied, Some(&why), ENGINE_EFFECT);
+            d.approval = Some(minted_approval(&approval_id, None));
+            d
+        };
+        let (intent, scope) = match self.stage(req) {
+            Ok(x) => x,
+            Err(d) => return refuse(self, d.reason.clone().unwrap_or_default()),
+        };
+        let class = self
+            .spec(&req.capability)
+            .map(|(_, d)| routing_class(d.effects()));
+        let mut values = vec![format!("effect_class={class:?}")];
+        let outcome = self.effect_lane.authorize_approved(
+            intent.clone(),
+            scope,
+            &EffectClassAuthority,
+            grant,
+            now,
+        );
+        // A spent grant presented again for the effect it was spent on is a replay of a finished
+        // request: AIEN's ledger returns the existing receipt and nothing is minted or run.
+        let outcome = match outcome {
+            Err(AuthorityOutcome::Approval(ApprovalError::Consumed)) => {
+                match self
+                    .runtime
+                    .block_on(self.effect_lane.authorize_and_execute_approved(
+                        intent,
+                        scope,
+                        &EffectClassAuthority,
+                        grant,
+                        now,
+                    )) {
+                    Ok(receipt) => {
+                        self.replayed.insert(rid, receipt);
+                        values.push("replay=true".into());
+                        let mut d =
+                            self.decision(req, DecisionKind::Authorized, None, ENGINE_EFFECT);
+                        d.approval = Some(minted_approval(&approval_id, None));
+                        d.runtime_state = Some(RuntimeExtension {
+                            vocabulary: "aien.effects".into(),
+                            values,
+                            extensions: Map::new(),
+                        });
+                        return d;
+                    }
+                    Err(other) => Err(other),
+                }
+            }
+            o => o,
+        };
+        match outcome {
+            Ok(effect) => {
+                self.authorized.insert(rid, effect);
+                let mut d = self.decision(req, DecisionKind::Authorized, None, ENGINE_EFFECT);
+                d.approval = Some(minted_approval(&approval_id, None));
+                d.runtime_state = Some(RuntimeExtension {
+                    vocabulary: "aien.effects".into(),
+                    values,
+                    extensions: Map::new(),
+                });
+                d
+            }
+            Err(AuthorityOutcome::Approval(e)) => refuse(self, format!("approval refused: {e:?}")),
+            Err(AuthorityOutcome::Denied(r)) | Err(AuthorityOutcome::Contained(r)) => {
+                refuse(self, r)
+            }
+            Err(AuthorityOutcome::Execution(e)) => refuse(self, e.to_string()),
+            Err(AuthorityOutcome::Pending { reason, .. }) => refuse(self, reason),
+        }
     }
 
-    /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`,
-    /// or `authorize_approved` when a grant was presented for this request).
+    /// Host-only: drop an effect AIEN minted for `request_id` that `execute` did not run (the
+    /// pipeline refused the continuation). The grant stays spent; nothing ran. Returns whether an
+    /// unexecuted effect was dropped.
+    pub fn discard_unexecuted(&mut self, request_id: &str) -> bool {
+        self.authorized.remove(request_id).is_some() | self.replayed.remove(request_id).is_some()
+    }
+
+    /// Effect path: stage, then ask AIEN (`EffectLane::authorize` with `EffectClassAuthority`).
+    /// This never spends a grant: a `requires_approval` verdict stays pending until the host
+    /// continues it through [`Self::present_approval`].
     /// The adapter translates the answer and never builds the authorized value itself.
     fn decide_effect(&mut self, req: &CapabilityRequest, effects: ToolEffects) -> Decision {
         if let Some(path) = req.arguments.get("path").and_then(Value::as_str) {
@@ -344,50 +450,9 @@ impl AienAuthority {
             Err(d) => return *d,
         };
         let mut values = vec![format!("effect_class={:?}", routing_class(effects))];
-        let grant = self.grants.get(req.request_id.as_str()).cloned();
-        let outcome = match &grant {
-            Some((g, now)) => self.effect_lane.authorize_approved(
-                intent.clone(),
-                scope,
-                &EffectClassAuthority,
-                g,
-                *now,
-            ),
-            None => self
-                .effect_lane
-                .authorize(intent.clone(), scope, &EffectClassAuthority),
-        };
-        // A spent grant presented again for the effect it was spent on is a replay of a finished
-        // request: AIEN's ledger returns the existing receipt and nothing is minted or run.
-        let outcome = match (outcome, &grant) {
-            (Err(AuthorityOutcome::Approval(ApprovalError::Consumed)), Some((g, now))) => {
-                match self
-                    .runtime
-                    .block_on(self.effect_lane.authorize_and_execute_approved(
-                        intent,
-                        scope,
-                        &EffectClassAuthority,
-                        g,
-                        *now,
-                    )) {
-                    Ok(receipt) => {
-                        self.replayed
-                            .insert(req.request_id.as_str().to_string(), receipt);
-                        values.push("replay=true".into());
-                        let mut d =
-                            self.decision(req, DecisionKind::Authorized, None, ENGINE_EFFECT);
-                        d.runtime_state = Some(RuntimeExtension {
-                            vocabulary: "aien.effects".into(),
-                            values,
-                            extensions: Map::new(),
-                        });
-                        return d;
-                    }
-                    Err(other) => Err(other),
-                }
-            }
-            (o, _) => o,
-        };
+        let outcome = self
+            .effect_lane
+            .authorize(intent.clone(), scope, &EffectClassAuthority);
         match outcome {
             Ok(effect) => {
                 self.authorized
@@ -406,13 +471,22 @@ impl AienAuthority {
             }) => {
                 values.push("staged=true".into());
                 values.push(format!("intent_digest={}", hex(&intent_digest)));
-                // No grant presented: none is invented or consumed here.
+                // `decide` never spends a grant. The id is a handle this adapter mints so the host can
+                // correlate the continuation; it carries no authority (the desk's grant does).
+                let approval_id = format!(
+                    "aien-approval:{}:{}",
+                    req.request_id.as_str(),
+                    &hex(&intent_digest)[..16]
+                );
+                self.minted
+                    .insert(req.request_id.as_str().to_string(), approval_id.clone());
                 let mut d = self.decision(
                     req,
                     DecisionKind::RequiresApproval,
                     Some(&reason),
                     ENGINE_EFFECT,
                 );
+                d.approval = Some(minted_approval(&approval_id, Some(&hex(&intent_digest))));
                 d.runtime_state = Some(RuntimeExtension {
                     vocabulary: "aien.effect_intent".into(),
                     values,
@@ -764,5 +838,75 @@ impl RuntimeAuthority for AienAuthority {
             }),
         );
         c
+    }
+}
+
+fn minted_approval(approval_id: &str, scope: Option<&str>) -> Approval {
+    Approval {
+        approval_id: approval_id.to_string(),
+        scope: scope.map(str::to_string),
+        expires_at: None,
+        extensions: Map::new(),
+    }
+}
+
+/// A shareable handle to the adapter. The `Pipeline` borrows its runtime for its whole life, but
+/// the host's approver must call the adapter while a request is pending, so the host keeps one
+/// clone here and gives the pipeline another (`Pipeline::new(.., &mut shared.clone(), ..)`).
+/// Single-threaded; each call borrows the adapter only for its own duration.
+#[derive(Clone)]
+pub struct AienShared(Rc<RefCell<AienAuthority>>);
+
+impl AienShared {
+    pub fn new(inner: AienAuthority) -> Self {
+        Self(Rc::new(RefCell::new(inner)))
+    }
+
+    /// Host-side access to the adapter (approver calls, counters).
+    pub fn with<R>(&self, f: impl FnOnce(&mut AienAuthority) -> R) -> R {
+        f(&mut self.0.borrow_mut())
+    }
+
+    /// Host-only: continue the pending request `request_id` on `trace` with `grant`. Reads the
+    /// request and digest from the pipeline's own pending entry (never from the model), produces
+    /// the continuation decision through AIEN, hands it to `Pipeline::continue_approval`, and
+    /// drops any effect the pipeline did not run. `now_epoch` is for AIEN's grant expiry, `now`
+    /// (`YYYY-MM-DDTHH:MM:SSZ`) for the pipeline's.
+    pub fn continue_approval(
+        &self,
+        pipeline: &mut Pipeline<'_>,
+        trace: &str,
+        request_id: &str,
+        grant: &ApprovalGrant,
+        now_epoch: u64,
+        now: &str,
+    ) -> Result<(ToolResult, ObservedRecord), Refusal> {
+        let pa = pipeline
+            .pending_approval(trace, request_id)
+            .ok_or(Refusal::NoPendingApproval)?;
+        let d = self.with(|a| a.present_approval(&pa.capability_request, grant, now_epoch));
+        let out = pipeline.continue_approval(trace, request_id, &d, &pa.request_digest, now);
+        self.with(|a| a.discard_unexecuted(request_id));
+        out
+    }
+}
+
+impl RuntimeAuthority for AienShared {
+    fn runtime_id(&self) -> &str {
+        RUNTIME_ID
+    }
+    fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
+        self.0.borrow_mut().decide(req, ctx)
+    }
+    fn execute(
+        &mut self,
+        req: &CapabilityRequest,
+        decision: &Decision,
+        ctx: &CallContext,
+    ) -> ToolResult {
+        self.0.borrow_mut().execute(req, decision, ctx)
+    }
+    fn catalog(&self) -> Catalog {
+        self.0.borrow().catalog()
     }
 }

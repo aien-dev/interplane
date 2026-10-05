@@ -276,3 +276,24 @@ fn close_trace() {
     assert!(!p.ledger.holds("t") && p.inputs("t").is_empty());
     assert_eq!(p.events.len(), 2 * n_u, "the closed trace added no events");
 }
+
+/// A malformed call's result cites its request id, so no later call in the trace may reuse it
+/// (same in both SDKs).
+#[test]
+fn refused_call_uses_its_request_id() {
+    let mut rt = MockRuntime::new();
+    let mut p = pipe(&mut rt, Limits::default());
+    let bad = json!({"id": "c8", "type": "function", "function": {"name": "read_file", "arguments": "{bad"}});
+    let good = call("c8", "read_file", json!({"path": "/tmp/a"}));
+    let out = p.run_turn("openai", "m", &turn(vec![bad, good.clone()]), "t", 0);
+    let codes: Vec<&str> = out
+        .results
+        .iter()
+        .map(|r| r.error.as_ref().expect("error").code.as_str())
+        .collect();
+    assert_eq!(codes, ["malformed_tool_call", "duplicate_request_id"]);
+    let out = p.run_turn("openai", "m", &turn(vec![good]), "t", 1);
+    let e = out.results[0].error.as_ref().expect("error");
+    assert_eq!(e.code.as_str(), "duplicate_request_id");
+    assert_eq!(e.message, "duplicate request_id: c8");
+}

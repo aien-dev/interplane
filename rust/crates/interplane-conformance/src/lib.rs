@@ -2,7 +2,9 @@
 //! mock runtime per case and compares the result with `expected`.
 use std::path::Path;
 
-use interplane_core::{canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger, ToolResult};
+use interplane_core::{
+    canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger, ToolResult,
+};
 use interplane_crossaxis::{expand, select};
 use interplane_crossveil::{
     mock_mapping_table, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,

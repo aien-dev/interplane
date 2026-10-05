@@ -1,0 +1,1097 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 308,
+  "calls": [
+    {
+      "argument_keys": [
+        "action",
+        "query"
+      ],
+      "arguments_digest": "sha256:b70fab879c627a8d6dd00d68fd4f5d8ea5f99c1a51081795923696c0322d45b3",
+      "capability": "manage_notes",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_ysoi66qj",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:edd045f2a95ceafc60b7dc989edb8357f1a2b43ccf4cff6f3ed7155606c430af",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "manage_notes",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:4aa2f4f45ff69fb7720b67166e724f4bdb71f04a117cde8dd267f026217e69bb",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_9z4hrqkc",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:b3d6d5025670ae816df663854a5ece3815a668974057a9cb886b606eab4fd5b3",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_notes",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_39x8hzck",
+      "result_content_kind": null,
+      "result_digest": "sha256:3857e0bb697053ab0ba36cf2f88229e39f14e95a60d9a6235ca7c135e925d104",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_notes",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_notes",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_eem7jkk9",
+      "result_content_kind": null,
+      "result_digest": "sha256:eb221f671870e301e0c01c3f687fffce0ec19878bdc26e0c5480640648ad273d",
+      "result_trust": null,
+      "round": 3,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_notes",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_notes",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_xct1jdhe",
+      "result_content_kind": null,
+      "result_digest": "sha256:2afd60e1c9480144531700ac5f4101efddbdcf8fddb862509164a4ef587627d7",
+      "result_trust": null,
+      "round": 4,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_notes",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_notes",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_d43eyarh",
+      "result_content_kind": null,
+      "result_digest": "sha256:25bb7d5072d896ad7d420d8abd5fea53e25e47ccfc5281da937692190ec2ae30",
+      "result_trust": null,
+      "round": 5,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_notes",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_deg89tah",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:79fd0e05e59156d700438f6a29be7f32313e4c7c2bbb0133fbf867f4fbd9bdd8",
+      "result_trust": "workspace_untrusted",
+      "round": 6,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:4e05d41d8176a0033aecdf78005b8f0d4718692db89dc733291d2a2c1967a5a4",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_tsdv5o7k",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:75f56637ec9d052557ec4a0736493360546b7a115bd72243da6b3b2c2537b073",
+      "result_trust": "workspace_untrusted",
+      "round": 7,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:07bc831f36d3e5af3e289204f4cef99dd77520db262d2d7962320de84c53e15b",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_ag89qeo2",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:55976c8d08fafbf600fa91979f33081e8bc3ae8eb421e07841ee0352afd12950",
+      "result_trust": "workspace_untrusted",
+      "round": 8,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:da56f529025fd233913cf4a1aa5e3527bb1c95dc28b2a34c816e635a8b8ea368",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_g9g1q7t3",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:77d209e923870e23634ca046bcedae51a59cb7c3fe0a7f5cc92fa98b212a977b",
+      "result_trust": "workspace_untrusted",
+      "round": 8,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B2",
+  "condition_spec": {
+    "expansion_policy": "0.2",
+    "family": "B",
+    "id": "B2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 8
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 9
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "max_rounds",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "apply_patch",
+    "edit_file",
+    "get_workspace",
+    "glob",
+    "grep",
+    "ls",
+    "manage_notes",
+    "read_file",
+    "write_file"
+  ],
+  "fixture": {
+    "digest": "sha256:7d6754fb5e1fbf52c14a95bc19775db824d01a17f80d6cea145c0ddc47c3c840",
+    "name": "fixtures/orchard"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "no final answer",
+        "kind": "answer_contains_all",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 308,
+    "calls_total": 10,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 6,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 4
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 10,
+    "exposed_capabilities_max": 10,
+    "exposed_tools_first": 11,
+    "exposed_tools_max": 11,
+    "first_turn_prompt_tokens": 2740,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 22743,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 8,
+    "tool_schema_bytes_per_round_mean": 8693.0,
+    "tool_schema_tokens_first": 2432,
+    "tool_schema_tokens_per_round_mean": 2432.0,
+    "tool_schema_tokens_sum": 19456,
+    "total_completion_tokens": 795,
+    "total_prompt_tokens": 24696,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 22821
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 8
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 147,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 4743,
+      "n_tool_calls": 2,
+      "outcome": "tool_request",
+      "prompt_tokens": 2740,
+      "reasoning_present": true,
+      "request_digest": "sha256:8e8558769ea4ca7f47b41924d207d99874d3fd4504f6b15857487052b503bb33",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 59,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1687,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2900,
+      "reasoning_present": true,
+      "request_digest": "sha256:3ad636c02da48b30b70b0ff159f28fec3876e3fea70b1d169fa6c267a1f916f6",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 57,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1615,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2977,
+      "reasoning_present": true,
+      "request_digest": "sha256:0d462c289e89d6494a502543c624462b132726a13b294f233c5d19a5d3f02fc1",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 136,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3726,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 3053,
+      "reasoning_present": true,
+      "request_digest": "sha256:799c800b203da045409a2d15634420a8373e40506b28938004173c1af95de755",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 205,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 5594,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 3128,
+      "reasoning_present": true,
+      "request_digest": "sha256:29e8235365f22acbec7d1542c26b9b87105cf41a98c4c2ab07d668dec11a4c6e",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 77,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2147,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 3204,
+      "reasoning_present": true,
+      "request_digest": "sha256:41e5e0f5765d7181a1a82b8b8348e3e12515e455f00af3ecdf27c55d857b4e85",
+      "round": 6,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 38,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1106,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 3300,
+      "reasoning_present": true,
+      "request_digest": "sha256:cc5bfca59c0f15506d31433cfa2b6a8065d28690175cd7fd398e1eb6037ba2b4",
+      "round": 7,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    },
+    {
+      "completion_tokens": 76,
+      "exposed_caps_count": 10,
+      "exposed_names": [
+        "ask_user",
+        "apply_patch",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "ls",
+        "manage_notes",
+        "read_file",
+        "write_file"
+      ],
+      "exposed_tools_count": 11,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2125,
+      "n_tool_calls": 2,
+      "outcome": "tool_request",
+      "prompt_tokens": 3394,
+      "reasoning_present": true,
+      "request_digest": "sha256:b4177a7717f880266cc384f7801461ccfedb51982c0cd01424a6020df78cd4f5",
+      "round": 8,
+      "text_digest": null,
+      "tools_bytes": 8693,
+      "tools_digest": "sha256:84c413a09934b1b7db575eb94555103f314398f94b42317fb6c677442e949909"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": {
+    "final_digest": "sha256:b329c88cdf719a4c5ba36884eed703d68bab15002247fce6a85620badaa0ae62",
+    "final_selected": [
+      "ask_user",
+      "apply_patch",
+      "edit_file",
+      "get_workspace",
+      "glob",
+      "grep",
+      "ls",
+      "manage_notes",
+      "read_file",
+      "write_file"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "todowrite",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 8223
+        },
+        "selected_count": 10,
+        "selected_rendered_bytes": 8223
+      },
+      "requested_domains": [
+        "filesystem",
+        "notes"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "apply_patch",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "edit_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "get_workspace",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "glob",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "code",
+            "filesystem"
+          ],
+          "name": "grep",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "ls",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "notes"
+          ],
+          "name": "manage_notes",
+          "rule_id": "domain:notes"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "read_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "write_file",
+          "rule_id": "domain:filesystem"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:b329c88cdf719a4c5ba36884eed703d68bab15002247fce6a85620badaa0ae62"
+  },
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "multidomain",
+    "digest": "sha256:1179a814db9c187e9199a2b52e2f33b9d6585cfb7abe91b18bc7cc99a4bd8245",
+    "id": "multidomain-103",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 22743,
+    "wall_ms": 22821
+  },
+  "tool_schema_tokens_per_round": [
+    2432,
+    2432,
+    2432,
+    2432,
+    2432,
+    2432,
+    2432,
+    2432
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "manage_notes",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "manage_notes"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "manage_notes",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "manage_notes"
+      },
+      {
+        "capability": "manage_notes",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 3,
+        "status": "requires_approval",
+        "tool": "manage_notes"
+      },
+      {
+        "capability": "manage_notes",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 4,
+        "status": "requires_approval",
+        "tool": "manage_notes"
+      },
+      {
+        "capability": "manage_notes",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 5,
+        "status": "requires_approval",
+        "tool": "manage_notes"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 6,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 7,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 8,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 8,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": null
+  },
+  "user_request_digest": "sha256:63f6fff300252a4dc81c706f745ff547d4d8f544f33512df740b363080aef3d7"
+}

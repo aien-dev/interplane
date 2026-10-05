@@ -1,0 +1,812 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 182,
+  "calls": [
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_email_accounts",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_orzg1hgt",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:a02101eea9dbff95cb4bce878e57fea481032ce3e705937cdc16a067b6e62283",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "list_email_accounts",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_email_accounts",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_tej58i26",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:4819a792fd2d207ab90d6d9bafd53bb10098afa99abd4467470eb5c118961f9d",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "list_email_accounts",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_email_accounts",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_28455404",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:63e9ea65fc57a2047b3e25bd756e20782e20fa37d2d1529d528d03a5ae834518",
+      "result_trust": "trusted_runtime",
+      "round": 3,
+      "status": "error",
+      "synthetic": null,
+      "tool": "list_email_accounts",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "folder",
+        "max_results",
+        "unread_only"
+      ],
+      "arguments_digest": "sha256:6f29911735ec31a05019e23b5f9f0ee4313ecdfb4e6a8f9eba5c607c7451c9d0",
+      "capability": "list_emails",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_ng400ngv",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:cbf26c1c6d025418fb9d7485918869b2e674e2ebf5100b3ef4404ba3710a7da3",
+      "result_trust": "external_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": "stub",
+      "tool": "list_emails",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B3",
+  "condition_spec": {
+    "expansion_policy": "runtime-v1",
+    "family": "B",
+    "id": "B3",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "archive_email",
+    "bulk_email",
+    "delete_email",
+    "list_email_accounts",
+    "list_emails",
+    "mark_email_read",
+    "read_email",
+    "reply_to_email",
+    "scan_email_unsubscribes",
+    "send_email",
+    "unsubscribe_email"
+  ],
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 182,
+    "calls_total": 4,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 4,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 3,
+    "expansions": 0,
+    "exposed_capabilities_first": 12,
+    "exposed_capabilities_max": 12,
+    "exposed_tools_first": 13,
+    "exposed_tools_max": 13,
+    "first_turn_prompt_tokens": 2778,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 18359,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 5,
+    "tool_schema_bytes_per_round_mean": 9599.0,
+    "tool_schema_tokens_first": 2596,
+    "tool_schema_tokens_per_round_mean": 2596.0,
+    "tool_schema_tokens_sum": 12980,
+    "total_completion_tokens": 641,
+    "total_prompt_tokens": 14471,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 3,
+    "wall_ms": 18396
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 5
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 68,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "archive_email",
+        "bulk_email",
+        "delete_email",
+        "list_email_accounts",
+        "list_emails",
+        "mark_email_read",
+        "read_email",
+        "reply_to_email",
+        "scan_email_unsubscribes",
+        "send_email",
+        "unsubscribe_email"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2645,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2778,
+      "reasoning_present": true,
+      "request_digest": "sha256:e6f5995b1a5f748916ad1d2206881e9ef2af6b7e4a29f8298c1d8fe27d51cb27",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 9599,
+      "tools_digest": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+    },
+    {
+      "completion_tokens": 42,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "archive_email",
+        "bulk_email",
+        "delete_email",
+        "list_email_accounts",
+        "list_emails",
+        "mark_email_read",
+        "read_email",
+        "reply_to_email",
+        "scan_email_unsubscribes",
+        "send_email",
+        "unsubscribe_email"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1212,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2831,
+      "reasoning_present": true,
+      "request_digest": "sha256:74c7b9c72ffbfca1829921e744057a750ee50becdf2a717c7174b90c8fd5da99",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 9599,
+      "tools_digest": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+    },
+    {
+      "completion_tokens": 36,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "archive_email",
+        "bulk_email",
+        "delete_email",
+        "list_email_accounts",
+        "list_emails",
+        "mark_email_read",
+        "read_email",
+        "reply_to_email",
+        "scan_email_unsubscribes",
+        "send_email",
+        "unsubscribe_email"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1046,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2884,
+      "reasoning_present": true,
+      "request_digest": "sha256:57706fb19ea1a4310ea32d48b13a4c9c8c95503cee0434508c271102e844e49f",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 9599,
+      "tools_digest": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+    },
+    {
+      "completion_tokens": 96,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "archive_email",
+        "bulk_email",
+        "delete_email",
+        "list_email_accounts",
+        "list_emails",
+        "mark_email_read",
+        "read_email",
+        "reply_to_email",
+        "scan_email_unsubscribes",
+        "send_email",
+        "unsubscribe_email"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2639,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 2937,
+      "reasoning_present": true,
+      "request_digest": "sha256:865ade0660af02d98b0729ff32f653abefd1837c36a69356c52e35dcd0663c1b",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 9599,
+      "tools_digest": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+    },
+    {
+      "completion_tokens": 399,
+      "exposed_caps_count": 12,
+      "exposed_names": [
+        "ask_user",
+        "archive_email",
+        "bulk_email",
+        "delete_email",
+        "list_email_accounts",
+        "list_emails",
+        "mark_email_read",
+        "read_email",
+        "reply_to_email",
+        "scan_email_unsubscribes",
+        "send_email",
+        "unsubscribe_email"
+      ],
+      "exposed_tools_count": 13,
+      "finish_reason": "stop",
+      "latency_ms": 10817,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 3041,
+      "reasoning_present": true,
+      "request_digest": "sha256:e7d924776f91e69d4fb585431361b7f44d31e97059caa4ab82a675ff96ac0158",
+      "round": 5,
+      "text_digest": "sha256:cb229fcc4677400c7697a13fb9487d6fe5aeafe7d1a485e4f1a8afa9b5c5ca8b",
+      "tools_bytes": 9599,
+      "tools_digest": "sha256:1395e18c14e19f1b2f53e52c6b33c493f79ef04d2467ba8dd69fc3fbb4e2c553"
+    }
+  ],
+  "run_id": "seed-44",
+  "runtime_triggers": [],
+  "selection": {
+    "final_digest": "sha256:a94e0e6a6fdd7bf2ba4e181c3d6873ba29a57b68f9f38de541d9c33f7f99bd7b",
+    "final_selected": [
+      "ask_user",
+      "archive_email",
+      "bulk_email",
+      "delete_email",
+      "list_email_accounts",
+      "list_emails",
+      "mark_email_read",
+      "read_email",
+      "reply_to_email",
+      "scan_email_unsubscribes",
+      "send_email",
+      "unsubscribe_email"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "apply_patch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "get_workspace",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "glob",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "grep",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ls",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "todowrite",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "write_file",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 9129
+        },
+        "selected_count": 12,
+        "selected_rendered_bytes": 9129
+      },
+      "requested_domains": [
+        "email"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "archive_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "bulk_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "delete_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "list_email_accounts",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "list_emails",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "mark_email_read",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "read_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "reply_to_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "scan_email_unsubscribes",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "send_email",
+          "rule_id": "domain:email"
+        },
+        {
+          "domains": [
+            "email"
+          ],
+          "name": "unsubscribe_email",
+          "rule_id": "domain:email"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:a94e0e6a6fdd7bf2ba4e181c3d6873ba29a57b68f9f38de541d9c33f7f99bd7b"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "rare",
+    "digest": "sha256:e5955e51fbf215150eb0bbfef43242b9eceb376bb68680f0f5bbfab0b9ae5f9c",
+    "id": "rare-108",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 18359,
+    "wall_ms": 18396
+  },
+  "tool_schema_tokens_per_round": [
+    2596,
+    2596,
+    2596,
+    2596,
+    2596
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "list_email_accounts",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "list_email_accounts"
+      },
+      {
+        "capability": "list_email_accounts",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "list_email_accounts"
+      },
+      {
+        "capability": "list_email_accounts",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 3,
+        "status": "error",
+        "tool": "list_email_accounts"
+      },
+      {
+        "capability": "list_emails",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "list_emails"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "There are **4 unread emails** in your inbox:\n\n1. Lens order shipped\n2. Board minutes\n3. Fuse invoice\n4. Welcome"
+  },
+  "user_request_digest": "sha256:cba0a7e13f98c5f0de63f6f0d937d5ae781f6699a2da0e1b3340c07046a56dd7"
+}

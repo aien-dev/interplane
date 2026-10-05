@@ -1,0 +1,277 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 302,
+  "calls": [
+    {
+      "argument_keys": [
+        "code"
+      ],
+      "arguments_digest": "sha256:073e48d7a1782226b07ed40abd54807e5e2b4090cfaf824cf4597325fef15579",
+      "capability": "python",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_u61nt0xj",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:1b61f4da982ee1db5372abbeb49045916edae41ed1bee5f5300dcebeca3739f9",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "error",
+      "synthetic": "sim_declared_failure",
+      "tool": "python",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:4aa2f4f45ff69fb7720b67166e724f4bdb71f04a117cde8dd267f026217e69bb",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_2ikocdy8",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:f54a6bb287bcceddb7acb74ada6e1772d3783a5e4bd98469c0e78231b0476df9",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A2",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:7d6754fb5e1fbf52c14a95bc19775db824d01a17f80d6cea145c0ddc47c3c840",
+    "name": "fixtures/orchard"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "no match",
+            "kind": "answer_regex",
+            "passed": false
+          },
+          {
+            "applies": true,
+            "detail": "no match",
+            "kind": "answer_regex",
+            "passed": false
+          }
+        ],
+        "detail": "0 of 2 passed",
+        "kind": "any_of",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "any_of"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 302,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 16094,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 23944,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 47376,
+    "total_completion_tokens": 787,
+    "total_prompt_tokens": 49038,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 1,
+    "wall_ms": 23997
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 3
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 491,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 15079,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16094,
+      "reasoning_present": true,
+      "request_digest": "sha256:1afaa30d942dc013b888d6271314e810415473a7605037b86b8230cdfcbbe030",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 64,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2075,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16421,
+      "reasoning_present": true,
+      "request_digest": "sha256:3fdc8ffcea4a51312fd5e3e529deeb98054391c29f2b19dd803cbf28c2d84371",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 232,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 6790,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16523,
+      "reasoning_present": true,
+      "request_digest": "sha256:d2b4c9f03cee18e37ddba3ddc69b7779744decc8cd552b8d41fd82eb025f3150",
+      "round": 3,
+      "text_digest": "sha256:276d6db35fc1f7320ffadaa8d8fa6def8aa9dbced92e9d1f346d1d5db902f13b",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:cd64c0f5ace851f48eda5487c31fcaab2baafb629b229600bf679741d0049360",
+    "id": "unknown_tool-105",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 23944,
+    "wall_ms": 23997
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "python",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "python"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "Based on the CSV data, here are the mean kg per variety:\n\n| Variety | Mean kg |\n|---------|---------|\n| Bramley | 3120 kg |\n| Cox | 2860 kg |\n| Russet | 1430 kg |\n\nSince each variety appears only once in the dataset, the mean kg per variety is simply the single recorded value for each variety."
+  },
+  "user_request_digest": "sha256:13062970b043761f0d24cd6e33793b93b51145dc37092978d6878f56735bb047"
+}

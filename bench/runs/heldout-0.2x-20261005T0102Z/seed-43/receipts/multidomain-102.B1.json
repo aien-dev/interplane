@@ -1,0 +1,750 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 196,
+  "calls": [
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_models",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_r5whxo8n",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:7b249e29dc987aacb4c326bc5b19d94b335eb71504cceba9cc85ce16107efd35",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "list_models",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:9e8cf3317a0581e0fc4d7bb4c3c62d5651afee4f92f946ebab90567f84706fc5",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_p44696i6",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:f18a23a14c467f437495382e04068b98b2ef5bd760f38059e4ca37f14028f303",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B1",
+  "condition_spec": {
+    "expansion_policy": "0.2",
+    "family": "B",
+    "id": "B1",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "adopt_served_model",
+    "apply_patch",
+    "ask_teacher",
+    "cancel_download",
+    "chat_with_model",
+    "create_session",
+    "download_model",
+    "edit_file",
+    "get_workspace",
+    "glob",
+    "grep",
+    "list_cached_models",
+    "list_downloads",
+    "list_models",
+    "list_served_models",
+    "ls",
+    "manage_endpoints",
+    "pipeline",
+    "read_file",
+    "search_hf_models",
+    "serve_model",
+    "write_file"
+  ],
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: keeper-2b, keeper-7b",
+        "kind": "answer_contains_all",
+        "passed": false
+      },
+      {
+        "applies": true,
+        "detail": "no match",
+        "kind": "answer_regex",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all",
+      "answer_regex"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 196,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 23,
+    "exposed_capabilities_max": 23,
+    "exposed_tools_first": 24,
+    "exposed_tools_max": 24,
+    "first_turn_prompt_tokens": 4369,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 6461,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 14851.0,
+    "tool_schema_tokens_first": 4173,
+    "tool_schema_tokens_per_round_mean": 4173.0,
+    "tool_schema_tokens_sum": 8346,
+    "total_completion_tokens": 199,
+    "total_prompt_tokens": 8880,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 6471
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 2
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 118,
+      "exposed_caps_count": 23,
+      "exposed_names": [
+        "ask_user",
+        "adopt_served_model",
+        "apply_patch",
+        "ask_teacher",
+        "cancel_download",
+        "chat_with_model",
+        "create_session",
+        "download_model",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "list_cached_models",
+        "list_downloads",
+        "list_models",
+        "list_served_models",
+        "ls",
+        "manage_endpoints",
+        "pipeline",
+        "read_file",
+        "search_hf_models",
+        "serve_model",
+        "write_file"
+      ],
+      "exposed_tools_count": 24,
+      "finish_reason": "tool_calls",
+      "latency_ms": 4178,
+      "n_tool_calls": 2,
+      "outcome": "tool_request",
+      "prompt_tokens": 4369,
+      "reasoning_present": true,
+      "request_digest": "sha256:32ec4674f0eba4b6934f2a54906a43a4f55fdb1e82f739eaf0ad67c66509d1fe",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 14851,
+      "tools_digest": "sha256:b8cc9f573f047c06cf6dbe6e3b11f095b27795f052f0d06e16ab69b0a454a36f"
+    },
+    {
+      "completion_tokens": 81,
+      "exposed_caps_count": 23,
+      "exposed_names": [
+        "ask_user",
+        "adopt_served_model",
+        "apply_patch",
+        "ask_teacher",
+        "cancel_download",
+        "chat_with_model",
+        "create_session",
+        "download_model",
+        "edit_file",
+        "get_workspace",
+        "glob",
+        "grep",
+        "list_cached_models",
+        "list_downloads",
+        "list_models",
+        "list_served_models",
+        "ls",
+        "manage_endpoints",
+        "pipeline",
+        "read_file",
+        "search_hf_models",
+        "serve_model",
+        "write_file"
+      ],
+      "exposed_tools_count": 24,
+      "finish_reason": "stop",
+      "latency_ms": 2283,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 4511,
+      "reasoning_present": true,
+      "request_digest": "sha256:c93c12c6e7c60edcd1ec811b8dc68a6153bb15f82ab8a11fb307b4c4b36b0cd3",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 14851,
+      "tools_digest": "sha256:b8cc9f573f047c06cf6dbe6e3b11f095b27795f052f0d06e16ab69b0a454a36f"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": {
+    "final_digest": "sha256:41f22666037fdf3284007c64bfd02ad87bfae3ada768abe9e1f33a179f4a5d18",
+    "final_selected": [
+      "ask_user",
+      "adopt_served_model",
+      "apply_patch",
+      "ask_teacher",
+      "cancel_download",
+      "chat_with_model",
+      "create_session",
+      "download_model",
+      "edit_file",
+      "get_workspace",
+      "glob",
+      "grep",
+      "list_cached_models",
+      "list_downloads",
+      "list_models",
+      "list_served_models",
+      "ls",
+      "manage_endpoints",
+      "pipeline",
+      "read_file",
+      "search_hf_models",
+      "serve_model",
+      "write_file"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "todowrite",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 14381
+        },
+        "selected_count": 23,
+        "selected_rendered_bytes": 14381
+      },
+      "requested_domains": [
+        "filesystem",
+        "models"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "serving",
+            "models",
+            "admin"
+          ],
+          "name": "adopt_served_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "apply_patch",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "user",
+            "models"
+          ],
+          "name": "ask_teacher",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving",
+            "admin"
+          ],
+          "name": "cancel_download",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "sessions"
+          ],
+          "name": "chat_with_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "sessions",
+            "models"
+          ],
+          "name": "create_session",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving",
+            "admin"
+          ],
+          "name": "download_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "edit_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "get_workspace",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "glob",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "code",
+            "filesystem"
+          ],
+          "name": "grep",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "models",
+            "serving"
+          ],
+          "name": "list_cached_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving"
+          ],
+          "name": "list_downloads",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models"
+          ],
+          "name": "list_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "serving",
+            "models"
+          ],
+          "name": "list_served_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "filesystem"
+          ],
+          "name": "ls",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "admin",
+            "models"
+          ],
+          "name": "manage_endpoints",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models"
+          ],
+          "name": "pipeline",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "read_file",
+          "rule_id": "domain:filesystem"
+        },
+        {
+          "domains": [
+            "models",
+            "web"
+          ],
+          "name": "search_hf_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "serving",
+            "models",
+            "admin"
+          ],
+          "name": "serve_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "filesystem",
+            "code"
+          ],
+          "name": "write_file",
+          "rule_id": "domain:filesystem"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:41f22666037fdf3284007c64bfd02ad87bfae3ada768abe9e1f33a179f4a5d18"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "multidomain",
+    "digest": "sha256:59644496c8ff19f7839ebf2ab1219f3f7b66798215ad1999a11d84fd9a32044d",
+    "id": "multidomain-102",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 6461,
+    "wall_ms": 6471
+  },
+  "tool_schema_tokens_per_round": [
+    4173,
+    4173
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "list_models",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "list_models"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": ""
+  },
+  "user_request_digest": "sha256:51ba9e32a53b612615b504abdeda8248862bc638d6eb6268156dc08257645c1b"
+}

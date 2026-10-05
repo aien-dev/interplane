@@ -1,0 +1,163 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 293,
+  "calls": [],
+  "condition": "A2",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "matched",
+            "kind": "answer_regex",
+            "passed": true
+          },
+          {
+            "applies": true,
+            "detail": "missing: Lena Varga",
+            "kind": "answer_contains_all",
+            "passed": false
+          }
+        ],
+        "detail": "1 of 2 passed",
+        "kind": "any_of",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 293,
+    "calls_total": 0,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 0,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 16085,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 11955,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 1,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 15792,
+    "total_completion_tokens": 385,
+    "total_prompt_tokens": 16085,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 11961
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 1
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 385,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 11955,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16085,
+      "reasoning_present": true,
+      "request_digest": "sha256:d0cf1cf58cd41fe362ff25a01695e0f3f1eab2d25f49bb90c8a4f332e0c681c1",
+      "round": 1,
+      "text_digest": "sha256:eafec05ea035d4d2cf998e52c57b5848775615a59811610cb4ac4c84d9eae1c9",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:c647f197e3b088c3f8a06cda41381a8ef303e49f3b745b656fc0186e28624137",
+    "id": "unknown_tool-103",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 11955,
+    "wall_ms": 11961
+  },
+  "tool_schema_tokens_per_round": [
+    15792
+  ],
+  "transcript": {
+    "calls": [],
+    "expansions": [],
+    "final_answer": "I don't have access to a `page_oncall` function or any on-call paging system in my available tools. \n\nThe tools I have access to include:\n- Email management (list_emails, read_email, send_email, etc.)\n- Calendar management (manage_calendar)\n- Contact management (manage_contact)\n- Task management (manage_tasks)\n- Document management (create_document, edit_document, etc.)\n- Model serving and AI tools\n\nHowever, there's no on-call paging or scheduling system available. If you have an on-call schedule stored somewhere else (like in a file, calendar event, or contact), I could help you look that up using the available tools. Could you clarify where your on-call information is stored?"
+  },
+  "user_request_digest": "sha256:0ce813a093ec470c6b7ea797eef763db8b8315932c6c877239797d1942fb6fe8"
+}

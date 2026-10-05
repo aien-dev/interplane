@@ -1,0 +1,437 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 188,
+  "calls": [
+    {
+      "argument_keys": [
+        "action",
+        "filter"
+      ],
+      "arguments_digest": "sha256:64a827f5d9bdd33684cb1e8a8b6c07a89565fbb4f089dbdc966781a44f7b4a82",
+      "capability": "app_api",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_faickoys",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:f141b73026155bef58bb44c5b11824dc336e06ff8f741cbfd34e330986202c83",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:dd7c6d110cf1f075ae34746db6d93149c39ab167974a505cd5d800e43a277c9c",
+      "capability": "app_api",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_p368vm3k",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:9b76146518ec684d1e4b1dd4f9aeeeaa7b7bbfca8d740f7cdf5a26f106a52f6d",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "get_workspace",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_fgnlsivh",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:b35f51f84d9731b7c72a421ef701139382ec61251154ea738e4647b27dada169",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": "sim_handler",
+      "tool": "get_workspace",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_cujsv9ou",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:a8381fceb6ef9890b189922fcc19a141668cf5b073b7008cbba941b3ba66b3bd",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:7d6441497d2a000b8143602a7817c90abe7db88e139f89c062a1c36cfe0ad9d6",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_yd5707ci",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:f580d59f21047c5a7a36aeb2e81e616f5431639e7df05e895bee0b174f9f5e01",
+      "result_trust": "workspace_untrusted",
+      "round": 5,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "no match",
+            "kind": "answer_regex",
+            "passed": false
+          },
+          {
+            "applies": true,
+            "detail": "all present",
+            "kind": "answer_contains_all",
+            "passed": true
+          }
+        ],
+        "detail": "1 of 2 passed",
+        "kind": "any_of",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 188,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 2,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15980,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 9060,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 6,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 94752,
+    "total_completion_tokens": 254,
+    "total_prompt_tokens": 97315,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 9130
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 43,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2188,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15980,
+      "reasoning_present": false,
+      "request_digest": "sha256:8c50f100312b024c955ec72cd9a1294aba16f425fd8b2ba8f983c8d70aa89ba1",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 59,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1870,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16057,
+      "reasoning_present": false,
+      "request_digest": "sha256:a7aec34d02ab7e171045ac0e4632c7565990ff1ba9b62c31524bdaf9fb5f298b",
+      "round": 2,
+      "text_digest": "sha256:c907de23035397900e536acd3f846d90bf90e80050eaeb2f235ab3a6ea7be8fa",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 47,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1497,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16150,
+      "reasoning_present": false,
+      "request_digest": "sha256:c0423878b0e408148ca453a56734edccb1525d51c64cf4df140c6fa176ff45ac",
+      "round": 3,
+      "text_digest": "sha256:1ffd5734a97785d42f1b74fb245a675acc08e1e80d7590fc8d83eb8225132c06",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 14,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 572,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16260,
+      "reasoning_present": false,
+      "request_digest": "sha256:348c603797c576f22f1c837cb01c8a66d69ea83fb471de1e307f4210d5ccabb7",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 40,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1299,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16381,
+      "reasoning_present": false,
+      "request_digest": "sha256:e056c81de835ce06847c41a956001905d60d9b668e6ac61550c3bf794880c542",
+      "round": 5,
+      "text_digest": "sha256:3babc598e7ef7ce4f5be32b1b5c9ec1f81b0ad783eddfd52cee0d2192d9e33ed",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 51,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1634,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16487,
+      "reasoning_present": false,
+      "request_digest": "sha256:0a023f93a3232c9fd2c781ab58596a6b556883810c813543251b2559d1a08451",
+      "round": 6,
+      "text_digest": "sha256:e8eecea1001e71e4ac1c844a2e0f646b6af79cc7b867ec487e38a4782740a403",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:21a830556e630741234923ef574a56f7129a3385bf1726f6f615f7ae2fc4c87d",
+    "id": "unknown_tool-101",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 9060,
+    "wall_ms": 9130
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "app_api",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "app_api"
+      },
+      {
+        "capability": "app_api",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "app_api"
+      },
+      {
+        "capability": "get_workspace",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "get_workspace"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 5,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "This project is called **Beacon**, which schedules lamp rotations for small lighthouses. It includes configuration files, source code in a Rust project (Cargo.toml), documentation, scripts for verification, and an OWNERS.md file listing team members."
+  },
+  "user_request_digest": "sha256:9b46e2d6b2c1b502e8519ca98035a6ab9edfe765957b405e04ec2e7a47f7b5a1"
+}

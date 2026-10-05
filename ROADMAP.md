@@ -53,4 +53,8 @@ approvals and negative controls, over both SDKs and both adapters. The live-mode
 had 0 violations; the model followed injected text in 16 of 33 cases, which is reported, not gated.
 The claim covers the runtime layer only. See `docs/REPORT-0.3.md` for limits.
 
-Next: the 0.2.x campaign result as its own report, then **0.4 Execution**.
+The 0.2.x campaign (`bench/PROTOCOL-0.2x.md`) failed in all four arms on 2026-10-05: narrowing
+cuts tool-schema cost by a median 89 % without hurting success, but required tools stay missing
+on most expansion tasks, whichever mechanism is tried. See `docs/REPORT-0.2x.md`.
+
+Next: **0.4 Execution**.

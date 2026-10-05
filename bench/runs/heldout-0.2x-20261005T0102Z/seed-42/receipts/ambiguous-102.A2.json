@@ -1,0 +1,209 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 284,
+  "calls": [
+    {
+      "argument_keys": [
+        "action",
+        "filter"
+      ],
+      "arguments_digest": "sha256:5b297df37ed337e3160cf7a8809197cc13cce5ef1eb858e66bd50868fe4c71b9",
+      "capability": "app_api",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_r6oydjrt",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:43f10bfc197ae4bbee9115c70bbc3ed33670d34e3ceb424eee2210e49132394b",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A2",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: white",
+        "kind": "answer_contains_all",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 284,
+    "calls_total": 1,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 16076,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 13967,
+    "recovered_after_error": false,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 31584,
+    "total_completion_tokens": 446,
+    "total_prompt_tokens": 32230,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 1,
+    "wall_ms": 13985
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 1
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 311,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 9953,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16076,
+      "reasoning_present": true,
+      "request_digest": "sha256:cad0f7e97a5b7009f85492182c9a1313c419b0858640127bd3385ef267af0677",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 135,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 4014,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16154,
+      "reasoning_present": false,
+      "request_digest": "sha256:171f5bfbec15df5d4fd5e1758cc292591431da6e48d68adc64ceded69de1b9d9",
+      "round": 2,
+      "text_digest": "sha256:db040db96e21a761658aae5b1a158d0d41962fc6fcae613a2458f50e3052fd8a",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-42",
+  "selection": null,
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "ambiguous",
+    "digest": "sha256:25b580765f00abf33d4557f68f7d720a83f1f2fb8d57c8af500066f0ece08f65",
+    "id": "ambiguous-102",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 13967,
+    "wall_ms": 13985
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "app_api",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "app_api"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "I don't have access to a smart home or lighting control system in my available tools. To check the light color, I would need:\n\n- A smart home integration (like Home Assistant, Philips Hue, etc.)\n- Access to IoT device APIs\n- Or a specific smart lighting service\n\nCould you tell me:\n1. What smart lighting system you're using? (e.g., Philips Hue, LIFX, Nanoleaf)\n2. Is there an app or interface where I could check the light status?\n\nAlternatively, if you want me to help set up a smart home integration, I can guide you through that process."
+  },
+  "user_request_digest": "sha256:7212cdce0cdc16b82ae8532ce1e4ce6c9d140169e2b54f824cc9a23cd5d9261b"
+}

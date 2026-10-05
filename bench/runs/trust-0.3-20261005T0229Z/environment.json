@@ -1,0 +1,10 @@
+{
+  "interplane_commit": "0c69bb5f10b86a384d977dcfca09258f6247a3d8",
+  "odysseus_commit": "2992bf6d368a11472323e47d3bfed91e79cefc6b",
+  "aegis_runtime_commit": "f4e870953a466bb1cf68f1d88285929024cf1ba9",
+  "aien_protocols_commit": "3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10",
+  "sovereign_core_commit": "0c1d249f2d119c7c2d726a2d252dc913e6185d28 (Cargo git dependency, PINS)",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "python": "Python 3.12.3",
+  "note": "observed at run time; sibling checkouts made by adapters/aien/setup-siblings.sh, Odysseus a clean detached worktree"
+}

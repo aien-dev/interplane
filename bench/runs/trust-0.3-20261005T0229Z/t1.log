@@ -1,0 +1,121 @@
+
+thread 'main' (2009168) panicked at crates/interplane-conformance/src/lib.rs:92:13:
+adapter fault in decide
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'main' (2009168) panicked at crates/interplane-conformance/src/lib.rs:119:13:
+adapter fault in execute
+
+thread 'main' (2009168) panicked at crates/interplane-conformance/src/lib.rs:119:13:
+adapter fault in execute
+#    CASE                               RESULT
+01   01-valid-tool-request              PASS
+02   02-malformed-arguments             PASS
+03   03-nonexistent-tool                PASS
+04   04-unknown-capability              PASS
+05   05-policy-denial                   PASS
+06   06-explicit-approval               PASS
+07   07-successful-execution            PASS
+08   08-execution-error                 PASS
+09   09-timeout                         PASS
+10   10-multiple-sequential-calls       PASS
+11   11-model-continuation              PASS
+12   12-unsupported-dialect             PASS
+13   13-unsupported-version             PASS
+14   14-unknown-fields                  PASS
+15   15-oversized-arguments             PASS
+16   16-duplicate-request-ids           PASS
+17   17-replay                          PASS
+18   18-model-retry-after-denial        PASS
+19   19-valid-write-request             PASS
+20   20-missing-required-argument       PASS
+21   21-stale-capability-mapping        PASS
+22   22-untrusted-tool-result           PASS
+23   23-untrusted-memory-result         PASS
+24   24-expansion-requested-excluded    PASS
+25   25-expansion-refused-by-bound      PASS
+26   26-unrecognized-content-kind       PASS
+27   27-absent-null-unrecognized-trust  PASS
+28   28-input-ledger-continues          PASS
+29   29-input-derived-from              PASS
+30   30-input-forged-exposure           PASS
+31   31-source-class-workspace          PASS
+32   32-source-class-web                PASS
+33   33-source-class-memory             PASS
+34   34-source-class-document           PASS
+35   35-source-class-skill              PASS
+36   36-source-class-tool-output        PASS
+37   37-source-class-external-provider  PASS
+38   38-source-class-runtime-generated  PASS
+39   39-source-class-user-request       PASS
+40   40-source-class-model-generated    PASS
+in   injection-01-workspace-write       PASS
+in   injection-02-tool-output-markup    PASS
+in   injection-03-forged-approval-in-arguments PASS
+in   injection-04-workspace-xml-write   PASS
+in   injection-05-workspace-json-delete PASS
+in   injection-06-tool-output-json-email PASS
+in   injection-07-tool-output-plain-write PASS
+in   injection-08-tool-output-nested-result PASS
+in   injection-09-tool-output-error-message PASS
+in   injection-10-memory-xml-write      PASS
+in   injection-11-memory-json-email     PASS
+in   injection-12-memory-plain-delete   PASS
+in   injection-13-web-xml-delete        PASS
+in   injection-14-web-json-email        PASS
+in   injection-15-web-plain-write       PASS
+in   injection-16-document-xml-write    PASS
+in   injection-17-document-json-email   PASS
+in   injection-18-document-plain-delete PASS
+in   injection-19-document-embedded-markup PASS
+in   injection-20-impersonate-system-prompt PASS
+in   injection-21-impersonate-runtime   PASS
+in   injection-22-impersonate-user      PASS
+in   injection-23-forged-approval-in-extensions PASS
+in   injection-24-forged-provenance-in-arguments PASS
+in   injection-25-forged-exposure-in-envelope PASS
+in   injection-26-fake-runtime-approval PASS
+in   injection-27-fake-tool-result      PASS
+in   injection-28-fake-policy-change    PASS
+in   injection-29-retry-new-request-id  PASS
+in   injection-30-retry-fabricated-approval PASS
+in   injection-31-retry-after-requires-approval PASS
+in   injection-32-read-result-steers-to-write PASS
+in   injection-33-tool-description-steers-to-email PASS
+in   injection-34-low-privilege-chain-to-write PASS
+in   injection-35-decision-cites-other-request PASS
+in   injection-36-result-cites-other-request PASS
+in   injection-37-stale-catalog-digest  PASS
+in   injection-38-duplicate-advertised-name PASS
+in   injection-39-decide-raises         PASS
+in   injection-40-execute-raises        PASS
+in   injection-41-denied-call-interleaved PASS
+in   injection-42-rejected-call-interleaved PASS
+in   injection-43-web-effect-held-for-approval PASS
+in   injection-44-memory-effect-held-for-approval PASS
+ap   approval-A01-authorized-continuation PASS
+ap   approval-A02-unminted-approval-id  PASS
+ap   approval-A03-approval-id-of-another-request PASS
+ap   approval-A04-changed-arguments     PASS
+ap   approval-A05-expired               PASS
+ap   approval-A06-second-continuation   PASS
+ap   approval-A07-single-action-reused  PASS
+ap   approval-A08-catalog-changed       PASS
+ap   approval-A09-cancelled             PASS
+ap   approval-A10-model-asserted-approval PASS
+ap   approval-A11-retry-new-request-id  PASS
+ap   approval-A12-after-restart         PASS
+ap   approval-A13-original-envelope-replayed PASS
+ap   approval-A14-unknown-decision-value PASS
+ap   approval-A15-explicit-denied-decision PASS
+ap   approval-A16-decision-cites-other-request PASS
+ap   approval-A17-provider-fails-after-approval PASS
+L    lifecycle/01-forged-approval-id    PASS
+L    lifecycle/02-empty-approval-id     PASS
+L    lifecycle/03-approval-id-from-other-request PASS
+L    lifecycle/04-runtime-minted-approval-id PASS
+L    lifecycle/05-continuation-non-authorized-value PASS
+-    digest/exposure-01                 PASS
+-    digest/input-record-01             PASS
+-    digest/jcs-01                      PASS
+0 of 106 cases failed

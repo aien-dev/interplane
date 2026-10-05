@@ -32,6 +32,8 @@ jobs:
         run: python bench/tools/validate.py --require-jsonschema
       - name: 0.2x held-out corpus structure, coverage, composition, digests (no model, no GPU)
         run: python bench/tools/validate.py --corpus 0.2x --require-jsonschema
+      - name: gate M live-model runner offline test (scripted endpoint, mock runtime; no model, no GPU)
+        run: PYTHONPATH=python PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_live_injection.py
       - name: pre-registered statistics reproduce Newcombe 1998 Table III
         run: python bench/tools/stats.py
       - name: analyzer tests and synthetic-run fixture (no model, no GPU)

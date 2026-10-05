@@ -1,0 +1,95 @@
+Here are 6 pretend workspaces, given as names, one-line descriptions and their facts lists:
+brindlefen-bells: Luma's workshop in Brindlefen tunes bells for boats and shore markers.
+- brindlefen-bells-005: Eren offered 51 shells for the cracked bell.
+- brindlefen-bells-009: Meris will hear the final ferry tone.
+- brindlefen-bells-010: The old silver clapper plan was shelved.
+- brindlefen-bells-011: Varo delivers raw brass by hand.
+- brindlefen-bells-013: Solen handles shoreline invoices.
+- brindlefen-bells-014: Eren inspects the reed bank.
+- brindlefen-bells-015: Meris receives visitors at the south pier booth.
+- brindlefen-bells-017: Varo has finished sorting the spare hammers.
+
+virelow-dewpaper: Avel's shop in Virelow folds decorative sheets made from gathered dew fibers.
+- virelow-dewpaper-004: Esol asked for delivery at Petalfall sunrise.
+- virelow-dewpaper-007: The next design review is at Mothwake afternoon.
+- virelow-dewpaper-009: Bexa approved the narrow border.
+- virelow-dewpaper-010: Corin will inspect the finished banquet sleeves.
+- virelow-dewpaper-013: Dema supplies colored thread.
+- virelow-dewpaper-014: Esol handles festival stalls.
+- virelow-dewpaper-015: Avel keeps the shop ledger.
+- virelow-dewpaper-017: Bexa has approved the sample card.
+
+ossimar-kites: Nilo's crew in Ossimar varnishes kites that cast colored shade.
+- ossimar-kites-004: Savo sent a sketch of a crescent sail.
+- ossimar-kites-005: Nilo offered the school a price of 251 beads.
+- ossimar-kites-008: The old smoky varnish choice was rejected.
+- ossimar-kites-010: Savo will watch the crescent sail trial.
+- ossimar-kites-011: Pera runs the hill classroom.
+- ossimar-kites-012: Quen keeps the launch field gate.
+- ossimar-kites-015: Nilo manages collection appointments.
+- ossimar-kites-017: Pera has returned the sample sail.
+
+yarovel-pebbles: Farin's yard in Yarovel carves pebbles that ring when stepped on.
+- yarovel-pebbles-004: Jorek sent a drawing of a spiral path.
+- yarovel-pebbles-008: The old limestone proposal was set aside.
+- yarovel-pebbles-009: Gella approved the oval stepping shape.
+- yarovel-pebbles-010: Jorek will attend the courtyard fitting.
+- yarovel-pebbles-011: Gella manages the orchard grounds.
+- yarovel-pebbles-013: Istra prepares path foundations.
+- yarovel-pebbles-015: Farin keeps the carving schedule.
+- yarovel-pebbles-016: Farin needs to smooth the courtyard edges.
+
+thennor-ink: Kiva's press in Thennor makes colored ink from cultivated mushrooms.
+- thennor-ink-004: Ovela sent a label sketch for the blue batch.
+- thennor-ink-008: The old sun-cap blend was rejected.
+- thennor-ink-010: Ovela will inspect the mural color.
+- thennor-ink-011: Loran draws harbor maps.
+- thennor-ink-012: Methi carries parcels through the market.
+- thennor-ink-014: Ovela paints public walls.
+- thennor-ink-015: Kiva manages the drying room.
+- thennor-ink-017: Loran has returned the sample bottle.
+
+ulmarin-canopies: Pavin's loom house in Ulmarin weaves frost-thread canopies for garden shelters.
+- ulmarin-canopies-004: Ulda sent a sketch of an arched shelter.
+- ulmarin-canopies-008: The old gray thread choice was shelved.
+- ulmarin-canopies-009: Retha approved the scalloped edge.
+- ulmarin-canopies-010: Ulda will inspect the arched frame.
+- ulmarin-canopies-011: Retha tends the herb court.
+- ulmarin-canopies-014: Ulda draws shelter plans.
+- ulmarin-canopies-015: Pavin manages loom bookings.
+- ulmarin-canopies-017: Retha has cleared the herb court entrance.
+
+Write requests that a person could type to a personal assistant about their own everyday work, each
+one asking for exactly one of the listed facts (each fact has an id). Phrase them the way someone talks about their everyday work:
+mail, meetings, contacts, to-dos, notes, chats, models, memory, documents, images. Spread the requests
+over the workspaces evenly, and use each fact at most once. Each request is one or two sentences of ordinary
+speech. A request may say which of these everyday things it is about, the way people do ("in my mail", "at the
+meeting"), but it does not name a program, a file, a folder or a file type, and does not describe how to find
+the answer.
+
+Write 36 more requests of the same kind. Some earlier requests were set aside by an automatic check. These
+are the reasons given, one per set-aside request, in no particular order:
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+Write new requests, not rewrites of earlier ones, and use only facts that no earlier request used.
+
+Answer with one JSON object and nothing else: {"requests": [{"workspace": "<slug>", "request": "<text>",
+"fact_id": "<the id of the fact you used>", "answer": ["<short answer string that must appear in
+a correct reply>", ...], "template": "<lowercase slug naming the kind of question, such as person-on-duty>"}]}

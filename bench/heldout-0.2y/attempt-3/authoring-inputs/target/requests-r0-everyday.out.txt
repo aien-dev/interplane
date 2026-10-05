@@ -1,0 +1,256 @@
+{
+  "requests": [
+    {
+      "workspace": "brindlefen-bells",
+      "request": "What tone did Meris ask for on the ferry bell?",
+      "fact_id": "brindlefen-bells-001",
+      "answer": ["low tone"],
+      "template": "requested-tone"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "When did Varo say he could pick up the bell?",
+      "fact_id": "brindlefen-bells-002",
+      "answer": ["Reedfall dusk"],
+      "template": "pickup-time"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "Which clapper request did Tavi cancel?",
+      "fact_id": "brindlefen-bells-003",
+      "answer": ["copper clapper"],
+      "template": "canceled-request"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "Which clapper did Luma choose at the quay meeting?",
+      "fact_id": "brindlefen-bells-006",
+      "answer": ["bronze clapper"],
+      "template": "meeting-decision"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "When is our next tone check?",
+      "fact_id": "brindlefen-bells-007",
+      "answer": ["Firstmist noon"],
+      "template": "next-check-time"
+    },
+    {
+      "workspace": "brindlefen-bells",
+      "request": "What does Tavi still need to do with the repaired bell?",
+      "fact_id": "brindlefen-bells-018",
+      "answer": ["tag the repaired bell"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "What color did Bexa want for the invitation fold?",
+      "fact_id": "virelow-dewpaper-001",
+      "answer": ["pale green"],
+      "template": "requested-color"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "What shape did Corin change the banquet sleeves to?",
+      "fact_id": "virelow-dewpaper-002",
+      "answer": ["round sleeves"],
+      "template": "order-change"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "How many petals did Avel quote for the window display?",
+      "fact_id": "virelow-dewpaper-005",
+      "answer": ["151 petals"],
+      "template": "quoted-price"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "Which fold did we choose for the spring cards?",
+      "fact_id": "virelow-dewpaper-006",
+      "answer": ["fan fold"],
+      "template": "design-decision"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "Who receives parcels at the east arcade?",
+      "fact_id": "virelow-dewpaper-012",
+      "answer": ["Corin"],
+      "template": "contact-role"
+    },
+    {
+      "workspace": "virelow-dewpaper",
+      "request": "What does Corin still owe us for the sleeves?",
+      "fact_id": "virelow-dewpaper-018",
+      "answer": ["sleeve dimensions"],
+      "template": "outstanding-item"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "What color shade kite did Pera ask for?",
+      "fact_id": "ossimar-kites-001",
+      "answer": ["amber"],
+      "template": "requested-color"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Which tail request did Risa withdraw?",
+      "fact_id": "ossimar-kites-003",
+      "answer": ["striped tail"],
+      "template": "withdrawn-request"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Which varnish did the crew pick for the ridge kite?",
+      "fact_id": "ossimar-kites-006",
+      "answer": ["clear varnish"],
+      "template": "material-decision"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "When is the next flight check?",
+      "fact_id": "ossimar-kites-007",
+      "answer": ["Cloudrest morning"],
+      "template": "next-check-time"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Who draws the sail patterns?",
+      "fact_id": "ossimar-kites-014",
+      "answer": ["Savo"],
+      "template": "contact-role"
+    },
+    {
+      "workspace": "ossimar-kites",
+      "request": "Who is due to bring the thin spars?",
+      "fact_id": "ossimar-kites-019",
+      "answer": ["Risa"],
+      "template": "person-on-duty"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "What kind of chime did Gella want for the orchard path?",
+      "fact_id": "yarovel-pebbles-001",
+      "answer": ["soft chime"],
+      "template": "requested-sound"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "When did Hovin ask to pick up the pebbles?",
+      "fact_id": "yarovel-pebbles-002",
+      "answer": ["Fernwake dusk"],
+      "template": "pickup-time"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "What was Farin's quote for the courtyard set?",
+      "fact_id": "yarovel-pebbles-005",
+      "answer": ["351 crowns"],
+      "template": "quoted-price"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "Which stone did the yard choose for the orchard path?",
+      "fact_id": "yarovel-pebbles-006",
+      "answer": ["riverstone"],
+      "template": "material-decision"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "Who draws the garden layouts?",
+      "fact_id": "yarovel-pebbles-014",
+      "answer": ["Jorek"],
+      "template": "contact-role"
+    },
+    {
+      "workspace": "yarovel-pebbles",
+      "request": "What does Jorek still need to place?",
+      "fact_id": "yarovel-pebbles-020",
+      "answer": ["spiral markers"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "What color ink did Loran ask for on the map?",
+      "fact_id": "thennor-ink-001",
+      "answer": ["rust-red"],
+      "template": "requested-color"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "Which order did Nerin withdraw?",
+      "fact_id": "thennor-ink-003",
+      "answer": ["gold-cap order"],
+      "template": "withdrawn-order"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "How much did Kiva quote for the mural supply?",
+      "fact_id": "thennor-ink-005",
+      "answer": ["451 marks"],
+      "template": "quoted-price"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "Which mushrooms did the press choose for the map ink?",
+      "fact_id": "thennor-ink-006",
+      "answer": ["dusk-cap mushrooms"],
+      "template": "ingredient-decision"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "When is the next color review?",
+      "fact_id": "thennor-ink-007",
+      "answer": ["Rainveil morning"],
+      "template": "next-review-time"
+    },
+    {
+      "workspace": "thennor-ink",
+      "request": "What does Methi still need to collect?",
+      "fact_id": "thennor-ink-018",
+      "answer": ["sealed parcels"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "What color canopy did Retha ask for in the herb court?",
+      "fact_id": "ulmarin-canopies-001",
+      "answer": ["silver"],
+      "template": "requested-color"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "When did Sumi ask to have the fitting?",
+      "fact_id": "ulmarin-canopies-002",
+      "answer": ["Icebloom midday"],
+      "template": "fitting-time"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "Which thread did the loom house choose for the herb court?",
+      "fact_id": "ulmarin-canopies-006",
+      "answer": ["pearl thread"],
+      "template": "material-decision"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "When is the next fitting review?",
+      "fact_id": "ulmarin-canopies-007",
+      "answer": ["Wintergleam dusk"],
+      "template": "next-review-time"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "Who builds the garden frames?",
+      "fact_id": "ulmarin-canopies-012",
+      "answer": ["Sumi"],
+      "template": "contact-role"
+    },
+    {
+      "workspace": "ulmarin-canopies",
+      "request": "What does Pavin still need to finish?",
+      "fact_id": "ulmarin-canopies-016",
+      "answer": ["festival hem"],
+      "template": "pending-task"
+    }
+  ]
+}

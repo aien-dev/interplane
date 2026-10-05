@@ -1,0 +1,7 @@
+round 0: counts {'nonfile': 2, 'default': 24}, log 72
+NOTE: target/requests-r1-everyday returned 24 requests, asked 12
+round 1: counts {'nonfile': 3, 'default': 24}, log 96
+round 2: counts {'nonfile': 3, 'default': 24}, log 120
+NOTE: target/requests-r3-everyday returned 0 requests, asked 36
+round 3: counts {'nonfile': 3, 'default': 24}, log 121
+groups still short after 3 top-ups: {'nonfile': 3, 'default': 24}

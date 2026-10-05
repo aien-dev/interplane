@@ -1,0 +1,103 @@
+Here are 6 pretend workspaces, given as names, one-line descriptions and their facts lists:
+vellmere-bells: Everyday records and work files for a fog-bell foundry in Vellmere.
+- vellmere-bells-005: Ressa confirmed a pickup at the east gate.
+- vellmere-bells-006: The rim team chose a six-rib mold.
+- vellmere-bells-008: Selva assigned wax checks to Daro.
+- vellmere-bells-009: The safety circle closed the cold-pour concern.
+- vellmere-bells-010: The next casting review is on Friday.
+- vellmere-bells-012: Ressa manages the east gate.
+- vellmere-bells-013: Daro is the wax inspector.
+- vellmere-bells-014: Palin represents the marsh office.
+- vellmere-bells-015: Ulen supplies charcoal sacks.
+- vellmere-bells-016: The blue enamel order is waiting for approval.
+- vellmere-bells-017: The hinge drawing is ready for filing.
+- vellmere-bells-018: The south shelf inventory remains open.
+
+sablewick-wardrobe: Everyday records and work files for a puppet wardrobe rental shop in Sablewick.
+- sablewick-wardrobe-003: Corlo reported a loose cuff on the baker coat.
+- sablewick-wardrobe-004: Fera sent a return slip for the fox mask.
+- sablewick-wardrobe-008: The cleaning group approved a gentler soap.
+- sablewick-wardrobe-009: Corlo will lead the next hem review.
+- sablewick-wardrobe-010: The costume rotation now starts on Tuesday.
+- sablewick-wardrobe-011: Tavi runs the paper stage.
+- sablewick-wardrobe-012: Nemi coordinates the hill troupe.
+- sablewick-wardrobe-014: Fera is the courier for returns.
+- sablewick-wardrobe-015: Vima manages the mask shelf.
+- sablewick-wardrobe-016: The moon cloak is ready for brushing.
+- sablewick-wardrobe-018: The blue cap has been set aside for the school play.
+- sablewick-wardrobe-020: The baker coat repair is waiting on thread.
+
+thistledrift-inks: Everyday records and work files for an edible ink blender in Thistledrift.
+- thistledrift-inks-002: Bexel asked for a less tart citrus ink.
+- thistledrift-inks-004: Kiva returned a faded plum sample.
+- thistledrift-inks-005: Nalo approved the mint label proof.
+- thistledrift-inks-009: The packaging group rejected cork caps for travel jars.
+- thistledrift-inks-010: The harvest check is scheduled for Saturday.
+- thistledrift-inks-011: Uma runs the sugar mural stall.
+- thistledrift-inks-012: Bexel supplies citrus peel.
+- thistledrift-inks-014: Kiva is the sample archivist.
+- thistledrift-inks-015: Nalo prints jar labels.
+- thistledrift-inks-016: The blackberry ink needs another strain.
+- thistledrift-inks-017: The mint ink is ready for bottling.
+- thistledrift-inks-019: The citrus trial is marked as pale.
+
+mossquay-markers: Everyday records and work files for a mosaic waymarker maker in Mossquay.
+- mossquay-markers-003: Cida approved the dune tile sketch.
+- mossquay-markers-004: Doven postponed collection of the orchard sign.
+- mossquay-markers-005: Esha reported a chipped sample corner.
+- mossquay-markers-008: Aven will review grout colors.
+- mossquay-markers-009: The cutting crew kept the heron beak in slate.
+- mossquay-markers-011: Aven coordinates the bridge trust.
+- mossquay-markers-012: Brell operates the ferry kiosk.
+- mossquay-markers-013: Cida keeps the dune register.
+- mossquay-markers-015: Esha manages sample displays.
+- mossquay-markers-017: The ferry border drawing awaits tracing.
+- mossquay-markers-019: The well pattern needs a frame check.
+- mossquay-markers-020: The orchard sign still needs a wrapping sheet.
+
+brindlefen-kites: Everyday records and work files for a kite sail mender in Brindlefen.
+- brindlefen-kites-001: Falin requested a patch for the saffron kite.
+- brindlefen-kites-003: Huno asked to shorten the ridge kite line.
+- brindlefen-kites-005: Jessa confirmed pickup at the wind porch.
+- brindlefen-kites-008: Falin will check balance after mending.
+- brindlefen-kites-009: The crew retired the brittle reed spar.
+- brindlefen-kites-011: Falin runs the kite meadow.
+- brindlefen-kites-013: Huno tends the ridge launch.
+- brindlefen-kites-014: Ibel is the sail recorder.
+- brindlefen-kites-015: Jessa handles pickups.
+- brindlefen-kites-016: The cloud sail patch is pinned.
+- brindlefen-kites-018: The ridge kite line is coiled on the hook.
+- brindlefen-kites-020: The blue swallow frame is marked for sanding.
+
+larkhollow-stamps: Everyday records and work files for a mineral dye stamp printer in Larkhollow.
+- larkhollow-stamps-001: Kori ordered fern stamps in rust dye.
+- larkhollow-stamps-003: Meren confirmed delivery to the lantern court.
+- larkhollow-stamps-005: Orel approved the seed emblem.
+- larkhollow-stamps-008: Kori will sign off on the paper weight.
+- larkhollow-stamps-010: The next plate review is on Thursday.
+- larkhollow-stamps-011: Kori runs the market archive.
+- larkhollow-stamps-012: Luma keeps the color ledger.
+- larkhollow-stamps-014: Nissa cuts border blocks.
+- larkhollow-stamps-015: Orel oversees emblem orders.
+- larkhollow-stamps-016: The rust dye has settled overnight.
+- larkhollow-stamps-017: The blue dye trial looks too deep.
+- larkhollow-stamps-019: The fern plate is waiting for a new handle.
+
+Write 24 requests that a person could type to a personal assistant about their own everyday work, each
+one asking for exactly one of the listed facts (each fact has an id). Phrase them the way someone talks about their everyday work:
+mail, meetings, contacts, to-dos, notes, chats, models, memory, documents, images. Spread the requests
+over the workspaces evenly, and use each fact at most once. Each request is one or two sentences of ordinary
+speech. Do not tell the assistant where to look and do not describe how to find the answer.
+
+Write 24 more requests of the same kind. Some earlier requests were set aside by an automatic check. These
+are the reasons given, one per set-aside request, in no particular order:
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+Write new requests, not rewrites of earlier ones, and use only facts that no earlier request used.
+
+Answer with one JSON object and nothing else: {"requests": [{"workspace": "<slug>", "request": "<text>",
+"fact_id": "<the id of the fact you used>", "answer": ["<short answer string that must appear in
+a correct reply>", ...], "template": "<lowercase slug naming the kind of question, such as person-on-duty>"}]}

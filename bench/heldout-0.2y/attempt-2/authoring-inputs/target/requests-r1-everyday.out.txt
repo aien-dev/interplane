@@ -1,0 +1,172 @@
+{
+  "requests": [
+    {
+      "workspace": "vellmere-bells",
+      "request": "When is Orin collecting the harbor bell?",
+      "fact_id": "vellmere-bells-002",
+      "answer": ["Thursday"],
+      "template": "pickup-day"
+    },
+    {
+      "workspace": "vellmere-bells",
+      "request": "Did Palin approve the narrow clapper design?",
+      "fact_id": "vellmere-bells-004",
+      "answer": ["Palin declined it"],
+      "template": "design-decision"
+    },
+    {
+      "workspace": "sablewick-wardrobe",
+      "request": "Which costume did Tavi ask for?",
+      "fact_id": "sablewick-wardrobe-001",
+      "answer": ["velvet owl costume"],
+      "template": "requested-item"
+    },
+    {
+      "workspace": "sablewick-wardrobe",
+      "request": "What happened with Vima's satin crown booking?",
+      "fact_id": "sablewick-wardrobe-005",
+      "answer": ["Vima canceled it"],
+      "template": "booking-status"
+    },
+    {
+      "workspace": "thistledrift-inks",
+      "request": "Where did Jori say the delivery should go?",
+      "fact_id": "thistledrift-inks-003",
+      "answer": ["glass arcade"],
+      "template": "delivery-location"
+    },
+    {
+      "workspace": "thistledrift-inks",
+      "request": "Who's chairing our next color review?",
+      "fact_id": "thistledrift-inks-008",
+      "answer": ["Uma"],
+      "template": "meeting-chair"
+    },
+    {
+      "workspace": "mossquay-markers",
+      "request": "What kind of marker did Aven request?",
+      "fact_id": "mossquay-markers-001",
+      "answer": ["heron marker"],
+      "template": "requested-item"
+    },
+    {
+      "workspace": "mossquay-markers",
+      "request": "Where did the Tuesday layout session move?",
+      "fact_id": "mossquay-markers-007",
+      "answer": ["arch room"],
+      "template": "meeting-location"
+    },
+    {
+      "workspace": "brindlefen-kites",
+      "request": "Did Gera approve the new tail ribbon?",
+      "fact_id": "brindlefen-kites-002",
+      "answer": ["Yes"],
+      "template": "approval-status"
+    },
+    {
+      "workspace": "brindlefen-kites",
+      "request": "What day is the next flight check?",
+      "fact_id": "brindlefen-kites-010",
+      "answer": ["Monday"],
+      "template": "meeting-day"
+    },
+    {
+      "workspace": "larkhollow-stamps",
+      "request": "What did Nissa decide about the square border?",
+      "fact_id": "larkhollow-stamps-004",
+      "answer": ["Nissa declined it"],
+      "template": "design-decision"
+    },
+    {
+      "workspace": "larkhollow-stamps",
+      "request": "What happened with the ochre mix?",
+      "fact_id": "larkhollow-stamps-009",
+      "answer": ["The team postponed it"],
+      "template": "work-status"
+    },
+    {
+      "workspace": "vellmere-bells",
+      "request": "Who manages the east gate?",
+      "fact_id": "vellmere-bells-012",
+      "answer": ["Ressa"],
+      "template": "person-on-duty"
+    },
+    {
+      "workspace": "vellmere-bells",
+      "request": "What's holding up the blue enamel order?",
+      "fact_id": "vellmere-bells-016",
+      "answer": ["waiting for approval"],
+      "template": "order-status"
+    },
+    {
+      "workspace": "sablewick-wardrobe",
+      "request": "Who's leading the next hem review?",
+      "fact_id": "sablewick-wardrobe-009",
+      "answer": ["Corlo"],
+      "template": "meeting-lead"
+    },
+    {
+      "workspace": "sablewick-wardrobe",
+      "request": "What is the baker coat repair waiting on?",
+      "fact_id": "sablewick-wardrobe-020",
+      "answer": ["thread"],
+      "template": "repair-blocker"
+    },
+    {
+      "workspace": "thistledrift-inks",
+      "request": "What did the packaging group decide about cork caps for travel jars?",
+      "fact_id": "thistledrift-inks-009",
+      "answer": ["They rejected cork caps"],
+      "template": "packaging-decision"
+    },
+    {
+      "workspace": "thistledrift-inks",
+      "request": "Is the mint ink ready for bottling?",
+      "fact_id": "thistledrift-inks-017",
+      "answer": ["Yes"],
+      "template": "production-status"
+    },
+    {
+      "workspace": "mossquay-markers",
+      "request": "Who keeps the dune register?",
+      "fact_id": "mossquay-markers-013",
+      "answer": ["Cida"],
+      "template": "record-keeper"
+    },
+    {
+      "workspace": "mossquay-markers",
+      "request": "What does the well pattern still need?",
+      "fact_id": "mossquay-markers-019",
+      "answer": ["a frame check"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "brindlefen-kites",
+      "request": "Who's our sail recorder?",
+      "fact_id": "brindlefen-kites-014",
+      "answer": ["Ibel"],
+      "template": "contact-role"
+    },
+    {
+      "workspace": "brindlefen-kites",
+      "request": "Where did we leave the ridge kite line?",
+      "fact_id": "brindlefen-kites-018",
+      "answer": ["coiled on the hook"],
+      "template": "item-location"
+    },
+    {
+      "workspace": "larkhollow-stamps",
+      "request": "Who keeps the color ledger?",
+      "fact_id": "larkhollow-stamps-012",
+      "answer": ["Luma"],
+      "template": "record-keeper"
+    },
+    {
+      "workspace": "larkhollow-stamps",
+      "request": "What is the fern plate waiting for?",
+      "fact_id": "larkhollow-stamps-019",
+      "answer": ["a new handle"],
+      "template": "pending-part"
+    }
+  ]
+}

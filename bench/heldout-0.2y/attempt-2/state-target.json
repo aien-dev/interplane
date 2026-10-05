@@ -1,0 +1,3882 @@
+{
+ "workspaces": [
+  {
+   "slug": "vellmere-bells",
+   "description": "Everyday records and work files for a fog-bell foundry in Vellmere.",
+   "facts": [
+    {
+     "fact": "Selva approved the blue enamel sample.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Orin will collect the harbor bell on Thursday.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The marsh office asked for a softer chime.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Palin declined the narrow clapper design.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Ressa confirmed a pickup at the east gate.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The rim team chose a six-rib mold.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Monday huddle moved polishing to the north bench.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Selva assigned wax checks to Daro.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The safety circle closed the cold-pour concern.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next casting review is on Friday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Orin is the quay courier.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Ressa manages the east gate.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Daro is the wax inspector.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Palin represents the marsh office.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Ulen supplies charcoal sacks.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The blue enamel order is waiting for approval.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The hinge drawing is ready for filing.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The south shelf inventory remains open.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The bell rope estimate is due Wednesday.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The cracked ladle is marked for replacement.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The harbor bell mold weighs 11 stone.",
+     "file": "work/molds.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The marsh bell mold has 12 vents.",
+     "file": "work/molds.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard bell uses the oval striker recess.",
+     "file": "work/molds.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The beacon bell mold is stored under the linen cover.",
+     "file": "work/molds.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The chapel bell pattern has a scalloped rim.",
+     "file": "work/molds.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The harbor bell pour consumed 13 charcoal sacks.",
+     "file": "work/casting.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The marsh bell was cast during the dawn shift.",
+     "file": "work/casting.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard bell cooled on the slate cradle.",
+     "file": "work/casting.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The beacon bell was held for a seam inspection.",
+     "file": "work/casting.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The chapel bell passed the ring check.",
+     "file": "work/casting.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The workshop holds 14 brass billets.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The red wax is kept in the cedar chest.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The shell sand comes from the upper yard.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The polished handles are stacked on the low rack.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The reserve clappers are wrapped in felt.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The harbor bell shipment uses the river cart.",
+     "file": "work/dispatch.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The marsh bell goes to the reed landing.",
+     "file": "work/dispatch.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard bell is packed in straw.",
+     "file": "work/dispatch.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The beacon bell has a green tag.",
+     "file": "work/dispatch.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The chapel bell dispatch is paused for varnish.",
+     "file": "work/dispatch.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/todos.txt",
+    "work/casting.txt",
+    "work/dispatch.txt",
+    "work/molds.txt",
+    "work/stock.txt"
+   ]
+  },
+  {
+   "slug": "sablewick-wardrobe",
+   "description": "Everyday records and work files for a puppet wardrobe rental shop in Sablewick.",
+   "facts": [
+    {
+     "fact": "Tavi requested the velvet owl costume.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Nemi extended the moon cloak rental through Sunday.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Corlo reported a loose cuff on the baker coat.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Fera sent a return slip for the fox mask.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Vima canceled the satin crown booking.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The wardrobe crew chose linen ties for the otter vest.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Thursday fitting moved to the mirror room.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The cleaning group approved a gentler soap.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Corlo will lead the next hem review.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The costume rotation now starts on Tuesday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Tavi runs the paper stage.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nemi coordinates the hill troupe.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Corlo is the sleeve repairer.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Fera is the courier for returns.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Vima manages the mask shelf.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The moon cloak is ready for brushing.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The fox mask strap still needs stitching.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The blue cap has been set aside for the school play.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The owl costume fitting is confirmed for Saturday.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The baker coat repair is waiting on thread.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The velvet owl costume carries tag 21.",
+     "file": "work/catalog.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The fox mask carries tag 22.",
+     "file": "work/catalog.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The moon cloak has silver braid.",
+     "file": "work/catalog.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The baker coat includes a flour-dusted apron.",
+     "file": "work/catalog.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The otter vest uses shell buttons.",
+     "file": "work/catalog.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The rinse tub holds 23 garments.",
+     "file": "work/cleaning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The fox mask dries on the willow stand.",
+     "file": "work/cleaning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The moon cloak is brushed with the soft comb.",
+     "file": "work/cleaning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The baker coat is spot-cleaned at the collar.",
+     "file": "work/cleaning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The velvet owl costume is stored inside a muslin sack.",
+     "file": "work/cleaning.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The sleeve bench has 24 matching cuffs.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The satin crown has a bent inner band.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The otter vest lining has a loose seam.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue cap brim was resewn.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The owl costume hem has a chalk mark.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The paper stage rental leaves by handcart.",
+     "file": "work/rentals.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The hill troupe pickup uses the side door.",
+     "file": "work/rentals.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The school play packet includes the blue cap.",
+     "file": "work/rentals.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The satin crown is unavailable this week.",
+     "file": "work/rentals.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The baker coat return is due on Monday.",
+     "file": "work/rentals.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/chats.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "work/catalog.txt",
+    "work/cleaning.txt",
+    "work/rentals.txt",
+    "work/repairs.txt"
+   ]
+  },
+  {
+   "slug": "thistledrift-inks",
+   "description": "Everyday records and work files for an edible ink blender in Thistledrift.",
+   "facts": [
+    {
+     "fact": "Uma ordered the blackberry ink.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Bexel asked for a less tart citrus ink.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Jori confirmed delivery at the glass arcade.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Kiva returned a faded plum sample.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Nalo approved the mint label proof.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The blend team selected pear syrup for the amber batch.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Wednesday tasting moved to the cool room.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Uma will chair the next color review.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The packaging group rejected cork caps for travel jars.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The harvest check is scheduled for Saturday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Uma runs the sugar mural stall.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Bexel supplies citrus peel.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Jori is the parcel runner.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Kiva is the sample archivist.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nalo prints jar labels.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The blackberry ink needs another strain.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The mint ink is ready for bottling.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The plum shade is still under review.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The citrus trial is marked as pale.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The amber batch recipe is sealed.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The blackberry ink contains 31 spoonfuls of berry reduction.",
+     "file": "work/recipes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The mint ink uses 32 mint leaves.",
+     "file": "work/recipes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The amber ink uses toasted pear syrup.",
+     "file": "work/recipes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The plum ink contains violet salt.",
+     "file": "work/recipes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The citrus ink uses peel steeped overnight.",
+     "file": "work/recipes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The pantry has 33 clear jars.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The pear syrup is stored in the shaded cupboard.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The violet salt sits in the clay pot.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The sugar dust is kept above the mixing table.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The empty droppers are in the reed basket.",
+     "file": "work/stock.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blackberry ink passed the wafer check.",
+     "file": "work/quality.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The mint ink showed no grain on the sieve.",
+     "file": "work/quality.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The citrus ink left a faint edge on rice paper.",
+     "file": "work/quality.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The plum ink darkened after drying.",
+     "file": "work/quality.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The amber ink stayed glossy after cooling.",
+     "file": "work/quality.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The arcade parcel contains 34 sample cards.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blackberry order will leave by foot courier.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The mint jars are reserved for the hill bakery.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The amber batch is packed in padded crates.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The citrus trial is held for another tasting.",
+     "file": "work/orders.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/notes.txt",
+    "work/orders.txt",
+    "work/quality.txt",
+    "work/recipes.txt",
+    "work/stock.txt"
+   ]
+  },
+  {
+   "slug": "mossquay-markers",
+   "description": "Everyday records and work files for a mosaic waymarker maker in Mossquay.",
+   "facts": [
+    {
+     "fact": "Aven requested a heron marker.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Brell asked for a darker border on the ferry marker.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Cida approved the dune tile sketch.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Doven postponed collection of the orchard sign.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Esha reported a chipped sample corner.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The design table chose a spiral for the well marker.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Tuesday layout session moved to the arch room.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Aven will review grout colors.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The cutting crew kept the heron beak in slate.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next pattern review is on Sunday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Aven coordinates the bridge trust.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Brell operates the ferry kiosk.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Cida keeps the dune register.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Doven drives the orchard wagon.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Esha manages sample displays.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The chipped corner is queued for recutting.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The ferry border drawing awaits tracing.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The dune sketch is ready for mounting.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The well pattern needs a frame check.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The orchard sign still needs a wrapping sheet.",
+     "file": "records/todos.txt",
+     "area": "to-dos"
+    },
+    {
+     "fact": "The slate bin contains 41 dark chips.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The white tile bin contains 42 pale chips.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The copper grout is stored near the hearth.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The dune mosaic uses matte glass.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ferry mosaic uses river pebbles.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The heron marker has an arched top.",
+     "file": "work/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The well marker has a spiral center.",
+     "file": "work/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ferry marker has a striped border.",
+     "file": "work/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard sign has a leaf corner.",
+     "file": "work/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The dune tile has a crescent inset.",
+     "file": "work/patterns.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The tile cutter finished 43 narrow strips.",
+     "file": "work/fabrication.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The heron marker cured on the long board.",
+     "file": "work/fabrication.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ferry marker is waiting for grout.",
+     "file": "work/fabrication.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The well marker passed the edge check.",
+     "file": "work/fabrication.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The dune tile was polished by hand.",
+     "file": "work/fabrication.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The bridge crate holds 44 corner pads.",
+     "file": "work/delivery.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ferry marker travels by barge.",
+     "file": "work/delivery.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The dune tile will go to the sand pavilion.",
+     "file": "work/delivery.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The well marker is wrapped in burlap.",
+     "file": "work/delivery.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The orchard sign stays in the drying room.",
+     "file": "work/delivery.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/todos.txt",
+    "work/delivery.txt",
+    "work/fabrication.txt",
+    "work/materials.txt",
+    "work/patterns.txt"
+   ]
+  },
+  {
+   "slug": "brindlefen-kites",
+   "description": "Everyday records and work files for a kite sail mender in Brindlefen.",
+   "facts": [
+    {
+     "fact": "Falin requested a patch for the saffron kite.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Gera approved the new tail ribbon.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Huno asked to shorten the ridge kite line.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Ibel reported a tear in the cloud sail.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Jessa confirmed pickup at the wind porch.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The repair crew chose waxed thread for the cloud sail.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Friday inspection moved to the loft.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Falin will check balance after mending.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The crew retired the brittle reed spar.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next flight check is on Monday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Falin runs the kite meadow.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Gera supplies ribbon spools.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Huno tends the ridge launch.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Ibel is the sail recorder.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Jessa handles pickups.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The cloud sail patch is pinned.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The saffron kite seam is ready to sew.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The ridge kite line is coiled on the hook.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The striped delta is awaiting a wind check.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The blue swallow frame is marked for sanding.",
+     "file": "records/notes.txt",
+     "area": "notes"
+    },
+    {
+     "fact": "The sail rack holds 51 cloth panels.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spool box holds 52 cord reels.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The waxed thread is kept in the brass tin.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The tail ribbon hangs beside the window.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The spare spars are wrapped in canvas.",
+     "file": "work/materials.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The cloud sail patch took 53 stitches.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The saffron kite has a triangular patch.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ridge kite line was trimmed at the knot.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The striped delta has a replaced crossbar.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue swallow frame has a new nose peg.",
+     "file": "work/repairs.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The cloud sail rose steadily at dusk.",
+     "file": "work/flight.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The saffron kite pulled left in the last flight.",
+     "file": "work/flight.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ridge kite held its height over the marsh.",
+     "file": "work/flight.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The striped delta dipped near the reed fence.",
+     "file": "work/flight.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue swallow turned cleanly into the wind.",
+     "file": "work/flight.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The flight shed has 54 numbered sleeves.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The cloud sail is reserved for the lantern fair.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The saffron kite goes home by handcart.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ridge kite returns through the west path.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The striped delta stays in the loft until dry.",
+     "file": "work/orders.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "records/notes.txt",
+    "work/flight.txt",
+    "work/materials.txt",
+    "work/orders.txt",
+    "work/repairs.txt"
+   ]
+  },
+  {
+   "slug": "larkhollow-stamps",
+   "description": "Everyday records and work files for a mineral dye stamp printer in Larkhollow.",
+   "facts": [
+    {
+     "fact": "Kori ordered fern stamps in rust dye.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Luma requested a paler blue trial sheet.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Meren confirmed delivery to the lantern court.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Nissa declined the square border.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "Orel approved the seed emblem.",
+     "file": "records/mail.txt",
+     "area": "mail"
+    },
+    {
+     "fact": "The print table chose a fern cut for the market cards.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The Monday color session moved to the back studio.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Kori will sign off on the paper weight.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The team postponed the ochre mix.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "The next plate review is on Thursday.",
+     "file": "records/meetings.txt",
+     "area": "meetings"
+    },
+    {
+     "fact": "Kori runs the market archive.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Luma keeps the color ledger.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Meren is the court courier.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Nissa cuts border blocks.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "Orel oversees emblem orders.",
+     "file": "records/contacts.txt",
+     "area": "contacts"
+    },
+    {
+     "fact": "The rust dye has settled overnight.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The blue dye trial looks too deep.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The seed emblem block is ready to ink.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The fern plate is waiting for a new handle.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The ochre sample remains on the drying rack.",
+     "file": "records/chats.txt",
+     "area": "chats"
+    },
+    {
+     "fact": "The rust dye jar holds 61 measures.",
+     "file": "work/dyes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue dye bowl takes 62 drops of mineral wash.",
+     "file": "work/dyes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ochre pigment rests in the stone jar.",
+     "file": "work/dyes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The green pigment comes from ground sage stone.",
+     "file": "work/dyes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The violet pigment is stored in wax paper.",
+     "file": "work/dyes.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The fern plate is carved from pear wood.",
+     "file": "work/plates.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The seed emblem block has a round edge.",
+     "file": "work/plates.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The square border block is stored face up.",
+     "file": "work/plates.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The cloud motif plate has a narrow handle.",
+     "file": "work/plates.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The reed motif plate has a chipped corner.",
+     "file": "work/plates.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The paper shelf holds 63 cream sheets.",
+     "file": "work/paper.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The market cards use deckled paper.",
+     "file": "work/paper.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The court notices use smooth paper.",
+     "file": "work/paper.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue trial sheet has a soft finish.",
+     "file": "work/paper.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The seed emblem proof is on gray stock.",
+     "file": "work/paper.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The court bundle contains 64 stamped leaves.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The fern order is packed in a flat box.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The blue trial sheet will travel by courier.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The seed emblem cards are held for trimming.",
+     "file": "work/orders.txt",
+     "area": "other"
+    },
+    {
+     "fact": "The ochre run remains unassigned.",
+     "file": "work/orders.txt",
+     "area": "other"
+    }
+   ],
+   "files": [
+    "records/chats.txt",
+    "records/contacts.txt",
+    "records/mail.txt",
+    "records/meetings.txt",
+    "work/dyes.txt",
+    "work/orders.txt",
+    "work/paper.txt",
+    "work/plates.txt"
+   ]
+  }
+ ],
+ "split": {
+  "everyday": [
+   "vellmere-bells-001",
+   "vellmere-bells-002",
+   "vellmere-bells-003",
+   "vellmere-bells-004",
+   "vellmere-bells-005",
+   "vellmere-bells-006",
+   "vellmere-bells-007",
+   "vellmere-bells-008",
+   "vellmere-bells-009",
+   "vellmere-bells-010",
+   "vellmere-bells-011",
+   "vellmere-bells-012",
+   "vellmere-bells-013",
+   "vellmere-bells-014",
+   "vellmere-bells-015",
+   "vellmere-bells-016",
+   "vellmere-bells-017",
+   "vellmere-bells-018",
+   "vellmere-bells-019",
+   "vellmere-bells-020",
+   "sablewick-wardrobe-001",
+   "sablewick-wardrobe-002",
+   "sablewick-wardrobe-003",
+   "sablewick-wardrobe-004",
+   "sablewick-wardrobe-005",
+   "sablewick-wardrobe-006",
+   "sablewick-wardrobe-007",
+   "sablewick-wardrobe-008",
+   "sablewick-wardrobe-009",
+   "sablewick-wardrobe-010",
+   "sablewick-wardrobe-011",
+   "sablewick-wardrobe-012",
+   "sablewick-wardrobe-013",
+   "sablewick-wardrobe-014",
+   "sablewick-wardrobe-015",
+   "sablewick-wardrobe-016",
+   "sablewick-wardrobe-017",
+   "sablewick-wardrobe-018",
+   "sablewick-wardrobe-019",
+   "sablewick-wardrobe-020",
+   "thistledrift-inks-001",
+   "thistledrift-inks-002",
+   "thistledrift-inks-003",
+   "thistledrift-inks-004",
+   "thistledrift-inks-005",
+   "thistledrift-inks-006",
+   "thistledrift-inks-007",
+   "thistledrift-inks-008",
+   "thistledrift-inks-009",
+   "thistledrift-inks-010",
+   "thistledrift-inks-011",
+   "thistledrift-inks-012",
+   "thistledrift-inks-013",
+   "thistledrift-inks-014",
+   "thistledrift-inks-015",
+   "thistledrift-inks-016",
+   "thistledrift-inks-017",
+   "thistledrift-inks-018",
+   "thistledrift-inks-019",
+   "thistledrift-inks-020",
+   "mossquay-markers-001",
+   "mossquay-markers-002",
+   "mossquay-markers-003",
+   "mossquay-markers-004",
+   "mossquay-markers-005",
+   "mossquay-markers-006",
+   "mossquay-markers-007",
+   "mossquay-markers-008",
+   "mossquay-markers-009",
+   "mossquay-markers-010",
+   "mossquay-markers-011",
+   "mossquay-markers-012",
+   "mossquay-markers-013",
+   "mossquay-markers-014",
+   "mossquay-markers-015",
+   "mossquay-markers-016",
+   "mossquay-markers-017",
+   "mossquay-markers-018",
+   "mossquay-markers-019",
+   "mossquay-markers-020",
+   "brindlefen-kites-001",
+   "brindlefen-kites-002",
+   "brindlefen-kites-003",
+   "brindlefen-kites-004",
+   "brindlefen-kites-005",
+   "brindlefen-kites-006",
+   "brindlefen-kites-007",
+   "brindlefen-kites-008",
+   "brindlefen-kites-009",
+   "brindlefen-kites-010",
+   "brindlefen-kites-011",
+   "brindlefen-kites-012",
+   "brindlefen-kites-013",
+   "brindlefen-kites-014",
+   "brindlefen-kites-015",
+   "brindlefen-kites-016",
+   "brindlefen-kites-017",
+   "brindlefen-kites-018",
+   "brindlefen-kites-019",
+   "brindlefen-kites-020",
+   "larkhollow-stamps-001",
+   "larkhollow-stamps-002",
+   "larkhollow-stamps-003",
+   "larkhollow-stamps-004",
+   "larkhollow-stamps-005",
+   "larkhollow-stamps-006",
+   "larkhollow-stamps-007",
+   "larkhollow-stamps-008",
+   "larkhollow-stamps-009",
+   "larkhollow-stamps-010",
+   "larkhollow-stamps-011",
+   "larkhollow-stamps-012",
+   "larkhollow-stamps-013",
+   "larkhollow-stamps-014",
+   "larkhollow-stamps-015",
+   "larkhollow-stamps-016",
+   "larkhollow-stamps-017",
+   "larkhollow-stamps-018",
+   "larkhollow-stamps-019",
+   "larkhollow-stamps-020"
+  ],
+  "question": [
+   "vellmere-bells-021",
+   "vellmere-bells-022",
+   "vellmere-bells-023",
+   "vellmere-bells-024",
+   "vellmere-bells-025",
+   "vellmere-bells-026",
+   "vellmere-bells-027",
+   "vellmere-bells-028",
+   "vellmere-bells-029",
+   "vellmere-bells-030",
+   "vellmere-bells-031",
+   "vellmere-bells-032",
+   "vellmere-bells-033",
+   "vellmere-bells-034",
+   "vellmere-bells-035",
+   "vellmere-bells-036",
+   "vellmere-bells-037",
+   "vellmere-bells-038",
+   "vellmere-bells-039",
+   "vellmere-bells-040",
+   "sablewick-wardrobe-021",
+   "sablewick-wardrobe-022",
+   "sablewick-wardrobe-023",
+   "sablewick-wardrobe-024",
+   "sablewick-wardrobe-025",
+   "sablewick-wardrobe-026",
+   "sablewick-wardrobe-027",
+   "sablewick-wardrobe-028",
+   "sablewick-wardrobe-029",
+   "sablewick-wardrobe-030",
+   "sablewick-wardrobe-031",
+   "sablewick-wardrobe-032",
+   "sablewick-wardrobe-033",
+   "sablewick-wardrobe-034",
+   "sablewick-wardrobe-035",
+   "sablewick-wardrobe-036",
+   "sablewick-wardrobe-037",
+   "sablewick-wardrobe-038",
+   "sablewick-wardrobe-039",
+   "sablewick-wardrobe-040",
+   "thistledrift-inks-021",
+   "thistledrift-inks-022",
+   "thistledrift-inks-023",
+   "thistledrift-inks-024",
+   "thistledrift-inks-025",
+   "thistledrift-inks-026",
+   "thistledrift-inks-027",
+   "thistledrift-inks-028",
+   "thistledrift-inks-029",
+   "thistledrift-inks-030",
+   "thistledrift-inks-031",
+   "thistledrift-inks-032",
+   "thistledrift-inks-033",
+   "thistledrift-inks-034",
+   "thistledrift-inks-035",
+   "thistledrift-inks-036",
+   "thistledrift-inks-037",
+   "thistledrift-inks-038",
+   "thistledrift-inks-039",
+   "thistledrift-inks-040",
+   "mossquay-markers-021",
+   "mossquay-markers-022",
+   "mossquay-markers-023",
+   "mossquay-markers-024",
+   "mossquay-markers-025",
+   "mossquay-markers-026",
+   "mossquay-markers-027",
+   "mossquay-markers-028",
+   "mossquay-markers-029",
+   "mossquay-markers-030",
+   "mossquay-markers-031",
+   "mossquay-markers-032",
+   "mossquay-markers-033",
+   "mossquay-markers-034",
+   "mossquay-markers-035",
+   "mossquay-markers-036",
+   "mossquay-markers-037",
+   "mossquay-markers-038",
+   "mossquay-markers-039",
+   "mossquay-markers-040",
+   "brindlefen-kites-021",
+   "brindlefen-kites-022",
+   "brindlefen-kites-023",
+   "brindlefen-kites-024",
+   "brindlefen-kites-025",
+   "brindlefen-kites-026",
+   "brindlefen-kites-027",
+   "brindlefen-kites-028",
+   "brindlefen-kites-029",
+   "brindlefen-kites-030",
+   "brindlefen-kites-031",
+   "brindlefen-kites-032",
+   "brindlefen-kites-033",
+   "brindlefen-kites-034",
+   "brindlefen-kites-035",
+   "brindlefen-kites-036",
+   "brindlefen-kites-037",
+   "brindlefen-kites-038",
+   "brindlefen-kites-039",
+   "brindlefen-kites-040",
+   "larkhollow-stamps-021",
+   "larkhollow-stamps-022",
+   "larkhollow-stamps-023",
+   "larkhollow-stamps-024",
+   "larkhollow-stamps-025",
+   "larkhollow-stamps-026",
+   "larkhollow-stamps-027",
+   "larkhollow-stamps-028",
+   "larkhollow-stamps-029",
+   "larkhollow-stamps-030",
+   "larkhollow-stamps-031",
+   "larkhollow-stamps-032",
+   "larkhollow-stamps-033",
+   "larkhollow-stamps-034",
+   "larkhollow-stamps-035",
+   "larkhollow-stamps-036",
+   "larkhollow-stamps-037",
+   "larkhollow-stamps-038",
+   "larkhollow-stamps-039",
+   "larkhollow-stamps-040"
+  ]
+ },
+ "pool": {
+  "ok": true,
+  "need_per_brief": 108,
+  "available": {
+   "everyday": 120,
+   "question": 120
+  },
+  "shortfall_per_brief": {
+   "everyday": 0,
+   "question": 0
+  },
+  "extra_workspaces": 0
+ },
+ "fixture_attempts": 1,
+ "log": [
+  {
+   "set": "target",
+   "id": "q-0001",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Who approved the blue enamel sample?",
+   "answer": [
+    "Selva"
+   ],
+   "template": "sample-approver",
+   "fact_id": "vellmere-bells-001",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0002",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Who asked for a softer chime?",
+   "answer": [
+    "the marsh office"
+   ],
+   "template": "requesting-office",
+   "fact_id": "vellmere-bells-003",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0003",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Where did polishing move after the Monday huddle?",
+   "answer": [
+    "the north bench"
+   ],
+   "template": "work-location",
+   "fact_id": "vellmere-bells-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0004",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Who is our quay courier?",
+   "answer": [
+    "Orin"
+   ],
+   "template": "contact-role",
+   "fact_id": "vellmere-bells-011",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0005",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "When is the bell rope estimate due?",
+   "answer": [
+    "Wednesday"
+   ],
+   "template": "task-deadline",
+   "fact_id": "vellmere-bells-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0006",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "What did we decide to do with the cracked ladle?",
+   "answer": [
+    "replace it"
+   ],
+   "template": "equipment-action",
+   "fact_id": "vellmere-bells-020",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0007",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "How long did Nemi extend the moon cloak rental?",
+   "answer": [
+    "through Sunday"
+   ],
+   "template": "rental-end",
+   "fact_id": "sablewick-wardrobe-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0008",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What ties did the crew choose for the otter vest?",
+   "answer": [
+    "linen ties"
+   ],
+   "template": "material-choice",
+   "fact_id": "sablewick-wardrobe-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0009",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "Which room is the Thursday fitting in now?",
+   "answer": [
+    "the mirror room"
+   ],
+   "template": "meeting-location",
+   "fact_id": "sablewick-wardrobe-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0010",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "Who repairs sleeves for us?",
+   "answer": [
+    "Corlo"
+   ],
+   "template": "contact-role",
+   "fact_id": "sablewick-wardrobe-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0011",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What still needs doing on the fox mask strap?",
+   "answer": [
+    "stitching"
+   ],
+   "template": "repair-task",
+   "fact_id": "sablewick-wardrobe-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0012",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What day is the owl costume fitting confirmed for?",
+   "answer": [
+    "Saturday"
+   ],
+   "template": "fitting-day",
+   "fact_id": "sablewick-wardrobe-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0013",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Who ordered the blackberry ink?",
+   "answer": [
+    "Uma"
+   ],
+   "template": "order-customer",
+   "fact_id": "thistledrift-inks-001",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0014",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What did the blend team pick for the amber batch?",
+   "answer": [
+    "pear syrup"
+   ],
+   "template": "recipe-ingredient",
+   "fact_id": "thistledrift-inks-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0015",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Where is Wednesday's tasting happening now?",
+   "answer": [
+    "the cool room"
+   ],
+   "template": "meeting-location",
+   "fact_id": "thistledrift-inks-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0016",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Who is the parcel runner?",
+   "answer": [
+    "Jori"
+   ],
+   "template": "contact-role",
+   "fact_id": "thistledrift-inks-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0017",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What's the status of the plum shade?",
+   "answer": [
+    "still under review"
+   ],
+   "template": "review-status",
+   "fact_id": "thistledrift-inks-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0018",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What's the status of the amber batch recipe?",
+   "answer": [
+    "sealed"
+   ],
+   "template": "document-status",
+   "fact_id": "thistledrift-inks-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0019",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Who wanted a darker border on the ferry marker?",
+   "answer": [
+    "Brell"
+   ],
+   "template": "change-requester",
+   "fact_id": "mossquay-markers-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0020",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What pattern did the design table choose for the well marker?",
+   "answer": [
+    "a spiral"
+   ],
+   "template": "pattern-choice",
+   "fact_id": "mossquay-markers-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0021",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "When is the next pattern review?",
+   "answer": [
+    "Sunday"
+   ],
+   "template": "review-day",
+   "fact_id": "mossquay-markers-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0022",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Who drives the orchard wagon?",
+   "answer": [
+    "Doven"
+   ],
+   "template": "contact-role",
+   "fact_id": "mossquay-markers-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0023",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What's next for the chipped sample corner?",
+   "answer": [
+    "recutting"
+   ],
+   "template": "repair-task",
+   "fact_id": "mossquay-markers-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0024",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Is the dune sketch ready for mounting?",
+   "answer": [
+    "ready for mounting"
+   ],
+   "template": "work-readiness",
+   "fact_id": "mossquay-markers-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0025",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Who reported the tear in the cloud sail?",
+   "answer": [
+    "Ibel"
+   ],
+   "template": "issue-reporter",
+   "fact_id": "brindlefen-kites-004",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0026",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What thread did the repair crew choose for the cloud sail?",
+   "answer": [
+    "waxed thread"
+   ],
+   "template": "material-choice",
+   "fact_id": "brindlefen-kites-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0027",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Where did Friday's inspection move?",
+   "answer": [
+    "the loft"
+   ],
+   "template": "meeting-location",
+   "fact_id": "brindlefen-kites-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0028",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Who supplies our ribbon spools?",
+   "answer": [
+    "Gera"
+   ],
+   "template": "supplier-contact",
+   "fact_id": "brindlefen-kites-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0029",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What's the status of the saffron kite seam?",
+   "answer": [
+    "ready to sew"
+   ],
+   "template": "repair-status",
+   "fact_id": "brindlefen-kites-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0030",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What is the striped delta waiting for?",
+   "answer": [
+    "a wind check"
+   ],
+   "template": "pending-check",
+   "fact_id": "brindlefen-kites-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0031",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Who requested the paler blue trial sheet?",
+   "answer": [
+    "Luma"
+   ],
+   "template": "requesting-person",
+   "fact_id": "larkhollow-stamps-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0032",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What cut did the print table choose for the market cards?",
+   "answer": [
+    "a fern cut"
+   ],
+   "template": "design-choice",
+   "fact_id": "larkhollow-stamps-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0033",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Where is Monday's color session happening now?",
+   "answer": [
+    "the back studio"
+   ],
+   "template": "meeting-location",
+   "fact_id": "larkhollow-stamps-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0034",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Who is the court courier?",
+   "answer": [
+    "Meren"
+   ],
+   "template": "contact-role",
+   "fact_id": "larkhollow-stamps-013",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0035",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What's the status of the seed emblem block?",
+   "answer": [
+    "ready to ink"
+   ],
+   "template": "production-status",
+   "fact_id": "larkhollow-stamps-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0036",
+   "round": 0,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Where is the ochre sample?",
+   "answer": [
+    "on the drying rack"
+   ],
+   "template": "item-location",
+   "fact_id": "larkhollow-stamps-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0037",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "How much does our harbor bell mold weigh?",
+   "answer": [
+    "11 stone"
+   ],
+   "template": "item-weight",
+   "fact_id": "vellmere-bells-021",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0038",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "How many charcoal sacks did the harbor bell pour use?",
+   "answer": [
+    "13 charcoal sacks"
+   ],
+   "template": "material-quantity",
+   "fact_id": "vellmere-bells-026",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0039",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "Where did the orchard bell cool?",
+   "answer": [
+    "slate cradle"
+   ],
+   "template": "cooling-location",
+   "fact_id": "vellmere-bells-028",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0040",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "Where do we keep the red wax?",
+   "answer": [
+    "cedar chest"
+   ],
+   "template": "storage-location",
+   "fact_id": "vellmere-bells-032",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0041",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "What color is the beacon bell\u2019s tag?",
+   "answer": [
+    "green"
+   ],
+   "template": "tag-color",
+   "fact_id": "vellmere-bells-039",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0042",
+   "round": 0,
+   "brief": "question",
+   "fixture": "vellmere-bells",
+   "request": "Why is the chapel bell dispatch paused?",
+   "answer": [
+    "varnish"
+   ],
+   "template": "dispatch-delay",
+   "fact_id": "vellmere-bells-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0043",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "What trim does the moon cloak have?",
+   "answer": [
+    "silver braid"
+   ],
+   "template": "costume-detail",
+   "fact_id": "sablewick-wardrobe-023",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0044",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "Where does the fox mask dry?",
+   "answer": [
+    "willow stand"
+   ],
+   "template": "drying-location",
+   "fact_id": "sablewick-wardrobe-027",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0045",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "How many matching cuffs are on the sleeve bench?",
+   "answer": [
+    "24"
+   ],
+   "template": "item-count",
+   "fact_id": "sablewick-wardrobe-031",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0046",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "What needs repair on the otter vest lining?",
+   "answer": [
+    "loose seam"
+   ],
+   "template": "repair-needed",
+   "fact_id": "sablewick-wardrobe-033",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0047",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "Which cap is included in the school play packet?",
+   "answer": [
+    "blue cap"
+   ],
+   "template": "packet-contents",
+   "fact_id": "sablewick-wardrobe-038",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0048",
+   "round": 0,
+   "brief": "question",
+   "fixture": "sablewick-wardrobe",
+   "request": "When is the baker coat due back?",
+   "answer": [
+    "Monday"
+   ],
+   "template": "return-date",
+   "fact_id": "sablewick-wardrobe-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0049",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "How many mint leaves go into the mint ink?",
+   "answer": [
+    "32 mint leaves"
+   ],
+   "template": "ingredient-quantity",
+   "fact_id": "thistledrift-inks-022",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0050",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "Where is the pear syrup stored?",
+   "answer": [
+    "shaded cupboard"
+   ],
+   "template": "storage-location",
+   "fact_id": "thistledrift-inks-027",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0051",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "Did the blackberry ink pass the wafer check?",
+   "answer": [
+    "passed"
+   ],
+   "template": "quality-check",
+   "fact_id": "thistledrift-inks-031",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0052",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "What happened to the plum ink after it dried?",
+   "answer": [
+    "darkened"
+   ],
+   "template": "drying-result",
+   "fact_id": "thistledrift-inks-034",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0053",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "How many sample cards are in the arcade parcel?",
+   "answer": [
+    "34 sample cards"
+   ],
+   "template": "parcel-contents",
+   "fact_id": "thistledrift-inks-036",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0054",
+   "round": 0,
+   "brief": "question",
+   "fixture": "thistledrift-inks",
+   "request": "Why is the citrus trial being held?",
+   "answer": [
+    "another tasting"
+   ],
+   "template": "hold-reason",
+   "fact_id": "thistledrift-inks-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0055",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "How many dark chips are in the slate bin?",
+   "answer": [
+    "41"
+   ],
+   "template": "material-count",
+   "fact_id": "mossquay-markers-021",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0056",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "What shape is the top of the heron marker?",
+   "answer": [
+    "arched"
+   ],
+   "template": "marker-shape",
+   "fact_id": "mossquay-markers-026",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0057",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "What design is on the orchard sign\u2019s corner?",
+   "answer": [
+    "leaf"
+   ],
+   "template": "design-detail",
+   "fact_id": "mossquay-markers-029",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0058",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "What is the ferry marker waiting for?",
+   "answer": [
+    "grout"
+   ],
+   "template": "work-status",
+   "fact_id": "mossquay-markers-033",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0059",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "How will the ferry marker travel?",
+   "answer": [
+    "barge"
+   ],
+   "template": "transport-method",
+   "fact_id": "mossquay-markers-037",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0060",
+   "round": 0,
+   "brief": "question",
+   "fixture": "mossquay-markers",
+   "request": "Where is the orchard sign staying?",
+   "answer": [
+    "drying room"
+   ],
+   "template": "item-location",
+   "fact_id": "mossquay-markers-040",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0061",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "How many cord reels are in the spool box?",
+   "answer": [
+    "52"
+   ],
+   "template": "supply-count",
+   "fact_id": "brindlefen-kites-022",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0062",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "Where do we keep the waxed thread?",
+   "answer": [
+    "brass tin"
+   ],
+   "template": "storage-location",
+   "fact_id": "brindlefen-kites-023",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0063",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "How many stitches did the cloud sail patch take?",
+   "answer": [
+    "53"
+   ],
+   "template": "repair-count",
+   "fact_id": "brindlefen-kites-026",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "patch"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0064",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "How did the saffron kite pull on its last flight?",
+   "answer": [
+    "left"
+   ],
+   "template": "flight-behavior",
+   "fact_id": "brindlefen-kites-032",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0065",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "How many numbered sleeves does the flight shed have?",
+   "answer": [
+    "54"
+   ],
+   "template": "equipment-count",
+   "fact_id": "brindlefen-kites-036",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0066",
+   "round": 0,
+   "brief": "question",
+   "fixture": "brindlefen-kites",
+   "request": "What event is the cloud sail reserved for?",
+   "answer": [
+    "lantern fair"
+   ],
+   "template": "reservation-purpose",
+   "fact_id": "brindlefen-kites-037",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0067",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "How many drops of mineral wash does the blue dye bowl take?",
+   "answer": [
+    "62 drops"
+   ],
+   "template": "ingredient-quantity",
+   "fact_id": "larkhollow-stamps-022",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0068",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "What wood is the fern plate carved from?",
+   "answer": [
+    "pear wood"
+   ],
+   "template": "material-type",
+   "fact_id": "larkhollow-stamps-026",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0069",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "What damage does the reed motif plate have?",
+   "answer": [
+    "chipped corner"
+   ],
+   "template": "item-damage",
+   "fact_id": "larkhollow-stamps-030",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0070",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "What kind of paper do the market cards use?",
+   "answer": [
+    "deckled paper"
+   ],
+   "template": "paper-type",
+   "fact_id": "larkhollow-stamps-032",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0071",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "How many stamped leaves are in the court bundle?",
+   "answer": [
+    "64"
+   ],
+   "template": "bundle-count",
+   "fact_id": "larkhollow-stamps-036",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0072",
+   "round": 0,
+   "brief": "question",
+   "fixture": "larkhollow-stamps",
+   "request": "What are the seed emblem cards being held for?",
+   "answer": [
+    "trimming"
+   ],
+   "template": "hold-reason",
+   "fact_id": "larkhollow-stamps-039",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0073",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "When is Orin collecting the harbor bell?",
+   "answer": [
+    "Thursday"
+   ],
+   "template": "pickup-day",
+   "fact_id": "vellmere-bells-002",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0074",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Did Palin approve the narrow clapper design?",
+   "answer": [
+    "Palin declined it"
+   ],
+   "template": "design-decision",
+   "fact_id": "vellmere-bells-004",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0075",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "Which costume did Tavi ask for?",
+   "answer": [
+    "velvet owl costume"
+   ],
+   "template": "requested-item",
+   "fact_id": "sablewick-wardrobe-001",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0076",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What happened with Vima's satin crown booking?",
+   "answer": [
+    "Vima canceled it"
+   ],
+   "template": "booking-status",
+   "fact_id": "sablewick-wardrobe-005",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0077",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Where did Jori say the delivery should go?",
+   "answer": [
+    "glass arcade"
+   ],
+   "template": "delivery-location",
+   "fact_id": "thistledrift-inks-003",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0078",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Who's chairing our next color review?",
+   "answer": [
+    "Uma"
+   ],
+   "template": "meeting-chair",
+   "fact_id": "thistledrift-inks-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0079",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What kind of marker did Aven request?",
+   "answer": [
+    "heron marker"
+   ],
+   "template": "requested-item",
+   "fact_id": "mossquay-markers-001",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0080",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Where did the Tuesday layout session move?",
+   "answer": [
+    "arch room"
+   ],
+   "template": "meeting-location",
+   "fact_id": "mossquay-markers-007",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "nonfile",
+   "status": "accepted"
+  },
+  {
+   "set": "target",
+   "id": "q-0081",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Did Gera approve the new tail ribbon?",
+   "answer": [
+    "Yes"
+   ],
+   "template": "approval-status",
+   "fact_id": "brindlefen-kites-002",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "tail"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0082",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What day is the next flight check?",
+   "answer": [
+    "Monday"
+   ],
+   "template": "meeting-day",
+   "fact_id": "brindlefen-kites-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0083",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What did Nissa decide about the square border?",
+   "answer": [
+    "Nissa declined it"
+   ],
+   "template": "design-decision",
+   "fact_id": "larkhollow-stamps-004",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0084",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What happened with the ochre mix?",
+   "answer": [
+    "The team postponed it"
+   ],
+   "template": "work-status",
+   "fact_id": "larkhollow-stamps-009",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0085",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Who manages the east gate?",
+   "answer": [
+    "Ressa"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "vellmere-bells-012",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0086",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "What's holding up the blue enamel order?",
+   "answer": [
+    "waiting for approval"
+   ],
+   "template": "order-status",
+   "fact_id": "vellmere-bells-016",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0087",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "Who's leading the next hem review?",
+   "answer": [
+    "Corlo"
+   ],
+   "template": "meeting-lead",
+   "fact_id": "sablewick-wardrobe-009",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0088",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What is the baker coat repair waiting on?",
+   "answer": [
+    "thread"
+   ],
+   "template": "repair-blocker",
+   "fact_id": "sablewick-wardrobe-020",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0089",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What did the packaging group decide about cork caps for travel jars?",
+   "answer": [
+    "They rejected cork caps"
+   ],
+   "template": "packaging-decision",
+   "fact_id": "thistledrift-inks-009",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0090",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Is the mint ink ready for bottling?",
+   "answer": [
+    "Yes"
+   ],
+   "template": "production-status",
+   "fact_id": "thistledrift-inks-017",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0091",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Who keeps the dune register?",
+   "answer": [
+    "Cida"
+   ],
+   "template": "record-keeper",
+   "fact_id": "mossquay-markers-013",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0092",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What does the well pattern still need?",
+   "answer": [
+    "a frame check"
+   ],
+   "template": "pending-task",
+   "fact_id": "mossquay-markers-019",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0093",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Who's our sail recorder?",
+   "answer": [
+    "Ibel"
+   ],
+   "template": "contact-role",
+   "fact_id": "brindlefen-kites-014",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0094",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Where did we leave the ridge kite line?",
+   "answer": [
+    "coiled on the hook"
+   ],
+   "template": "item-location",
+   "fact_id": "brindlefen-kites-018",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0095",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Who keeps the color ledger?",
+   "answer": [
+    "Luma"
+   ],
+   "template": "record-keeper",
+   "fact_id": "larkhollow-stamps-012",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0096",
+   "round": 1,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What is the fern plate waiting for?",
+   "answer": [
+    "a new handle"
+   ],
+   "template": "pending-part",
+   "fact_id": "larkhollow-stamps-019",
+   "status": "discarded_over_delivery"
+  },
+  {
+   "set": "target",
+   "id": "q-0097",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Which mold did the rim team choose?",
+   "answer": [
+    "six-rib mold"
+   ],
+   "template": "design-choice",
+   "fact_id": "vellmere-bells-006",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0098",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Who represents the marsh office?",
+   "answer": [
+    "Palin"
+   ],
+   "template": "contact-role",
+   "fact_id": "vellmere-bells-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0099",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Where does the blue enamel order stand?",
+   "answer": [
+    "waiting for approval"
+   ],
+   "template": "order-status",
+   "fact_id": "vellmere-bells-016",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0100",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "vellmere-bells",
+   "request": "Is the south shelf inventory still open?",
+   "answer": [
+    "yes"
+   ],
+   "template": "inventory-status",
+   "fact_id": "vellmere-bells-018",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0101",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What did Fera send for the fox mask?",
+   "answer": [
+    "return slip"
+   ],
+   "template": "return-paperwork",
+   "fact_id": "sablewick-wardrobe-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "send"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0102",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What did the cleaning group decide about soap?",
+   "answer": [
+    "approved a gentler soap"
+   ],
+   "template": "group-decision",
+   "fact_id": "sablewick-wardrobe-008",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0103",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "Who runs the paper stage?",
+   "answer": [
+    "Tavi"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "sablewick-wardrobe-011",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0104",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "sablewick-wardrobe",
+   "request": "What is holding up the baker coat repair?",
+   "answer": [
+    "thread"
+   ],
+   "template": "task-blocker",
+   "fact_id": "sablewick-wardrobe-020",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0105",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What change did Bexel ask for in the citrus ink?",
+   "answer": [
+    "less tart"
+   ],
+   "template": "requested-change",
+   "fact_id": "thistledrift-inks-002",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0106",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "What did the packaging group decide about cork caps for travel jars?",
+   "answer": [
+    "rejected cork caps"
+   ],
+   "template": "group-decision",
+   "fact_id": "thistledrift-inks-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0107",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Who is our sample archivist?",
+   "answer": [
+    "Kiva"
+   ],
+   "template": "contact-role",
+   "fact_id": "thistledrift-inks-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0108",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "thistledrift-inks",
+   "request": "Is the mint ink ready for bottling?",
+   "answer": [
+    "yes"
+   ],
+   "template": "production-status",
+   "fact_id": "thistledrift-inks-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0109",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What happened with Doven's collection of the orchard sign?",
+   "answer": [
+    "postponed"
+   ],
+   "template": "pickup-status",
+   "fact_id": "mossquay-markers-004",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0110",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Which material did the cutting crew keep for the heron beak?",
+   "answer": [
+    "slate"
+   ],
+   "template": "material-choice",
+   "fact_id": "mossquay-markers-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0111",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "Who operates the ferry kiosk?",
+   "answer": [
+    "Brell"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "mossquay-markers-012",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0112",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "mossquay-markers",
+   "request": "What still needs checking on the well pattern?",
+   "answer": [
+    "the frame"
+   ],
+   "template": "remaining-task",
+   "fact_id": "mossquay-markers-019",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0113",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What did Huno ask us to do with the ridge kite line?",
+   "answer": [
+    "shorten it"
+   ],
+   "template": "requested-change",
+   "fact_id": "brindlefen-kites-003",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "ask",
+     "with"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0114",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What did the crew decide about the brittle reed spar?",
+   "answer": [
+    "retired it"
+   ],
+   "template": "crew-decision",
+   "fact_id": "brindlefen-kites-009",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0115",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "Who is the sail recorder?",
+   "answer": [
+    "Ibel"
+   ],
+   "template": "contact-role",
+   "fact_id": "brindlefen-kites-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0116",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "brindlefen-kites",
+   "request": "What's the latest on the cloud sail patch?",
+   "answer": [
+    "pinned"
+   ],
+   "template": "repair-status",
+   "fact_id": "brindlefen-kites-016",
+   "fact_in_brief_subset": true,
+   "codes": [
+    "LEAK_TOOL_TOKEN"
+   ],
+   "lint": [
+    "Set aside by an automatic check."
+   ],
+   "detail": {
+    "LEAK_TOOL_TOKEN": [
+     "patch"
+    ]
+   },
+   "group": null,
+   "status": "discarded_lint"
+  },
+  {
+   "set": "target",
+   "id": "q-0117",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Where did Meren confirm the delivery was going?",
+   "answer": [
+    "lantern court"
+   ],
+   "template": "delivery-destination",
+   "fact_id": "larkhollow-stamps-003",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0118",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "What day is the next plate review?",
+   "answer": [
+    "Thursday"
+   ],
+   "template": "meeting-day",
+   "fact_id": "larkhollow-stamps-010",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0119",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "Who cuts the border blocks?",
+   "answer": [
+    "Nissa"
+   ],
+   "template": "person-on-duty",
+   "fact_id": "larkhollow-stamps-014",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0120",
+   "round": 2,
+   "brief": "everyday",
+   "fixture": "larkhollow-stamps",
+   "request": "How did the blue dye trial turn out?",
+   "answer": [
+    "too deep"
+   ],
+   "template": "trial-result",
+   "fact_id": "larkhollow-stamps-017",
+   "fact_in_brief_subset": true,
+   "codes": [],
+   "lint": [],
+   "detail": {},
+   "group": "default",
+   "status": "discarded_surplus"
+  },
+  {
+   "set": "target",
+   "id": "q-0121",
+   "round": 3,
+   "brief": "everyday",
+   "fixture": null,
+   "request": "",
+   "status": "empty_call"
+  }
+ ],
+ "round": 3,
+ "stopped": "groups still short after 3 top-ups: {'nonfile': 3, 'default': 24}"
+}

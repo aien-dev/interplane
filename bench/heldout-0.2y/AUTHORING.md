@@ -298,3 +298,16 @@ the same model and an empty scratch working directory for each call).
 frozen (PREREG-0.2y section 5). Report, log and every prompt and answer: `attempt-1/REPORT.md`. The authoring rules
 are revised under section 11 before attempt 2 (amendment 3: area-tagged facts, over-delivery rule). Attempt 2 uses
 new fixtures, a new author run and none of attempt 1's requests.
+
+- 2026-10-05T18:27:36Z attempt 2, `target/fixtures-call1`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 226 s, 34309 bytes
+- 2026-10-05T18:28:21Z attempt 2, `target/requests-r0-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 44 s, 6366 bytes
+- 2026-10-05T18:29:03Z attempt 2, `target/requests-r0-question`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 42 s, 6168 bytes
+- 2026-10-05T18:29:41Z attempt 2, `target/requests-r1-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 37 s, 5297 bytes
+- 2026-10-05T18:30:21Z attempt 2, `target/requests-r2-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 40 s, 4126 bytes
+- 2026-10-05T18:30:50Z attempt 2, `target/requests-r3-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 29 s, 298 bytes
+
+**Attempt 2 stopped short (2026-10-05):** the non-file group reached 3 of 24 after three top-ups, so the corpus is not
+frozen (PREREG-0.2y section 5). Two defects of this written procedure, both observed: Brief E forbids telling the
+assistant where to look, while a request joins the non-file group only through such words; and section 4.3 puts
+`{K}` in the brief and again in the top-up paragraph, which the author read as 2K. Report, log and every prompt and
+answer: `attempt-2/REPORT.md`. A further attempt needs a section 11 revision first.

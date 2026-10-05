@@ -7,7 +7,7 @@ was taken and is listed below.
 
 ## Layout
 
-- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval; cut I2 cases 04-19 for C01 to C05, fixture-level `mock_data`). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V6) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
+- `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval; cut I2 cases 04-19 for C01 to C05, fixture-level `mock_data`; cut I3 cases 20-34 for C06 to C09 and C11 (20-22 C06, 23-25 C07, 26-28 C08, 29-31 C09, 32-34 C11); cut I4 cases 35-42 for C12 (35-38) and C13 (39-42), fixture-level `mock_fault`). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V8) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md plus SDK follow-ups 15 (explicit `denied` continuation value) and 16 (continuation decision citing another request_id; not the protocol's T4-only A15) driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
 - `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
   runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
@@ -77,7 +77,17 @@ can issue: `approve`, `cancel`, `restart` (a fresh pipeline over the same mock r
 (the runtime's catalog digest changes). `mock_approval.expires_at` makes the mock mint an expiry.
 Each `approve` and `cancel` step adds one row to `expected.continuations` and, when resolved, one
 `ObservedRecord`; the verdict row of an approval case gains `continuations`. Rows of earlier cases
-are unchanged. Total verdict rows: 78 (40 + 19 injection + 14 approval + 5 lifecycle).
+are unchanged. Total verdict rows: 103 (40 + 42 injection + 16 approval + 5 lifecycle).
+
+## Corpus accounting (gate I)
+
+`validate_fixtures.py` counts the corpus from fixture metadata and fails below the minimum of
+bench/PROTOCOL-0.3.md 3.2. C01 to C09 and C11 to C13 are the `injection.category` of the injection
+fixtures. **C10 (approval manipulation) is supplied by lane A:** every approval fixture except
+A01 (the one legitimate approval) counts, 15 cases (A02 to A16) against a minimum of 10. It also
+checks that the negative controls V1 to V8 together fail at least one case in each of the 13
+categories (gate N). Current counts: C01=3, C02=5, C03=3, C04=3, C05=4, C06=3, C07=4, C08=3, C09=3,
+C10=15, C11=3, C12=4, C13=4; 57 cases against the minimum of 52.
 
 Fail-closed readings taken where the protocol leaves room: a continuation that fails a binding check
 (wrong or foreign `approval_id`, changed arguments, expiry, changed catalog, decision value) on a

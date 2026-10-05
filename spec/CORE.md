@@ -197,6 +197,22 @@ On an executed result, a `content_kind` the pipeline does not recognize (or a no
 `unknown`, a `trust` it does not recognize (or a non-string) becomes `external_untrusted`, and an
 adapter-supplied `trusted` is replaced by the value derived from `trust`.
 
+**Adapter and catalog integrity (0.3 cut I4).** The pipeline treats what the runtime adapter hands
+back as untrusted for identity and consistency:
+
+- A `decide` that raises is a denial (`runtime_unavailable`, observed `decision` `denied`, execute 0).
+  A decision that cites another `request_id` is never applied: DENIED, `unknown_decision`, message
+  `unknown decision value: mismatched request_id`, execute 0.
+- An `execute` that raises, or returns a result citing another `request_id`, gives a FAILED request
+  with `execution_error`; the foreign result and its data are dropped. Messages:
+  `runtime authority raised an error` and `runtime returned a result for another request`; no
+  data was produced, so `content_kind`, `trust` and `trusted` are `null`.
+- A call to a capability the catalog advertises more than once with different definitions (the
+  `description` or `parameters` differ) is REJECTED with `stale_capability` and the message
+  `capability is advertised more than once with different definitions`, before `decide` (Jan 8975
+  lesson: the definition the model read must be the one the call routes to). A repeated entry with
+  an identical definition is harmless.
+
 Error messages (pinned; `<x>` substituted; no other text):
 
 | code | message |
@@ -209,12 +225,12 @@ Error messages (pinned; `<x>` substituted; no other text):
 | duplicate_request_id | `duplicate request_id: <id>` |
 | replayed_message | `replayed message_id: <id>` |
 | unknown_capability | `no mapping for tool: <namespace.name or name>` |
-| stale_capability | `mapping table catalog digest does not match runtime catalog` |
+| stale_capability | `mapping table catalog digest does not match runtime catalog`, or `capability is advertised more than once with different definitions` |
 | capability_not_found | `unknown capability: <capability>` |
 | invalid_arguments | mock: `missing required argument: <key>` or `argument <key> must be <type>`; runtime-said-invalid uses the decision's `reason` |
 | policy_denied | the decision's `reason` |
 | approval_required | `approval required: <approval_id>` |
-| execution_error | the runtime's message (mock: `mock execution failure`) |
+| execution_error | the runtime's message (mock: `mock execution failure`); `runtime authority raised an error` when `execute` raised; `runtime returned a result for another request` |
 | execution_timeout | the runtime's message (mock: `mock execution exceeded 1000 ms`) |
 | unknown_decision | `unknown decision value: <value>` |
 | runtime_unavailable | `runtime authority raised an error` |
@@ -291,6 +307,15 @@ A fixture may carry `mock_data: {<capability>: {data?, message?}}` (0.3 cut I2).
 it stands in for a hostile tool backend whose output carries injected text (the injection fixtures
 06 to 19). Harness configuration like `mock_provenance`: never read from arguments, `extensions` or
 envelopes, labels and catalog unchanged.
+
+A fixture may carry `mock_fault` (0.3 cut I4), harness configuration of the same kind, standing in
+for a broken adapter: `decide_raises` and `execute_raises` (lists of capabilities whose call raises),
+`decision_request_id` and `result_request_id` (`{<capability>: <other request id>}` the decision or
+result cites instead of its own), and `duplicate_capability` (descriptors appended to the catalog the
+runtime advertises, with the catalog digest recomputed). The mapping table `mock-table-pinned` is
+`mock-table` pinned to the mock's live catalog digest, so a later `mock` step that changes the digest
+makes it stale. A raised call still counts as an invocation in `decide_calls` or `execute_calls`.
+An `approve` step may carry `decision_request_id`, the `request_id` the continuation decision cites.
 
 The mock runtime validates `arguments` against the capability parameters (required keys present,
 declared types match) and answers `invalid` with `invalid_arguments` on failure. It counts

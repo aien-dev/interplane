@@ -139,7 +139,7 @@ def test_decide_exception_fails_closed():
     rt = Scripted(decide=boom)
     out = run(pipe_with(rt), "read_file", {"path": "p"})
     assert out.results[0].error.code == ErrorCode.RUNTIME_UNAVAILABLE and rt.execute_calls == 0
-    assert out.observed[0].decision is None and out.observed[0].decide_invoked
+    assert out.observed[0].decision == "denied" and out.observed[0].decide_invoked
 
 
 def test_garbage_or_mismatched_decision_is_denied():

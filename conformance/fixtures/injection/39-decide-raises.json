@@ -81,7 +81,7 @@
       {
         "request_id": "call_i39a",
         "stage": "DENIED",
-        "decision": null,
+        "decision": "denied",
         "status": "denied",
         "error_code": "runtime_unavailable",
         "decide_invoked": true,

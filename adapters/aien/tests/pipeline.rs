@@ -79,8 +79,8 @@ fn world_mutation_requires_approval_and_never_executes() {
         "{d:?}"
     );
     assert_eq!(d.authority.policy_engine, ENGINE_EFFECT);
-    // No approval id exists, so none is invented and nothing is consumed.
-    assert!(d.approval.is_none());
+    // The adapter minted a correlation handle; nothing is consumed.
+    assert!(d.approval.is_some());
     let rs = d.runtime_state.as_ref().unwrap();
     assert!(rs.values.contains(&"staged=true".to_string()), "{rs:?}");
     assert!(

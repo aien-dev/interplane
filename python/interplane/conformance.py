@@ -190,6 +190,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         Limits.from_dict(case.get("limits")), case.get("mapping_table", "mock-table")
     )
     pipe.runtime.provenance_overrides = case.get("mock_provenance", {})
+    pipe.runtime.data_overrides = case.get("mock_data", {})
     pipe.runtime.approval_expires_at = case.get("mock_approval", {}).get("expires_at")
     probe = _Probe(pipe.runtime, nc, variant)
     pipe.runtime = probe

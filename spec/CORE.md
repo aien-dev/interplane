@@ -264,6 +264,8 @@ Error messages (pinned; `<x>` substituted; no other text):
 | replayed_message | `replayed message_id: <id>` |
 | unknown_capability | `no mapping for tool: <namespace.name or name>` |
 | stale_capability | `mapping table catalog digest does not match runtime catalog`, or `capability is advertised more than once with different definitions` |
+| session_limit_exceeded | `session limit exceeded: <limit name>` |
+| session_closed | `session closed: <trace_id>` |
 | capability_not_found | `unknown capability: <capability>` |
 | invalid_arguments | mock: `missing required argument: <key>` or `argument <key> must be <type>`; runtime-said-invalid uses the decision's `reason` |
 | policy_denied | the decision's `reason` |

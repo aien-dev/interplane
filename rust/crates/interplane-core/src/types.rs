@@ -25,6 +25,8 @@ string_enum! {
         UnknownDecision => "unknown_decision",
         RuntimeUnavailable => "runtime_unavailable",
         StaleCapability => "stale_capability",
+        SessionLimitExceeded => "session_limit_exceeded",
+        SessionClosed => "session_closed",
     }
 }
 

@@ -108,7 +108,9 @@
         "execution_timeout",
         "unknown_decision",
         "runtime_unavailable",
-        "stale_capability"
+        "stale_capability",
+        "session_limit_exceeded",
+        "session_closed"
       ]
     },
     "Error": {

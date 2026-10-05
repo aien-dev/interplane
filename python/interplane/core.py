@@ -103,6 +103,8 @@ class ErrorCode:
     UNKNOWN_DECISION = "unknown_decision"
     RUNTIME_UNAVAILABLE = "runtime_unavailable"
     STALE_CAPABILITY = "stale_capability"
+    SESSION_LIMIT_EXCEEDED = "session_limit_exceeded"
+    SESSION_CLOSED = "session_closed"
 
     ALL = frozenset(v for k, v in list(vars().items()) if k.isupper() and isinstance(v, str))
 
@@ -845,6 +847,10 @@ class Limits:
     max_argument_bytes: int = 65536
     max_requests_per_turn: int = 32
     max_text_length: int = 4096
+    max_traces: int = 1024
+    max_messages_per_trace: int = 4096
+    max_requests_per_trace: int = 4096
+    max_inputs_per_trace: int = 4096
 
     @classmethod
     def from_dict(cls, data: Optional[dict]) -> "Limits":
@@ -892,6 +898,32 @@ class RequestLedger:
             return ErrorCode.DUPLICATE_REQUEST_ID
         requests.add(request_id)
         return None
+
+    # Read-only views and cleanup used by the session state limits (CORE.md).
+    def has_message(self, trace_id: str, message_id: str) -> bool:
+        return message_id in self._messages.get(trace_id, ())
+
+    def has_request_id(self, trace_id: str, request_id: str) -> bool:
+        return request_id in self._requests.get(trace_id, ())
+
+    def message_count(self, trace_id: str) -> int:
+        return len(self._messages.get(trace_id, ()))
+
+    def request_count(self, trace_id: str) -> int:
+        return len(self._requests.get(trace_id, ()))
+
+    def holds(self, trace_id: str) -> bool:
+        return bool(self._messages.get(trace_id) or self._requests.get(trace_id))
+
+    def traces(self) -> set:
+        """Every trace that holds at least one recorded id."""
+        return {t for t, v in self._messages.items() if v} | {
+            t for t, v in self._requests.items() if v
+        }
+
+    def forget(self, trace_id: str) -> None:
+        self._messages.pop(trace_id, None)
+        self._requests.pop(trace_id, None)
 
 
 # ---------------------------------------------------------------------------

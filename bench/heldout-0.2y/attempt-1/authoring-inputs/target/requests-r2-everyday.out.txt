@@ -1,0 +1,340 @@
+{
+  "requests": [
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "I'm replying to Velra's shipping email. How is her parcel traveling?",
+      "fact_id": "fenquay_lanterns-009",
+      "answer": ["punt"],
+      "template": "shipping-method"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "What should I tell a customer they'll receive for a returned lantern?",
+      "fact_id": "fenquay_lanterns-015",
+      "answer": ["store credit"],
+      "template": "return-policy"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "I'm updating Velra's order. Which cord does she prefer?",
+      "fact_id": "fenquay_lanterns-017",
+      "answer": ["copper cord"],
+      "template": "customer-preference"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "How many frames can the drying rack hold?",
+      "fact_id": "fenquay_lanterns-021",
+      "answer": ["47 frames"],
+      "template": "equipment-capacity"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "I'm checking the current atlas sleeve instructions. How many loops does each sleeve need?",
+      "fact_id": "mireholt_mapcases-001",
+      "answer": ["61 loops"],
+      "template": "production-requirement"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "What's the next step for the tide-chart case?",
+      "fact_id": "mireholt_mapcases-005",
+      "answer": ["stitching"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "Which landing should I put on Doma's sleeve shipment?",
+      "fact_id": "mireholt_mapcases-007",
+      "answer": ["Copper Landing"],
+      "template": "shipping-route"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "I'm drafting a quote. What's the price for plain binding?",
+      "fact_id": "mireholt_mapcases-011",
+      "answer": ["63 crowns"],
+      "template": "service-price"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "I'm confirming Arvo's order. What kind of tail did he ask for?",
+      "fact_id": "valdren_vanes-003",
+      "answer": ["hammered tail"],
+      "template": "order-detail"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "What work is still waiting on the tower batch?",
+      "fact_id": "valdren_vanes-005",
+      "answer": ["polishing"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "How should the chapel piece travel?",
+      "fact_id": "valdren_vanes-009",
+      "answer": ["padded crate"],
+      "template": "shipping-package"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "What should I charge for a narrow spindle?",
+      "fact_id": "valdren_vanes-011",
+      "answer": ["83 crowns"],
+      "template": "item-price"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "I'm updating the materials list for the current forest set. How many wooden leaves does it use?",
+      "fact_id": "orellune_scenery-001",
+      "answer": ["101 wooden leaves"],
+      "template": "materials-count"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "What price should go on the quote for a small backdrop?",
+      "fact_id": "orellune_scenery-011",
+      "answer": ["103 crowns"],
+      "template": "item-price"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "I'm reviewing Quorin's scenery sketch. What sky color does Quorin prefer?",
+      "fact_id": "orellune_scenery-017",
+      "answer": ["violet"],
+      "template": "customer-preference"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "Which doorway did Sovek reject?",
+      "fact_id": "orellune_scenery-019",
+      "answer": ["pine doorway"],
+      "template": "rejected-design"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "What's still needed on the stern bench?",
+      "fact_id": "karvella_cushions-005",
+      "answer": ["stitching"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "I'm arranging delivery for the cabin cushions. How do they travel?",
+      "fact_id": "karvella_cushions-009",
+      "answer": ["barge"],
+      "template": "shipping-method"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "How much is a bench cushion?",
+      "fact_id": "karvella_cushions-011",
+      "answer": ["123 crowns"],
+      "template": "item-price"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "What should I add to the quote for waterproof edging?",
+      "fact_id": "karvella_cushions-013",
+      "answer": ["125 crowns"],
+      "template": "option-price"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "What's the next job for the harbor blend?",
+      "fact_id": "zelmora_dyes-005",
+      "answer": ["grinding"],
+      "template": "pending-task"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "I'm preparing the mural pigment shipment. What containers do the pigments travel in?",
+      "fact_id": "zelmora_dyes-009",
+      "answer": ["corked jars"],
+      "template": "shipping-container"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "How much should I put on the invoice for fine grinding?",
+      "fact_id": "zelmora_dyes-013",
+      "answer": ["145 crowns"],
+      "template": "service-price"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "What finish does Mavik prefer?",
+      "fact_id": "zelmora_dyes-017",
+      "answer": ["paste finish"],
+      "template": "customer-preference"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "Where should I look for the blue cord?",
+      "fact_id": "fenquay_lanterns-023",
+      "answer": ["north cupboard"],
+      "template": "supply-location"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "I'm labeling the supplies. What container holds the pale wax?",
+      "fact_id": "fenquay_lanterns-025",
+      "answer": ["clay jar"],
+      "template": "storage-container"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "How many turns does the old press need for one sheet?",
+      "fact_id": "fenquay_lanterns-031",
+      "answer": ["49 turns"],
+      "template": "equipment-setting"
+    },
+    {
+      "workspace": "fenquay_lanterns",
+      "request": "Who handles our fragile parcels?",
+      "fact_id": "fenquay_lanterns-039",
+      "answer": ["punt courier"],
+      "template": "delivery-contact"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "When do we bill for repairs?",
+      "fact_id": "mireholt_mapcases-015",
+      "answer": ["after inspection"],
+      "template": "billing-timing"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "How many bolts fit on the canvas shelf?",
+      "fact_id": "mireholt_mapcases-021",
+      "answer": ["67 bolts"],
+      "template": "storage-capacity"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "Who stitches the spines?",
+      "fact_id": "mireholt_mapcases-027",
+      "answer": ["Kelik"],
+      "template": "person-on-duty"
+    },
+    {
+      "workspace": "mireholt_mapcases",
+      "request": "I'm checking an old equipment note. How many holes does the retired punch make per strip?",
+      "fact_id": "mireholt_mapcases-031",
+      "answer": ["69 holes"],
+      "template": "equipment-specification"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "How much does gold edging cost?",
+      "fact_id": "valdren_vanes-013",
+      "answer": ["85 crowns"],
+      "template": "option-price"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "Where is the thin wire kept?",
+      "fact_id": "valdren_vanes-023",
+      "answer": ["below the vise"],
+      "template": "supply-location"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "How many divisions are marked on the older compass?",
+      "fact_id": "valdren_vanes-031",
+      "answer": ["89 divisions"],
+      "template": "equipment-specification"
+    },
+    {
+      "workspace": "valdren_vanes",
+      "request": "What does the pulley need before we can use it?",
+      "fact_id": "valdren_vanes-035",
+      "answer": ["a new rope"],
+      "template": "repair-needed"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "How many jars can the paint cabinet hold?",
+      "fact_id": "orellune_scenery-021",
+      "answer": ["107 jars"],
+      "template": "storage-capacity"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "Who cuts the panels?",
+      "fact_id": "orellune_scenery-027",
+      "answer": ["Varko"],
+      "template": "person-on-duty"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "How many marks are on the old cutting guide?",
+      "fact_id": "orellune_scenery-031",
+      "answer": ["109 marks"],
+      "template": "equipment-specification"
+    },
+    {
+      "workspace": "orellune_scenery",
+      "request": "What do we put over handcart loads?",
+      "fact_id": "orellune_scenery-039",
+      "answer": ["canvas covers"],
+      "template": "transport-protection"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "How many rolls can the cloth room hold?",
+      "fact_id": "karvella_cushions-021",
+      "answer": ["127 rolls"],
+      "template": "storage-capacity"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "Who cuts the cloth?",
+      "fact_id": "karvella_cushions-027",
+      "answer": ["Garnet"],
+      "template": "person-on-duty"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "Who should I ask to check the seams?",
+      "fact_id": "karvella_cushions-029",
+      "answer": ["Isma"],
+      "template": "quality-check-contact"
+    },
+    {
+      "workspace": "karvella_cushions",
+      "request": "Which tool is awaiting repair?",
+      "fact_id": "karvella_cushions-035",
+      "answer": ["hand stapler"],
+      "template": "equipment-repair"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "Which shade did Pevra reject?",
+      "fact_id": "zelmora_dyes-019",
+      "answer": ["smoke shade"],
+      "template": "rejected-option"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "Where is the blue mineral?",
+      "fact_id": "zelmora_dyes-023",
+      "answer": ["behind the sieve"],
+      "template": "supply-location"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "How many openings does the older sieve have?",
+      "fact_id": "zelmora_dyes-031",
+      "answer": ["149 openings"],
+      "template": "equipment-specification"
+    },
+    {
+      "workspace": "zelmora_dyes",
+      "request": "What ties do we use on sample pouches?",
+      "fact_id": "zelmora_dyes-039",
+      "answer": ["linen ties"],
+      "template": "packaging-detail"
+    }
+  ]
+}

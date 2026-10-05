@@ -1,0 +1,57 @@
+Here are 6 pretend workspaces, given as names, one-line descriptions and their facts lists:
+fenquay_lanterns: Sela's workshop in Fenquay makes lanterns from cured marsh reeds.
+- fenquay_lanterns-019: Tamon canceled the square pattern.
+- fenquay_lanterns-033: The east bench is reserved for cutting.
+- fenquay_lanterns-035: The brass gauge is out of service.
+- fenquay_lanterns-037: The square pattern was retired after summer.
+
+mireholt_mapcases: Ilya's shop in Mireholt sews protective cases for hand-drawn maps.
+- mireholt_mapcases-019: Ghara declined a strap.
+- mireholt_mapcases-025: The brass clasps are stored beside the awl.
+- mireholt_mapcases-033: The long table is for cutting.
+- mireholt_mapcases-037: Straps were removed from the travel range.
+
+valdren_vanes: A small metalworking crew in Valdren makes rooftop weather vanes.
+- valdren_vanes-019: Delro declined the fox silhouette.
+- valdren_vanes-025: Silver leaf stays in a sealed tin.
+- valdren_vanes-033: The small anvil stands near the door.
+- valdren_vanes-039: Padded crates are used for chapel pieces.
+
+orellune_scenery: A theater craft shop in Orellune builds painted scenery for puppet shows.
+- orellune_scenery-023: Silver pigment sits in the low drawer.
+- orellune_scenery-033: The narrow easel stands beside the stove.
+- orellune_scenery-035: The glue press is awaiting a clamp.
+- orellune_scenery-037: The pine doorway was retired from touring shows.
+
+karvella_cushions: A dockside crew in Karvella repairs cushions for canal ferries.
+- karvella_cushions-019: Delsa declined the felt backing.
+- karvella_cushions-031: The older needle rack holds 129 needles.
+- karvella_cushions-033: The long workbench is for measuring.
+- karvella_cushions-037: Felt backing was removed from open decks.
+
+zelmora_dyes: Neral's studio in Zelmora blends mineral pigments for fabric dyers.
+- zelmora_dyes-025: The binding oil stays in a dark bottle.
+- zelmora_dyes-033: The stone mortar stands near the sink.
+- zelmora_dyes-035: The drying tray is awaiting a new rim.
+- zelmora_dyes-037: The smoke shade was removed from the spring range.
+
+Write 36 requests that a person could type to a personal assistant about their own everyday work, each
+one asking for exactly one of the listed facts (each fact has an id). Phrase them the way someone talks about their everyday work:
+mail, meetings, contacts, to-dos, notes, chats, models, memory, documents, images. Spread the requests
+over the workspaces evenly, and use each fact at most once. Each request is one or two sentences of ordinary
+speech. Do not tell the assistant where to look and do not describe how to find the answer.
+
+Write 36 more requests of the same kind. Some earlier requests were set aside by an automatic check. These
+are the reasons given, one per set-aside request, in no particular order:
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+- Set aside by an automatic check.
+Write new requests, not rewrites of earlier ones, and use only facts that no earlier request used.
+
+Answer with one JSON object and nothing else: {"requests": [{"workspace": "<slug>", "request": "<text>",
+"fact_id": "<the id of the fact you used>", "answer": ["<short answer string that must appear in
+a correct reply>", ...], "template": "<lowercase slug naming the kind of question, such as person-on-duty>"}]}

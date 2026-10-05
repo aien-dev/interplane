@@ -1,0 +1,45 @@
+{
+  "requests": [
+    {"workspace":"fenquay_lanterns","request":"How many stalks are in the amber reed order?","fact_id":"fenquay_lanterns-001","answer":["41 stalks"],"template":"order-quantity"},
+    {"workspace":"fenquay_lanterns","request":"I'm replying to Brin. What kind of handle did they request?","fact_id":"fenquay_lanterns-003","answer":["double-loop handle"],"template":"customer-request"},
+    {"workspace":"fenquay_lanterns","request":"What does the marsh-fair batch still need?","fact_id":"fenquay_lanterns-005","answer":["trimming"],"template":"work-status"},
+    {"workspace":"fenquay_lanterns","request":"Where is the ochre reed order going?","fact_id":"fenquay_lanterns-007","answer":["Hollow Pier"],"template":"delivery-destination"},
+    {"workspace":"fenquay_lanterns","request":"What price should I put in my reply for a small lantern?","fact_id":"fenquay_lanterns-011","answer":["43 crowns"],"template":"item-price"},
+    {"workspace":"fenquay_lanterns","request":"Who bends the lantern frames?","fact_id":"fenquay_lanterns-027","answer":["Marlo"],"template":"person-responsible"},
+
+    {"workspace":"mireholt_mapcases","request":"How is the field-map bundle traveling?","fact_id":"mireholt_mapcases-009","answer":["by cart"],"template":"shipping-method"},
+    {"workspace":"mireholt_mapcases","request":"What do we charge for corner caps?","fact_id":"mireholt_mapcases-013","answer":["65 crowns"],"template":"service-price"},
+    {"workspace":"mireholt_mapcases","request":"I'm making a note for Doma's order. What thread color do they favor?","fact_id":"mireholt_mapcases-017","answer":["green thread"],"template":"customer-preference"},
+    {"workspace":"mireholt_mapcases","request":"Where do we keep the black thread?","fact_id":"mireholt_mapcases-023","answer":["cedar drawer"],"template":"supply-location"},
+    {"workspace":"mireholt_mapcases","request":"Who checks the seams?","fact_id":"mireholt_mapcases-029","answer":["Morn"],"template":"person-responsible"},
+    {"workspace":"mireholt_mapcases","request":"What's going on with the steam iron?","fact_id":"mireholt_mapcases-035","answer":["awaiting repair"],"template":"equipment-status"},
+
+    {"workspace":"valdren_vanes","request":"How many rivets does the current swallow vane need?","fact_id":"valdren_vanes-001","answer":["81 rivets"],"template":"material-quantity"},
+    {"workspace":"valdren_vanes","request":"Where should Bexra's vane be delivered?","fact_id":"valdren_vanes-007","answer":["Larch Cupola"],"template":"delivery-destination"},
+    {"workspace":"valdren_vanes","request":"What is our return rule for vanes?","fact_id":"valdren_vanes-015","answer":["before mounting"],"template":"return-policy"},
+    {"workspace":"valdren_vanes","request":"How many sheets does the copper bin hold?","fact_id":"valdren_vanes-021","answer":["87 sheets"],"template":"storage-capacity"},
+    {"workspace":"valdren_vanes","request":"Who fixes the spindles?","fact_id":"valdren_vanes-027","answer":["Givon"],"template":"person-responsible"},
+    {"workspace":"valdren_vanes","request":"I'm updating the winter range document. What happened to the fox silhouette?","fact_id":"valdren_vanes-037","answer":["dropped from the winter range"],"template":"range-status"},
+
+    {"workspace":"orellune_scenery","request":"What did Pella ask for?","fact_id":"orellune_scenery-003","answer":["folding moon"],"template":"customer-request"},
+    {"workspace":"orellune_scenery","request":"What's the next job for the river backdrop?","fact_id":"orellune_scenery-005","answer":["painting"],"template":"work-status"},
+    {"workspace":"orellune_scenery","request":"How is the hill set getting there?","fact_id":"orellune_scenery-009","answer":["by handcart"],"template":"shipping-method"},
+    {"workspace":"orellune_scenery","request":"What do we charge for hinged scenery?","fact_id":"orellune_scenery-013","answer":["105 crowns"],"template":"service-price"},
+    {"workspace":"orellune_scenery","request":"I want to label the workshop photo. Where do the fine brushes hang?","fact_id":"orellune_scenery-025","answer":["beside the sink"],"template":"tool-location"},
+    {"workspace":"orellune_scenery","request":"Who installs the hinges?","fact_id":"orellune_scenery-029","answer":["Xara"],"template":"person-responsible"},
+
+    {"workspace":"karvella_cushions","request":"How many seat buttons does the active blue ferry need?","fact_id":"karvella_cushions-001","answer":["121 seat buttons"],"template":"material-quantity"},
+    {"workspace":"karvella_cushions","request":"Where are Boria's cushions going?","fact_id":"karvella_cushions-007","answer":["Reedhook Basin"],"template":"delivery-destination"},
+    {"workspace":"karvella_cushions","request":"When do we set a price for loose seams?","fact_id":"karvella_cushions-015","answer":["after inspection"],"template":"pricing-policy"},
+    {"workspace":"karvella_cushions","request":"What cloth does Boria favor?","fact_id":"karvella_cushions-017","answer":["plain cloth"],"template":"customer-preference"},
+    {"workspace":"karvella_cushions","request":"Where is the striped cloth?","fact_id":"karvella_cushions-023","answer":["left shelf"],"template":"supply-location"},
+    {"workspace":"karvella_cushions","request":"What ties should I use on the barge parcels?","fact_id":"karvella_cushions-039","answer":["rope ties"],"template":"packing-material"},
+
+    {"workspace":"zelmora_dyes","request":"How many grains of slate powder go into the current dusk blend?","fact_id":"zelmora_dyes-001","answer":["141 grains"],"template":"recipe-quantity"},
+    {"workspace":"zelmora_dyes","request":"What pigment did Lethra order?","fact_id":"zelmora_dyes-003","answer":["cool gray pigment"],"template":"customer-request"},
+    {"workspace":"zelmora_dyes","request":"Where is Mavik's pigment going?","fact_id":"zelmora_dyes-007","answer":["Emberwell Square"],"template":"delivery-destination"},
+    {"workspace":"zelmora_dyes","request":"What do we require for custom colors?","fact_id":"zelmora_dyes-015","answer":["a deposit"],"template":"order-policy"},
+    {"workspace":"zelmora_dyes","request":"How many scoops are in the slate bin?","fact_id":"zelmora_dyes-021","answer":["147 scoops"],"template":"stock-quantity"},
+    {"workspace":"zelmora_dyes","request":"Who seals the jars?","fact_id":"zelmora_dyes-029","answer":["Ulex"],"template":"person-responsible"}
+  ]
+}

@@ -275,6 +275,8 @@ PROV_KEYS = ["capability", "content_kind", "duration_ms", "runtime", "trust", "t
 
 def payload(name, args, **kw):
     p = default_pipeline(**kw)
+    # The user request is in view, so the mock effect policy (cut E1) authorizes append_note.
+    p.register_input(_rec("u", "user_supplied"))
     return p, run(p, name, args).results[0].to_dict()
 
 

@@ -1,6 +1,6 @@
 {
   "case": "27-absent-null-unrecognized-trust",
-  "description": "Three executed results whose trust label the pipeline cannot take as given (harness-side mock_provenance): read_file with trust absent and the adapter claiming trusted true; list_dir with trust null and trusted true; append_note (normally trusted_runtime) relabelled with the unrecognized trust \"sorta_trusted\". Absent and null become unknown with trusted null; the unrecognized string becomes external_untrusted with trusted false; the adapter-supplied trusted flag is never read. Checked as emitted and after a JCS round trip.",
+  "description": "Three executed results whose trust label the pipeline cannot take as given (harness-side mock_provenance): read_file with trust absent and the adapter claiming trusted true; list_dir with trust null and trusted true; append_note (normally trusted_runtime) relabelled with the unrecognized trust \"sorta_trusted\". Absent and null become unknown with trusted null; the unrecognized string becomes external_untrusted with trusted false; the adapter-supplied trusted flag is never read. Checked as emitted and after a JCS round trip. The user request is registered first so the turn floor is user_supplied and the mock policy (0.3 cut E1) authorizes the append_note.",
   "limits": {
     "max_argument_bytes": 65536
   },
@@ -18,6 +18,22 @@
     }
   },
   "steps": [
+    {
+      "input": {
+        "input_id": "in-27-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "runtime:user-turn-1",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-27",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
     {
       "turn": 0,
       "dialect": "openai",

@@ -1,6 +1,6 @@
 {
   "case": "40-source-class-model-generated",
-  "description": "Source class model_generated. The pipeline does not record the model's own text: after a plain-text turn the next call still sees only the user input (floor user_supplied). The host registers the earlier model output as model_generated with trust external_untrusted when it feeds it back; the following call's floor drops to external_untrusted.",
+  "description": "Source class model_generated. The pipeline does not record the model's own text: after a plain-text turn the next call still sees only the user input (floor user_supplied). The host registers the earlier model output as model_generated with trust external_untrusted when it feeds it back; the following call's floor drops to external_untrusted. Under the mock policy (0.3 cut E1) that append_note is an effect at an untrusted floor, so it waits for approval and is not executed; the host still records its non-data result.",
   "limits": {
     "max_argument_bytes": 65536
   },
@@ -102,12 +102,12 @@
       },
       {
         "request_id": "call_40b",
-        "stage": "SUCCEEDED",
-        "decision": "authorized",
-        "status": "ok",
-        "error_code": null,
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
         "decide_invoked": true,
-        "execute_invoked": true,
+        "execute_invoked": false,
         "result_digest": null
       }
     ],
@@ -136,7 +136,7 @@
     ],
     "runtime": {
       "decide_calls": 2,
-      "execute_calls": 2
+      "execute_calls": 1
     },
     "inputs": [
       {
@@ -183,8 +183,8 @@
       },
       {
         "input_id": "in-auto-1",
-        "content_kind": "workspace_content",
-        "trust": "trusted_runtime",
+        "content_kind": "unknown",
+        "trust": "unknown",
         "source": {
           "kind": "runtime",
           "id": "mock"
@@ -193,7 +193,7 @@
         "trace_id": "trace-40",
         "parent_id": "call_40b",
         "derived_from": [],
-        "content_digest": "sha256:6e968d85992d71255dfe60a74843a56523e677e7554def325251cad44b8a054a"
+        "content_digest": "sha256:bdd69c5dc43d9eb7d6e540d99fc7af63913934cd7dd6544248f06bb154bfccfc"
       }
     ],
     "exposure": [

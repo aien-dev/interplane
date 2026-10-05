@@ -1,6 +1,6 @@
 corpus: conformance/fixtures
-corpus_files: 115
-corpus_digest: sha256:c400e6bb34e5ac22d6c02344fb9cb2153b4cb77d9c40d5ad568bea1ac4e28476
+corpus_files: 117
+corpus_digest: sha256:00e424596408ae08fbb44b8a3c971685b1f66f0237d236783f03cb1815314fd4
 negative_controls: conformance/negative-controls.json
 negative_controls_sha256: sha256:7bc5c9b51b04d82b2c77a260caf6ba0bbfcd73e0da5d5b4f3071b071d2cb04fd
 protocol: bench/PROTOCOL-0.3.md

@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0001",
+  "content_kind": "workspace_content",
+  "trust": "workspace_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-fs"
+  },
+  "origin": "file:README.md",
+  "content_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "trace_id": "trace-ex",
+  "parent_id": "req-1",
+  "derived_from": []
+}

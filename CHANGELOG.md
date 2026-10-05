@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased (0.3, Trust lane)
+
+- Security: the Rust lifecycle now accepts an approval continuation only with the `approval_id` the runtime minted for that request, as Python already did; before, any non-empty id was accepted. A non-`authorized` continuation value with the minted id is DENIED in both SDKs. Lifecycle conformance cases `lifecycle/01-05`; 30/30 byte-identical.
+- Trust vocabulary reconciled (plan cut P1, gaps G1-G3): CROSSVEIL.md default is `tool_result` + `unknown` (the undefined `untrusted_tool_content` and `origin` are gone), VERSIONING.md lists `ContentKind` in place of the undefined `Origin`. Python now reads an unrecognized or non-string `content_kind` as `unknown`, as Rust did; non-string trust is `external_untrusted`. Odysseus `system` result integrity maps to `trusted_runtime` unless Odysseus's own gate marks the result untrusted. Conformance cases 26, 27 (with a harness-only `mock_provenance` seam and JCS round-trip checks); 32/32 byte-identical together with lifecycle/01-05.
+- InputRecord and Exposure types (plan cut P2): `spec/schemas/input.schema.json`, optional `provenance.exposure` in `intent.schema.json`, Crossveil Trust rules 5 and 6, Rust and Python types in lockstep, one schema-valid example per source class under `conformance/fixtures/input/`, digest fixtures `digest/input-record-01` and `digest/exposure-01` identical in both languages; types only, no pipeline behaviour (cut P3).
+- Pipeline input ledger and exposure (plan cut P3): the pipeline records every rendered result as an InputRecord (`parent_id` = its `request_id`), the host registers other inputs with the host-only `register_input`, and every `tool_request` and `CallContext` carries a computed `provenance.exposure` (a forged one is overwritten; an empty ledger, unknown trust or an untraceable `derived_from` gives `external_untrusted`). Conformance cases 28-30 and new optional `expected.inputs` / `expected.exposure`; 35/35 byte-identical in both SDKs, earlier verdicts unchanged.
+
 ## Unreleased (0.2, CrossAxis lane)
 
 - 0.2 report: `docs/REPORT-0.2.md`. Pre-registered gate verdict FAIL (O1 0.865, O2 0/5; T 0.877 and S pass).

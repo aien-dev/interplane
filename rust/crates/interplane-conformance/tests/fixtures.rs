@@ -12,7 +12,11 @@ fn every_fixture_passes() {
         let errs = compare(fx, &run);
         assert!(errs.is_empty(), "{}: {errs:?}", run.case);
     }
-    assert_eq!(check_digest_fixture(&dir), None);
+    let digests = check_digest_fixtures(&dir);
+    assert!(digests.len() >= 2);
+    for (name, err) in digests {
+        assert_eq!(err, None, "{name}");
+    }
 }
 
 #[test]
@@ -40,7 +44,7 @@ fn verdicts_are_deterministic() {
 fn expanded_in_capability_is_still_denied_and_a_changed_selection_is_detected() {
     let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../conformance/fixtures");
     let all = load_fixtures(&dir).unwrap();
-    assert_eq!(all.len(), 25);
+    assert_eq!(all.len(), 30);
     let mut fx = all
         .into_iter()
         .find(|f| f["case"] == "24-expansion-requested-excluded")

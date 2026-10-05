@@ -46,6 +46,16 @@ and needs no change (the `odysseus_text` dialect is registered adapter-locally).
   `workspace_untrusted` arms the gate), or set `external_context_seen=True` on the constructor.
   Odysseus itself treats a workspace read as arming the gate, so a later `send_email` in the same trace
   is `requires_approval`.
+* **Result trust.** Odysseus's `ResultIntegrity` (`tool_capabilities.py:37-46`) has a `system` value that
+  is not an INTERPLANE `TrustLevel`; the pipeline used to fold it to `external_untrusted` silently. The
+  adapter now maps it explicitly: `system` (Odysseus's label for server-authored output) is
+  `trusted_runtime` unless Odysseus's own `tool_result_should_arm_gate` (`:506-528`) says the result
+  carries non-system content (the producer set `untrusted_content`), then `external_untrusted`.
+  `workspace_untrusted` and `external_untrusted` carry over; anything else is `external_untrusted`.
+  Limit: `system` is Odysseus's *default* for a registered tool, so a tool Odysseus registers without an
+  explicit integrity is labelled `trusted_runtime` through this adapter. None of the four tools the
+  adapter executes is `system` at 2992bf6 (all are `workspace_untrusted`), so no executed result
+  changes label today.
 * **Approval handle.** `odysseus-pending-<request_id>` is an opaque handle. Odysseus mints sealed
   `PendingToolApproval` objects only inside its agent loop (`tool_approvals.py:144`); the adapter does
   not, and 0.1 has no path that turns the handle into an authorization.

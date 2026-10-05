@@ -1,0 +1,8 @@
+# Sibling checkouts the AIEN adapter needs. One source of truth: CI (.github/workflows/ci.yml, job
+# adapter-aien) and local setup (README.md) both read this file. Format: KEY=value, no spaces.
+AEGIS_RUNTIME_REPO=https://github.com/aien-dev/aegis-runtime.git
+AEGIS_RUNTIME_REV=f4e870953a466bb1cf68f1d88285929024cf1ba9
+AIEN_PROTOCOLS_REPO=https://github.com/aien-dev/aien-protocols.git
+AIEN_PROTOCOLS_REV=3a4cdbe8d360a2e1ddb3e8b108684048b9d4ba10
+# Pinned in Cargo.toml (git dependency); CI checks that Cargo.toml and this line agree.
+SOVEREIGN_CORE_REV=6554aac7d81b04c91202e6bb0c90d258c8a07f04

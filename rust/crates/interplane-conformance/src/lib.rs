@@ -2,7 +2,9 @@
 //! mock runtime per case and compares the result with `expected`.
 use std::path::Path;
 
-use interplane_core::{canonicalize, digest, Limits, RequestLedger};
+use interplane_core::{
+    canonicalize, digest, Decision, Lifecycle, Limits, RequestLedger, ToolResult,
+};
 use interplane_crossaxis::{expand, select};
 use interplane_crossveil::{
     mock_mapping_table, MockRuntime, ObservedRecord, Pipeline, RuntimeAuthority,
@@ -22,6 +24,10 @@ pub struct CaseRun {
     pub results: Vec<Value>,
     /// The selection receipt after each `expand` step, in order.
     pub selections: Vec<Value>,
+    /// The trace's input ledger after the last step (0.3 cut P3), in registration order.
+    pub inputs: Vec<Value>,
+    /// `{request_id, inputs, floor}` the runtime saw in `CallContext` at `decide`, in order.
+    pub exposure: Vec<Value>,
 }
 
 /// Run one fixture document.
@@ -30,10 +36,14 @@ pub fn run_case(fx: &Value) -> CaseRun {
     let trace = fx["trace_id"].as_str().unwrap_or("trace").to_string();
     let limits: Limits = serde_json::from_value(fx["limits"].clone()).unwrap_or_default();
     let mut rt = MockRuntime::new();
+    if let Some(o) = fx["mock_provenance"].as_object() {
+        rt.provenance_overrides = o.clone();
+    }
     let mut observed = vec![];
     let mut turns = vec![];
     let mut results = vec![];
     let mut selections = vec![];
+    let mut inputs: Vec<Value> = vec![];
     let catalog = rt.catalog();
     let mut sel = fx.get("selection").map(|spec| {
         let strings = |k: &str| -> Vec<String> {
@@ -91,6 +101,11 @@ pub fn run_case(fx: &Value) -> CaseRun {
                 let (r, o) = p.admit_value(env);
                 results.push(serde_json::to_value(&r).unwrap_or(Value::Null));
                 observed.push(o);
+            } else if step.get("input").is_some() && step.get("dialect").is_none() {
+                // Host-only input registration (0.3 cut P3): never reachable from model input.
+                if let Ok(rec) = serde_json::from_value(step["input"].clone()) {
+                    let _ = p.register_input(rec);
+                }
             } else if let Some(d) = step["dialect"].as_str() {
                 let model = step["model"].as_str().unwrap_or("");
                 let out = p.run_turn(d, model, &step["input"], &trace, turn);
@@ -108,6 +123,14 @@ pub fn run_case(fx: &Value) -> CaseRun {
                 observed.extend(out.records);
             }
         }
+        // Reported only for cases that assert them, so older verdicts keep their shape.
+        if fx["expected"].get("inputs").is_some() {
+            inputs = p
+                .inputs(&trace)
+                .iter()
+                .map(|r| serde_json::to_value(r).unwrap_or(Value::Null))
+                .collect();
+        }
     }
     CaseRun {
         case,
@@ -117,6 +140,12 @@ pub fn run_case(fx: &Value) -> CaseRun {
         execute_calls: rt.execute_calls,
         results,
         selections,
+        inputs,
+        exposure: if fx["expected"].get("exposure").is_some() {
+            rt.seen_exposure.clone()
+        } else {
+            vec![]
+        },
     }
 }
 
@@ -182,14 +211,47 @@ pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
             errs.push("selections differ from expected".to_string());
         }
     }
+    if let Some(want) = exp.get("inputs").and_then(Value::as_array) {
+        // Subset match per record: a fixture may omit `content_digest` of an automatic record.
+        let ok = want.len() == run.inputs.len()
+            && want.iter().zip(&run.inputs).all(|(w, g)| {
+                w.as_object()
+                    .is_some_and(|o| o.iter().all(|(k, v)| g.get(k) == Some(v)))
+            });
+        if !ok {
+            errs.push(format!(
+                "inputs: expected {}, got {}",
+                canonicalize(&Value::Array(want.clone())),
+                canonicalize(&Value::Array(run.inputs.clone()))
+            ));
+        }
+    }
+    if let Some(want) = exp.get("exposure") {
+        if want != &Value::Array(run.exposure.clone()) {
+            errs.push(format!(
+                "exposure: expected {}, got {}",
+                canonicalize(want),
+                canonicalize(&Value::Array(run.exposure.clone()))
+            ));
+        }
+    }
     for c in exp["result_checks"].as_array().cloned().unwrap_or_default() {
         let rid = c["request_id"].as_str().unwrap_or("");
         let path = c["path"].as_str().unwrap_or("");
-        let found = run
+        let result = run
             .results
             .iter()
-            .find(|r| r["request_id"].as_str() == Some(rid))
-            .and_then(|r| dotted(r, path));
+            .find(|r| r["request_id"].as_str() == Some(rid));
+        // `round_trip`: read the value after JCS serialization and a parse back into the
+        // SDK's own result type, as a receiver would see it.
+        let parsed = if c["round_trip"] == json!(true) {
+            result
+                .and_then(|r| serde_json::from_str::<ToolResult>(&canonicalize(r)).ok())
+                .and_then(|t| serde_json::to_value(t).ok())
+        } else {
+            result.cloned()
+        };
+        let found = parsed.as_ref().and_then(|r| dotted(r, path));
         if found != Some(&c["equals"]) {
             errs.push(format!(
                 "result_check {rid}:{path}: expected {}, got {:?}",
@@ -210,6 +272,12 @@ pub fn verdict(run: &CaseRun, errs: &[String]) -> Value {
     });
     if !run.selections.is_empty() {
         v["selections"] = Value::Array(run.selections.clone());
+    }
+    if !run.inputs.is_empty() {
+        v["inputs"] = Value::Array(run.inputs.clone());
+    }
+    if !run.exposure.is_empty() {
+        v["exposure"] = Value::Array(run.exposure.clone());
     }
     v
 }
@@ -239,18 +307,67 @@ pub fn load_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
         .collect()
 }
 
-/// Check the JCS digest fixture (`digest/jcs-01.json`) if present. Returns an error text on mismatch.
-pub fn check_digest_fixture(dir: &Path) -> Option<String> {
-    let p = dir.join("digest").join("jcs-01.json");
-    let fx: Value = serde_json::from_str(&std::fs::read_to_string(p).ok()?).ok()?;
-    let got = canonicalize(&fx["value"]);
+/// Check every `digest/*.json` fixture. A fixture with a `"type"` is also parsed as that SDK type
+/// and re-serialized before the JCS and digest are compared. Returns `(name, error)` per fixture.
+pub fn check_digest_fixtures(dir: &Path) -> Vec<(String, Option<String>)> {
+    let mut paths: Vec<_> = match std::fs::read_dir(dir.join("digest")) {
+        Ok(rd) => rd
+            .filter_map(Result::ok)
+            .map(|e| e.path())
+            .filter(|p| p.extension().is_some_and(|x| x == "json"))
+            .collect(),
+        Err(_) => return Vec::new(),
+    };
+    paths.sort();
+    paths
+        .iter()
+        .map(|p| {
+            let name = format!("digest/{}", p.file_stem().unwrap().to_string_lossy());
+            (name, check_digest_file(p))
+        })
+        .collect()
+}
+
+fn check_digest_file(p: &Path) -> Option<String> {
+    let fx: Value = match std::fs::read_to_string(p)
+        .map_err(|e| e.to_string())
+        .and_then(|s| serde_json::from_str(&s).map_err(|e| e.to_string()))
+    {
+        Ok(v) => v,
+        Err(e) => return Some(e),
+    };
+    let value = match fx.get("type").and_then(Value::as_str) {
+        None => fx["value"].clone(),
+        Some(t) => match typed_roundtrip(t, &fx["value"]) {
+            Ok(v) => v,
+            Err(e) => return Some(e),
+        },
+    };
+    let got = canonicalize(&value);
     if fx["expected_jcs"].as_str() != Some(got.as_str()) {
         return Some(format!("jcs mismatch: got {got}"));
     }
-    if fx["expected_sha256"].as_str() != Some(digest(&fx["value"]).as_str()) {
+    if fx["expected_sha256"].as_str() != Some(digest(&value).as_str()) {
         return Some("sha256 mismatch".into());
     }
     None
+}
+
+/// Parse `value` as the named SDK type and serialize it back.
+fn typed_roundtrip(ty: &str, value: &Value) -> Result<Value, String> {
+    let e = |e: serde_json::Error| e.to_string();
+    match ty {
+        "InputRecord" => {
+            let t: interplane_core::InputRecord =
+                serde_json::from_value(value.clone()).map_err(e)?;
+            serde_json::to_value(t).map_err(e)
+        }
+        "Exposure" => {
+            let t: interplane_core::Exposure = serde_json::from_value(value.clone()).map_err(e)?;
+            serde_json::to_value(t).map_err(e)
+        }
+        _ => Err(format!("unknown fixture type {ty}")),
+    }
 }
 
 /// Silence an unused-import lint for `RuntimeAuthority` in docs builds.
@@ -266,4 +383,54 @@ pub fn verdicts(rows: Vec<(String, Value)>) -> Value {
         m.insert(k, v);
     }
     Value::Object(m)
+}
+
+/// Load `lifecycle/NN-*.json` fixtures, sorted by file name. Absent directory = none.
+pub fn load_lifecycle_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
+    let sub = dir.join("lifecycle");
+    if !sub.is_dir() {
+        return Ok(vec![]);
+    }
+    load_fixtures(&sub)
+}
+
+/// Drive the Crossveil lifecycle directly (no pipeline): for each step, the lifecycle of
+/// `request_id` (created and mapped on first sight) receives `decision`. Each step yields the
+/// state after the call and whether the call was refused. Returns `(rows, disagreements)`.
+pub fn run_lifecycle_case(fx: &Value) -> (Vec<Value>, Vec<String>) {
+    let mut lcs: Vec<Lifecycle> = vec![];
+    let mut rows = vec![];
+    for step in fx["steps"].as_array().cloned().unwrap_or_default() {
+        let rid = step["request_id"].as_str().unwrap_or("").to_string();
+        let idx = match lcs.iter().position(|l| l.request_id() == rid) {
+            Some(i) => i,
+            None => {
+                let mut l = Lifecycle::new(&rid);
+                let _ = l.map();
+                lcs.push(l);
+                lcs.len() - 1
+            }
+        };
+        let lc = &mut lcs[idx];
+        let refused = match serde_json::from_value::<Decision>(step["decision"].clone()) {
+            Ok(d) => lc.apply_decision(&d).is_err(),
+            Err(_) => true,
+        };
+        rows.push(json!({"request_id": rid, "state": lc.state().name(), "refused": refused}));
+    }
+    let want = fx["expected"].as_array().cloned().unwrap_or_default();
+    let mut errs = vec![];
+    if want != rows {
+        errs.push(format!(
+            "steps: expected {}, got {}",
+            canonicalize(&Value::Array(want)),
+            canonicalize(&Value::Array(rows.clone()))
+        ));
+    }
+    (rows, errs)
+}
+
+/// One row of the verdict file for a lifecycle case.
+pub fn lifecycle_verdict(rows: &[Value], errs: &[String]) -> Value {
+    json!({"pass": errs.is_empty(), "steps": rows})
 }

@@ -1,7 +1,7 @@
 //! Crossveil: the authority boundary. A runtime adapter supplies `decide` and `execute`; the
 //! [`Pipeline`] enforces the CORE.md / CROSSVEIL.md invariants around them and never fabricates,
 //! caches, upgrades or reuses a decision.
-use interplane_core::{CapabilityRequest, Catalog, Decision, Party, ToolResult};
+use interplane_core::{CapabilityRequest, Catalog, Decision, Exposure, Party, ToolResult};
 use serde_json::Value;
 
 pub mod mock;
@@ -19,6 +19,9 @@ pub struct CallContext {
     pub model: Party,
     /// Runtime-local session handle the adapter may attach.
     pub session: Option<Value>,
+    /// What the model could see when it produced this request (0.3 cut P3). Always computed by
+    /// the pipeline from its own input ledger, never read from the model or the envelope.
+    pub exposure: Option<Exposure>,
 }
 
 /// The two callbacks that touch a runtime, plus its catalog.

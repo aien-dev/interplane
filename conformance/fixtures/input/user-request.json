@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0009",
+  "content_kind": "user_request",
+  "trust": "user_supplied",
+  "source": {
+    "kind": "operator",
+    "id": "operator-1"
+  },
+  "origin": "runtime:user-turn-1",
+  "content_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+  "trace_id": "trace-ex",
+  "parent_id": "msg-1",
+  "derived_from": []
+}

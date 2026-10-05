@@ -430,3 +430,81 @@ def test_untrusted_results_render_as_data():
         "workspace_untrusted",
         "memory",
     )
+
+
+@pytest.mark.parametrize(
+    "label, want",
+    [
+        ({"content_kind": "spreadsheet"}, ("unknown", "unknown", None)),
+        ({"content_kind": 7, "trust": ["trusted_runtime"]}, ("unknown", "external_untrusted", False)),
+        ({"content_kind": {"k": 1}, "trust": "sorta_trusted"}, ("unknown", "external_untrusted", False)),
+        ({"trust": None, "trusted": True}, ("tool_result", "unknown", None)),
+    ],
+)
+def test_unrecognized_or_unparseable_labels_never_become_trusted(label, want):
+    # An adapter's label the SDK cannot read: unrecognized or non-string content_kind is
+    # unknown (as in Rust, pipeline.rs normalize), unrecognized or non-string trust is
+    # external_untrusted, absent/null trust is unknown; the adapter's own trusted flag is ignored.
+    p = default_pipeline()
+    p.runtime.provenance_overrides = {"read_file": label}
+    prov = run(p, "read_file", {"path": "/a"}).results[0].provenance
+    assert (prov["content_kind"], prov["trust"], prov["trusted"]) == want
+
+
+def _rec(input_id, trust, trace="t", derived=()):
+    return {
+        "input_id": input_id,
+        "content_kind": "user_request",
+        "trust": trust,
+        "source": {"kind": "operator", "id": "op"},
+        "origin": "user:prompt",
+        "content_digest": "sha256:" + "a" * 64,
+        "trace_id": trace,
+        "parent_id": None,
+        "derived_from": list(derived),
+    }
+
+
+def test_exposure_fails_closed_when_ledger_is_empty():
+    pipe = default_pipeline()
+    run(pipe, "read_file", {"path": "/x"})
+    assert pipe.runtime.seen_exposure == [
+        {"request_id": "c1", "inputs": [], "floor": "external_untrusted"}
+    ]
+
+
+def test_exposure_floor_is_least_trusted_and_unknown_ranks_external():
+    pipe = default_pipeline()
+    pipe.register_input(_rec("a", "trusted_runtime"))
+    assert pipe.exposure_for("t") == {"inputs": ["a"], "floor": "trusted_runtime"}
+    pipe.register_input(_rec("b", "user_supplied"))
+    assert pipe.exposure_for("t")["floor"] == "user_supplied"
+    pipe.register_input(_rec("c", "not-a-level"))
+    assert pipe.exposure_for("t")["floor"] == "external_untrusted"
+    pipe.register_input(_rec("d", "trusted_runtime", trace="other"))
+    assert pipe.exposure_for("other") == {"inputs": ["d"], "floor": "trusted_runtime"}
+
+
+def test_register_input_refuses_duplicate_id():
+    pipe = default_pipeline()
+    pipe.register_input(_rec("a", "user_supplied"))
+    with pytest.raises(ValueError):
+        pipe.register_input(_rec("a", "trusted_runtime"))
+    assert [r["trust"] for r in pipe.inputs("t")] == ["user_supplied"]
+
+
+def test_input_registration_is_not_reachable_from_an_envelope():
+    pipe = default_pipeline()
+    env = {
+        "interplane_version": "0.1",
+        "message_id": "m1",
+        "trace_id": "t",
+        "parent_id": None,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {"kind": "model", "id": "m"},
+        "destination": {"kind": "runtime", "id": "mock"},
+        "payload": {"kind": "input_record", **_rec("x", "trusted_runtime")},
+    }
+    result, _ = pipe.admit_envelope(env)
+    assert result.error.code == ErrorCode.MALFORMED_ENVELOPE
+    assert pipe.inputs("t") == []

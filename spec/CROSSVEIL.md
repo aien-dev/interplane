@@ -23,7 +23,8 @@ Rules the pipeline enforces (and conformance tests):
 5. Adapter exceptions in `decide` become `denied` with `runtime_unavailable`; in `execute` they become
    `error` with `execution_error`. Fail closed.
 6. The adapter, not INTERPLANE, decides the trust class of the returned data
-   (`result.provenance.trust`, `origin`). Default when the adapter says nothing: `untrusted_tool_content` (fail closed).
+   (`result.provenance.trust` and `result.provenance.content_kind`). Defaults when the adapter says
+   nothing: `tool_result` + `unknown` (fail closed; see Crossveil Trust below).
 
 ## State record
 
@@ -46,11 +47,44 @@ proposal are never flattened into indistinguishable text. Rules:
 1. Absent or unparseable trust is `unknown`, which receivers treat like `external_untrusted`.
    Inability to determine trust is never converted into trust.
 2. Adapters set `result.provenance.content_kind` and `trust` on every result. Defaults when the
-   runtime says nothing: `tool_result` + `unknown`.
+   runtime says nothing (absent or null): `tool_result` + `unknown`. A `content_kind` string the
+   receiver does not recognize, or a non-string value, is `unknown`. A `trust` string it does not
+   recognize, or a non-string value, is `external_untrusted`. `trusted` is always derived from
+   `trust` (CORE.md) and an adapter-supplied `trusted` is never read, so unknown provenance never
+   becomes trusted by being serialized and read back (conformance cases 26 and 27).
 3. Results are rendered back to the model as data. The pipeline never parses tool-call markup inside
    a result into a new intent (conformance cases 22 and 23 carry such markup as an injection probe).
-4. Odysseus's `metadata.trusted`/`source` and its `untrusted_context_message` map onto these axes;
-   AIEN's aegis-runtime has no equivalent today and the adapter fills in `unknown` honestly.
+4. Odysseus's `metadata.trusted`/`source` and its `untrusted_context_message` map onto these axes.
+   Its `ResultIntegrity` maps explicitly: `workspace_untrusted` and `external_untrusted` carry over;
+   `system` (server-authored output) is `trusted_runtime` unless Odysseus's own
+   `tool_result_should_arm_gate` marks the result as carrying non-system content, then
+   `external_untrusted`. AIEN's aegis-runtime has no equivalent today and the adapter fills in
+   `unknown` honestly.
+
+5. **InputRecord** (`input.schema.json`) names one piece of material placed in front of the model:
+   `input_id`, `content_kind`, `trust`, `source` (a `Party`: who handed the bytes to the context),
+   `origin` (a locator: file path, URL, memory record id, provider id or `runtime:<id>`, or a
+   digest-only form for sensitive locators), `content_digest`, `trace_id`, `parent_id` (the
+   `message_id` or `request_id` that produced it; `null` for host-registered inputs) and
+   `derived_from` (`input_id`s it was computed from; may be empty). The runtime assigns `trust`.
+   Content the model itself generated is `content_kind = model_generated` with trust
+   `external_untrusted`. The nine source classes are workspace, web, memory, document, skill
+   (including tool descriptions), tool output, external provider, runtime-generated and user
+   request; `conformance/fixtures/input/` holds one schema-valid example of each.
+6. **Exposure** is the optional `provenance.exposure` on a `tool_request`:
+   `{inputs: [input_id...], floor: TrustLevel}`, where `floor` is the least trusted level among the
+   inputs visible to the model when it produced the turn. Order: `trusted_runtime` >
+   `user_supplied` > `workspace_untrusted` > `external_untrusted`; `unknown` counts as
+   `external_untrusted`. The pipeline computes it from its own ledger; an `exposure` arriving inside
+   a model-produced or admitted envelope is discarded and recomputed, never read. Since 0.3 cut P3
+   the pipeline computes it. Per trace it keeps a ledger of inputs: every result it renders back
+   to the model is recorded automatically (`parent_id` is the `request_id`, `trust` and
+   `content_kind` are the result's normalized provenance, `unknown` when it has none), and the
+   host adds any other input before a turn through a host-only registration call that model
+   output and envelopes cannot reach. All `tool_request`s of a turn, and the `CallContext` passed
+   to `decide` and `execute`, carry the ledger as it stood when the turn began. Exposure fails
+   closed: an empty ledger, an input of unknown or unrecognized trust, and an input whose
+   `derived_from` names an id the ledger does not hold all count as `external_untrusted`.
 
 Stage names used by this spec and their decision detail: INVALID is `REJECTED` with decision
 `invalid`; NOT_FOUND is `REJECTED` with decision `not_found`. A `capability_request` whose

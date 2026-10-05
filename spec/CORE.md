@@ -48,7 +48,7 @@ MAPPED
   -> REQUIRES_APPROVAL   runtime decision = requires_approval
   -> AUTHORIZED    runtime decision = authorized
 REQUIRES_APPROVAL
-  -> AUTHORIZED | DENIED   only by a NEW runtime decision that cites the approval_id
+  -> AUTHORIZED | DENIED   only by a NEW runtime decision that cites the minted approval_id
 AUTHORIZED
   -> EXECUTING     runtime began execution
 EXECUTING
@@ -57,7 +57,12 @@ EXECUTING
 
 Terminal: REJECTED, DENIED, SUCCEEDED, FAILED, TIMED_OUT. REQUIRES_APPROVAL is terminal for the
 request as far as the model is concerned; a later authorization is a new decision on the same
-`request_id` carrying `approval.approval_id`.
+`request_id` carrying `approval.approval_id`. The lifecycle keeps the non-empty `approval_id` from
+the `requires_approval` decision that put the request in REQUIRES_APPROVAL, and accepts a
+continuation only when it cites exactly that id. A continuation with no id, an empty id, an id the
+runtime never minted, or an id minted for another request is refused and the state does not change.
+With the minted id, `authorized` gives AUTHORIZED and every other value (including unknown values)
+gives DENIED. Conformance: `conformance/fixtures/lifecycle/`.
 
 Invariants (every implementation must enforce; conformance tests check them):
 
@@ -98,7 +103,10 @@ forced to `null`. Before the runtime is reached, `provenance.runtime` and `capab
 execute (denied, requires_approval, not_found, invalid, unknown decision, decide fault),
 `provenance.runtime` and `capability` are set and `content_kind`, `trust` and `trusted` are `null`:
 no data was produced, so there is no content to classify. The defaults `tool_result` / `unknown`
-apply only to executed results whose runtime said nothing about their content.
+apply only to executed results whose runtime said nothing about their content (absent or null).
+On an executed result, a `content_kind` the pipeline does not recognize (or a non-string) becomes
+`unknown`, a `trust` it does not recognize (or a non-string) becomes `external_untrusted`, and an
+adapter-supplied `trusted` is replaced by the value derived from `trust`.
 
 Error messages (pinned; `<x>` substituted; no other text):
 
@@ -173,6 +181,13 @@ A second table `mock-table-stale` is identical but carries `catalog_digest: "sha
 which the mock runtime does **not** have, so the runtime answers `not_found`. Any other name is
 `unknown_capability`.
 
+A fixture may carry `mock_provenance: {<capability>: {content_kind?, trust?, trusted?}}`. The
+runner copies it into the mock before the pipeline runs, and the mock's executed result for that
+capability reports those provenance values in place of the table's (a key present with `null`
+sets null). It stands in for a mislabelling adapter. It is harness configuration, like
+`mapping_table`: the mock never reads labels from arguments, `extensions` or envelopes, and the
+catalog is unchanged. Only cases 26 and 27 use it.
+
 The mock runtime validates `arguments` against the capability parameters (required keys present,
 declared types match) and answers `invalid` with `invalid_arguments` on failure. It counts
 `decide` and `execute` invocations; conformance records them.
@@ -203,8 +218,31 @@ One JSON file per case under `conformance/fixtures/NN-slug.json`:
 A `step` with `dialect` is parsed by Lenshift; the runner wraps each intent in an envelope with
 `message_id = "m-<case>-<turn>-<n>"`, `timestamp = "2026-01-01T00:00:00Z"`, source
 `{"kind":"model","id":<model>}`, destination `{"kind":"runtime","id":"mock"}`. A step with
-`envelope` is admitted as-is. Rendered results are fed back into the next step only when the step
+`envelope` is admitted as-is. A step with `input` and no `dialect` is a host-only input
+registration: the runner passes its `InputRecord` to the pipeline's `register_input` before the
+next turn (0.3 cut P3). Two optional `expected` blocks: `inputs`, the trace's ledger after the last
+step in order, each entry matched on the keys the fixture lists; and `exposure`, `[{request_id, inputs, floor}]` as seen in `CallContext` at each `decide`.
+Verdict files carry `inputs` and `exposure` only for cases that assert them. Rendered results are fed back into the next step only when the step
 declares `"continues": true`.
+
+Lifecycle fixtures live under `conformance/fixtures/lifecycle/NN-slug.json` and drive the
+lifecycle state machine directly, with no pipeline and no mock runtime:
+
+```json
+{
+  "case": "lifecycle/01-forged-approval-id",
+  "description": "...",
+  "steps": [ {"request_id": "call_L01", "decision": <decision>} ],
+  "expected": [ {"request_id": "call_L01", "state": "REQUIRES_APPROVAL", "refused": false} ]
+}
+```
+
+The runner creates and maps a lifecycle the first time it sees a `request_id`, then applies the
+step's `decision` to it. The first decision on each request is the runtime's `requires_approval`
+decision that mints the `approval_id`; later steps are continuation attempts. Each step yields the
+state after the call and `refused` (true when the lifecycle refused the decision or the decision
+did not parse). The verdict row is `{"pass", "steps"}` under the key `lifecycle/<slug>`; rows of
+the `NN-slug` cases are unchanged.
 
 ObservedRecord (deterministic, no timestamps, no durations):
 
@@ -245,6 +283,8 @@ to null. Rust and Python runners must emit byte-identical `observed` arrays.
 | 21 | stale capability mapping (table built against catalog digest `sha256:0000…`) | `rejected`, `stale_capability`, decide 0 |
 | 22 | untrusted tool result (`web_fetch` content carries tool-call markup) | ok; `provenance.trust = external_untrusted`, `content_kind = web_content`; the rendered tool message contains the markup verbatim; a following `continues` turn parses the model's text only, and 0 new intents come from the result |
 | 23 | untrusted memory result (`recall_memory`) | ok; trust `workspace_untrusted`, kind `memory`; rendered as data |
+| 26 | unrecognized `content_kind` (`read_file` labelled `spreadsheet` via `mock_provenance`) | ok; kind `unknown`, trust `unknown`, `trusted` null, also after a JCS round trip |
+| 27 | absent, null and unrecognized trust (`read_file` trust absent with `trusted: true`; `list_dir` trust null; `append_note` trust `sorta_trusted`) | absent and null: `unknown`, `trusted` null; unrecognized: `external_untrusted`, `trusted` false; also after a JCS round trip |
 
 Plus Lenshift dialect fixtures under `dialects/fixtures/<dialect>/` with expected canonical output
 (see `LENSHIFT.md`) and one JCS digest fixture under `conformance/fixtures/digest/`.

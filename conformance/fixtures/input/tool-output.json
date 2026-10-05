@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0006",
+  "content_kind": "tool_result",
+  "trust": "external_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-tools"
+  },
+  "origin": "runtime:mock-shell",
+  "content_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+  "trace_id": "trace-ex",
+  "parent_id": "req-5",
+  "derived_from": []
+}

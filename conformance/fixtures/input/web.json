@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0002",
+  "content_kind": "web_content",
+  "trust": "external_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-web"
+  },
+  "origin": "https://example.test/page",
+  "content_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "trace_id": "trace-ex",
+  "parent_id": "req-2",
+  "derived_from": []
+}

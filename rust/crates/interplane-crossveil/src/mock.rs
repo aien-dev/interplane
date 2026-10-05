@@ -120,6 +120,14 @@ fn build_table(catalog_digest: Option<String>) -> MappingTable {
 pub struct MockRuntime {
     pub decide_calls: u32,
     pub execute_calls: u32,
+    /// Harness-only: per capability, provenance keys (`content_kind`, `trust`, `trusted`) the
+    /// mock reports on an executed result in place of its defaults, as a mislabelling adapter
+    /// would. Set by the conformance runner from a fixture's `mock_provenance`; never read from
+    /// arguments, extensions or envelopes.
+    pub provenance_overrides: Map<String, Value>,
+    /// Harness-only: `{request_id, inputs, floor}` of the `CallContext.exposure` seen at each
+    /// `decide`, in order.
+    pub seen_exposure: Vec<Value>,
 }
 
 impl MockRuntime {
@@ -170,8 +178,15 @@ impl RuntimeAuthority for MockRuntime {
         "mock"
     }
 
-    fn decide(&mut self, req: &CapabilityRequest, _ctx: &CallContext) -> Decision {
+    fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
         self.decide_calls += 1;
+        if let Some(e) = &ctx.exposure {
+            self.seen_exposure.push(json!({
+                "request_id": req.request_id,
+                "inputs": e.inputs,
+                "floor": e.floor.as_str(),
+            }));
+        }
         let Some(spec) = SPECS.iter().find(|s| s.cap == req.capability) else {
             return self.decision(
                 req,
@@ -308,7 +323,7 @@ impl RuntimeAuthority for MockRuntime {
             ),
             _ => (None, None),
         };
-        r.provenance = Some(ResultProvenance {
+        let mut prov = ResultProvenance {
             runtime: Some("mock".into()),
             capability: Some(req.capability.clone()),
             duration_ms: Some(0),
@@ -316,7 +331,19 @@ impl RuntimeAuthority for MockRuntime {
             trust,
             trusted: None,
             extensions: Map::new(),
-        });
+        };
+        if let Some(o) = self.provenance_overrides.get(&req.capability) {
+            if let Some(v) = o.get("content_kind") {
+                prov.content_kind = serde_json::from_value(v.clone()).ok().flatten();
+            }
+            if let Some(v) = o.get("trust") {
+                prov.trust = serde_json::from_value(v.clone()).ok().flatten();
+            }
+            if let Some(v) = o.get("trusted") {
+                prov.trusted = v.as_bool();
+            }
+        }
+        r.provenance = Some(prov);
         r
     }
 

@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0003",
+  "content_kind": "memory",
+  "trust": "workspace_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-memory"
+  },
+  "origin": "memory:rec-41",
+  "content_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "trace_id": "trace-ex",
+  "parent_id": "req-3",
+  "derived_from": []
+}

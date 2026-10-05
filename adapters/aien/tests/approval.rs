@@ -23,6 +23,7 @@ fn ctx() -> CallContext {
         message_id: "m".into(),
         parent_id: None,
         model: Party::new("model", "m"),
+        exposure: None,
         session: None,
     }
 }

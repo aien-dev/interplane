@@ -51,7 +51,9 @@ pub enum LifecycleError {
     NotAuthorized,
     #[error("decision is for a different request")]
     WrongRequest,
-    #[error("approval transition needs a decision carrying approval.approval_id")]
+    /// The continuation did not cite the approval_id the runtime minted for this request
+    /// (absent, empty, never minted, or minted for another request).
+    #[error("approval requires a new decision citing the approval_id")]
     MissingApproval,
 }
 
@@ -62,6 +64,9 @@ pub enum LifecycleError {
 pub struct Lifecycle {
     request_id: String,
     state: State,
+    /// The non-empty approval_id the runtime minted in the decision that entered
+    /// REQUIRES_APPROVAL. A continuation must cite exactly this id.
+    approval_id: Option<String>,
 }
 
 impl Lifecycle {
@@ -70,6 +75,7 @@ impl Lifecycle {
         Self {
             request_id: request_id.to_string(),
             state: State::Proposed,
+            approval_id: None,
         }
     }
     pub fn state(&self) -> State {
@@ -95,8 +101,10 @@ impl Lifecycle {
     }
     /// Apply a runtime decision. From MAPPED: authorized -> AUTHORIZED, denied (and any unknown
     /// value) -> DENIED, requires_approval -> REQUIRES_APPROVAL, invalid/not_found -> REJECTED.
-    /// From REQUIRES_APPROVAL: only a NEW decision carrying `approval.approval_id`, either
-    /// authorized -> AUTHORIZED or denied/unknown -> DENIED.
+    /// From REQUIRES_APPROVAL: only a NEW decision citing the non-empty `approval.approval_id`
+    /// the runtime minted when it required approval; authorized -> AUTHORIZED, every other
+    /// value -> DENIED. Any other id (absent, empty, never minted, minted for another request)
+    /// is refused with [`LifecycleError::MissingApproval`] and the state does not change.
     pub fn apply_decision(&mut self, d: &Decision) -> Result<State, LifecycleError> {
         if d.request_id != self.request_id {
             return Err(LifecycleError::WrongRequest);
@@ -106,24 +114,23 @@ impl Lifecycle {
                 let next = match &d.decision {
                     DecisionKind::Authorized => State::Authorized,
                     DecisionKind::Denied => State::Denied,
-                    DecisionKind::RequiresApproval => State::RequiresApproval,
+                    DecisionKind::RequiresApproval => {
+                        self.approval_id = minted_id(d);
+                        State::RequiresApproval
+                    }
                     DecisionKind::NotFound | DecisionKind::Invalid => State::Rejected,
                     DecisionKind::Unknown(_) => State::Denied,
                 };
                 self.set(next)
             }
             State::RequiresApproval => {
-                let has = d
-                    .approval
-                    .as_ref()
-                    .is_some_and(|a| !a.approval_id.is_empty());
-                if !has {
+                let cited = minted_id(d);
+                if cited.is_none() || cited != self.approval_id {
                     return Err(LifecycleError::MissingApproval);
                 }
                 match &d.decision {
                     DecisionKind::Authorized => self.set(State::Authorized),
-                    DecisionKind::Denied | DecisionKind::Unknown(_) => self.set(State::Denied),
-                    _ => Err(LifecycleError::Illegal { from: self.state }),
+                    _ => self.set(State::Denied),
                 }
             }
             from => Err(LifecycleError::Illegal { from }),
@@ -155,4 +162,12 @@ impl Lifecycle {
         self.state = s;
         Ok(s)
     }
+}
+
+/// The decision's `approval.approval_id`, if present and non-empty.
+fn minted_id(d: &Decision) -> Option<String> {
+    d.approval
+        .as_ref()
+        .map(|a| a.approval_id.clone())
+        .filter(|id| !id.is_empty())
 }

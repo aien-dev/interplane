@@ -1,0 +1,230 @@
+{
+  "case": "28-input-ledger-continues",
+  "description": "The pipeline records every rendered result as an InputRecord (parent_id is the request_id) and the next turn's tool_requests see it: the exposure floor falls from user_supplied to workspace_untrusted to external_untrusted as memory and web results enter the ledger. Inputs are never removed.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-28",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-28-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-28",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_28a",
+            "type": "function",
+            "function": {
+              "name": "recall_memory",
+              "arguments": "{\"query\": \"tests\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "turn": 1,
+      "dialect": "openai",
+      "model": "mock-model",
+      "continues": true,
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_28b",
+            "type": "function",
+            "function": {
+              "name": "web_fetch",
+              "arguments": "{\"url\": \"https://example.com/page\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "turn": 2,
+      "dialect": "openai",
+      "model": "mock-model",
+      "continues": true,
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_28c",
+            "type": "function",
+            "function": {
+              "name": "list_dir",
+              "arguments": "{\"path\": \"/tmp\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_28a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_28b",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_28c",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      },
+      {
+        "turn": 1,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      },
+      {
+        "turn": 2,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 3,
+      "execute_calls": 3
+    },
+    "inputs": [
+      {
+        "input_id": "in-28-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "user:prompt",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-28",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "memory",
+        "trust": "workspace_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-28",
+        "parent_id": "call_28a",
+        "derived_from": [],
+        "content_digest": "sha256:a095be98e2fcb65b663206008baae917b76dc4d058e970147acc4a83a5d2aedc"
+      },
+      {
+        "input_id": "in-auto-1",
+        "content_kind": "web_content",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-28",
+        "parent_id": "call_28b",
+        "derived_from": [],
+        "content_digest": "sha256:b47a780a310060ded4fe2f28ef1e492c38d6aeda9642a553c7655b38e5185f49"
+      },
+      {
+        "input_id": "in-auto-2",
+        "content_kind": "tool_result",
+        "trust": "unknown",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-28",
+        "parent_id": "call_28c",
+        "derived_from": [],
+        "content_digest": "sha256:f3c9007bb6e656c560f57d1a752ca2fdda1f1829aca02dd2247eea370fa8f540"
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_28a",
+        "inputs": [
+          "in-28-user"
+        ],
+        "floor": "user_supplied"
+      },
+      {
+        "request_id": "call_28b",
+        "inputs": [
+          "in-28-user",
+          "in-auto-0"
+        ],
+        "floor": "workspace_untrusted"
+      },
+      {
+        "request_id": "call_28c",
+        "inputs": [
+          "in-28-user",
+          "in-auto-0",
+          "in-auto-1"
+        ],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

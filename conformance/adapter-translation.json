@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "note": "Normative data for the T3/T4 adapter subset rule and fixture translation (spec/CORE.md, Adapter subsets). Frozen by TRUST-DIGEST.txt.",
+  "harness_keys": ["mock_fault", "mock_provenance", "mapping_table", "selection"],
+  "harness_steps": ["mock", "expand"],
+  "mock_only_capabilities": ["fail_tool", "slow_tool"],
+  "delivered_reads": {
+    "web_fetch": {"content_kind": "web_content", "trust": "external_untrusted"},
+    "recall_memory": {"content_kind": "memory", "trust": "workspace_untrusted"},
+    "read_document": {"content_kind": "document", "trust": "external_untrusted"},
+    "load_skill": {"content_kind": "skill", "trust": "external_untrusted"},
+    "call_provider": {"content_kind": "external_provider", "trust": "external_untrusted"}
+  },
+  "approval_cases": {"first": 1, "last": 14},
+  "adapters": {
+    "odysseus": {
+      "system": "T3",
+      "runtime_id": "odysseus",
+      "native_reads": {
+        "read_file": {"name": "read_file", "args": {"path": {"const": "notes.txt"}}},
+        "list_dir": {"name": "ls", "args": {"path": {"const": "."}}}
+      },
+      "effects": {
+        "write_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"from": ["content", "text"]}}},
+        "append_note": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"from": ["text", "content"]}}},
+        "send_email": {"name": "send_email", "args": {"to": {"from": ["to"]}, "subject": {"from": ["subject"], "default": "notes"}, "body": {"from": ["body"]}}}
+      },
+      "approval_effects": {
+        "delete_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"const": "approval-case"}}}
+      }
+    },
+    "aien": {
+      "system": "T4",
+      "runtime_id": "aien",
+      "native_reads": {
+        "read_file": {"name": "read_file", "args": {"path": {"const": "notes.txt"}}},
+        "list_dir": {"name": "list_dir", "args": {"path": {"const": "."}}}
+      },
+      "effects": {
+        "write_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"from": ["content", "text"]}}},
+        "append_note": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"from": ["text", "content"]}}}
+      },
+      "approval_effects": {
+        "delete_file": {"name": "write_file", "args": {"path": {"from": ["path"], "as": "basename"}, "content": {"const": "approval-case"}}}
+      }
+    }
+  }
+}

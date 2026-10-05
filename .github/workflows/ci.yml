@@ -128,6 +128,9 @@ jobs:
         working-directory: interplane/adapters/aien
       - run: cargo test
         working-directory: interplane/adapters/aien
+      - name: T4 subset through the real Pipeline and AIEN authority (bench/PROTOCOL-0.3.md section 2; no skips)
+        run: T4_OUT=$RUNNER_TEMP/t4-verdicts.json cargo test --test t4_corpus -- --nocapture
+        working-directory: interplane/adapters/aien
   adapter-odysseus:
     runs-on: ubuntu-latest
     steps:
@@ -146,5 +149,9 @@ jobs:
           ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 \
             python -m pytest tests -q -p no:cacheprovider -rs | tee pytest.log
           ! grep -q "skipped" pytest.log
+      - name: T3 subset through the real Pipeline and Odysseus authority (bench/PROTOCOL-0.3.md section 2; no skips)
+        run: |
+          ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONPATH=$GITHUB_WORKSPACE/python:adapters/odysseus PYTHONDONTWRITEBYTECODE=1 \
+            python -m interplane_adapter_odysseus.t3 --out $RUNNER_TEMP/t3-verdicts.json
       - name: bench runner offline test (scripted endpoint, sim-1 backends, runtime-v1 with denial/approval negative controls)
         run: ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_runner_offline.py

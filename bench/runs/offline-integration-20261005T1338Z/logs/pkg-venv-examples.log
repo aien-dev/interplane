@@ -1,0 +1,15 @@
+call  capability   decision           executed
+c1    web_fetch    authorized         True    
+c2    send_email   denied             False   
+c3    write_file   denied             False   
+c4    append_note  requires_approval  False   
+
+exposure floor before turn 2: external_untrusted
+OK: the injected actions were denied or held; none executed.
+c1 add_item     floor before: user_supplied        decision: authorized         executed: True
+c2 list_items   floor before: user_supplied        decision: authorized         executed: True
+c3 add_item     floor before: workspace_untrusted  decision: requires_approval  executed: False
+c4 delete_item  floor before: external_untrusted   decision: requires_approval  executed: False
+c3 after a person approves: ('authorized', True)
+c4 after a person declines: ('denied', False)
+OK: the host decided every request; the held write ran once after approval, the delete never ran.

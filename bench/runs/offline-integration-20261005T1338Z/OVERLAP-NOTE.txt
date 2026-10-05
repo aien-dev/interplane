@@ -1,0 +1,9 @@
+Quiet hold: started 13:39Z (holder cand2-window, expected end 2026-10-05T13:59:12Z). Coordinator message received ~13:40Z.
+Steps run between 13:35Z and 14:00Z (UTC start/end, from steps.tsv):
+pip-install 13:38:49-13:38:52 | schema-selfcheck 13:38:52-13:38:52 | fixture-validation 13:38:52-13:38:52
+bench-validate 13:38:52 | bench-validate-0.2x 13:38:52 | live-injection-offline 13:38:52-13:38:53
+stats-newcombe 13:38:53 | analyze-tests 13:38:53-13:38:54 | rust-fmt 13:38:54 | rust-clippy 13:38:54-13:38:58
+rust-test (cargo test --all) 13:38:58-13:39:59 (hold began 13:39 during this step; allowed to finish)
+rust-negctl-tests 13:39:59-13:40:04 | rust-conformance 13:40:04-13:40:07 | py-pyflakes 13:40:07-13:40:07
+py-pytest: 13:40:07 to ~13:40:37 (303 passed in 29.03s per log); driver killed before its exit code was recorded in steps.tsv (log shows pass summary; rc not captured).
+Driver killed at ~13:40:40Z after the hold message; no step started after that. Remaining steps not run.

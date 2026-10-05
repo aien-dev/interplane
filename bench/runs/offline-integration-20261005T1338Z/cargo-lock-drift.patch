@@ -1,0 +1,13 @@
+diff --git a/adapters/aien/Cargo.lock b/adapters/aien/Cargo.lock
+index c7cbfc5..7615e40 100644
+--- a/adapters/aien/Cargo.lock
++++ b/adapters/aien/Cargo.lock
+@@ -1253,7 +1253,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "interplane-adapter-aien"
+-version = "0.3.0"
++version = "0.1.0"
+ dependencies = [
+  "aegis",
+  "aien-capability",

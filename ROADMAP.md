@@ -44,3 +44,13 @@ with listed limits.
 Next: **0.3 Trust**. In parallel, **0.2.x expansion follow-up** as a new pre-registered protocol
 (runtime-triggered expansion on unknown tool, failed call or approval; discovery prompting;
 reasoning off). That is planned work, not a result.
+
+## 0.3 closed (2026-10-05): gate PASS
+
+The pre-registered 0.3 trust gate (`bench/PROTOCOL-0.3.md`) passed on run
+`trust-0.3-20261005T0229Z`: provenance, cross-language identity, corpus, no untrusted effect,
+approvals and negative controls, over both SDKs and both adapters. The live-model leg (gate M)
+had 0 violations; the model followed injected text in 16 of 33 cases, which is reported, not gated.
+The claim covers the runtime layer only. See `docs/REPORT-0.3.md` for limits.
+
+Next: the 0.2.x campaign result as its own report, then **0.4 Execution**.

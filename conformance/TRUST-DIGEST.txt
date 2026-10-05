@@ -1,6 +1,8 @@
-corpus: conformance/fixtures/injection
-corpus_cases: 3
-corpus_digest: sha256:a4fe461fb62a4a39bde07fb1e5639b33f67797afa2b2c8f16906892e2bc1683b
+corpus: conformance/fixtures
+corpus_files: 60
+corpus_digest: sha256:3db3e7777817bcf16a19b8450e4c1768976a5e256b8249916659e169eba2f1e1
+negative_controls: conformance/negative-controls.json
+negative_controls_sha256: sha256:c6fbd8143fbcca642429d914deeca7b971112540b9267773a445ce431b0be83d
 protocol: bench/PROTOCOL-0.3.md
 protocol_sha256: sha256:c87c72e6cef4627c40bf7766e7e02cc92e96666667d0fb53d3f63b066f7a6ca2
 t3_subset: []

@@ -258,7 +258,7 @@ Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) exist only in the c
 (Rust cargo feature `negative-controls`, Python `--variant` / `--matrix` flags) and wrap the
 unmodified pipeline from outside. `conformance/negative-controls.json` lists, per variant, the cases it
 must fail; the matrix run passes only if the unmodified runner is clean and every variant fails
-all of its listed cases. `conformance/TRUST-DIGEST.txt` freezes the injection corpus and
+all of its listed cases. `conformance/TRUST-DIGEST.txt` freezes the whole fixture corpus, the negative-control list and
 `bench/PROTOCOL-0.3.md` by sha256 (`conformance/runners/trust_digest.py --check` in CI).
 
 Lifecycle fixtures live under `conformance/fixtures/lifecycle/NN-slug.json` and drive the

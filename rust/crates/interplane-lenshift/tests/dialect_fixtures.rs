@@ -102,5 +102,5 @@ fn dialect_fixtures_match() {
             n += 1;
         }
     }
-    assert!(n >= 54, "expected the 54 dialect fixtures, ran {n}");
+    assert!(n >= 56, "expected the 56 dialect fixtures, ran {n}");
 }

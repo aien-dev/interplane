@@ -99,14 +99,10 @@ impl Dialect for OpenAi {
                         continue;
                     }
                 },
-                // Some servers hand back an already-decoded object; accept it.
-                Some(Value::Object(m)) => m.clone(),
-                Some(Value::Null) | None => {
+                // `arguments` must be a JSON string (spec/LENSHIFT.md). An already-decoded object is
+                // what Ollama's own /api/chat sends, not an OpenAI-compatible endpoint.
+                _ => {
                     reject(&mut turn, "arguments is not valid JSON");
-                    continue;
-                }
-                Some(_) => {
-                    reject(&mut turn, "arguments is not an object");
                     continue;
                 }
             };

@@ -37,8 +37,10 @@ by an OpenAI-compatible `/v1/chat/completions` (non-streamed, or streamed and as
 caller; dialect `openai_stream` below assembles a stream).
 
 - `tool_calls[i].function.name` -> raw_name; `tool_calls[i].id` -> source_call_id.
-- `function.arguments` is a JSON string: parse; must be an object. Not JSON -> `malformed_tool_call`
-  "arguments is not valid JSON". JSON but not an object -> `malformed_tool_call` "arguments is not an object".
+- `function.arguments` is a JSON string: parse; must be an object. Not JSON, absent, or not a string
+  (an already-decoded object, as Ollama's own `/api/chat` sends, is not the OpenAI-compatible form)
+  -> `malformed_tool_call` "arguments is not valid JSON". JSON but not an object ->
+  `malformed_tool_call` "arguments is not an object".
 - Missing or empty name -> `malformed_tool_call`.
 - `content` -> text (null -> ""). `reasoning_content` / `reasoning` -> reasoning_digest.
 - Legacy `function_call` (single) is accepted as one call with no id.

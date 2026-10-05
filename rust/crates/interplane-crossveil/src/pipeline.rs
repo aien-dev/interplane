@@ -1,5 +1,5 @@
 //! The reference pipeline: admit -> map -> decide -> execute -> render.
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use interplane_core::*;
@@ -149,8 +149,61 @@ pub struct Pipeline<'a> {
     pending: HashMap<(String, String), PendingEntry>,
     /// The trace each entry of `events` belongs to (same length as `events`).
     event_traces: Vec<String>,
-    /// Traces closed by the host (session state limits); they stay refused for the pipeline's life.
+    /// Traces closed by the host (session state limits): the last `max_closed_traces` in close
+    /// order, exactly (`closed_order` keeps the order). Older ones are retired into `retired`.
     closed: HashSet<String>,
+    closed_order: VecDeque<String>,
+    retired: Option<RetiredFilter>,
+}
+
+/// Fixed-size filter of retired closed-trace ids (CORE.md, "Closing a trace"). Positions: the
+/// first four big-endian 32-bit words of sha256(trace id as UTF-8), each modulo `bits`. It never
+/// forgets an added id; it can match an id never added (a false refusal, fail closed). With
+/// `bits` 0 it matches every id once anything was added.
+#[derive(Debug, Clone)]
+struct RetiredFilter {
+    bits: usize,
+    data: Vec<u8>,
+    count: u64,
+}
+
+impl RetiredFilter {
+    fn new(bits: usize) -> Self {
+        Self {
+            bits,
+            data: vec![0; bits.div_ceil(8)],
+            count: 0,
+        }
+    }
+
+    fn positions(&self, trace: &str) -> [usize; 4] {
+        let hex = digest_bytes(trace.as_bytes());
+        let hex = &hex["sha256:".len()..];
+        let mut out = [0usize; 4];
+        for (i, slot) in out.iter_mut().enumerate() {
+            let word = u32::from_str_radix(&hex[8 * i..8 * i + 8], 16).unwrap_or(0);
+            *slot = (word as usize) % self.bits;
+        }
+        out
+    }
+
+    fn add(&mut self, trace: &str) {
+        self.count += 1;
+        if self.bits > 0 {
+            for pos in self.positions(trace) {
+                self.data[pos >> 3] |= 1 << (pos & 7);
+            }
+        }
+    }
+
+    fn matches(&self, trace: &str) -> bool {
+        if self.bits == 0 {
+            return self.count > 0;
+        }
+        self.positions(trace)
+            .iter()
+            .all(|&pos| self.data[pos >> 3] & (1 << (pos & 7)) != 0)
+    }
 }
 
 /// Position in the trust order; `unknown` and anything unrecognized rank as `external_untrusted`.
@@ -287,6 +340,8 @@ impl<'a> Pipeline<'a> {
             pending: HashMap::new(),
             event_traces: vec![],
             closed: HashSet::new(),
+            closed_order: VecDeque::new(),
+            retired: None,
         }
     }
 
@@ -312,9 +367,29 @@ impl<'a> Pipeline<'a> {
         held.len()
     }
 
+    /// True for a closed trace: in the window of recent closed ids, or matched by the retirement
+    /// filter (which may also match a trace that was never used: refused, fail closed). A trace
+    /// that holds state is never matched by the filter (a retired id can never hold state again).
+    fn is_closed(&self, trace: &str) -> bool {
+        self.closed.contains(trace)
+            || self
+                .retired
+                .as_ref()
+                .is_some_and(|f| !self.holds(trace) && f.matches(trace))
+    }
+
+    /// `(closed ids held exactly, bytes of the retirement filter)`: the state closing traces keeps.
+    /// Bounded by `(max_closed_traces, ceil(retired_filter_bits / 8))`.
+    pub fn closed_trace_state(&self) -> (usize, usize) {
+        (
+            self.closed.len(),
+            self.retired.as_ref().map_or(0, |f| f.data.len()),
+        )
+    }
+
     /// False for a closed trace, and for a new trace while `max_traces` are held.
     fn can_hold(&self, trace: &str) -> bool {
-        if self.closed.contains(trace) {
+        if self.is_closed(trace) {
             return false;
         }
         self.holds(trace) || self.held_count() < self.limits.max_traces
@@ -326,7 +401,7 @@ impl<'a> Pipeline<'a> {
 
     /// `(code, message)` when a further message on the trace is refused.
     fn message_refusal(&self, trace: &str) -> Option<(ErrorCode, String)> {
-        if self.closed.contains(trace) {
+        if self.is_closed(trace) {
             return Some(Self::closed_refusal(trace));
         }
         let limit = if !self.holds(trace) && self.held_count() >= self.limits.max_traces {
@@ -344,7 +419,7 @@ impl<'a> Pipeline<'a> {
 
     /// `(code, message)` when a further request id on the trace is refused.
     fn request_refusal(&self, trace: &str) -> Option<(ErrorCode, String)> {
-        if self.closed.contains(trace) {
+        if self.is_closed(trace) {
             return Some(Self::closed_refusal(trace));
         }
         if self.ledger.request_count(trace) >= self.limits.max_requests_per_trace {
@@ -366,11 +441,25 @@ impl<'a> Pipeline<'a> {
 
     /// Host-only: drop everything the pipeline keeps for the trace (ledger ids, inputs, approval
     /// entries, event sequence, events) and refuse any later message, request, input or
-    /// continuation on it with `session_closed`. Closing an unknown or closed trace is a no-op.
-    /// Not reachable from model output or an admitted envelope.
+    /// continuation on it with `session_closed`. Closing a trace that holds no state (unknown,
+    /// already closed or retired) is a no-op and records nothing. The id joins the window of the
+    /// last `max_closed_traces` closed ids; the oldest id leaving the window is retired into the
+    /// filter, so it stays refused. Not reachable from model output or an admitted envelope.
     pub fn close_trace(&mut self, trace: &str) {
-        if !self.closed.insert(trace.to_string()) {
+        if self.is_closed(trace) || !self.holds(trace) {
             return;
+        }
+        self.closed.insert(trace.to_string());
+        self.closed_order.push_back(trace.to_string());
+        while self.closed_order.len() > self.limits.max_closed_traces {
+            let Some(oldest) = self.closed_order.pop_front() else {
+                break;
+            };
+            self.closed.remove(&oldest);
+            let bits = self.limits.retired_filter_bits;
+            self.retired
+                .get_or_insert_with(|| RetiredFilter::new(bits))
+                .add(&oldest);
         }
         self.ledger.forget(trace);
         self.inputs.remove(trace);
@@ -388,7 +477,7 @@ impl<'a> Pipeline<'a> {
     /// reachable from model output or from an admitted envelope: those paths never call it.
     /// Refuses a duplicate `input_id` on the trace.
     pub fn register_input(&mut self, rec: InputRecord) -> Result<(), String> {
-        if self.closed.contains(&rec.trace_id) {
+        if self.is_closed(&rec.trace_id) {
             return Err(format!("session closed: {}", rec.trace_id));
         }
         let held = self.inputs.get(&rec.trace_id).map_or(0, Vec::len);
@@ -958,7 +1047,7 @@ impl<'a> Pipeline<'a> {
         request_digest: &str,
         now: &str,
     ) -> Result<(ToolResult, ObservedRecord), Refusal> {
-        if self.closed.contains(trace) {
+        if self.is_closed(trace) {
             return Err(Refusal::SessionClosed);
         }
         let key = (trace.to_string(), request_id.to_string());
@@ -1052,7 +1141,7 @@ impl<'a> Pipeline<'a> {
         trace: &str,
         request_id: &str,
     ) -> Result<(ToolResult, ObservedRecord), Refusal> {
-        if self.closed.contains(trace) {
+        if self.is_closed(trace) {
             return Err(Refusal::SessionClosed);
         }
         let key = (trace.to_string(), request_id.to_string());
@@ -1289,4 +1378,31 @@ fn normalize(mut r: ToolResult, cap: &CapabilityRequest) -> ToolResult {
     p.trusted = trust.trusted_flag();
     p.trust = Some(trust);
     r
+}
+
+#[cfg(test)]
+mod tests {
+    use super::RetiredFilter;
+
+    /// Filter positions at 1009 bits, computed from the CORE.md rule with sha256sum, outside both
+    /// SDKs (same literals as python/tests/test_session_limits.py).
+    const RETIRED_FILTER_POSITIONS_1009: [(&str, [usize; 4]); 3] = [
+        ("r0", [20, 106, 629, 750]),
+        ("f6", [278, 703, 321, 847]),
+        ("trace-\u{e9}", [733, 695, 298, 954]),
+    ];
+
+    #[test]
+    fn retirement_filter_positions_match_the_spec_vector() {
+        let mut f = RetiredFilter::new(1009);
+        for (t, want) in RETIRED_FILTER_POSITIONS_1009 {
+            assert_eq!(f.positions(t), want, "{t}");
+        }
+        f.add("r0");
+        // Bit p is bit p mod 8, least significant first, of byte p div 8.
+        let set: Vec<usize> = (0..1009)
+            .filter(|&i| f.data[i >> 3] >> (i & 7) & 1 == 1)
+            .collect();
+        assert_eq!(set, [20, 106, 629, 750]);
+    }
 }

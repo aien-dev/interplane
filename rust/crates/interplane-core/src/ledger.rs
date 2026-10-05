@@ -19,6 +19,15 @@ pub struct Limits {
     pub max_requests_per_trace: usize,
     #[serde(default = "default_session")]
     pub max_inputs_per_trace: usize,
+    /// Closed trace ids remembered exactly (CORE.md, "Closing a trace"); older ones are retired.
+    #[serde(default = "default_session")]
+    pub max_closed_traces: usize,
+    /// Size in bits of the filter that keeps retired closed trace ids refused.
+    #[serde(default = "default_filter_bits")]
+    pub retired_filter_bits: usize,
+}
+fn default_filter_bits() -> usize {
+    8_388_608
 }
 fn default_traces() -> usize {
     1024
@@ -41,6 +50,8 @@ impl Default for Limits {
             max_messages_per_trace: 4096,
             max_requests_per_trace: 4096,
             max_inputs_per_trace: 4096,
+            max_closed_traces: 4096,
+            retired_filter_bits: 8_388_608,
         }
     }
 }

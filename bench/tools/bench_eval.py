@@ -203,3 +203,30 @@ def run_metrics(task: dict, condition: str, run: dict) -> dict:
         "tool_schema_bytes_per_round_mean": (sum(r["tools_bytes"] for r in rounds) / n_rounds) if n_rounds else None,
         "infra_failure": bool(run.get("infra_failure")),
     }
+
+
+def r1_problems(receipt: dict) -> list:
+    """R1 receipt fields (PREREG-0.2y section 2): the full assistant text of every round and the
+    query string of every discovery call. Returns the problems found; an empty list means valid.
+    A B5 receipt with any problem is invalid (the analyzer must exclude the run)."""
+    bad = []
+    if not receipt.get("rounds"):
+        bad.append("no rounds recorded")
+    for r in receipt.get("rounds") or []:
+        if not isinstance(r.get("text"), str):
+            bad.append(f"round {r.get('round')}: no text")
+    for c in receipt.get("calls") or []:
+        if not c.get("discovery"):
+            continue
+        where = f"round {c.get('round')} call {c.get('index')}"
+        if "query" not in c:
+            bad.append(f"{where}: discovery call without query")
+        elif not isinstance(c["query"], str) and c.get("error_code") != "invalid_arguments":
+            # a non-string query is valid only as the model's own malformed call, which the
+            # runner records as an invalid_arguments error; anything else is a recording fault
+            bad.append(f"{where}: query is not a string and the call is not an invalid_arguments error")
+    return bad
+
+
+def r1_valid(receipt: dict) -> bool:
+    return not r1_problems(receipt)

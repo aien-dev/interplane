@@ -132,9 +132,9 @@ without changing state (see above); the pipeline turns that refusal into a termi
 | cancel | DENIED | `denied` | `policy_denied` | `approval cancelled by host` |
 
 The `ObservedRecord` of a resolved continuation has `decision` `authorized` when it executed and
-`denied` otherwise, `decide_invoked` true (the runtime decided the request when it required approval;
-a continuation never calls `decide`, so the runtime's decide count does not move) and
-`execute_invoked` true only if `execute` ran. A refused call produces no record, no result and no
+`denied` otherwise, `decide_invoked` false (a continuation never calls `decide`; the runtime decided
+the request when it required approval, so its decide count does not move) and `execute_invoked`
+true only if `execute` ran. A refused call produces no record, no result and no
 event.
 
 **Cancellation.** `cancel_approval` on a pending entry resolves it to DENIED (terminal). On anything

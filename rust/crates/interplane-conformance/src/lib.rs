@@ -91,6 +91,8 @@ pub struct CaseRun {
     /// The injection judge's counts, for fixtures with an `injection` block:
     /// `{injected_intents, violations, content_derived}`.
     pub injection: Option<Value>,
+    /// Step kinds the runner does not support yet (the case then fails).
+    pub unsupported: Vec<String>,
 }
 
 /// Run one fixture document.
@@ -114,6 +116,7 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
     let mut results = vec![];
     let mut selections = vec![];
     let mut inputs: Vec<Value> = vec![];
+    let mut unsupported: Vec<String> = vec![];
     let catalog = rt.catalog();
     let mut sel = fx.get("selection").map(|spec| {
         let strings = |k: &str| -> Vec<String> {
@@ -190,6 +193,11 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
                 );
                 results.push(rv);
                 observed.push(o);
+            } else if let Some(k) = ["approve", "cancel", "restart", "mock"]
+                .iter()
+                .find(|k| step.get(**k).is_some())
+            {
+                unsupported.push(format!("unsupported step kind: {k}"));
             } else if step.get("input").is_some() && step.get("dialect").is_none() {
                 // Host-only input registration (0.3 cut P3): never reachable from model input.
                 if let Ok(rec) = serde_json::from_value(step["input"].clone()) {
@@ -259,6 +267,7 @@ pub fn run_case_with(fx: &Value, ctl: Ctl) -> CaseRun {
             vec![]
         },
         injection,
+        unsupported,
     }
 }
 
@@ -306,7 +315,7 @@ fn dotted<'a>(v: &'a Value, path: &str) -> Option<&'a Value> {
 
 /// Compare a run with `expected`; returns the list of disagreements (empty = pass).
 pub fn compare(fx: &Value, run: &CaseRun) -> Vec<String> {
-    let mut errs = vec![];
+    let mut errs = run.unsupported.clone();
     let exp = &fx["expected"];
     let want: Vec<Value> = exp["observed"].as_array().cloned().unwrap_or_default();
     if want.len() != run.observed.len() {
@@ -482,6 +491,15 @@ pub fn load_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
 /// Load `injection/NN-*.json` fixtures (0.3 cut I1), sorted by file name. Absent directory = none.
 pub fn load_injection_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
     let sub = dir.join("injection");
+    if !sub.is_dir() {
+        return Ok(vec![]);
+    }
+    load_fixtures(&sub)
+}
+
+/// Load `approval/NN-*.json` fixtures (0.3 cut A2), sorted by file name. Absent directory = none.
+pub fn load_approval_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
+    let sub = dir.join("approval");
     if !sub.is_dir() {
         return Ok(vec![]);
     }
@@ -667,10 +685,12 @@ pub fn run_suite(dir: &Path, ctl: Ctl) -> Result<Suite, String> {
     let mut rows = vec![];
     let mut outcomes = vec![];
     let injection = load_injection_fixtures(dir)?;
+    let approval = load_approval_fixtures(dir)?;
     for (tag, fx) in fixtures
         .iter()
         .map(|f| (None, f))
         .chain(injection.iter().map(|f| (Some("in"), f)))
+        .chain(approval.iter().map(|f| (Some("ap"), f)))
     {
         let run = run_case_with(fx, ctl);
         let errs = compare(fx, &run);

@@ -1,0 +1,158 @@
+{
+  "case": "approval-A11-retry-new-request-id",
+  "description": "After requires_approval the model retries with a new request_id: it is decided afresh and gets its own approval_id. The old approval_id does not transfer to it.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-a11",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-approval-A11-retry-new-request-id-0",
+        "trace_id": "trace-a11",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "call_a11a",
+          "tool": {
+            "namespace": null,
+            "name": "delete_file"
+          },
+          "arguments": {
+            "path": "/tmp/old.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "delete_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-approval-A11-retry-new-request-id-1",
+        "trace_id": "trace-a11",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "call_a11b",
+          "tool": {
+            "namespace": null,
+            "name": "delete_file"
+          },
+          "arguments": {
+            "path": "/tmp/old.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "delete_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a11b",
+        "approval_id": "mock-approval-call_a11a"
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_a11a",
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_a11b",
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_a11b",
+        "stage": "DENIED",
+        "decision": "denied",
+        "status": "denied",
+        "error_code": "policy_denied",
+        "decide_invoked": false,
+        "execute_invoked": false,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 2,
+      "execute_calls": 0
+    },
+    "result_checks": [
+      {
+        "request_id": "call_a11a",
+        "path": "decision.approval.approval_id",
+        "equals": "mock-approval-call_a11a"
+      },
+      {
+        "request_id": "call_a11b",
+        "path": "decision.approval.approval_id",
+        "equals": "mock-approval-call_a11b"
+      }
+    ],
+    "continuations": [
+      {
+        "step": 2,
+        "kind": "approve",
+        "request_id": "call_a11b",
+        "outcome": "resolved",
+        "stage": "DENIED",
+        "reason": null,
+        "message": "approval refused: approval_id does not match"
+      }
+    ]
+  }
+}

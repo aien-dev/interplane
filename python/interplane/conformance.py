@@ -104,6 +104,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
     results: list = []
     turns: list = []
     selections: list = []
+    unsupported: list = []
     sel_spec = case.get("selection")
     catalog = pipe.runtime.catalog()
     sel = None
@@ -127,6 +128,10 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
                 ex.get("max_added_per_expansion"),
             )
             selections.append(sel.to_dict())
+            continue
+        kind = next((k for k in ("approve", "cancel", "restart", "mock") if k in step), None)
+        if kind is not None:
+            unsupported.append(f"unsupported step kind: {kind}")
             continue
         if "input" in step and "dialect" not in step:
             # host-only input registration (0.3 cut P3): never reachable from model input
@@ -173,7 +178,7 @@ def run_case(case: dict, variant: Optional[str] = None) -> dict:
         injection = _judge(case["injection"], probe, turns, envelopes)
 
     expected = case["expected"]
-    problems: list = []
+    problems: list = list(unsupported)
     exp_obs = expected.get("observed", [])
     if len(exp_obs) != len(observed):
         problems.append(f"observed count {len(observed)} != {len(exp_obs)}")
@@ -295,12 +300,20 @@ def load_injection_fixtures(fixtures_dir: str) -> list:
     ]
 
 
+def load_approval_fixtures(fixtures_dir: str) -> list:
+    """The ``approval/NN-*.json`` fixtures (0.3 cut A2), sorted by file name. Absent directory = none."""
+    return [
+        json.loads(p.read_text(encoding="utf-8"))
+        for p in sorted(Path(fixtures_dir, "approval").glob("*.json"))
+    ]
+
+
 def run_suite(fixtures_dir: str, variant: Optional[str] = None) -> tuple:
     """Run a whole fixtures directory: the NN cases, the injection cases, the lifecycle cases.
     Returns ``(verdicts, lifecycle, digest_errors)``; ``variant`` applies a negative control."""
     verdicts: dict = {}
     cases = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(Path(fixtures_dir).glob("*.json"))]
-    for case in cases + load_injection_fixtures(fixtures_dir):
+    for case in cases + load_injection_fixtures(fixtures_dir) + load_approval_fixtures(fixtures_dir):
         verdicts[case["case"]] = run_case(case, variant)
     lifecycle: dict = {}
     for path in sorted(Path(fixtures_dir, "lifecycle").glob("*.json")):

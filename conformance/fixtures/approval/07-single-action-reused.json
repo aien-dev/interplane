@@ -1,0 +1,126 @@
+{
+  "case": "approval-A07-single-action-reused",
+  "description": "A single_action approval is spent by the first request. Presenting it for a second, distinct request (never pending) is refused; the second runs nothing, and the spent approval cannot run the first again either.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-a07",
+  "steps": [
+    {
+      "turn": 0,
+      "envelope": {
+        "interplane_version": "0.1",
+        "message_id": "m-approval-A07-single-action-reused-0",
+        "trace_id": "trace-a07",
+        "parent_id": null,
+        "timestamp": "2026-01-01T00:00:00Z",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "destination": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "payload": {
+          "kind": "tool_request",
+          "request_id": "call_a07a",
+          "tool": {
+            "namespace": null,
+            "name": "delete_file"
+          },
+          "arguments": {
+            "path": "/tmp/a.txt"
+          },
+          "provenance": {
+            "dialect": "openai",
+            "dialect_version": "1",
+            "model": "mock-model",
+            "parser_version": "1.0.0",
+            "source_turn": 0,
+            "source_call_id": null,
+            "source_digest": null,
+            "raw_name": "delete_file",
+            "coercion": "none"
+          }
+        }
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a07a",
+        "approval_id": "mock-approval-call_a07a"
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a07b",
+        "approval_id": "mock-approval-call_a07a"
+      }
+    },
+    {
+      "approve": {
+        "request_id": "call_a07a",
+        "approval_id": "mock-approval-call_a07a"
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_a07a",
+        "stage": "REQUIRES_APPROVAL",
+        "decision": "requires_approval",
+        "status": "requires_approval",
+        "error_code": "approval_required",
+        "decide_invoked": true,
+        "execute_invoked": false,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_a07a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": false,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "continuations": [
+      {
+        "step": 1,
+        "kind": "approve",
+        "request_id": "call_a07a",
+        "outcome": "resolved",
+        "stage": "SUCCEEDED",
+        "reason": null,
+        "message": null
+      },
+      {
+        "step": 2,
+        "kind": "approve",
+        "request_id": "call_a07b",
+        "outcome": "refused",
+        "stage": null,
+        "reason": "no_pending_approval",
+        "message": null
+      },
+      {
+        "step": 3,
+        "kind": "approve",
+        "request_id": "call_a07a",
+        "outcome": "refused",
+        "stage": "SUCCEEDED",
+        "reason": "no_pending_approval",
+        "message": null
+      }
+    ]
+  }
+}

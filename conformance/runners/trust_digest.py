@@ -8,15 +8,20 @@ corpus_digest is the sha256 of the `sha256sum` lines (`<hex>  <path>\\n`, repo-r
 every conformance/fixtures/**/*.json in LC_ALL=C path order (the whole corpus the negative-control
 matrix depends on, not only the injection cases). negative_controls_sha256 freezes
 conformance/negative-controls.json. protocol_sha256 is the sha256 of
-bench/PROTOCOL-0.3.md. The T3 and T4 adapter subset lists stay empty until the adapter cuts.
+bench/PROTOCOL-0.3.md. adapter_translation_sha256 freezes conformance/adapter-translation.json (the
+data of the subset rule), and t3_subset and t4_subset list the fixtures each adapter must run,
+computed from fixture metadata by adapter_subset.py (spec/CORE.md, Adapter subsets).
 """
 import hashlib, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import adapter_subset
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 OUT = os.path.join(ROOT, "conformance", "TRUST-DIGEST.txt")
 CORPUS = "conformance/fixtures"
 NEGCTL = "conformance/negative-controls.json"
 PROTOCOL = "bench/PROTOCOL-0.3.md"
+TRANSLATION = "conformance/adapter-translation.json"
 
 def sha(b): return hashlib.sha256(b).hexdigest()
 
@@ -32,9 +37,14 @@ def compute():
         negctl = sha(f.read())
     with open(os.path.join(ROOT, PROTOCOL), "rb") as f:
         proto = sha(f.read())
+    with open(os.path.join(ROOT, TRANSLATION), "rb") as f:
+        trans = sha(f.read())
+    t3, t4 = adapter_subset.subset("odysseus"), adapter_subset.subset("aien")
     return ("corpus: %s\ncorpus_files: %d\ncorpus_digest: sha256:%s\nnegative_controls: %s\nnegative_controls_sha256: sha256:%s\n"
-            "protocol: %s\nprotocol_sha256: sha256:%s\nt3_subset: []\nt4_subset: []\n"
-            % (CORPUS, len(names), sha(lines.encode("utf-8")), NEGCTL, negctl, PROTOCOL, proto))
+            "protocol: %s\nprotocol_sha256: sha256:%s\nadapter_translation: %s\nadapter_translation_sha256: sha256:%s\n"
+            "t3_subset_count: %d\nt3_subset: %s\nt4_subset_count: %d\nt4_subset: %s\n"
+            % (CORPUS, len(names), sha(lines.encode("utf-8")), NEGCTL, negctl, PROTOCOL, proto,
+               TRANSLATION, trans, len(t3), ",".join(t3), len(t4), ",".join(t4)))
 
 if __name__ == "__main__":
     want = compute()

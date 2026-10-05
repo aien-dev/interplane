@@ -137,3 +137,29 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 23. Case 20: the runtime is asked and answers `invalid`, so stage `REJECTED`, decision `invalid`, decide true (CORE.md case table row 20). Case 21: nothing reaches the runtime, so decision null, decide false.
 24. Case 22/23 `provenance.trusted` is asserted false (CORE.md: false for the two untrusted levels); case 19 true.
 25. Cases 24-25 (CROSSAXIS.md, Bounded expansion): the selection receipt after each expansion is compared exactly; `validate_fixtures.py` also recomputes `selection_digest` and the `parent_digest` chain independently and validates each receipt against `selection.schema.json`.
+
+## Adapter subsets (T3 Odysseus, T4 AIEN)
+
+`adapter-translation.json` is the data of the normative rule in `spec/CORE.md` (Adapter subsets);
+`runners/adapter_subset.py` computes each adapter's subset from fixture metadata
+(`--subset odysseus|aien`) and the translated plans (`--plans odysseus|aien`), and
+`runners/trust_digest.py` freezes both lists (`t3_subset`, `t4_subset`) and the table's sha256 in
+`TRUST-DIGEST.txt`. Current subsets: T3 43 fixtures (30 injection, 13 approval), T4 31 (18
+injection, 13 approval).
+
+- T3: `ODYSSEUS_SRC=<odysseus@2992bf6> PYTHONPATH=python:adapters/odysseus <venv>/bin/python -m interplane_adapter_odysseus.t3 --out t3-verdicts.json`
+  (real `Pipeline` + `OdysseusAuthority`, Odysseus's own gate).
+- T4: `cd adapters/aien && T4_OUT=t4-verdicts.json cargo test --test t4_corpus -- --nocapture`
+  (real `Pipeline` + `AienAuthority`; needs `python3` for the plans and the sibling checkouts of `adapters/aien/README.md`).
+
+Both fail on any subset member they cannot run, and T4 also fails when its computed subset differs
+from the frozen list (T3 likewise). The verdict JSON has one row per fixture plus a summary with
+`violations` and `content_derived` (gate E over the subset). Red check: with Odysseus's
+exposure trigger forced off, T3 failed 43 of 43 (32 violations; all 30 injection cases executed
+the injected effect, all 13 approval cases failed); with AIEN's `write_file` mis-enrolled as
+`LOCAL_EPHEMERAL`, T4 failed all 18 injection cases and all 13 approval cases. Neither change is committed.
+
+Out of subset by rule, not by result: T3 excludes 17 fixtures (injection delete targets 05, 12, 13, 18,
+22, 26, 31; `fail_tool` 09; mock-fault, stale-catalog and duplicate-name cases 35-40; approval 08,
+15, 16); T4 additionally excludes the `send_email` targets. Approval fixtures A01 to A14 except A08
+(`mock` step) are in both subsets; the protocol's A15 has no corpus fixture.

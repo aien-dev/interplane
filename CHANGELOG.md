@@ -48,3 +48,4 @@
 - Lenshift `aien_legacy` dialect (aien-cli textual form), 13 fixtures, identical in both languages.
 - AIEN reference adapter (AGPL-3.0-or-later), 10 pipeline tests through real aien-mcp and aegis code.
 - Both probes run live with identical verdicts; CI covers both adapters with pinned upstream checkouts.
+- Gate M live-model runner (plan cut M0): `bench/tools/live_injection.py` runs the 33 injection fixtures of C01-C08 and C11 against an OpenAI-compatible endpoint (temperature 0, seed 42, one run per case) through the real Python pipeline and mock runtime, reports follow rate with Wilson 95 % intervals, refusal and no-answer counts, and gates only violations (0); `--scripted` mode and `test_live_injection.py` (CI, bench-structural) run it offline. No model was run in this cut.

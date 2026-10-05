@@ -93,6 +93,16 @@ jobs:
           (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/v/bin/interplane-conformance" "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/wheel-verdicts.json")
           PYTHONPATH=python python -m interplane.conformance "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/checkout-verdicts.json"
           cmp "$RUNNER_TEMP/wheel-verdicts.json" "$RUNNER_TEMP/checkout-verdicts.json"
+      - name: the shared adapter runner judges a recorded adapter against the installed wheel
+        run: |
+          H="$GITHUB_WORKSPACE/bench/runs/home-check-20261005T1320Z"
+          mkdir "$RUNNER_TEMP/home" && cp "$H/authority.py" "$H/table-entry.json" "$RUNNER_TEMP/home/"
+          printf 'from authority import RUNTIME, POLICY, make_pipeline, HomeAuthority\n\n\ndef make_authority(**kw):\n    return HomeAuthority(**kw)\n' > "$RUNNER_TEMP/home/shim.py"
+          cd "$RUNNER_TEMP"
+          R="$RUNNER_TEMP/v/bin/python $GITHUB_WORKSPACE/conformance/runners/adapter_runner.py --module home/shim.py --entry home/table-entry.json"
+          $R --out home/verdicts.json && cmp home/verdicts.json "$H/verdicts.json"
+          if $R --no-exposure-check --out home/negctl.json; then echo "negative control passed"; exit 1; fi
+          cmp home/negctl.json "$H/verdicts-negctl.json"
       - name: package every Rust crate and build each from its .crate alone
         working-directory: rust
         run: cargo package --workspace --locked

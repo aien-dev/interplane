@@ -1,0 +1,206 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 189,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:f03a640fbf359de2139a0bb153e329d5aafa2dd138ba16e85aff2f46e0775735",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_jwwguww8",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:1fe83f2206cd1a27404f361a63b20bb034d52c0d5a9bfef94e1dd457de487269",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 189,
+    "calls_total": 1,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15981,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 4349,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 31584,
+    "total_completion_tokens": 110,
+    "total_prompt_tokens": 32044,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 4367
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 2
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 74,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3179,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15981,
+      "reasoning_present": true,
+      "request_digest": "sha256:1e688c53ea638edc45dabaad80391d55b434f578fd0ee56e02e5603ccf79e723",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 36,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1170,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16063,
+      "reasoning_present": true,
+      "request_digest": "sha256:7c72af29cc080b0f0f198df8ff533fe367fa650e468004304eaad0b21e7de4f2",
+      "round": 2,
+      "text_digest": "sha256:d5e66850651e9813321e289ad4398898421bd9de5a0a2dfebd7936421b7092d7",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "wrong_first_tool",
+    "digest": "sha256:7b70d9c047757c7cb81fc566d2473eca963dbf4add5aec96fa837c377eef15b5",
+    "id": "wrong_first_tool-104",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 4349,
+    "wall_ms": 4367
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The port in `services/billing.toml` is **7712**."
+  },
+  "user_request_digest": "sha256:51688ff26e89ae7de49aacc641dc8160462fa693f6eef435dfcb574e5c5768ee"
+}

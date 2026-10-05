@@ -1,0 +1,628 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 182,
+  "calls": [
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_tasks",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_kov4jz81",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:19db722bbf690f5a00e949988be56e0edbb207b015b5c4962b21337e90c6ba98",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "manage_tasks",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "options",
+        "question"
+      ],
+      "arguments_digest": "sha256:6a7d96d9141d395111d45a5a18c2e28dc6efe7003a886932bdba2b3534979a6b",
+      "capability": "ask_user",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_fy500qcx",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:878027f48e1381288bc96919fd6af2ea60b4460f0075ef218eb0fa44b3a9aa23",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "ask_user",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "B3",
+  "condition_spec": {
+    "expansion_policy": "runtime-v1",
+    "family": "B",
+    "id": "B3",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": false,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "manage_tasks",
+    "todowrite",
+    "update_plan"
+  ],
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: Ines Duarte",
+        "kind": "answer_contains_all",
+        "passed": false
+      },
+      {
+        "applies": true,
+        "detail": "no expansion",
+        "kind": "expansion_occurred",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all",
+      "expansion_occurred"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 182,
+    "calls_total": 2,
+    "covered_after_effective_expansions": null,
+    "covered_at_round": null,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 4,
+    "exposed_capabilities_max": 4,
+    "exposed_tools_first": 5,
+    "exposed_tools_max": 5,
+    "first_turn_prompt_tokens": 1898,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": true,
+    "missing_required_first": true,
+    "model_ms": 12628,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 5985.0,
+    "tool_schema_tokens_first": 1716,
+    "tool_schema_tokens_per_round_mean": 1716.0,
+    "tool_schema_tokens_sum": 5148,
+    "total_completion_tokens": 437,
+    "total_prompt_tokens": 5978,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 12640
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 3
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 80,
+      "exposed_caps_count": 4,
+      "exposed_names": [
+        "ask_user",
+        "manage_tasks",
+        "todowrite",
+        "update_plan"
+      ],
+      "exposed_tools_count": 5,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2814,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 1898,
+      "reasoning_present": true,
+      "request_digest": "sha256:0ac21d43e8319369dd05665c3adb765e81e4704beb8aa732198f73321522de82",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 5985,
+      "tools_digest": "sha256:f22af5b5d941f8bf5c6e7c4cf28e728b49fc4983495079aba5f8ea5265ac39e0"
+    },
+    {
+      "completion_tokens": 137,
+      "exposed_caps_count": 4,
+      "exposed_names": [
+        "ask_user",
+        "manage_tasks",
+        "todowrite",
+        "update_plan"
+      ],
+      "exposed_tools_count": 5,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3778,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 1963,
+      "reasoning_present": true,
+      "request_digest": "sha256:d3448b84a5e3072ec3ef86e27d5ce3463bf91233acb4f21f6d62c602975a1374",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 5985,
+      "tools_digest": "sha256:f22af5b5d941f8bf5c6e7c4cf28e728b49fc4983495079aba5f8ea5265ac39e0"
+    },
+    {
+      "completion_tokens": 220,
+      "exposed_caps_count": 4,
+      "exposed_names": [
+        "ask_user",
+        "manage_tasks",
+        "todowrite",
+        "update_plan"
+      ],
+      "exposed_tools_count": 5,
+      "finish_reason": "stop",
+      "latency_ms": 6036,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 2117,
+      "reasoning_present": true,
+      "request_digest": "sha256:3ae99290fa1d34453ea19c68f1c804dc303163e32fcd84a83c6460b77b957be0",
+      "round": 3,
+      "text_digest": "sha256:fa0a11fd9e716e1c2c17f69e3c3fca31ac6cbdb5e6d85a8973cc53f97f467e5f",
+      "tools_bytes": 5985,
+      "tools_digest": "sha256:f22af5b5d941f8bf5c6e7c4cf28e728b49fc4983495079aba5f8ea5265ac39e0"
+    }
+  ],
+  "run_id": "seed-42",
+  "runtime_triggers": [],
+  "selection": {
+    "final_digest": "sha256:3309e50d6e456134166ba5c4037d594cdf5b211711ccb148e6e534c3c10a81d6",
+    "final_selected": [
+      "ask_user",
+      "manage_tasks",
+      "todowrite",
+      "update_plan"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "adopt_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "apply_patch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ask_teacher",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "cancel_download",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "chat_with_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "download_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "get_workspace",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "glob",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "grep",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cached_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_downloads",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_served_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ls",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_endpoints",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "pipeline",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_hf_models",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "write_file",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 5515
+        },
+        "selected_count": 4,
+        "selected_rendered_bytes": 5515
+      },
+      "requested_domains": [
+        "tasks"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "tasks"
+          ],
+          "name": "manage_tasks",
+          "rule_id": "domain:tasks"
+        },
+        {
+          "domains": [
+            "tasks",
+            "code"
+          ],
+          "name": "todowrite",
+          "rule_id": "domain:tasks"
+        },
+        {
+          "domains": [
+            "tasks",
+            "user"
+          ],
+          "name": "update_plan",
+          "rule_id": "domain:tasks"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:3309e50d6e456134166ba5c4037d594cdf5b211711ccb148e6e534c3c10a81d6"
+  },
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "expansion",
+    "digest": "sha256:8fb50ad9aa6ecdefd0fb17a9621651e44b5ad4205d53a1d83a66f5e9012e4f89",
+    "id": "expansion-117",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 12628,
+    "wall_ms": 12640
+  },
+  "tool_schema_tokens_per_round": [
+    1716,
+    1716,
+    1716
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "manage_tasks",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "manage_tasks"
+      },
+      {
+        "capability": "ask_user",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "ask_user"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "I don't have access to a calendar or schedule system that would contain information about \"night keeper tasks.\" The tools available to me are for creating and managing automated tasks, but not for viewing existing schedules or calendars.\n\nTo find out who has the night keeper task for March, you would need to:\n- Check your calendar application\n- Look at a shared spreadsheet or document\n- Review any scheduling system you use\n\nIf you can tell me where this schedule is stored (e.g., a specific file path, Google Sheet, Outlook calendar), I may be able to help you locate that information."
+  },
+  "user_request_digest": "sha256:a5bdea7e254f536d18ddc4ded52cb5be2641bb34959e54ae2ceca70b1c185c41"
+}

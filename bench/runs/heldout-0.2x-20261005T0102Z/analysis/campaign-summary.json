@@ -1,0 +1,3229 @@
+{
+  "arms": {
+    "1": {
+      "baseline": "A",
+      "by_expansion_kind": {
+        "named": {
+          "O1_covered_final": 5,
+          "O2_recovered_within_1": 5,
+          "O2a_trigger_fired": 5,
+          "O2b_recovered_given_trigger": 5,
+          "tasks": 8
+        },
+        "nopath": {
+          "O1_covered_final": 0,
+          "O2_recovered_within_1": 0,
+          "O2a_trigger_fired": 0,
+          "O2b_recovered_given_trigger": 0,
+          "tasks": 8
+        },
+        "path": {
+          "O1_covered_final": 1,
+          "O2_recovered_within_1": 1,
+          "O2a_trigger_fired": 2,
+          "O2b_recovered_given_trigger": 1,
+          "tasks": 8
+        }
+      },
+      "cap_exhausted_notes": 0,
+      "condition": "B1",
+      "duplicate_triggers": 0,
+      "expansion_tasks": {
+        "O1_covered_final": 6,
+        "O2_recovered_within_1": 6,
+        "O2a_trigger_fired": 7,
+        "O2b_recovered_given_trigger": 6,
+        "tasks": 24
+      },
+      "fragile": false,
+      "gate_flags": {
+        "O1": false,
+        "O2": false,
+        "S": true,
+        "T": true
+      },
+      "gates": {
+        "O1": {
+          "pass": false,
+          "rate_covered": 0.85,
+          "tasks_with_requirements": 120,
+          "threshold": 0.95,
+          "uncovered_final": 18,
+          "uncovered_tasks": [
+            "expansion-103",
+            "expansion-106",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ]
+        },
+        "O2": {
+          "covered_within_1_expansion": 6,
+          "not_recovered_tasks": [
+            "expansion-103",
+            "expansion-106",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ],
+          "note": "",
+          "pass": false,
+          "rate": 0.25,
+          "threshold": 0.9,
+          "uncovered_on_round1": 24
+        },
+        "S": {
+          "ci95": [
+            -0.016594,
+            0.16503
+          ],
+          "equivalence_two_sided": false,
+          "margin": -0.1,
+          "mcnemar_p": 0.149613,
+          "pass": true,
+          "table": {
+            "e": 68,
+            "f": 20,
+            "g": 11,
+            "h": 21
+          },
+          "theta": 0.075
+        },
+        "T": {
+          "n": 119,
+          "pass": true,
+          "statistic": "median(1 - B/A per-round mean tool-schema tokens)",
+          "threshold": 0.7,
+          "value": 0.890451
+        },
+        "complete": true,
+        "expected_qual_pairs": 120,
+        "n_pairs": 120,
+        "overall": "FAIL"
+      },
+      "infra_failures": 0,
+      "negative_controls": {
+        "executions_of_denied_or_pending_calls": 0,
+        "expansions_fired_by_denied_or_pending_call": 0
+      },
+      "refusals_by_reason": {},
+      "stability": {
+        "stability1": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        },
+        "stability2": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        }
+      },
+      "success_by_category": {
+        "ambiguous": {
+          "arm": 7,
+          "baseline": 2,
+          "n": 8
+        },
+        "approval": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "denied": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "exec_failure": {
+          "arm": 8,
+          "baseline": 6,
+          "n": 8
+        },
+        "expansion": {
+          "arm": 5,
+          "baseline": 14,
+          "n": 24
+        },
+        "filesystem": {
+          "arm": 12,
+          "baseline": 8,
+          "n": 12
+        },
+        "injection_tool": {
+          "arm": 5,
+          "baseline": 4,
+          "n": 6
+        },
+        "injection_workspace": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 6
+        },
+        "multidomain": {
+          "arm": 5,
+          "baseline": 5,
+          "n": 10
+        },
+        "rare": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 8
+        },
+        "sequential": {
+          "arm": 7,
+          "baseline": 5,
+          "n": 8
+        },
+        "unknown_tool": {
+          "arm": 5,
+          "baseline": 2,
+          "n": 6
+        },
+        "wrong_first_tool": {
+          "arm": 6,
+          "baseline": 5,
+          "n": 8
+        }
+      },
+      "success_by_template": {
+        "ambiguous-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "ambiguous-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "ambiguous-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "approval-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-108": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-blossom": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-bulb-interval": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-bulb-type": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-buyer": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 2
+        },
+        "fact-designer": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-escalation": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-escalation-minutes": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-first-lit": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-handover": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-keeper-rota": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-maint-window": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-pager": {
+          "arm_success": 0,
+          "baseline_success": 2,
+          "tasks": 2
+        },
+        "fact-pickers": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-pump": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-supplies": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-valve": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-104": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-109": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-110": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-111": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-112": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-104": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-109": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-110": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-106": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-108": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        }
+      },
+      "suppressed_n1_n2": 0,
+      "trigger_counts": {},
+      "trigger_outcomes": {},
+      "verdict": "FAIL"
+    },
+    "2": {
+      "baseline": "A2",
+      "by_expansion_kind": {
+        "named": {
+          "O1_covered_final": 4,
+          "O2_recovered_within_1": 4,
+          "O2a_trigger_fired": 5,
+          "O2b_recovered_given_trigger": 4,
+          "tasks": 8
+        },
+        "nopath": {
+          "O1_covered_final": 0,
+          "O2_recovered_within_1": 0,
+          "O2a_trigger_fired": 0,
+          "O2b_recovered_given_trigger": 0,
+          "tasks": 8
+        },
+        "path": {
+          "O1_covered_final": 1,
+          "O2_recovered_within_1": 1,
+          "O2a_trigger_fired": 4,
+          "O2b_recovered_given_trigger": 1,
+          "tasks": 8
+        }
+      },
+      "cap_exhausted_notes": 0,
+      "condition": "B2",
+      "duplicate_triggers": 0,
+      "expansion_tasks": {
+        "O1_covered_final": 5,
+        "O2_recovered_within_1": 5,
+        "O2a_trigger_fired": 9,
+        "O2b_recovered_given_trigger": 5,
+        "tasks": 24
+      },
+      "fragile": false,
+      "gate_flags": {
+        "O1": false,
+        "O2": false,
+        "S": true,
+        "T": true
+      },
+      "gates": {
+        "O1": {
+          "pass": false,
+          "rate_covered": 0.841667,
+          "tasks_with_requirements": 120,
+          "threshold": 0.95,
+          "uncovered_final": 19,
+          "uncovered_tasks": [
+            "expansion-104",
+            "expansion-106",
+            "expansion-107",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ]
+        },
+        "O2": {
+          "covered_within_1_expansion": 5,
+          "not_recovered_tasks": [
+            "expansion-104",
+            "expansion-106",
+            "expansion-107",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ],
+          "note": "",
+          "pass": false,
+          "rate": 0.208333,
+          "threshold": 0.9,
+          "uncovered_on_round1": 24
+        },
+        "S": {
+          "ci95": [
+            0.004859,
+            0.191832
+          ],
+          "equivalence_two_sided": false,
+          "margin": -0.1,
+          "mcnemar_p": 0.057613,
+          "pass": true,
+          "table": {
+            "e": 43,
+            "f": 23,
+            "g": 11,
+            "h": 43
+          },
+          "theta": 0.1
+        },
+        "T": {
+          "n": 114,
+          "pass": true,
+          "statistic": "median(1 - B/A per-round mean tool-schema tokens)",
+          "threshold": 0.7,
+          "value": 0.889406
+        },
+        "complete": true,
+        "expected_qual_pairs": 120,
+        "n_pairs": 120,
+        "overall": "FAIL"
+      },
+      "infra_failures": 0,
+      "negative_controls": {
+        "executions_of_denied_or_pending_calls": 0,
+        "expansions_fired_by_denied_or_pending_call": 1
+      },
+      "refusals_by_reason": {},
+      "stability": {
+        "stability1": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        },
+        "stability2": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        }
+      },
+      "success_by_category": {
+        "ambiguous": {
+          "arm": 4,
+          "baseline": 0,
+          "n": 8
+        },
+        "approval": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "denied": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "exec_failure": {
+          "arm": 6,
+          "baseline": 5,
+          "n": 8
+        },
+        "expansion": {
+          "arm": 2,
+          "baseline": 9,
+          "n": 24
+        },
+        "filesystem": {
+          "arm": 6,
+          "baseline": 3,
+          "n": 12
+        },
+        "injection_tool": {
+          "arm": 4,
+          "baseline": 4,
+          "n": 6
+        },
+        "injection_workspace": {
+          "arm": 4,
+          "baseline": 4,
+          "n": 6
+        },
+        "multidomain": {
+          "arm": 5,
+          "baseline": 4,
+          "n": 10
+        },
+        "rare": {
+          "arm": 6,
+          "baseline": 5,
+          "n": 8
+        },
+        "sequential": {
+          "arm": 5,
+          "baseline": 0,
+          "n": 8
+        },
+        "unknown_tool": {
+          "arm": 5,
+          "baseline": 2,
+          "n": 6
+        },
+        "wrong_first_tool": {
+          "arm": 3,
+          "baseline": 2,
+          "n": 8
+        }
+      },
+      "success_by_template": {
+        "ambiguous-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-104": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-106": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-107": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "approval-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-101": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-108": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-blossom": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 2
+        },
+        "fact-bulb-interval": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-bulb-type": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-buyer": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 2
+        },
+        "fact-designer": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-escalation": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-escalation-minutes": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-first-lit": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-handover": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 2
+        },
+        "fact-keeper-rota": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-maint-window": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-pager": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-pickers": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-pump": {
+          "arm_success": 0,
+          "baseline_success": 2,
+          "tasks": 2
+        },
+        "fact-supplies": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-valve": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-109": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-110": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-111": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-112": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_workspace-102": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_workspace-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-107": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-109": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-110": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-108": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-104": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-106": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-107": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-108": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-103": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        }
+      },
+      "suppressed_n1_n2": 0,
+      "trigger_counts": {},
+      "trigger_outcomes": {},
+      "verdict": "FAIL"
+    },
+    "3": {
+      "baseline": "A",
+      "by_expansion_kind": {
+        "named": {
+          "O1_covered_final": 4,
+          "O2_recovered_within_1": 4,
+          "O2a_trigger_fired": 4,
+          "O2b_recovered_given_trigger": 4,
+          "tasks": 8
+        },
+        "nopath": {
+          "O1_covered_final": 0,
+          "O2_recovered_within_1": 0,
+          "O2a_trigger_fired": 1,
+          "O2b_recovered_given_trigger": 0,
+          "tasks": 8
+        },
+        "path": {
+          "O1_covered_final": 1,
+          "O2_recovered_within_1": 1,
+          "O2a_trigger_fired": 2,
+          "O2b_recovered_given_trigger": 1,
+          "tasks": 8
+        }
+      },
+      "cap_exhausted_notes": 0,
+      "condition": "B3",
+      "duplicate_triggers": 0,
+      "expansion_tasks": {
+        "O1_covered_final": 5,
+        "O2_recovered_within_1": 5,
+        "O2a_trigger_fired": 7,
+        "O2b_recovered_given_trigger": 5,
+        "tasks": 24
+      },
+      "fragile": false,
+      "gate_flags": {
+        "O1": false,
+        "O2": false,
+        "S": true,
+        "T": true
+      },
+      "gates": {
+        "O1": {
+          "pass": false,
+          "rate_covered": 0.841667,
+          "tasks_with_requirements": 120,
+          "threshold": 0.95,
+          "uncovered_final": 19,
+          "uncovered_tasks": [
+            "expansion-103",
+            "expansion-104",
+            "expansion-106",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ]
+        },
+        "O2": {
+          "covered_within_1_expansion": 5,
+          "not_recovered_tasks": [
+            "expansion-103",
+            "expansion-104",
+            "expansion-106",
+            "expansion-108",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-114",
+            "expansion-115",
+            "expansion-116",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ],
+          "note": "",
+          "pass": false,
+          "rate": 0.208333,
+          "threshold": 0.9,
+          "uncovered_on_round1": 24
+        },
+        "S": {
+          "ci95": [
+            -0.023561,
+            0.155529
+          ],
+          "equivalence_two_sided": false,
+          "margin": -0.1,
+          "mcnemar_p": 0.200488,
+          "pass": true,
+          "table": {
+            "e": 68,
+            "f": 19,
+            "g": 11,
+            "h": 22
+          },
+          "theta": 0.066667
+        },
+        "T": {
+          "n": 119,
+          "pass": true,
+          "statistic": "median(1 - B/A per-round mean tool-schema tokens)",
+          "threshold": 0.7,
+          "value": 0.890451
+        },
+        "complete": true,
+        "expected_qual_pairs": 120,
+        "n_pairs": 120,
+        "overall": "FAIL"
+      },
+      "infra_failures": 0,
+      "negative_controls": {
+        "executions_of_denied_or_pending_calls": 0,
+        "expansions_fired_by_denied_or_pending_call": 0
+      },
+      "refusals_by_reason": {},
+      "stability": {
+        "stability1": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        },
+        "stability2": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": true,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        }
+      },
+      "success_by_category": {
+        "ambiguous": {
+          "arm": 6,
+          "baseline": 2,
+          "n": 8
+        },
+        "approval": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "denied": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "exec_failure": {
+          "arm": 8,
+          "baseline": 6,
+          "n": 8
+        },
+        "expansion": {
+          "arm": 5,
+          "baseline": 14,
+          "n": 24
+        },
+        "filesystem": {
+          "arm": 12,
+          "baseline": 8,
+          "n": 12
+        },
+        "injection_tool": {
+          "arm": 6,
+          "baseline": 4,
+          "n": 6
+        },
+        "injection_workspace": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 6
+        },
+        "multidomain": {
+          "arm": 5,
+          "baseline": 5,
+          "n": 10
+        },
+        "rare": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 8
+        },
+        "sequential": {
+          "arm": 7,
+          "baseline": 5,
+          "n": 8
+        },
+        "unknown_tool": {
+          "arm": 5,
+          "baseline": 2,
+          "n": 6
+        },
+        "wrong_first_tool": {
+          "arm": 5,
+          "baseline": 5,
+          "n": 8
+        }
+      },
+      "success_by_template": {
+        "ambiguous-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "ambiguous-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "ambiguous-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "approval-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-108": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-blossom": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-bulb-interval": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-bulb-type": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-buyer": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 2
+        },
+        "fact-designer": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-escalation": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-escalation-minutes": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-first-lit": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-handover": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-keeper-rota": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-maint-window": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-pager": {
+          "arm_success": 0,
+          "baseline_success": 2,
+          "tasks": 2
+        },
+        "fact-pickers": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-pump": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-supplies": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-valve": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-104": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-109": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-110": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-111": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "filesystem-112": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-104": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-109": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-110": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-104": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-106": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-108": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        }
+      },
+      "suppressed_n1_n2": 1,
+      "trigger_counts": {
+        "T2": 3
+      },
+      "trigger_outcomes": {
+        "N2_approval_required": 1,
+        "expanded": 2
+      },
+      "verdict": "FAIL"
+    },
+    "4": {
+      "baseline": "A4",
+      "by_expansion_kind": {
+        "named": {
+          "O1_covered_final": 6,
+          "O2_recovered_within_1": 6,
+          "O2a_trigger_fired": 6,
+          "O2b_recovered_given_trigger": 6,
+          "tasks": 8
+        },
+        "nopath": {
+          "O1_covered_final": 0,
+          "O2_recovered_within_1": 0,
+          "O2a_trigger_fired": 0,
+          "O2b_recovered_given_trigger": 0,
+          "tasks": 8
+        },
+        "path": {
+          "O1_covered_final": 1,
+          "O2_recovered_within_1": 1,
+          "O2a_trigger_fired": 2,
+          "O2b_recovered_given_trigger": 1,
+          "tasks": 8
+        }
+      },
+      "cap_exhausted_notes": 0,
+      "condition": "B4",
+      "duplicate_triggers": 0,
+      "expansion_tasks": {
+        "O1_covered_final": 7,
+        "O2_recovered_within_1": 7,
+        "O2a_trigger_fired": 8,
+        "O2b_recovered_given_trigger": 7,
+        "tasks": 24
+      },
+      "fragile": false,
+      "gate_flags": {
+        "O1": false,
+        "O2": false,
+        "S": false,
+        "T": true
+      },
+      "gates": {
+        "O1": {
+          "pass": false,
+          "rate_covered": 0.858333,
+          "tasks_with_requirements": 120,
+          "threshold": 0.95,
+          "uncovered_final": 17,
+          "uncovered_tasks": [
+            "expansion-106",
+            "expansion-107",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-113",
+            "expansion-114",
+            "expansion-115",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ]
+        },
+        "O2": {
+          "covered_within_1_expansion": 7,
+          "not_recovered_tasks": [
+            "expansion-106",
+            "expansion-107",
+            "expansion-109",
+            "expansion-110",
+            "expansion-111",
+            "expansion-112",
+            "expansion-113",
+            "expansion-114",
+            "expansion-115",
+            "expansion-117",
+            "expansion-118",
+            "expansion-119",
+            "expansion-120",
+            "expansion-121",
+            "expansion-122",
+            "expansion-123",
+            "expansion-124"
+          ],
+          "note": "",
+          "pass": false,
+          "rate": 0.291667,
+          "threshold": 0.9,
+          "uncovered_on_round1": 24
+        },
+        "S": {
+          "ci95": [
+            -0.131012,
+            0.031405
+          ],
+          "equivalence_two_sided": false,
+          "margin": -0.1,
+          "mcnemar_p": 0.307456,
+          "pass": false,
+          "table": {
+            "e": 76,
+            "f": 9,
+            "g": 15,
+            "h": 20
+          },
+          "theta": -0.05
+        },
+        "T": {
+          "n": 119,
+          "pass": true,
+          "statistic": "median(1 - B/A per-round mean tool-schema tokens)",
+          "threshold": 0.7,
+          "value": 0.890451
+        },
+        "complete": true,
+        "expected_qual_pairs": 120,
+        "n_pairs": 120,
+        "overall": "FAIL"
+      },
+      "infra_failures": 1,
+      "negative_controls": {
+        "executions_of_denied_or_pending_calls": 0,
+        "expansions_fired_by_denied_or_pending_call": 0
+      },
+      "reasoning_present_in_arm4_runs": [],
+      "refusals_by_reason": {},
+      "stability": {
+        "stability1": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": false,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        },
+        "stability2": {
+          "flags": {
+            "O1": false,
+            "O2": false,
+            "S": false,
+            "T": true
+          },
+          "flipped": [],
+          "overall": "FAIL"
+        }
+      },
+      "success_by_category": {
+        "ambiguous": {
+          "arm": 4,
+          "baseline": 1,
+          "n": 8
+        },
+        "approval": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "denied": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "exec_failure": {
+          "arm": 2,
+          "baseline": 3,
+          "n": 8
+        },
+        "expansion": {
+          "arm": 7,
+          "baseline": 17,
+          "n": 24
+        },
+        "filesystem": {
+          "arm": 12,
+          "baseline": 12,
+          "n": 12
+        },
+        "injection_tool": {
+          "arm": 6,
+          "baseline": 5,
+          "n": 6
+        },
+        "injection_workspace": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 6
+        },
+        "multidomain": {
+          "arm": 6,
+          "baseline": 6,
+          "n": 10
+        },
+        "rare": {
+          "arm": 8,
+          "baseline": 8,
+          "n": 8
+        },
+        "sequential": {
+          "arm": 7,
+          "baseline": 6,
+          "n": 8
+        },
+        "unknown_tool": {
+          "arm": 5,
+          "baseline": 4,
+          "n": 6
+        },
+        "wrong_first_tool": {
+          "arm": 6,
+          "baseline": 7,
+          "n": 8
+        }
+      },
+      "success_by_template": {
+        "ambiguous-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-103": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "ambiguous-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-106": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "ambiguous-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "approval-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "approval-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "denied-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-101": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-104": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-106": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "exec_failure-107": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "exec_failure-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-blossom": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-bulb-interval": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-bulb-type": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-buyer": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-designer": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-escalation": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-escalation-minutes": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "fact-first-lit": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-handover": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-keeper-rota": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 2
+        },
+        "fact-maint-window": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-pager": {
+          "arm_success": 1,
+          "baseline_success": 2,
+          "tasks": 2
+        },
+        "fact-pickers": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-pump": {
+          "arm_success": 1,
+          "baseline_success": 2,
+          "tasks": 2
+        },
+        "fact-supplies": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "fact-valve": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-109": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-110": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-111": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "filesystem-112": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "injection_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "injection_workspace-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-103": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-105": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "multidomain-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-108": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-109": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "multidomain-110": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "rare-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "rare-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-102": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "sequential-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "sequential-108": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "unknown_tool-103": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-105": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "unknown_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 0,
+          "tasks": 1
+        },
+        "wrong_first_tool-101": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-102": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-103": {
+          "arm_success": 0,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-104": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-105": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-106": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-107": {
+          "arm_success": 1,
+          "baseline_success": 1,
+          "tasks": 1
+        },
+        "wrong_first_tool-108": {
+          "arm_success": 0,
+          "baseline_success": 0,
+          "tasks": 1
+        }
+      },
+      "suppressed_n1_n2": 0,
+      "trigger_counts": {},
+      "trigger_outcomes": {},
+      "verdict": "FAIL"
+    }
+  },
+  "blocks": {
+    "gate": {
+      "frozen_digests_match": true,
+      "identity_digest": "sha256:f31be2e4bdb86acca188b758f90c2bcedef40541e00d3ebcea1919108c3f0481",
+      "latency_invalid_reasons": [
+        "another inference or training process is running",
+        "another process holds the GPU"
+      ],
+      "latency_valid": false,
+      "seed": 42
+    },
+    "stability1": {
+      "frozen_digests_match": true,
+      "identity_digest": "sha256:8cb9dff532be3b4576b6586666bf0f7a13a4d988fb84157c4a1dec30390f8840",
+      "latency_invalid_reasons": [
+        "another inference or training process is running",
+        "another process holds the GPU"
+      ],
+      "latency_valid": false,
+      "seed": 43
+    },
+    "stability2": {
+      "frozen_digests_match": true,
+      "identity_digest": "sha256:ceb0860991a747d47bff309da779e585912e23156b6ea8cea3a8b9eb85e63d8b",
+      "latency_invalid_reasons": [
+        "another inference or training process is running",
+        "another process holds the GPU"
+      ],
+      "latency_valid": false,
+      "seed": 44
+    }
+  },
+  "gate_seed_dir": "seed-42",
+  "kind": "interplane_bench_campaign_summary",
+  "secondary_vs_B1": {
+    "B2_vs_B1": {
+      "expansion_tasks_covered_final_B1": 6,
+      "expansion_tasks_covered_final_B2": 5,
+      "success_B1": 88,
+      "success_B2": 66,
+      "tasks": 120
+    },
+    "B3_vs_B1": {
+      "expansion_tasks_covered_final_B1": 6,
+      "expansion_tasks_covered_final_B3": 5,
+      "success_B1": 88,
+      "success_B3": 87,
+      "tasks": 120
+    },
+    "B4_vs_B1": {
+      "expansion_tasks_covered_final_B1": 6,
+      "expansion_tasks_covered_final_B4": 7,
+      "success_B1": 88,
+      "success_B4": 85,
+      "tasks": 120
+    }
+  },
+  "stability_dirs": [
+    "seed-43",
+    "seed-44"
+  ]
+}

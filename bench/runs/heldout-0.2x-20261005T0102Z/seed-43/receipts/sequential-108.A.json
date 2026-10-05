@@ -1,0 +1,286 @@
+{
+  "attempt": 3,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 189,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:8b316486beb360cf54318bbd7dcc5f55483ab3c7ff6395b3440fbee14d36efd8",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_153py93q",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:365dfffe7e5aa0e9208e9548d963ecec80b397c54463b16cf22a3ea1628b6b16",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:ec3d5d422f7571655d254f35e2e8e18a8e9db59bbf4d631c86fd1c701278c102",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_78qbi5rh",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:e1b5278c85238590996f068d1efbdc7990464b428e088d9d4035b2f05c915785",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "none present",
+        "kind": "answer_not_contains",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 189,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15981,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 6975,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 47376,
+    "total_completion_tokens": 196,
+    "total_prompt_tokens": 48163,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 7019
+  },
+  "prior_infra_failures": [
+    {
+      "attempt": 1,
+      "conditions": [
+        "A2"
+      ],
+      "errors": [
+        "HTTPError: HTTP Error 500: Internal Server Error"
+      ]
+    },
+    {
+      "attempt": 2,
+      "conditions": [
+        "A2"
+      ],
+      "errors": [
+        "HTTPError: HTTP Error 500: Internal Server Error"
+      ]
+    }
+  ],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 3
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 86,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3517,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15981,
+      "reasoning_present": true,
+      "request_digest": "sha256:d152103226ef98ee70065bb30046c85539bb05eced3301839213990be31aff95",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 55,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1722,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16050,
+      "reasoning_present": true,
+      "request_digest": "sha256:d4b7eb6e7590579425041bd35dabae4ad87b1e055d23466e0f1a5dbba54b231f",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 55,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1736,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16132,
+      "reasoning_present": true,
+      "request_digest": "sha256:b5a07a447e37815712d8752bc3dad04c303c53e26feb38e471656f518f950af8",
+      "round": 3,
+      "text_digest": "sha256:653df636eb2c6b9fba9b2e3068cb26a1f0d1e89c746f59b92553acd4b44a79a3",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "sequential",
+    "digest": "sha256:8fdb405cdaeb8e08f096c2501e1fd01fc26d6f03b2f3d1fe6b1dfd5f0d2315f0",
+    "id": "sequential-108",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 6975,
+    "wall_ms": 7019
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The secondary person in the rota is **Kofi Mensah**."
+  },
+  "user_request_digest": "sha256:8a709fc745ce440e49cbc1aff20997f46778cf386e5af4d0ee0be6553f424d38"
+}

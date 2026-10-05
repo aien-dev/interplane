@@ -1,0 +1,422 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 195,
+  "calls": [
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "get_workspace",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_s744qij3",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:7b020f2a5b2d9bee403d35e5ca106d98290a4a87e8a105e4f94ff2871f04b99a",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim_handler",
+      "tool": "get_workspace",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_nlybtykw",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:5b207a8ef9c67206a7c9b3d905c69bcd358b283c48b8666de73704e33eefc82a",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:1bf3a76e5f505a1d3f287aa3232357ba89ee94f26be9b92c23da7c44310a9dc1",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_laztumo2",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:a7fc3ec6a2a4182def2d9c832cffcd0b36bf44ef77647f7adb78546230a322d1",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:5f75a74a174d16a22919eb4c3b40badf391a9a467b8cbb9f7430aee48398dc34",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_5xdgyife",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:22adac7bc71b7afa6763cd95510ecc02db800ae3144965b47adcae7cfc725b91",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:b98657115e0346a05a74c84d5173204e14316b6ec360b732fffc0761c317b18f",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_bhte9c9p",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:b7800cf709dbeba18e12ad332f80e5901d65eb89cb55b50b29ea397b8ac0b729",
+      "result_trust": "workspace_untrusted",
+      "round": 5,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:7d6754fb5e1fbf52c14a95bc19775db824d01a17f80d6cea145c0ddc47c3c840",
+    "name": "fixtures/orchard"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 195,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15987,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 7164,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 6,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 94752,
+    "total_completion_tokens": 192,
+    "total_prompt_tokens": 97354,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 7241
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 48,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2313,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15987,
+      "reasoning_present": false,
+      "request_digest": "sha256:1bbfce88535d947f6c871d9f6ce5fc95bb1252042ecab516aab63cb4ccd1f67b",
+      "round": 1,
+      "text_digest": "sha256:688dda5aebc5b3bf3ea036812c9ba6de0ddf1c41cc7c3d4bec112b83d7c025b0",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 14,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 568,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16099,
+      "reasoning_present": false,
+      "request_digest": "sha256:7d7a0859a67f75f387780ab0aa7a7e7e1b60f70643192627603bca992979612f",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 45,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1414,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16191,
+      "reasoning_present": false,
+      "request_digest": "sha256:1b5152fa5ca309a4f49ee424f1a09a455e33a64c29c21a336d6c868a89774eb0",
+      "round": 3,
+      "text_digest": "sha256:0dbfedf4d28166d0f9c2bfb432d8e998f0cf73cdba192677a5e82b69d740df1e",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 25,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 846,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16272,
+      "reasoning_present": false,
+      "request_digest": "sha256:c9d80445ac35cce2abb40616b5eb448041c8f3382157d68db1bff56f299907bd",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 28,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 957,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16371,
+      "reasoning_present": false,
+      "request_digest": "sha256:ea978b3f8542c411c6086a3b93febf71ee49474c2b58be134c4317cb1ab3e4f8",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 32,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1066,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16434,
+      "reasoning_present": false,
+      "request_digest": "sha256:d88a16cb51a9557f9d61a80d80e857710c0544882665cd745a7ad58e0646b8a3",
+      "round": 6,
+      "text_digest": "sha256:ced0098607556536eb788d70827648e7190eae75ce8194487689fcc0bc02ea1d",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-42",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "wrong_first_tool",
+    "digest": "sha256:0df529a3f2857cdf1399f11e1afa022b0917105976e8aa0f912d3186392887cd",
+    "id": "wrong_first_tool-103",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 7164,
+    "wall_ms": 7241
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "get_workspace",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "get_workspace"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 5,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "Based on the project configuration, I found that the currency used for reporting is **EUR** (Euro). This is specified in `config/report.toml`."
+  },
+  "user_request_digest": "sha256:538cb11bcd1bd5c1e67891091598e6ef6dce5b9deafb3a1dcb8af338f3ab155b"
+}

@@ -1,0 +1,655 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 285,
+  "calls": [
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_downloads",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_p7io32u3",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:b28690bdd2faae03b090a4c2de7b2a611c503c94a0131564ae122d4e84d85776",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "stub",
+      "tool": "list_downloads",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "B2",
+  "condition_spec": {
+    "expansion_policy": "0.2",
+    "family": "B",
+    "id": "B2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": "interplane_capabilities_search",
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": [
+    "ask_user",
+    "adopt_served_model",
+    "ask_teacher",
+    "cancel_download",
+    "chat_with_model",
+    "create_session",
+    "download_model",
+    "list_cached_models",
+    "list_downloads",
+    "list_models",
+    "list_served_models",
+    "manage_endpoints",
+    "pipeline",
+    "search_hf_models",
+    "serve_model"
+  ],
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: keeper-7b",
+        "kind": "answer_contains_all",
+        "passed": false
+      },
+      {
+        "applies": true,
+        "detail": "no match",
+        "kind": "answer_regex",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all",
+      "answer_regex"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 285,
+    "calls_total": 1,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 15,
+    "exposed_capabilities_max": 15,
+    "exposed_tools_first": 16,
+    "exposed_tools_max": 16,
+    "first_turn_prompt_tokens": 3352,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 2728,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 10554.0,
+    "tool_schema_tokens_first": 3067,
+    "tool_schema_tokens_per_round_mean": 3067.0,
+    "tool_schema_tokens_sum": 6134,
+    "total_completion_tokens": 68,
+    "total_prompt_tokens": 6754,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 2739
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 2
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 44,
+      "exposed_caps_count": 15,
+      "exposed_names": [
+        "ask_user",
+        "adopt_served_model",
+        "ask_teacher",
+        "cancel_download",
+        "chat_with_model",
+        "create_session",
+        "download_model",
+        "list_cached_models",
+        "list_downloads",
+        "list_models",
+        "list_served_models",
+        "manage_endpoints",
+        "pipeline",
+        "search_hf_models",
+        "serve_model"
+      ],
+      "exposed_tools_count": 16,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1998,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 3352,
+      "reasoning_present": true,
+      "request_digest": "sha256:f8551c86cac87f3a61a5863b6876524fbb90fef266ffbd2b106f88d898f8c3ae",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 10554,
+      "tools_digest": "sha256:58fc6790ac1e01d7aadca8e41d0027aa42df00ab5e9b542978186321f018a3a6"
+    },
+    {
+      "completion_tokens": 24,
+      "exposed_caps_count": 15,
+      "exposed_names": [
+        "ask_user",
+        "adopt_served_model",
+        "ask_teacher",
+        "cancel_download",
+        "chat_with_model",
+        "create_session",
+        "download_model",
+        "list_cached_models",
+        "list_downloads",
+        "list_models",
+        "list_served_models",
+        "manage_endpoints",
+        "pipeline",
+        "search_hf_models",
+        "serve_model"
+      ],
+      "exposed_tools_count": 16,
+      "finish_reason": "stop",
+      "latency_ms": 730,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 3402,
+      "reasoning_present": true,
+      "request_digest": "sha256:c59d6384c6f76dba68475c42fdd8b946bb8741a5abad371bb5fe8e6021373aab",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 10554,
+      "tools_digest": "sha256:58fc6790ac1e01d7aadca8e41d0027aa42df00ab5e9b542978186321f018a3a6"
+    }
+  ],
+  "run_id": "seed-42",
+  "selection": {
+    "final_digest": "sha256:73cd5998b045087e6613aa68a0abc039ded897de63f309ff023eb8ed1130498e",
+    "final_selected": [
+      "ask_user",
+      "adopt_served_model",
+      "ask_teacher",
+      "cancel_download",
+      "chat_with_model",
+      "create_session",
+      "download_model",
+      "list_cached_models",
+      "list_downloads",
+      "list_models",
+      "list_served_models",
+      "manage_endpoints",
+      "pipeline",
+      "search_hf_models",
+      "serve_model"
+    ],
+    "round1": {
+      "always_include": [
+        "ask_user"
+      ],
+      "catalog_digest": "sha256:4ec0d10e4abbf4446b99c8b9fb22375728e83fcde82903320c3e6e43a28771d3",
+      "excluded": [
+        {
+          "name": "api_call",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "app_api",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "apply_patch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "archive_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bash",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "bulk_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "create_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "delete_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "edit_image",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "get_workspace",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "glob",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "grep",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_cookbook_servers",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_email_accounts",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_emails",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_serve_presets",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "list_sessions",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ls",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_bg_jobs",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_calendar",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_documents",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_mcp",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_memory",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_notes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_settings",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_skills",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tasks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_tokens",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "manage_webhooks",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "mark_email_read",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "python",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "read_file",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "reply_to_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "resolve_contact",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "scan_email_unsubscribes",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "search_chats",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "send_to_session",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "serve_preset",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "stop_served_model",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "suggest_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "tail_serve_output",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "todowrite",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "trigger_research",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "ui_control",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "unsubscribe_email",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_document",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "update_plan",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_fetch",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "web_search",
+          "reason": "domain_mismatch"
+        },
+        {
+          "name": "write_file",
+          "reason": "domain_mismatch"
+        }
+      ],
+      "kind": "selection",
+      "measure": {
+        "full_count": 71,
+        "full_rendered_bytes": 59024,
+        "rendered_bytes": {
+          "full": 59024,
+          "selected": 10084
+        },
+        "selected_count": 15,
+        "selected_rendered_bytes": 10084
+      },
+      "requested_domains": [
+        "models"
+      ],
+      "runtime": "odysseus",
+      "selected": [
+        {
+          "domains": [
+            "user"
+          ],
+          "name": "ask_user",
+          "rule_id": "always_include"
+        },
+        {
+          "domains": [
+            "serving",
+            "models",
+            "admin"
+          ],
+          "name": "adopt_served_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "user",
+            "models"
+          ],
+          "name": "ask_teacher",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving",
+            "admin"
+          ],
+          "name": "cancel_download",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "sessions"
+          ],
+          "name": "chat_with_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "sessions",
+            "models"
+          ],
+          "name": "create_session",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving",
+            "admin"
+          ],
+          "name": "download_model",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving"
+          ],
+          "name": "list_cached_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "serving"
+          ],
+          "name": "list_downloads",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models"
+          ],
+          "name": "list_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "serving",
+            "models"
+          ],
+          "name": "list_served_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "admin",
+            "models"
+          ],
+          "name": "manage_endpoints",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models"
+          ],
+          "name": "pipeline",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "models",
+            "web"
+          ],
+          "name": "search_hf_models",
+          "rule_id": "domain:models"
+        },
+        {
+          "domains": [
+            "serving",
+            "models",
+            "admin"
+          ],
+          "name": "serve_model",
+          "rule_id": "domain:models"
+        }
+      ],
+      "selector": {
+        "name": "domain_match",
+        "version": "1"
+      }
+    },
+    "round1_digest": "sha256:73cd5998b045087e6613aa68a0abc039ded897de63f309ff023eb8ed1130498e"
+  },
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "rare",
+    "digest": "sha256:15f0300ddafa332dd32c0d1e28c12c3923dfa32939a1c9d05545d238c35c53ba",
+    "id": "rare-104",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 2728,
+    "wall_ms": 2739
+  },
+  "tool_schema_tokens_per_round": [
+    3067,
+    3067
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "list_downloads",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "list_downloads"
+      }
+    ],
+    "expansions": [],
+    "final_answer": ""
+  },
+  "user_request_digest": "sha256:f6ff0cd09d2fda08a91cf140e68a76c85596cd241bd9d3dc458121b8eb3958b1"
+}

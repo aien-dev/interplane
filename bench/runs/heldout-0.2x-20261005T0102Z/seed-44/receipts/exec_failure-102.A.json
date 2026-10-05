@@ -1,0 +1,269 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 186,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:f9dc3e99a2a9c5830c0b541a8038a4898a406670246b532b77482e47602fafb5",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_eadol5t7",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:62a664ca2df40e233616e4e0b1e1043f50d276f5ff8120848ae58ae7e5df8229",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "error",
+      "synthetic": "fault",
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:f9dc3e99a2a9c5830c0b541a8038a4898a406670246b532b77482e47602fafb5",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_i5dgptto",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:623c10b5d2adc7c0ee5e5f32525ed8afa080f60c5ed858f2730f080c6621ea30",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "error, later ok, final answer",
+        "kind": "recovered_after_error",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "no match",
+        "kind": "answer_regex",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_regex"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 186,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15978,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 5910,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 47376,
+    "total_completion_tokens": 135,
+    "total_prompt_tokens": 48167,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 5959
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 3
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 66,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3369,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15978,
+      "reasoning_present": true,
+      "request_digest": "sha256:ba8e85f96bc6f4a1ce690535f1751b40d37ed1b35167b436c62e4a8f1a7427dd",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 49,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1745,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16054,
+      "reasoning_present": true,
+      "request_digest": "sha256:004393da34804ed0f684350a89e055614167268012abd0e88711c3782289f2e7",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 20,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 796,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16135,
+      "reasoning_present": true,
+      "request_digest": "sha256:89706b4c08fc58522b88bfea551cf113aba38f1dd100ca0d5bba3a24ac1f7d4f",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "exec_failure",
+    "digest": "sha256:f7f2edaa20db5fb210a53be18e63bf37fb67d222e7c8f802611182ffb9a55ccc",
+    "id": "exec_failure-102",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 5910,
+    "wall_ms": 5959
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "read_file"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": ""
+  },
+  "user_request_digest": "sha256:92c097baec149f6ab70c376b48fcf951e155d5ebf3f9455906db450a59a4d64f"
+}

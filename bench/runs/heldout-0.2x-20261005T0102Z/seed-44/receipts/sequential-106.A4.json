@@ -1,0 +1,570 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 201,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:9e8cf3317a0581e0fc4d7bb4c3c62d5651afee4f92f946ebab90567f84706fc5",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_c9c5xead",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:bfdbe23ba44e8d7cdbb05ac6793b7548602f3aaac80fb325486373477447646b",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:cf27dd8ae85c5f1cb1190ddb712422fbf078f2b3c3d8f51c82e210157d34f315",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_5gbyfin5",
+      "result_content_kind": null,
+      "result_digest": "sha256:548405d0cfdc4d93844935d56650a865492259460d972428ee036cdc2946bc9d",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_oli58r1l",
+      "result_content_kind": null,
+      "result_digest": "sha256:db22e594ce38b1941f75c9818f186fa842cfefa76ce6cd5621f1d0283b793c82",
+      "result_trust": null,
+      "round": 3,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_9ie3ix17",
+      "result_content_kind": null,
+      "result_digest": "sha256:fff46523164884de2dcc168c0d35a78aeea5d66b87c26f42cc73943a02dbfabe",
+      "result_trust": null,
+      "round": 4,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_1uao8bqj",
+      "result_content_kind": null,
+      "result_digest": "sha256:cb52975a1dacaaa3f5b41877800ed96d8e07ef3e8b7f6aed3694d1a10f476a71",
+      "result_trust": null,
+      "round": 5,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_046nb7de",
+      "result_content_kind": null,
+      "result_digest": "sha256:62fbcaa4d1c4cba0f5d4fb0efa7cda538ada9db00839f23731936c9baa82053a",
+      "result_trust": null,
+      "round": 6,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_yl4g27p8",
+      "result_content_kind": null,
+      "result_digest": "sha256:ced132a662a565b63b3d48c6f2a276958de9f4aedfc3388669ea5e961729fcb9",
+      "result_trust": null,
+      "round": 7,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "command"
+      ],
+      "arguments_digest": "sha256:df651a1575b5efb3bfaeb778df28233468b31dd6c0efb6b99110d5d4bdf2cbcb",
+      "capability": "bash",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_5fhbgk7p",
+      "result_content_kind": null,
+      "result_digest": "sha256:025c3f8ebbc9d89969419f784c04ab4fb1202b35eb5600197c8ed071b18ac2d7",
+      "result_trust": null,
+      "round": 8,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "bash",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 8
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 9
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "max_rounds",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "no final answer",
+        "kind": "answer_regex",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_regex"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 201,
+    "calls_total": 8,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 7
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15993,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 10573,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 8,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 126336,
+    "total_completion_tokens": 300,
+    "total_prompt_tokens": 130525,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 7,
+    "wall_ms": 10693
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 69,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2901,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15993,
+      "reasoning_present": false,
+      "request_digest": "sha256:2de78004b97e60a89c6a774f36d84f4eb331dbf691cc79065d4eb2b578ca86c6",
+      "round": 1,
+      "text_digest": "sha256:e30f826c648d473b14e6259c3a135d2842e52f2f34faa433e9144c4d11cceb1e",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 57,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1784,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16113,
+      "reasoning_present": false,
+      "request_digest": "sha256:bfd6296c10a1b6ec597f6755d81e59b7868c364d58cf68558b73dfee968d3a18",
+      "round": 2,
+      "text_digest": "sha256:b6ee4394e271f325ba3b0ea3ad954339042d932f7f286bd402ae5c33b2d55bde",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 988,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16215,
+      "reasoning_present": false,
+      "request_digest": "sha256:62fdd2f3e7cb061f783b6e9ddcfdad76b92e92aaadc0116f2c482fedf3a6f0bd",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 968,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16290,
+      "reasoning_present": false,
+      "request_digest": "sha256:d4f1139c1a13728852bbc70115cfe5e1eda031e3acb243ca0e5329616fd16f5b",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 972,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16365,
+      "reasoning_present": false,
+      "request_digest": "sha256:03391b8e25dc9bf0e29dcc1e1b106ac555fa639f78686808d4414263e999f632",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 982,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16441,
+      "reasoning_present": false,
+      "request_digest": "sha256:b53c982d132740cbab321f2e4aa7144cc2f251c77161c4388b2b951470c228dc",
+      "round": 6,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 991,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16516,
+      "reasoning_present": false,
+      "request_digest": "sha256:08f6977ce07496d8c9f9796a43dca0628f38647eda6baabe145ffe07ce34b4b9",
+      "round": 7,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 29,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 987,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16592,
+      "reasoning_present": false,
+      "request_digest": "sha256:bc58d9b38b7947f8cd6f3c20d7687acd9de1ce6e7965781b6fce66f6be5bbe4b",
+      "round": 8,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "sequential",
+    "digest": "sha256:e7cdbeb68746af09a920f003d6e49b4006bd58d15309f9a93a9853d5f9d4d620",
+    "id": "sequential-106",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 10573,
+    "wall_ms": 10693
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 3,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 4,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 5,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 6,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 7,
+        "status": "requires_approval",
+        "tool": "bash"
+      },
+      {
+        "capability": "bash",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 8,
+        "status": "requires_approval",
+        "tool": "bash"
+      }
+    ],
+    "expansions": [],
+    "final_answer": null
+  },
+  "user_request_digest": "sha256:cd353c1221ce4ab96ac97ae3c9ab9d62bbe4e4496339878232eeee40b3f9bdab"
+}

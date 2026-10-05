@@ -1,0 +1,263 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 183,
+  "calls": [
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:fe4a79c9b49becf60b66f2480c409c8946409dbaba0e51b438330eb8af2d161f",
+      "capability": "manage_calendar",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_j672g5i9",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:da1ab41e725bdb9d611f071c3782bab0424ddf998ce1d784af2eb07c1ccde1e8",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "manage_calendar",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_contact",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_pvhja97t",
+      "result_content_kind": null,
+      "result_digest": "sha256:7e6c62a49d9ded16718d19cd3501da6496a8d818f7ab484bb8038e986b53aa93",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_contact",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: Lena Varga",
+        "kind": "answer_contains_all",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_contains_all"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 183,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 1
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15975,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 8065,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 47376,
+    "total_completion_tokens": 233,
+    "total_prompt_tokens": 48240,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 8093
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 40,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2128,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15975,
+      "reasoning_present": false,
+      "request_digest": "sha256:f61e381aa50bb714521294e8431d54b0925467779e0ab6828dceefa9a486da98",
+      "round": 1,
+      "text_digest": "sha256:9df220f88148333309bdf5957fcfcbd738f583f11ae947c470cbb574fd341cd9",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 76,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2357,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16072,
+      "reasoning_present": false,
+      "request_digest": "sha256:2c147b015cc8c0db405fa3105833535bcb4a2a52669fe2f7757c2a51dad452e3",
+      "round": 2,
+      "text_digest": "sha256:ab5b1368f9fd3c765ebc6fbb647bce65534f534ea49072362d4474c50afbcf6d",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 117,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 3580,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16193,
+      "reasoning_present": false,
+      "request_digest": "sha256:632e8e6a9fb0a4b0cb78353910bb973c0772120797d8ccef4cdc8887122c7f28",
+      "round": 3,
+      "text_digest": "sha256:718fa2f46655f5328b5bbf1180f0623b6c21f4f05e4f202405e89693bd41cafb",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "ambiguous",
+    "digest": "sha256:49070d4fcbc2b6499f58acc10016dc0f47ca8966637e3a42765b5427bb279ab8",
+    "id": "ambiguous-106",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 8065,
+    "wall_ms": 8093
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "manage_calendar",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "manage_calendar"
+      },
+      {
+        "capability": "manage_contact",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "manage_contact"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "I don't have direct access to see who is currently on call. The calendar shows a \"Rota handover\" event at the Control room, but this doesn't indicate the current on-call person.\n\nTo find out who is on call, you might need to:\n1. Check with your team's communication channels (Slack, Teams, etc.)\n2. Look at an on-call roster or schedule document\n3. Ask someone from your operations/engineering team\n\nIs there a specific contact or document where the on-call information is stored that I should check?"
+  },
+  "user_request_digest": "sha256:6f42f8931cac99a7bc49defdf58f4593458ce793b362a9276a9ee53905395445"
+}

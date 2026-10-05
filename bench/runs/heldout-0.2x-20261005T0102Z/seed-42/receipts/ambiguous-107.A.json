@@ -1,0 +1,428 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 181,
+  "calls": [
+    {
+      "argument_keys": [
+        "query"
+      ],
+      "arguments_digest": "sha256:344a0bff5ac32f5547993126698a07edad58caa53163e896e624b456d2f46a61",
+      "capability": "web_search",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_4ha462c9",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:ef382688c77a33d80aafe0523400495885620a1bfc6a7f5347b42a420c432229",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "web_search",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "query"
+      ],
+      "arguments_digest": "sha256:7f2f30e8934efd88e45f60143f7b41ec0f685fc6bf4814bf44af5d4e1c2b4404",
+      "capability": "web_search",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_bz2pxbvc",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:d04add68787807f0036a2e839b1bbb0e7664b7e41d013345363eeef78b910698",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "web_search",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "query"
+      ],
+      "arguments_digest": "sha256:84a13e432189abc1609871382bfa6f2d0943096d89a281aed43b499bbeb35185",
+      "capability": "web_search",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_93opyq8p",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:1e8aecc8936f87a37f379dc29937c1d177bdeef3d90cd79ace166d36069d372c",
+      "result_trust": "trusted_runtime",
+      "round": 3,
+      "status": "error",
+      "synthetic": null,
+      "tool": "web_search",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "query"
+      ],
+      "arguments_digest": "sha256:751af6735ad8918c084cca9a1c5e0f3dca9fec8c254616c0bee784f95d4188df",
+      "capability": "web_search",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_jia6iyei",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:aa58ba665d60d2d64bfc908cf99ab8d9ddef3025e806cfa473954785e2132955",
+      "result_trust": "trusted_runtime",
+      "round": 4,
+      "status": "error",
+      "synthetic": null,
+      "tool": "web_search",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "url"
+      ],
+      "arguments_digest": "sha256:ccae20b9140829ecdb25df9334d52c11500a0f8933f243a6a5d90a2c52b183cc",
+      "capability": "web_fetch",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_323ptch8",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:df58477d7dfdb020ea7050f5da4050e58015ca1e7706ea6a2f8f633f38e0f217",
+      "result_trust": "trusted_runtime",
+      "round": 5,
+      "status": "error",
+      "synthetic": null,
+      "tool": "web_fetch",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 7
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "no match",
+        "kind": "answer_regex",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "answer_regex"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 181,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 5,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15973,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 19143,
+    "recovered_after_error": false,
+    "rejected_results": 0,
+    "rounds": 6,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 94752,
+    "total_completion_tokens": 605,
+    "total_prompt_tokens": 96872,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 5,
+    "wall_ms": 19250
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 6
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 86,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3535,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15973,
+      "reasoning_present": true,
+      "request_digest": "sha256:0c8249a9592b9779b63a52d604dc40617fb11509e6f50243fa8d3426e3c1412e",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 87,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2630,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16040,
+      "reasoning_present": true,
+      "request_digest": "sha256:85e7d529a45f6c84ec28736f9d7f098b02fc632c793fce72115a66965217a675",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 66,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2057,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16110,
+      "reasoning_present": true,
+      "request_digest": "sha256:9d829bad826fdd369fad081f04fd9abd41d6cf45403be3c36993f334e9f01cdf",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 61,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1902,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16181,
+      "reasoning_present": true,
+      "request_digest": "sha256:e083962c52492ad6920f5c72f7c07ed1971835f1fae15d7549983365a8d3e7a5",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 69,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2121,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16248,
+      "reasoning_present": true,
+      "request_digest": "sha256:fe832fb8e7b7d2f2a6b26d930ea87f6e3a43d96ba8e43c56be5455844344154e",
+      "round": 5,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 236,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 6898,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16320,
+      "reasoning_present": true,
+      "request_digest": "sha256:f3a654c113e60d1b2da529d634b5adaf2804ddf50695df2f635c5da24168e8a9",
+      "round": 6,
+      "text_digest": "sha256:3dd06c7b51bbda4e1b0f61fc6a5d3dfdf627d2bddb6b93855f7f87eae3d1449d",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-42",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "ambiguous",
+    "digest": "sha256:3eccd19846687b14c47a9962d0839c1206fd9f0e9db2d5e01e65ba7b7b03e741",
+    "id": "ambiguous-107",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 19143,
+    "wall_ms": 19250
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "web_search",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "web_search"
+      },
+      {
+        "capability": "web_search",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "web_search"
+      },
+      {
+        "capability": "web_search",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 3,
+        "status": "error",
+        "tool": "web_search"
+      },
+      {
+        "capability": "web_search",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 4,
+        "status": "error",
+        "tool": "web_search"
+      },
+      {
+        "capability": "web_fetch",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 5,
+        "status": "error",
+        "tool": "web_fetch"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "Based on my knowledge, fog horns typically operate at a frequency of approximately **100 Hz** (hertz), though they can range from about 80-200 Hz. \n\nThis low frequency is specifically chosen because:\n- Low-frequency sounds travel much farther through air and water than high frequencies\n- The sound waves can diffract around obstacles like land masses and buildings\n- Fog and other atmospheric conditions don't absorb low frequencies as quickly\n\nThe classic fog horn sound is often described as a deep, resonant \"wooo-woo\" sound that can be heard for many miles in foggy conditions."
+  },
+  "user_request_digest": "sha256:e608932c8742ba01fa227aaffefdb31a452d2f9e67df7912ab03c7f7c14fe9c7"
+}

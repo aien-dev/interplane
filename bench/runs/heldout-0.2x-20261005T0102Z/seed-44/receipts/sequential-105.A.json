@@ -1,0 +1,422 @@
+{
+  "attempt": 3,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 191,
+  "calls": [
+    {
+      "argument_keys": [
+        "pattern"
+      ],
+      "arguments_digest": "sha256:befadf56e0bb0fab9e2bf40cbedd3f0583a9037d5c6282457a09cc06da639a8c",
+      "capability": "glob",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_zugi6bm5",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:4ea557523d84e0e0591701495e368f3611681ce3103b4a46a962ef8e713e9a6d",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "glob",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "pattern"
+      ],
+      "arguments_digest": "sha256:474695accd4aba47e47634f70e1e56187d1f99f2f54915c04c65521d0b9ccdf3",
+      "capability": "glob",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_x9plhvvl",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:8f46095a4dfc3c53f4e1a4106de3ee0081fb3cdd764bd3024d98486ff76458b1",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "glob",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:4bb94a64618bee225ca1556b2ca4031829b4ed3f7d280a5a72eef2a2caa96576",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_3i3owabj",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:899ba3c6060c03e0310cba92f80bdd4a43b96dcd624acc43ea402777e9d7e105",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "pattern"
+      ],
+      "arguments_digest": "sha256:094b1e08c3cd7c25a47891960873d606a890a41525cfb94af9ad71ecb4916798",
+      "capability": "glob",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_iwa0fpni",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:79b2a622aa4686bf191d806b7ec355df21e5843dd0a2471fe3e80f9c1c21814c",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "glob",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:a8108b53beaa73dd70d804f7fce67fbf6d1b26991362982d896399a3d81e5b69",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_s8050728",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:5af4ac3a16707cd683ce7c8562925b668098b74b29e4a75173de78b3529ebfac",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 191,
+    "calls_total": 5,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 5,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15983,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 12358,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 5,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 78960,
+    "total_completion_tokens": 375,
+    "total_prompt_tokens": 81067,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 12453
+  },
+  "prior_infra_failures": [
+    {
+      "attempt": 1,
+      "conditions": [
+        "A2"
+      ],
+      "errors": [
+        "HTTPError: HTTP Error 500: Internal Server Error"
+      ]
+    },
+    {
+      "attempt": 2,
+      "conditions": [
+        "A2"
+      ],
+      "errors": [
+        "HTTPError: HTTP Error 500: Internal Server Error"
+      ]
+    }
+  ],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 5
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 130,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 4777,
+      "n_tool_calls": 2,
+      "outcome": "tool_request",
+      "prompt_tokens": 15983,
+      "reasoning_present": true,
+      "request_digest": "sha256:621762a815adb488951d86769661c6f071525af30b3ec583f01df0e71bfaec5f",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 59,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1844,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16123,
+      "reasoning_present": true,
+      "request_digest": "sha256:e6ebb1dcf14da6436217cedb82e4450daabeb40f7f49cfab3a04432307bb996f",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 51,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1605,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16235,
+      "reasoning_present": true,
+      "request_digest": "sha256:da9fda55f17b1d8aaa458f40a99befad9250409ecd90456e2820d32868520b02",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 70,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2126,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16310,
+      "reasoning_present": true,
+      "request_digest": "sha256:988b82f1e32d761c8223fb129a4e0c365f5953aad5ebd168c251c3d1ad9819c2",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 65,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 2006,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16416,
+      "reasoning_present": true,
+      "request_digest": "sha256:98f96b125819d421f97c851afb77b7be934dfe495f81ff7e631a6180761019b0",
+      "round": 5,
+      "text_digest": "sha256:58527d9e8018bf5a3387175559aa4611a7c2856f03bd67fb64d1ff5a5d026587",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "sequential",
+    "digest": "sha256:de8d2bf9e3f910eff33a1f6730bf69cef8eaccc63857a052cb876bcc79f8f9a5",
+    "id": "sequential-105",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 12358,
+    "wall_ms": 12453
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "glob",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "glob"
+      },
+      {
+        "capability": "glob",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "glob"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "glob",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "glob"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The lead in the OWNERS.md file uses the email domain **beacon.example**."
+  },
+  "user_request_digest": "sha256:5ad56709f32bde4c95f1b28d2e19593bc88a67c0c56cb80af256a035ce4d1292"
+}

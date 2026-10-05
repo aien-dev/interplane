@@ -1,0 +1,244 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 200,
+  "calls": [
+    {
+      "argument_keys": [
+        "name"
+      ],
+      "arguments_digest": "sha256:ec6524f8bee37399608abc01ee2253e61893905c425c0191f530afe090eee41f",
+      "capability": "resolve_contact",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_0gkv3741",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:496898fe70b2f0931142bb8722524f1231f494fe269a526d7b0399041b972352",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "resolve_contact",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:847c8b5e0864f4551cadb1d1d3f9dbf1b578fc7aaf924fb633f8eb3594edc207",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 1,
+      "request_id": "call_rmudw35u",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:201ccb12dbdd5de3807186aab11960a85a99131a1b07d02f82c3816a48b7334f",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 200,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15992,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 3868,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 2,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 31584,
+    "total_completion_tokens": 95,
+    "total_prompt_tokens": 32133,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 3902
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 57,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2591,
+      "n_tool_calls": 2,
+      "outcome": "tool_request",
+      "prompt_tokens": 15992,
+      "reasoning_present": false,
+      "request_digest": "sha256:29cc13fb6a60e3796f83183bc55034469bc9fa0bac6cfa4038e25e2d9a9fb90b",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 38,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1277,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16141,
+      "reasoning_present": false,
+      "request_digest": "sha256:4efb74be7facebeaa77f5dba8f8b2151d0ca22f4768ce7ccdfd578bddbd958f5",
+      "round": 2,
+      "text_digest": "sha256:e4e5fdb7c3eb76e4d2c4a8baa6a6f4885ab96c267ec866312b7a256d5c4c0b4d",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "multidomain",
+    "digest": "sha256:273c7d914d41e3fb31072b3218973b588d2551edadd0e6423912cb1f000eb443",
+    "id": "multidomain-101",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 3868,
+    "wall_ms": 3902
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "resolve_contact",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "resolve_contact"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "No, her addresses are different:\n- **Contacts**: `mira@okafor-home.example`\n- **OWNERS.md**: `mira.okafor@beacon.example`"
+  },
+  "user_request_digest": "sha256:ba32ac65a7e5c6224946addc8f168ab8b8f652670b4dd5b25bcd38b0ef97e7a2"
+}

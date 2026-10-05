@@ -1,0 +1,377 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 194,
+  "calls": [
+    {
+      "argument_keys": [
+        "path",
+        "pattern"
+      ],
+      "arguments_digest": "sha256:2901bfb37ebec45f41019d2b1487ca58df901a286867d73ceb38221c9edc05fb",
+      "capability": "grep",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_jyuhpmt0",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:94d9b6ebf4e4644b28faf9e07a34396b50ee133dd02b2db2f1605e4899cb93a2",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "error",
+      "synthetic": "fault",
+      "tool": "grep",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path",
+        "pattern"
+      ],
+      "arguments_digest": "sha256:2901bfb37ebec45f41019d2b1487ca58df901a286867d73ceb38221c9edc05fb",
+      "capability": "grep",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_ybqaxzqj",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:119bf0a913e4d67dc5544d0778b22308d528c5a5854a545776071ff314bbb23a",
+      "result_trust": "workspace_untrusted",
+      "round": 2,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "grep",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:491ecf79724dd1868c896cc151292a43dca67714a2fdb701ec8f168ef11c83f7",
+      "capability": "ls",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_bosogpr5",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:cc5804383b81d66427263523a9ca51da628a4143a2aa5519fd87ef128c05b84b",
+      "result_trust": "workspace_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "ls",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "get_workspace",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_1nwhz6vr",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:c3a7d06ad4755bd09044d688d7d3638621d2d5985eda046fe7e13d061d3c22b3",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": "sim_handler",
+      "tool": "get_workspace",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "error, later ok, final answer",
+        "kind": "recovered_after_error",
+        "passed": true
+      },
+      {
+        "applies": true,
+        "detail": "all present",
+        "kind": "answer_contains_all",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 194,
+    "calls_total": 4,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 4,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 1,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15986,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 31360,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 5,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 78960,
+    "total_completion_tokens": 878,
+    "total_prompt_tokens": 81059,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 31457
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 5
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 142,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 5933,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15986,
+      "reasoning_present": true,
+      "request_digest": "sha256:53447c7bf080b94e6cba175de4877112305ada213dd69d08bf8a68c605e3ed20",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 57,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2030,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16068,
+      "reasoning_present": true,
+      "request_digest": "sha256:f2decdba337e6ac26494d95388239e746c696d4389d79a19e5b86124d2526db9",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 181,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 6393,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16218,
+      "reasoning_present": true,
+      "request_digest": "sha256:c77314a7454480d395ded4e638f883109639762cfe1835e706c150bf9c4a3ea1",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 120,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 4198,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16354,
+      "reasoning_present": true,
+      "request_digest": "sha256:aa8d7f430e57c1426fdd2d43bfbea48f94ddb48058284aaa61604f0979abd77b",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 378,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 12806,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16433,
+      "reasoning_present": true,
+      "request_digest": "sha256:a7aa95155ab308281bcb9314dc5a42be411155695a1a2db4e9c547fcaca36990",
+      "round": 5,
+      "text_digest": "sha256:f2b7314845b20926218a017ac065570606b21f5303704233021952e7c1afac06",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "exec_failure",
+    "digest": "sha256:3c100c219ebad5091fcdaffa625d10d9b37ba0dc801b178c51ffee3d2ba5b30d",
+    "id": "exec_failure-107",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 31360,
+    "wall_ms": 31457
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "grep",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "grep"
+      },
+      {
+        "capability": "grep",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 2,
+        "status": "ok",
+        "tool": "grep"
+      },
+      {
+        "capability": "ls",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "ls"
+      },
+      {
+        "capability": "get_workspace",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "get_workspace"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The word \"replica\" appears in **two** runbook files in the current workspace:\n\n1. **db-failover-v4.md** - mentions \"promote the replica named under key 'east' in services/replicas.json\"\n2. **db-failover-v3.md** - mentions \"promote replica pg-west-1\"\n\nBoth files are located in `/tmp/interplane-bench-ws/exec_failure-107.A/runbooks/`."
+  },
+  "user_request_digest": "sha256:af46e826ef71c0db21a61c58d6e5443bd11f36998491366cc350e9054b5595bf"
+}

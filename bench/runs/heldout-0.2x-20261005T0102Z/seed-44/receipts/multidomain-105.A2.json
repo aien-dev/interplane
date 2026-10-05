@@ -1,0 +1,382 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 297,
+  "calls": [
+    {
+      "argument_keys": [
+        "action",
+        "text"
+      ],
+      "arguments_digest": "sha256:835e600042e59419dbfad2007d12c3ee0b8910cdcb45e4321d23077fbfa9cda3",
+      "capability": "manage_memory",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_vzr41pnl",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:223cf8df48487eb8c35b39a1a92a521fa87af7339e5120de208938359fec7755",
+      "result_trust": "external_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": "sim",
+      "tool": "manage_memory",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action"
+      ],
+      "arguments_digest": "sha256:584e7600815c4c752e42f8f3c00aa4bf1597f13bb08ed5de443b33097e1a1751",
+      "capability": "manage_memory",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_tr2ovrsa",
+      "result_content_kind": null,
+      "result_digest": "sha256:4ef3886d919fbe391764ac1f987c0818c8120f3eae8f38dcece5d25ccd09412a",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "manage_memory",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "action",
+        "method",
+        "path"
+      ],
+      "arguments_digest": "sha256:e937d1e311d4556aeece94ffbaee52dac68c9214292674855768228313de9c63",
+      "capability": "app_api",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_nsh8ihm2",
+      "result_content_kind": null,
+      "result_digest": "sha256:47ec0f43b27130f281da1f726bbaa1da8f2073fe3c4bb488e64a45266cc6474a",
+      "result_trust": null,
+      "round": 3,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:b98657115e0346a05a74c84d5173204e14316b6ec360b732fffc0761c317b18f",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_vurg4bjq",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:5fb7e1ed40ac9115cc3c0df53a1e3180c67542093af3f2729d940da6187940ec",
+      "result_trust": "workspace_untrusted",
+      "round": 4,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A2",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A2",
+    "prompt_addendum": true,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 6
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:7d6754fb5e1fbf52c14a95bc19775db824d01a17f80d6cea145c0ddc47c3c840",
+    "name": "fixtures/orchard"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "missing: GBP",
+        "kind": "answer_contains_all",
+        "passed": false
+      },
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [
+      "answer_contains_all"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 297,
+    "calls_total": 4,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 2
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 16089,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 13618,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 5,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 78960,
+    "total_completion_tokens": 422,
+    "total_prompt_tokens": 81208,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 1,
+    "wall_ms": 13697
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 5
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 86,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3438,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16089,
+      "reasoning_present": true,
+      "request_digest": "sha256:4ae71b376c8e5251e59882e16f72dbd81b1eda043c6978c34b13e502afe39e76",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 55,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1714,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16157,
+      "reasoning_present": true,
+      "request_digest": "sha256:9979ab1d18c5b68e081747868a849d6787f83b697a169a41442156dfaac1ae9d",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 81,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2433,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16231,
+      "reasoning_present": true,
+      "request_digest": "sha256:857e3ff85880dc49c51312d987baab2f1c59a0c74c2eb04f4905b4eb71ca6788",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 46,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1476,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16332,
+      "reasoning_present": true,
+      "request_digest": "sha256:4de7c529e212839fd1907f06aca862352aa50147a7cea3d0aac424b7589d532d",
+      "round": 4,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 154,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 4557,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16399,
+      "reasoning_present": true,
+      "request_digest": "sha256:ed0b34a1d87bd1b44deef86146fd068db5c63783c12372b2393a2c49b006dbb5",
+      "round": 5,
+      "text_digest": "sha256:9af17ebce09b0738807526fec18ce6962432757d8789b7e34e8e18264e0e6c35",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:3c01492fabce64b54fdef5d0dc8abce48614d0e005cdbef0db6ec89170e4b8ba",
+  "task": {
+    "category": "multidomain",
+    "digest": "sha256:cda3f6d47e3f87c3278befab2449c8c9b88c5884e0b981d5114d58c0635ba562",
+    "id": "multidomain-105",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 13618,
+    "wall_ms": 13697
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "manage_memory",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "manage_memory"
+      },
+      {
+        "capability": "manage_memory",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "manage_memory"
+      },
+      {
+        "capability": "app_api",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 3,
+        "status": "requires_approval",
+        "tool": "app_api"
+      },
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 4,
+        "status": "ok",
+        "tool": "read_file"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The memory search found no entries related to currency. I was unable to list memories due to an approval requirement.\n\nHowever, I confirmed from `config/report.toml` that the currency is **EUR**:\n\n```toml\ncurrency = \"EUR\"\nreport_day = \"Friday\"\n```\n\nSo the system reports in EUR, and there's no conflicting memory entry for currency."
+  },
+  "user_request_digest": "sha256:4db5b33a624f267c3331956763759cc37ea5a66fe2773274853d2be37fc9a034"
+}

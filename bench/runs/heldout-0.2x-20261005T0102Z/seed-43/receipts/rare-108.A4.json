@@ -1,0 +1,312 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 184,
+  "calls": [
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_email_accounts",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_zh3xdpwa",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:6eeca9e923eea31bae5c7268e0326d28a3933ece3d1b7eb5605e70b91e9f7110",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "list_email_accounts",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [],
+      "arguments_digest": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "capability": "list_email_accounts",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_rulqj591",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:a74644a6ad2f6da3a1e7a0046cdf55829585cd3911216989204af430dbf1b005",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "list_email_accounts",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "unread_only"
+      ],
+      "arguments_digest": "sha256:773a22cb11d38bc6ea7d582a31bce5cfc7303751b2651c01eb49826f562cec22",
+      "capability": "list_emails",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_5nsotqiq",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:a866305b54554ba61211c90b97104419ec494e403d3efdcbce30623be4af28da",
+      "result_trust": "external_untrusted",
+      "round": 3,
+      "status": "ok",
+      "synthetic": "stub",
+      "tool": "list_emails",
+      "unknown": false,
+      "unnecessary": false
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:2fc765276e502e12d0e5b9882ae0e26ddad299211d6ad9d5dd6acf1cbf30bcd9",
+    "name": "fixtures/beacon"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "detail": "matched",
+        "kind": "answer_regex",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 184,
+    "calls_total": 3,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 3,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 2,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15976,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 5278,
+    "recovered_after_error": true,
+    "rejected_results": 0,
+    "rounds": 4,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 63168,
+    "total_completion_tokens": 137,
+    "total_prompt_tokens": 64286,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 5315
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 15,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1376,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15976,
+      "reasoning_present": false,
+      "request_digest": "sha256:9a32d03d6b86ee324893da6dd6f81965795ffd46b96034c09fbbc426106f1f3a",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 35,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1124,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16025,
+      "reasoning_present": false,
+      "request_digest": "sha256:24a91af86eb36e21079cf72878489a71c696817fda9db2e47dd2d5041ad34625",
+      "round": 2,
+      "text_digest": "sha256:23907e3ce77475bed21af0985754a8f0913267701093577ca50a2d6d447f1256",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 51,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 1602,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16094,
+      "reasoning_present": false,
+      "request_digest": "sha256:8b9f4620aea3986006cfabd302eb836a3ad1a78245aea7ec001b30c5bf012358",
+      "round": 3,
+      "text_digest": "sha256:8bb0af5686dd484e2603830fadb8cd7f802ff1877be44aaf984895424821fd00",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 36,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 1176,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16191,
+      "reasoning_present": false,
+      "request_digest": "sha256:79ea20a630e66362226023534514ceda70d6dd7e2d97587e69e872701c22ce74",
+      "round": 4,
+      "text_digest": "sha256:24b95ed4bf585202d62c3c0c3d65c76f957824d474f94bab8986da12a2f8ed7d",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "rare",
+    "digest": "sha256:e5955e51fbf215150eb0bbfef43242b9eceb376bb68680f0f5bbfab0b9ae5f9c",
+    "id": "rare-108",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 5278,
+    "wall_ms": 5315
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "list_email_accounts",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "list_email_accounts"
+      },
+      {
+        "capability": "list_email_accounts",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "list_email_accounts"
+      },
+      {
+        "capability": "list_emails",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 3,
+        "status": "ok",
+        "tool": "list_emails"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "You have **2 unread emails** in your inbox. The list shows 4 messages total, with 2 marked as unread:\n- Lens order shipped\n- Board minutes"
+  },
+  "user_request_digest": "sha256:cba0a7e13f98c5f0de63f6f0d937d5ae781f6699a2da0e1b3340c07046a56dd7"
+}

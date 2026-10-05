@@ -1,0 +1,278 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 190,
+  "calls": [
+    {
+      "argument_keys": [
+        "action",
+        "method",
+        "path"
+      ],
+      "arguments_digest": "sha256:59b6e6faff1fda4d51ff7d19859fdb47b895b1ca6eabdff271abf111ac7c3ef4",
+      "capability": "app_api",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_f1z7z74s",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:1e4285ebd6276b0f3a839772d49429295620e18bb2fcb4bdb317fa8e1c9ad375",
+      "result_trust": "trusted_runtime",
+      "round": 1,
+      "status": "error",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "action",
+        "filter"
+      ],
+      "arguments_digest": "sha256:3d16fd2068cc799e179769e8843581562939836cf693237ac6887265907583ce",
+      "capability": "app_api",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": "execution_error",
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_wa3fqpuk",
+      "result_content_kind": "tool_result",
+      "result_digest": "sha256:205b60ff2bce40a710816ec9196c7d3d9b69888b57f3caaf1e79fc00ae9db069",
+      "result_trust": "trusted_runtime",
+      "round": 2,
+      "status": "error",
+      "synthetic": null,
+      "tool": "app_api",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A4",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A4",
+    "prompt_addendum": false,
+    "reasoning_off": true
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 44,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "matched",
+            "kind": "answer_regex",
+            "passed": true
+          },
+          {
+            "applies": true,
+            "detail": "missing: Lena Varga",
+            "kind": "answer_contains_all",
+            "passed": false
+          }
+        ],
+        "detail": "1 of 2 passed",
+        "kind": "any_of",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 190,
+    "calls_total": 2,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 2,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 2,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15982,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 8014,
+    "recovered_after_error": false,
+    "rejected_results": 0,
+    "rounds": 3,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 47376,
+    "total_completion_tokens": 236,
+    "total_prompt_tokens": 48220,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 8053
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": "reasoning_effort",
+    "invalid_for_arm4": false,
+    "off_requested": true,
+    "rounds_with_reasoning": 0
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 53,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2495,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15982,
+      "reasoning_present": false,
+      "request_digest": "sha256:aadafec4b5f5d3156c632169ad32a2ce68d5aa491451e96f2d826e8d858d0f43",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 66,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 2018,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16069,
+      "reasoning_present": false,
+      "request_digest": "sha256:969c9526c5cbb8c33ae1b76ba78446c24347b385efc4d55de2953da6793c3ddf",
+      "round": 2,
+      "text_digest": "sha256:002044e78e730c0c62dad9218ff0ced62ad69633733211c7ffb591eec10edeab",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 117,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 3501,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16169,
+      "reasoning_present": false,
+      "request_digest": "sha256:7c3441fa975f2a477fd602b50fa7770663230853efae1991e2f682240efac7f7",
+      "round": 3,
+      "text_digest": "sha256:81bed2f93b3ae846c34e1693be2653cd8414511c905fd1043b0e3d1d1bbd528a",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-44",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:c647f197e3b088c3f8a06cda41381a8ef303e49f3b745b656fc0186e28624137",
+    "id": "unknown_tool-103",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 8014,
+    "wall_ms": 8053
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "app_api",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 1,
+        "status": "error",
+        "tool": "app_api"
+      },
+      {
+        "capability": "app_api",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": "execution_error",
+        "round": 2,
+        "status": "error",
+        "tool": "app_api"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "The `page_oncall` endpoint doesn't appear to be available in this system. I don't have access to a paging/on-call roster or scheduling system through the available tools.\n\nTo determine who would be paged as primary, I would need:\n- Access to an on-call roster/scheduling system (like PagerDuty, Opsgenie, etc.)\n- The specific service or incident that triggered the page\n\nCould you provide more context about what system should be used for paging, or do you have access to an on-call roster file/database I could query?"
+  },
+  "user_request_digest": "sha256:0ce813a093ec470c6b7ea797eef763db8b8315932c6c877239797d1942fb6fe8"
+}

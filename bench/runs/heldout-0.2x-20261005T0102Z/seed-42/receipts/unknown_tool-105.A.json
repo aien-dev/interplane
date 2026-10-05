@@ -1,0 +1,330 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 197,
+  "calls": [
+    {
+      "argument_keys": [
+        "path"
+      ],
+      "arguments_digest": "sha256:4aa2f4f45ff69fb7720b67166e724f4bdb71f04a117cde8dd267f026217e69bb",
+      "capability": "read_file",
+      "decision": "authorized",
+      "discovery": false,
+      "error_code": null,
+      "executed": true,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_mkp5n3ot",
+      "result_content_kind": "workspace_content",
+      "result_digest": "sha256:6d5a73fa912bfc09f0ed54f5b32b4b46775f95bfb092ae64993392a94ad21450",
+      "result_trust": "workspace_untrusted",
+      "round": 1,
+      "status": "ok",
+      "synthetic": null,
+      "tool": "read_file",
+      "unknown": false,
+      "unnecessary": false
+    },
+    {
+      "argument_keys": [
+        "code"
+      ],
+      "arguments_digest": "sha256:02781c2866b66e1bbc192cba7c07a8286c4462d62a790ebbea23521682d6ffe3",
+      "capability": "python",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_xtmeez3w",
+      "result_content_kind": null,
+      "result_digest": "sha256:74b34264c893f0cc629acdd625b1ddc0d0ae7e25bfdf2eab664cb252b51b272c",
+      "result_trust": null,
+      "round": 2,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "python",
+      "unknown": false,
+      "unnecessary": true
+    },
+    {
+      "argument_keys": [
+        "code"
+      ],
+      "arguments_digest": "sha256:2c7c782f7b37aaf501e00a764fd9f47bdf4d3c607a246c2571886570cf02f157",
+      "capability": "python",
+      "decision": "requires_approval",
+      "discovery": false,
+      "error_code": "approval_required",
+      "executed": false,
+      "exposed": true,
+      "index": 0,
+      "request_id": "call_h7j3vj6v",
+      "result_content_kind": null,
+      "result_digest": "sha256:5773b7b1497cf9d3be6b5265a190dda7223eb9dad1adfc56208a0ce796bffd08",
+      "result_trust": null,
+      "round": 3,
+      "status": "requires_approval",
+      "synthetic": null,
+      "tool": "python",
+      "unknown": false,
+      "unnecessary": true
+    }
+  ],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 3
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 4
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 5
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:7d6754fb5e1fbf52c14a95bc19775db824d01a17f80d6cea145c0ddc47c3c840",
+    "name": "fixtures/orchard"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 42,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "no match",
+            "kind": "answer_regex",
+            "passed": false
+          },
+          {
+            "applies": true,
+            "detail": "matched",
+            "kind": "answer_regex",
+            "passed": true
+          }
+        ],
+        "detail": "1 of 2 passed",
+        "kind": "any_of",
+        "passed": true
+      }
+    ],
+    "failed": [],
+    "success": true
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 197,
+    "calls_total": 3,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 1,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 2
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15989,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 24361,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 4,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 63168,
+    "total_completion_tokens": 796,
+    "total_prompt_tokens": 64806,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 2,
+    "wall_ms": 24400
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 4
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 218,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 7306,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 15989,
+      "reasoning_present": true,
+      "request_digest": "sha256:ef006b00696f7a44e683f20f188789ef6c1eee123253dee28d15f27e6e9825c4",
+      "round": 1,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 259,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 7626,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16091,
+      "reasoning_present": true,
+      "request_digest": "sha256:954663888038a6be302a9880286d04e986e62496acb3a9dc4a60804a3183dfa8",
+      "round": 2,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 131,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "tool_calls",
+      "latency_ms": 3902,
+      "n_tool_calls": 1,
+      "outcome": "tool_request",
+      "prompt_tokens": 16280,
+      "reasoning_present": true,
+      "request_digest": "sha256:d7cd964c74d697bed276440d2cb69612b43f8ac34f650ccb11e4da096d6543a9",
+      "round": 3,
+      "text_digest": null,
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    },
+    {
+      "completion_tokens": 188,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 5527,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 16446,
+      "reasoning_present": true,
+      "request_digest": "sha256:506b85751a25b202d8d0b40778e5fc1a4abc5e2f22a299b47801eba45d1279f8",
+      "round": 4,
+      "text_digest": "sha256:fc067de55efdb97673395c22c77e3f08feac176c0c433942183adc25feb29d51",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-42",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:cd64c0f5ace851f48eda5487c31fcaab2baafb629b229600bf679741d0049360",
+    "id": "unknown_tool-105",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 24361,
+    "wall_ms": 24400
+  },
+  "tool_schema_tokens_per_round": [
+    15792,
+    15792,
+    15792,
+    15792
+  ],
+  "transcript": {
+    "calls": [
+      {
+        "capability": "read_file",
+        "decision": "authorized",
+        "discovery": false,
+        "error_code": null,
+        "round": 1,
+        "status": "ok",
+        "tool": "read_file"
+      },
+      {
+        "capability": "python",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 2,
+        "status": "requires_approval",
+        "tool": "python"
+      },
+      {
+        "capability": "python",
+        "decision": "requires_approval",
+        "discovery": false,
+        "error_code": "approval_required",
+        "round": 3,
+        "status": "requires_approval",
+        "tool": "python"
+      }
+    ],
+    "expansions": [],
+    "final_answer": "Based on the CSV data I read:\n\n- Bramley: 3120 kg\n- Cox: 2860 kg  \n- Russet: 1430 kg\n\n**Total kg**: 3120 + 2860 + 1430 = **7410 kg**\n**Number of varieties**: 3\n\n**Mean kg per variety**: 7410 ÷ 3 = **2470 kg**"
+  },
+  "user_request_digest": "sha256:13062970b043761f0d24cd6e33793b93b51145dc37092978d6878f56735bb047"
+}

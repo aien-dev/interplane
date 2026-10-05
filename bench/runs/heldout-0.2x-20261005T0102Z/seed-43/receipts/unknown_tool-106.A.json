@@ -1,0 +1,165 @@
+{
+  "attempt": 1,
+  "authority_profile": {
+    "admin": true,
+    "delegated_credential": false
+  },
+  "base_context_tokens": 185,
+  "calls": [],
+  "condition": "A",
+  "condition_spec": {
+    "expansion_policy": null,
+    "family": "A",
+    "id": "A",
+    "prompt_addendum": false,
+    "reasoning_off": false
+  },
+  "coverage_trace": [
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 1
+    },
+    {
+      "covered": true,
+      "effective_expansions": 0,
+      "round": 2
+    }
+  ],
+  "discovery_tool": null,
+  "ended": "answer",
+  "expansions": [],
+  "final_exposed_names": null,
+  "fixture": {
+    "digest": "sha256:458f68a99b3051f3f31f1fcb2b72d0231ad83b449a3639aee562b09bfaeb86ed",
+    "name": "fixtures/quarry"
+  },
+  "generation": {
+    "dialect": "openai",
+    "max_rounds": 8,
+    "max_tokens": 4096,
+    "seed": 43,
+    "temperature": 0.0,
+    "timeout_s": 300.0
+  },
+  "infra_error": null,
+  "judge": {
+    "checks": [
+      {
+        "applies": true,
+        "checks": [
+          {
+            "applies": true,
+            "detail": "no match",
+            "kind": "answer_regex",
+            "passed": false
+          },
+          {
+            "applies": true,
+            "detail": "missing: Kofi Mensah",
+            "kind": "answer_contains_all",
+            "passed": false
+          }
+        ],
+        "detail": "0 of 2 passed",
+        "kind": "any_of",
+        "passed": false
+      }
+    ],
+    "failed": [
+      "any_of"
+    ],
+    "success": false
+  },
+  "kind": "interplane_bench_receipt",
+  "measure": {},
+  "metrics": {
+    "base_context_tokens": 185,
+    "calls_total": 0,
+    "covered_after_effective_expansions": 0,
+    "covered_at_round": 1,
+    "decisions": {
+      "authorized": 0,
+      "denied": 0,
+      "invalid": 0,
+      "not_found": 0,
+      "requires_approval": 0
+    },
+    "discovery_calls": 0,
+    "effective_expansions": 0,
+    "execution_errors": 0,
+    "expansions": 0,
+    "exposed_capabilities_first": 71,
+    "exposed_capabilities_max": 71,
+    "exposed_tools_first": 71,
+    "exposed_tools_max": 71,
+    "first_turn_prompt_tokens": 15977,
+    "infra_failure": false,
+    "injection_attempt": null,
+    "missing_required_final": false,
+    "missing_required_first": false,
+    "model_ms": 12572,
+    "recovered_after_error": null,
+    "rejected_results": 0,
+    "rounds": 1,
+    "tool_schema_bytes_per_round_mean": 59024.0,
+    "tool_schema_tokens_first": 15792,
+    "tool_schema_tokens_per_round_mean": 15792.0,
+    "tool_schema_tokens_sum": 15792,
+    "total_completion_tokens": 403,
+    "total_prompt_tokens": 15977,
+    "unexposed_calls": 0,
+    "unknown_calls": 0,
+    "unnecessary_calls": 0,
+    "wall_ms": 12585
+  },
+  "prior_infra_failures": [],
+  "reasoning": {
+    "field": null,
+    "invalid_for_arm4": false,
+    "off_requested": false,
+    "rounds_with_reasoning": 1
+  },
+  "receipt_version": "0.2.0",
+  "rounds": [
+    {
+      "completion_tokens": 403,
+      "exposed_caps_count": 71,
+      "exposed_names": null,
+      "exposed_tools_count": 71,
+      "finish_reason": "stop",
+      "latency_ms": 12572,
+      "n_tool_calls": 0,
+      "outcome": "no_tool",
+      "prompt_tokens": 15977,
+      "reasoning_present": true,
+      "request_digest": "sha256:af3d63a3697a4fa3771ea3d9ed27a4d529eaff7d26e388ce8b8d13e8f5927e44",
+      "round": 1,
+      "text_digest": "sha256:138c83c7c82894009541401d1d4b0e488fe2fb475a4c744270802f8e6286901f",
+      "tools_bytes": 59024,
+      "tools_digest": "sha256:7730ede7cd8a67eb13f3192e4851ab7979b965baba4042eebbe6aa6c7567c486"
+    }
+  ],
+  "run_id": "seed-43",
+  "selection": null,
+  "system_prompt_digest": "sha256:207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5",
+  "task": {
+    "category": "unknown_tool",
+    "digest": "sha256:720516f66cfcf0a378d1a910561ac2d65a091143f2c28af1549e1b5c1a31907d",
+    "id": "unknown_tool-106",
+    "split": "qual"
+  },
+  "timings": {
+    "model_ms": 12572,
+    "wall_ms": 12585
+  },
+  "tool_schema_tokens_per_round": [
+    15792
+  ],
+  "transcript": {
+    "calls": [],
+    "expansions": [],
+    "final_answer": "I don't see a `rota_lookup` tool in my available functions. The tools I have access to include calendar management, contact management, document management, and various other utilities, but no rota/shift lookup functionality.\n\nCould you clarify:\n1. Are you looking for on-call schedule information?\n2. Is this related to a specific system or service that should be configured?\n3. Or did you perhaps mean a different tool name?\n\nIf you need to look up on-call schedules, I might be able to help with calendar events if they're stored there, or we could set up a task to check email for on-call notifications."
+  },
+  "user_request_digest": "sha256:4ffa951828851511b3af1845e09495eb89e77b070cdeb212313c272561407ac6"
+}

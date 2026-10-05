@@ -105,6 +105,28 @@ digest, in the order pinned in CORE.md ("Approval continuation"). It executes at
 ## 7. Checking an adapter against the conformance corpus
 
 `spec/CORE.md`, "Adapter subsets" and its "Adding an adapter" paragraph, say which fixtures an
-adapter must run and how they are judged. `conformance/runners/adapter_subset.py --plans <name>`
-prints the translated plans once the adapter has a table entry. An independent run of this process
-is in `docs/REPORT-adapter-repro.md`.
+adapter must run and how they are judged. `conformance/runners/adapter_runner.py` runs them and
+judges them, so an adapter author writes two files and no runner:
+
+- `authority.py` defines `RUNTIME`, `POLICY`, `make_authority(*, no_exposure_check, expires_at)` and
+  `make_pipeline(authority)`. The authority counts its calls in `decide_calls` and `execute_calls`,
+  mints approval ids with the given `expires_at`, and when `no_exposure_check` is true drops its
+  exposure floor check (the negative control).
+- `entry.json` is `{"<name>": <table entry>}`, with the fields of the `aien` entry in
+  `conformance/adapter-translation.json` and the effect classes of "Adding an adapter".
+
+```sh
+python3 conformance/runners/adapter_runner.py --module authority.py --entry entry.json --out verdicts.json
+python3 conformance/runners/adapter_runner.py --module authority.py --entry entry.json --no-exposure-check
+```
+
+The first should exit 0 with `violations` 0 and `content_derived` 0. The second should exit 1 with
+the injection cases failing; if it passes, the policy is not what stops the injections. The entry is
+added to an in-memory copy of the table, so the shared table and `TRUST-DIGEST.txt` stay unchanged
+and the subset is computed, not frozen (say so in any report). Approval cases are judged by the
+A-AIEN rule, so the runner expects approval continuation. `adapter_subset.py --plans <name>` prints
+the translated plans of an adapter already in the table.
+
+Two runs of this process are recorded: an independent one (`docs/REPORT-adapter-repro.md`) and a
+maintainer check on a smart-home host (its addendum). The shared runner reproduces both byte for
+byte (`python/tests/test_adapter_runner.py`).

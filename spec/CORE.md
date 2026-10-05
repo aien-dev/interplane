@@ -595,7 +595,8 @@ paragraph states what a new adapter does where the text above speaks only of Ody
 - *Table entry.* The adapter adds an entry under `adapters` in `adapter-translation.json`, keyed by its
   name, with the same fields as `aien` (`effects`, `approval_effects`, `native_reads`, optionally
   `provider_failure_effects`). `adapter_subset.py --subset <name>` and `--plans <name>` accept any name
-  in the table. Changing the table changes `adapter_translation_sha256`, so adding an adapter to the
+  in the table, and `adapter_runner.py --entry` runs and judges an adapter from an entry kept outside
+  it (docs/WRITING-AN-ADAPTER.md section 7). Changing the table changes `adapter_translation_sha256`, so adding an adapter to the
   shared table is a `TRUST-DIGEST.txt` revision; until a protocol freezes a list for it, its subset is
   computed, not frozen, and a report must say so.
 - *Effect classes.* The mock's targets stand for classes, not literal file and mail operations:

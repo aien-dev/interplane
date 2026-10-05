@@ -6,7 +6,8 @@ text is spec/CORE.md, "Adapter subsets"). Pure standard library, no adapter impo
   adapter_subset.py --plans <adapter>       print the translated plans of the subset as JSON
 
 The rule reads only fixture metadata and conformance/adapter-translation.json, never a result.
-Both runners (adapters/odysseus T3, adapters/aien T4) execute exactly these plans.
+Both runners (adapters/odysseus T3, adapters/aien T4) execute exactly these plans, as does
+adapter_runner.py for a new adapter.
 """
 import copy, hashlib, json, os, re, sys
 
@@ -223,8 +224,8 @@ def translate(name, case, adapter, table=None):
     return out
 
 
-def plans(adapter):
-    table = load_table()
+def plans(adapter, table=None):
+    table = table or load_table()
     byname = dict(fixtures())
     return [translate(n, byname[n], adapter, table) for n in subset(adapter, table)]
 

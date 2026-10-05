@@ -3,7 +3,7 @@ name = "interplane-crossaxis"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "INTERPLANE 0.1 reference implementation: crossaxis"
+description = "INTERPLANE reference implementation: crossaxis"
 
 [dependencies]
 interplane-core.workspace = true

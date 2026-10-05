@@ -3,7 +3,7 @@ name = "interplane-lenshift"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "INTERPLANE 0.1 reference implementation: lenshift"
+description = "INTERPLANE reference implementation: lenshift"
 
 [dependencies]
 interplane-core.workspace = true

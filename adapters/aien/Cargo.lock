@@ -1253,7 +1253,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-adapter-aien"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "aegis",
  "aien-capability",
@@ -1270,7 +1270,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-core"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "regex",
  "serde",
@@ -1281,7 +1281,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-crossaxis"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "serde",
@@ -1291,7 +1291,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-crossveil"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "interplane-crossaxis",
@@ -1302,7 +1302,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-lenshift"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "regex",

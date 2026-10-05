@@ -16,6 +16,19 @@ INTERPLANE belongs to neither side. Odysseus and AIEN are the first two referenc
 is the first qualified model dialect. Both runtimes keep their own tools, policy, approvals, memory
 and execution. INTERPLANE only standardizes what crosses between them and makes it measurable.
 
+## Try it offline (no model, no GPU, no network)
+
+```
+python3 examples/offline/run_offline.py
+```
+
+A scripted model fetches a web page that carries an injected instruction, then "obeys" it by
+asking to send an email, write a file and append a note. The reference pipeline with its mock
+runtime denies the email and the write, holds the note for a person's approval (untrusted content
+is in view) and executes none of them. The script checks this and exits 1 on any difference. It
+uses only the Python standard library. CI runs it against the built wheel installed in a clean
+environment (job `package`).
+
 ## What is in 0.1 (the Reality Layer)
 
 | Module | What it is | Status |

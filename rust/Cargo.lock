@@ -545,7 +545,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-conformance"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "interplane-crossaxis",
@@ -557,7 +557,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-core"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "proptest",
  "regex",
@@ -569,7 +569,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-crossaxis"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "serde",
@@ -579,7 +579,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-crossveil"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "interplane-crossaxis",
@@ -590,7 +590,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-lenshift"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "regex",
@@ -600,7 +600,7 @@ dependencies = [
 
 [[package]]
 name = "interplane-probe"
-version = "0.1.0"
+version = "0.3.0"
 dependencies = [
  "interplane-core",
  "interplane-lenshift",

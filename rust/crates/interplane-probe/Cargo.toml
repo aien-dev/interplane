@@ -3,7 +3,7 @@ name = "interplane-probe"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "INTERPLANE 0.1 reference implementation: probe"
+description = "INTERPLANE reference implementation: probe"
 
 [[bin]]
 name = "interplane-probe"

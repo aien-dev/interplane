@@ -268,3 +268,28 @@ Ollama 0.34.0 returned 500 on malformed `qwen3.5` tool calls (`docs/REPORT-0.2x.
       verbatim brief; attempt 1's fixture prompt carried it (no catalog name, keyword or selector detail; recorded,
       not changing attempt 1's outcome).
   Attempt 2 uses new fixtures, a new author run (same author family, section 5) and none of attempt 1's requests.
+- 2026-10-05 (amendment 4, after authoring attempt 2 stopped short and before attempt 3; no target or calibration
+  task exists, no model under test has received any request). Attempt 2 (`bench/heldout-0.2y/attempt-2/REPORT.md`)
+  filled the default group (24/24); the non-file group reached 3 of 24 after three top-ups, so the corpus was not
+  frozen. Thresholds, arms, sample size, group sizes, lint and acceptance rule are unchanged; the 24/24 requirement
+  stays.
+  14. Brief E may name the everyday thing. `AUTHORING.md` brief E ended "Do not tell the assistant where to look",
+      which is stricter than this section 5 (no tool, no path, no file extension) and conflicts with its own target:
+      the 24 non-file tasks are authored "so their keywords land in a non-file domain", the everyday word a user says
+      ("check my email"). Attempt 2 fed brief E only mail, meeting, contact, to-do, note and chat facts, and the
+      author asked bare questions about them ("Who approved the blue enamel sample?"); the lint groups a request
+      only by its own words, so 60 of 62 lint-passing everyday requests derived the default list. Brief E's last
+      sentence now allows a request to say which everyday thing it is about, with two examples built from the area
+      names the brief already lists ("in my mail", "at the meeting"), and still forbids a program, file, folder or
+      file type and any how-to. Brief Q is unchanged. No keyword list, tool or selector detail reaches the author.
+      Checked before attempt 3 on the lint only (no author call, no model): six attempt 2 facts asked with the area
+      named ("In my mail, who approved the blue enamel sample?") all pass the full lint into the non-file group; the
+      bare versions derive the default list. Whether the author then writes 24 such requests is not tested.
+  15. Top-up count stated once. `AUTHORING.md` 4.3 put the count in the brief ("Write {K} requests") and in the
+      top-up paragraph ("Write {K} more requests"), and the author read 2K: attempt 2's top-up 1 asked 12 and
+      returned 24, top-up 3 asked 36 and the author refused "72" for lack of facts. In a top-up the brief's sentence
+      now carries no number. The count rule (12, 24, 36) is unchanged.
+  16. Last attempt. If attempt 3 is short, 0.2y authoring stops: the shortfall is reported as the 0.2y result, the
+      fix under test (section 2) is not evaluated on these tasks, and any new attempt is a new pre-registration, not
+      a further amendment.
+  Attempt 3 uses new fixtures, a new author run (same author family, section 5) and none of the earlier requests.

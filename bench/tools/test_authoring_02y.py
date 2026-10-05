@@ -117,6 +117,21 @@ class BriefsAreClean(unittest.TestCase):
         for b in blocks:
             self.assertNotIn("tool", b.lower(), b[:80])
 
+    def test_brief_e_may_name_the_area_and_brief_q_may_not(self):
+        # amendment 4: brief E allows the everyday word, still forbids file and file type; brief Q keeps the ban
+        import re
+        text = (Path(__file__).resolve().parent.parent / "heldout-0.2y" / "AUTHORING.md").read_text(encoding="utf-8")
+        sec = text[text.index("## 4. Verbatim briefs"):text.index("## 5. Procedure")]
+        blocks = re.findall(r"```text\n(.*?)```", sec, flags=re.S)
+        e, q, top = blocks[1], blocks[2], blocks[3]
+        self.assertIn("everyday work", e)
+        self.assertNotIn("where to look", e)
+        self.assertIn("in my mail", e)
+        self.assertIn("a file type", e)
+        self.assertIn("plain question", q)
+        self.assertIn("Do not tell the\nassistant where to look", q)
+        self.assertEqual(top.count("{K}"), 1)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=1)

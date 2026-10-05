@@ -117,7 +117,7 @@ already records for each call: the `error_code`, the `capability`, the `exposed`
 | id | observable event | action |
 |---|---|---|
 | T1 unknown tool | `error_code = unknown_capability` (name not in the mapping table), or `capability_not_found` for a name not in the catalog | catalog search: `discover(catalog, selection, token)` for each token of the requested name split on `_ . -` with length ≥ 3. Hits are united, sorted and cut at 8, then `expand(..., {"kind": "discovery_hit", "query": <name>, "names": hits})` |
-| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), unless the call was denied or held for approval (N1, N2) | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409` at commit 2de4c81, under the comment `# ---- expansion and discovery, in call order`) |
+| T2 unexposed tool | a catalog capability called while not in the current selection (`exposed = false`), unless the call was denied or held for approval (N1, N2) | `expand(..., {"kind": "requested_excluded", "name": cap})` (already in 0.2, `bench/tools/run_bench.py:400-409` at commit 20ed1f4, under the comment `# ---- expansion and discovery, in call order`) |
 | T3 typed missing capability | `error_code` is `capability_not_found` or `stale_capability` for a name that **is** in the catalog | widen the domain: `expand(..., {"kind": "requested_excluded", "name": cap, "include_domain_siblings": true})` |
 
 For an unexposed catalog tool (T2), the catalog search the plan asks for reduces to an exact-name
@@ -196,6 +196,19 @@ held-out run.
   **1 effective expansion** in **≥ 90 %**, which means **≥ 22 of 24**. O2 is the binding
   omission criterion.
 
+Two diagnostic measures are reported for every arm next to O2. They are pre-registered here and
+do not gate:
+
+- **O2a, trigger coverage.** The number of the 24 expansion tasks on which any runtime trigger
+  (T1, T2, T3) or a model discovery call fired at least once.
+- **O2b, recovery given a trigger.** Among the O2a tasks, the number whose coverage was reached
+  within 1 effective expansion.
+
+O2 itself stays the gate as written above. The product claim is that a narrowed catalog loses
+nothing a task needs, and O2 measures that outcome directly. O2a and O2b only explain a pass
+or a fail: a low O2a means the mechanism had no signal to act on (section 9), a low O2b means
+it acted and still did not recover.
+
 An arm passes only if all four hold. O1 and O2 are also reported per expansion kind (named, path,
 nopath). A kind-level figure is descriptive and does not gate.
 
@@ -259,7 +272,7 @@ pair counts as a failure for the B side.
 
 - Runner: `--corpus 0.2x` (task root `bench/heldout-0.2x`); `--condition` for the seven
   conditions; the prompt addendum; the reasoning-off request field, since today `Client.chat`
-  sends only model, messages, temperature, seed, max_tokens and tools (`run_bench.py:134-143` at commit 2de4c81);
+  sends only model, messages, temperature, seed, max_tokens and tools (`run_bench.py:134-143` at commit 20ed1f4);
   `--backends sim-1` required for both corpora.
 - Arm 3 policy as in section 5, with negative controls: on denied and approval tasks, zero
   unauthorized executions and zero expansion events fired by a denied or pending call.
@@ -304,3 +317,8 @@ digests differ from the frozen ones does not count.
   No held-out run exists.
 - 2026-10-04: runner line citations pinned to commit 2de4c81 so later runner edits cannot move
   them. No held-out run exists.
+- 2026-10-04: runner citations re-pinned from 2de4c81 to 20ed1f4, the same runner content as
+  merged to main (#21 squash). Added the non-gating diagnostics O2a and O2b (section 6) after
+  checking the 0.2 qual receipts: condition B produced 0 `unknown_capability` and 0
+  `capability_not_found` results, so a gate change toward what arm 3 can reach was rejected;
+  O1 and O2 are unchanged. No held-out run exists.

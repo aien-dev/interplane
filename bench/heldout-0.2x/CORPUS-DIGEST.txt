@@ -3,5 +3,5 @@
 # each = sha256 over `sha256sum` lines in LC_ALL=C path order, paths relative to bench/.
 tasks_digest sha256:89996c0bbdced1ff119635fce95376514ca3a2de9b2a2b9047c8e8b499f4e6e7
 inputs_digest sha256:060ae80194c41a535cf9d573ac705f35f0f8b90d02f531927a65f2826726c6e6
-protocol_sha256 sha256:81c4281eec0e3aec083fbd112f27c3e0899c82ec4f4d971ee7b12f4887b92784
+protocol_sha256 sha256:827ef5fd638b3015d9d89a2484af664c08e7be26314558e7bc6ffee961bed4b3
 tasks 120 dev 0 qual 120

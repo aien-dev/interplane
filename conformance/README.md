@@ -77,7 +77,13 @@ can issue: `approve`, `cancel`, `restart` (a fresh pipeline over the same mock r
 (the runtime's catalog digest changes). `mock_approval.expires_at` makes the mock mint an expiry.
 Each `approve` and `cancel` step adds one row to `expected.continuations` and, when resolved, one
 `ObservedRecord`; the verdict row of an approval case gains `continuations`. Rows of earlier cases
-are unchanged. Total verdict rows: 103 (40 + 42 injection + 16 approval + 5 lifecycle).
+are unchanged. Total verdict rows: 105 (40 + 44 injection + 16 approval + 5 lifecycle).
+
+The mock effect policy (0.3 cut E1, `spec/CORE.md`) holds an `effect` capability for approval when
+the exposure floor is below `user_supplied`. Fixtures 19 and 27 now register the user request first
+so their `append_note` still runs; fixture 40 expects its second `append_note` held. Injection cases
+43 (web, C04) and 44 (memory, C03) aim content at `append_note`, the one effect the mock otherwise
+authorizes, and fail if the policy is removed.
 
 ## Corpus accounting (gate I)
 
@@ -86,8 +92,8 @@ bench/PROTOCOL-0.3.md 3.2. C01 to C09 and C11 to C13 are the `injection.category
 fixtures. **C10 (approval manipulation) is supplied by lane A:** every approval fixture except
 A01 (the one legitimate approval) counts, 15 cases (A02 to A16) against a minimum of 10. It also
 checks that the negative controls V1 to V8 together fail at least one case in each of the 13
-categories (gate N). Current counts: C01=3, C02=5, C03=3, C04=3, C05=4, C06=3, C07=4, C08=3, C09=3,
-C10=15, C11=3, C12=4, C13=4; 57 cases against the minimum of 52.
+categories (gate N). Current counts: C01=3, C02=5, C03=4, C04=4, C05=4, C06=3, C07=4, C08=3, C09=3,
+C10=15, C11=3, C12=4, C13=4; 59 cases against the minimum of 52.
 
 Fail-closed readings taken where the protocol leaves room: a continuation that fails a binding check
 (wrong or foreign `approval_id`, changed arguments, expiry, changed catalog, decision value) on a

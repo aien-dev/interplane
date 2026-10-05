@@ -1,11 +1,27 @@
 {
   "case": "19-valid-write-request",
-  "description": "append_note is authorized and executed; the result reports how many characters were appended and is trusted runtime workspace content.",
+  "description": "append_note with only the user's request in view (floor user_supplied) is authorized and executed; the result reports how many characters were appended and is trusted runtime workspace content.",
   "limits": {
     "max_argument_bytes": 65536
   },
   "trace_id": "trace-19",
   "steps": [
+    {
+      "input": {
+        "input_id": "in-19-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "runtime:user-turn-1",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-19",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
     {
       "turn": 0,
       "dialect": "openai",

@@ -881,6 +881,10 @@ def _params(**props: str) -> dict:
     }
 
 
+# The mock's effect class (CORE.md mock table, 0.3 cut E1); every other capability is `read`.
+_MOCK_EFFECTS = frozenset({"append_note", "write_file", "delete_file", "send_email"})
+_UNTRUSTED_EFFECT = "mock policy: effects after untrusted input need approval"
+
 # name -> (canonical namespace, canonical name, description, parameters, domains)
 _MOCK_CAPS = {
     "append_note": (
@@ -1090,13 +1094,20 @@ class MockRuntime:
         if req.capability == "send_email":
             return self._decision(req, "denied", "mock policy: external side effects are denied")
         if req.capability == "delete_file":
-            approval = {
-                "approval_id": f"mock-approval-{req.request_id}",
-                "scope": "single_action",
-                "expires_at": self.approval_expires_at,
-            }
-            return self._decision(req, "requires_approval", None, approval)
+            return self._decision(req, "requires_approval", None, self._approval(req))
+        # 0.3 cut E1: an effect while the model could see untrusted content waits for a person.
+        # A missing exposure counts as untrusted (fail closed).
+        floor = exp["floor"] if exp is not None else None
+        if req.capability in _MOCK_EFFECTS and floor not in ("trusted_runtime", "user_supplied"):
+            return self._decision(req, "requires_approval", _UNTRUSTED_EFFECT, self._approval(req))
         return self._decision(req, "authorized")
+
+    def _approval(self, req: CapabilityRequest) -> dict:
+        return {
+            "approval_id": f"mock-approval-{req.request_id}",
+            "scope": "single_action",
+            "expires_at": self.approval_expires_at,
+        }
 
     def _execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
         result = self._execute_inner(req, decision, ctx)

@@ -64,7 +64,8 @@
         "origin": "runtime:mock",
         "trace_id": "trace-32",
         "parent_id": "call_32a",
-        "derived_from": []
+        "derived_from": [],
+        "content_digest": "sha256:6ae9df7dbaea3861c2b20fb162b9345a962e1bca99def9540ac5d4165bccf40c"
       }
     ],
     "exposure": [

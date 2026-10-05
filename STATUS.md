@@ -22,7 +22,8 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Crossveil lifecycle: approval continuation | conformant | conformant | lifecycle/01-05 | only the approval_id the runtime minted for that request continues it; forged, empty, missing and other-request ids refused (Rust accepted any non-empty id before 0.3 cut A1); no pipeline continuation call yet (cut A2) |
 | Reproducibility pins | - | - | - | see docs/RUN-MANIFEST-COMMITS.md (toolchain, pip constraints, action SHAs, AIEN sibling pins) |
 | Pipeline input ledger and exposure (0.3 cut P3) | conformant | conformant | cases 28-30 | per-trace ledger of rendered results plus host `register_input`; every `tool_request` and `CallContext` gets a computed `exposure`; forged exposure overwritten; fails closed |
-| Conformance runner | implemented | implemented | 35/35 both (30 cases + 5 lifecycle, verdicts byte-identical) | `--dump` writes canonical results per case |
+| Source-class coverage (0.3 cut P4) | conformant | conformant | cases 31-40 | one fixture per source class asserting every InputRecord field; mock gains `read_document`, `load_skill`, `call_provider`; skills and tool descriptions are `external_untrusted`; host registers model_generated input |
+| Conformance runner | implemented | implemented | 45/45 both (40 cases + 5 lifecycle, verdicts byte-identical) | `--dump` writes canonical results per case |
 | Interplane Probe | qualified | qualified | - | both run live against Qwen3.5-9B/Ollama 0.34.0 with identical verdicts (reports under qualification/reports) |
 | AIEN adapter | tested (on the real EffectAuthority path, pinned sovereign-core 6554aac; was 10 pipeline tests in 0.1) | - | - | ADR 0003; real aien-mcp SpeculativeLane + aegis gate; aien-cli SafetyEngine not linkable (private); AGPL |
 | Odysseus adapter | - | tested (55 tests vs odysseus@2992bf6) | - | executes read_file/ls/glob/grep via Odysseus handlers; AGPL |

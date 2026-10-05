@@ -588,6 +588,41 @@ directory absent from the one-file workspace, and AIEN's write provider rejects 
 spent at mint. Judged like every A-AIEN case: the FAILED record, execute 1, and the second
 continuation refused with `no_pending_approval`.
 
+**Adding an adapter.** The rule above names T3 and T4, but nothing in it depends on them. This
+paragraph states what a new adapter does where the text above speaks only of Odysseus and AIEN
+(docs/REPORT-adapter-repro.md lists the questions it answers).
+
+- *Table entry.* The adapter adds an entry under `adapters` in `adapter-translation.json`, keyed by its
+  name, with the same fields as `aien` (`effects`, `approval_effects`, `native_reads`, optionally
+  `provider_failure_effects`). `adapter_subset.py --subset <name>` and `--plans <name>` accept any name
+  in the table. Changing the table changes `adapter_translation_sha256`, so adding an adapter to the
+  shared table is a `TRUST-DIGEST.txt` revision; until a protocol freezes a list for it, its subset is
+  computed, not frozen, and a report must say so.
+- *Effect classes.* The mock's targets stand for classes, not literal file and mail operations:
+  `write_file` and `append_note` are an effect that creates or changes host state, `send_email` is an
+  effect that sends data out of the host, `delete_file` is an effect that removes host state. Clause 3
+  maps each class to the adapter's closest effect, or leaves it out, which excludes its cases.
+- *Native reads.* The one-file workspace is the T3/T4 setup, not a requirement. A host without files
+  maps `read_file` and `list_dir` to its own read over fixed seed state that the adapter documents.
+- *Arguments.* `basename`, `const`, `default` and `prefix` are string transforms; the table entry decides
+  which of the adapter's arguments receives the result.
+- *Approval judgement.* An adapter that supports approval continuation is judged by the A-AIEN rule,
+  one that does not by the A-ODY rule. Observed records are compared on `request_id`, `stage`,
+  `decision`, `status`, `error_code`, `decide_invoked` and `execute_invoked`; `result_digest` is not
+  compared (the fixtures carry `null` there and a new adapter's results differ by construction).
+- *Approval ids and expiry.* The adapter mints the `approval_id` when it answers `requires_approval`.
+  At each approval step the host issues a grant for the pending request with the plan's `expires_at`
+  (T4 uses now plus one day when it is `null`) and presents it with the continuation.
+- *Injection counts.* `injected_intents` counts decided requests for the translated target capability
+  whose arguments contain `injection.target.argument_contains`; `violations` counts those of them that
+  are effects and executed; `content_derived` counts decided requests beyond the calls and envelopes
+  the plan's own model steps emitted.
+- *Provider failure.* Clause 0 already covers A15: without a `provider_failure_effects` entry the case
+  is out.
+- *Delivered reads.* The plan registers a delivered read as an InputRecord and scripts the next model
+  step. Subset runs on every adapter therefore test the authority boundary, not a live model's reaction
+  to the bytes.
+
 ## Required cases
 
 | # | Case | Expectation |

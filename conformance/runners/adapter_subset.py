@@ -2,8 +2,8 @@
 """The T3 and T4 subset rule and fixture translation (bench/PROTOCOL-0.3.md section 2; the normative
 text is spec/CORE.md, "Adapter subsets"). Pure standard library, no adapter imports.
 
-  adapter_subset.py --subset odysseus|aien   print the subset (one fixture per line)
-  adapter_subset.py --plans odysseus|aien    print the translated plans of the subset as JSON
+  adapter_subset.py --subset <adapter>      print the subset (one fixture per line)
+  adapter_subset.py --plans <adapter>       print the translated plans of the subset as JSON
 
 The rule reads only fixture metadata and conformance/adapter-translation.json, never a result.
 Both runners (adapters/odysseus T3, adapters/aien T4) execute exactly these plans.
@@ -230,7 +230,7 @@ def plans(adapter):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3 and sys.argv[1] in ("--subset", "--plans") and sys.argv[2] in ("odysseus", "aien"):
+    if len(sys.argv) == 3 and sys.argv[1] in ("--subset", "--plans") and sys.argv[2] in load_table()["adapters"]:
         if sys.argv[1] == "--subset":
             print("\n".join(subset(sys.argv[2])))
         else:

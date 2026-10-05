@@ -29,6 +29,10 @@ is in view) and executes none of them. The script checks this and exits 1 on any
 uses only the Python standard library. CI runs it against the built wheel installed in a clean
 environment (job `package`).
 
+To connect your own program, see `docs/WRITING-AN-ADAPTER.md` and its runnable example
+`examples/adapter/todo_adapter.py`: a to-do list host with its own policy, an approval a person
+grants and one they decline.
+
 ## What is in 0.1 (the Reality Layer)
 
 | Module | What it is | Status |

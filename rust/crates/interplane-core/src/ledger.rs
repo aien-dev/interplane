@@ -10,6 +10,21 @@ pub struct Limits {
     pub max_argument_bytes: usize,
     #[serde(default = "default_reqs")]
     pub max_requests_per_turn: usize,
+    /// Session state limits (CORE.md): traces held at once.
+    #[serde(default = "default_traces")]
+    pub max_traces: usize,
+    #[serde(default = "default_session")]
+    pub max_messages_per_trace: usize,
+    #[serde(default = "default_session")]
+    pub max_requests_per_trace: usize,
+    #[serde(default = "default_session")]
+    pub max_inputs_per_trace: usize,
+}
+fn default_traces() -> usize {
+    1024
+}
+fn default_session() -> usize {
+    4096
 }
 fn default_arg_bytes() -> usize {
     65536
@@ -22,6 +37,10 @@ impl Default for Limits {
         Self {
             max_argument_bytes: 65536,
             max_requests_per_turn: 32,
+            max_traces: 1024,
+            max_messages_per_trace: 4096,
+            max_requests_per_trace: 4096,
+            max_inputs_per_trace: 4096,
         }
     }
 }
@@ -53,6 +72,37 @@ impl RequestLedger {
         } else {
             Err(ErrorCode::DuplicateRequestId)
         }
+    }
+    /// Read-only views and cleanup used by the session state limits (CORE.md).
+    pub fn has_message(&self, trace: &str, message_id: &str) -> bool {
+        self.seen
+            .get(trace)
+            .is_some_and(|e| e.0.contains(message_id))
+    }
+    pub fn has_request(&self, trace: &str, request_id: &str) -> bool {
+        self.seen
+            .get(trace)
+            .is_some_and(|e| e.1.contains(request_id))
+    }
+    pub fn message_count(&self, trace: &str) -> usize {
+        self.seen.get(trace).map_or(0, |e| e.0.len())
+    }
+    pub fn request_count(&self, trace: &str) -> usize {
+        self.seen.get(trace).map_or(0, |e| e.1.len())
+    }
+    /// True when the trace holds at least one recorded id.
+    pub fn holds(&self, trace: &str) -> bool {
+        self.message_count(trace) + self.request_count(trace) > 0
+    }
+    /// Every trace that holds at least one recorded id.
+    pub fn traces(&self) -> impl Iterator<Item = &String> {
+        self.seen
+            .iter()
+            .filter(|(_, e)| !e.0.is_empty() || !e.1.is_empty())
+            .map(|(t, _)| t)
+    }
+    pub fn forget(&mut self, trace: &str) {
+        self.seen.remove(trace);
     }
 }
 

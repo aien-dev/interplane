@@ -308,21 +308,87 @@ class Pipeline:
         self.ledger = ledger or RequestLedger()
         self.events: list = []
         self._seq: dict = {}
-        self._pending: dict = {}  # trace_id -> True while results await a model continuation
+        self._awaiting: dict = {}  # trace_id -> True while results await a model continuation
         self._inputs: dict = {}  # trace_id -> [InputRecord, ...] in order (0.3 cut P3)
         # (trace_id, request_id) -> _PendingEntry. Host-only: only continue_approval and
         # cancel_approval read or change it; a new pipeline starts empty (0.3 cut A1/A2).
         self._pending: dict = {}
+        self._closed: set = set()  # trace ids closed by the host (session state limits)
+
+    # -- session state limits (CORE.md) ---------------------------------------------
+    def _holds(self, trace_id: str) -> bool:
+        """A trace is held when the pipeline keeps any state for it."""
+        return (
+            self.ledger.holds(trace_id)
+            or bool(self._inputs.get(trace_id))
+            or trace_id in self._seq
+            or trace_id in self._awaiting
+            or any(k[0] == trace_id for k in self._pending)
+        )
+
+    def _held_count(self) -> int:
+        held = set(self.ledger.traces()) | {t for t, v in self._inputs.items() if v}
+        held |= set(self._seq) | set(self._awaiting) | {k[0] for k in self._pending}
+        return len(held)
+
+    def _can_hold(self, trace_id: str) -> bool:
+        """False for a closed trace, and for a new trace while ``max_traces`` are held."""
+        if trace_id in self._closed:
+            return False
+        return self._holds(trace_id) or self._held_count() < self.limits.max_traces
+
+    def _message_refusal(self, trace_id: str) -> Optional[tuple]:
+        """``(code, message)`` when a further message on the trace is refused, else None."""
+        if trace_id in self._closed:
+            return ErrorCode.SESSION_CLOSED, f"session closed: {trace_id}"
+        if not self._holds(trace_id) and self._held_count() >= self.limits.max_traces:
+            return ErrorCode.SESSION_LIMIT_EXCEEDED, "session limit exceeded: max_traces"
+        if self.ledger.message_count(trace_id) >= self.limits.max_messages_per_trace:
+            msg = "session limit exceeded: max_messages_per_trace"
+            return ErrorCode.SESSION_LIMIT_EXCEEDED, msg
+        return None
+
+    def _request_refusal(self, trace_id: str) -> Optional[tuple]:
+        if trace_id in self._closed:
+            return ErrorCode.SESSION_CLOSED, f"session closed: {trace_id}"
+        if self.ledger.request_count(trace_id) >= self.limits.max_requests_per_trace:
+            msg = "session limit exceeded: max_requests_per_trace"
+            return ErrorCode.SESSION_LIMIT_EXCEEDED, msg
+        return None
+
+    def close_trace(self, trace_id: str) -> None:
+        """Host-only: drop everything the pipeline keeps for the trace (ledger ids, inputs,
+        approval entries, event sequence, events) and refuse any later message, request, input or
+        continuation on it with ``session_closed``. Closing an unknown or closed trace is a no-op.
+        Never called from model output or an admitted envelope."""
+        if trace_id in self._closed:
+            return
+        self._closed.add(trace_id)
+        self.ledger.forget(trace_id)
+        self._inputs.pop(trace_id, None)
+        self._seq.pop(trace_id, None)
+        self._awaiting.pop(trace_id, None)
+        for key in [k for k in self._pending if k[0] == trace_id]:
+            del self._pending[key]
+        self.events = [e for e in self.events if e.extra.get("trace_id") != trace_id]
 
     # -- input ledger and exposure (0.3 cut P3) -----------------------------------
     def register_input(self, record: Any) -> InputRecord:
         """Host-only: register an input placed in front of the model on ``record.trace_id``, before
         the turn that can see it. Never called from model output or an admitted envelope. Raises
-        ``ValueError`` on a duplicate ``input_id`` for the trace."""
+        ``ValueError`` on a duplicate ``input_id`` for the trace, past ``max_inputs_per_trace``,
+        on a new trace while ``max_traces`` are held, or on a closed trace; nothing is recorded then."""
         rec = record if isinstance(record, InputRecord) else InputRecord.from_dict(record)
-        ledger = self._inputs.setdefault(rec.trace_id, [])
+        if rec.trace_id in self._closed:
+            raise ValueError(f"session closed: {rec.trace_id}")
+        ledger = self._inputs.get(rec.trace_id, [])
         if any(r.input_id == rec.input_id for r in ledger):
             raise ValueError(f"duplicate input_id: {rec.input_id}")
+        if len(ledger) >= self.limits.max_inputs_per_trace:
+            raise ValueError("session limit exceeded: max_inputs_per_trace")
+        if not self._holds(rec.trace_id) and self._held_count() >= self.limits.max_traces:
+            raise ValueError("session limit exceeded: max_traces")
+        ledger = self._inputs.setdefault(rec.trace_id, [])
         ledger.append(copy.deepcopy(rec))
         return rec
 
@@ -353,6 +419,8 @@ class Pipeline:
         self._push_result_input(trace_id, result, digest(rendered))
 
     def _push_result_input(self, trace_id: str, result: ToolResult, content_digest: str) -> None:
+        if not self._can_hold(trace_id):
+            return  # closed, or refused as a further trace: no state may grow for it
         prov = result.provenance or {}
         ledger = self._inputs.setdefault(trace_id, [])
         n = sum(1 for r in ledger if r.input_id.startswith("in-auto-"))
@@ -377,6 +445,8 @@ class Pipeline:
     # -- events (RelayLine) -------------------------------------------------
 
     def _emit(self, trace_id: str, name: str, request_id=None, turn=None, payload=None) -> None:
+        if not self._can_hold(trace_id):
+            return  # closed, or refused as a further trace: nothing is recorded for it
         seq = self._seq.get(trace_id, 0)
         self._seq[trace_id] = seq + 1
         ev = Event(event=name, seq=seq, request_id=request_id, turn=turn, payload=payload)
@@ -440,13 +510,21 @@ class Pipeline:
                 "malformed envelope: payload.kind",
                 turn,
             )
-        replay = self.ledger.admit_message(trace_id, env["message_id"])
-        if replay is not None:
+        if self.ledger.has_message(trace_id, env["message_id"]):
             msg = f"replayed message_id: {env['message_id']}"
-            return self._rejected(rid, replay, trace_id, msg, turn)
-        dup = self.ledger.admit_request_id(trace_id, rid)
-        if dup is not None:
-            return self._rejected(rid, dup, trace_id, f"duplicate request_id: {rid}", turn)
+            return self._rejected(rid, ErrorCode.REPLAYED_MESSAGE, trace_id, msg, turn)
+        refusal = self._message_refusal(trace_id)
+        if refusal is not None:
+            return self._rejected(rid, refusal[0], trace_id, refusal[1], turn)
+        self.ledger.admit_message(trace_id, env["message_id"])
+        if self.ledger.has_request_id(trace_id, rid):
+            return self._rejected(
+                rid, ErrorCode.DUPLICATE_REQUEST_ID, trace_id, f"duplicate request_id: {rid}", turn
+            )
+        refusal = self._request_refusal(trace_id)
+        if refusal is not None:
+            return self._rejected(rid, refusal[0], trace_id, refusal[1], turn)
+        self.ledger.admit_request_id(trace_id, rid)
         self._emit(trace_id, "tool_request", rid, turn, {"tool": copy.deepcopy(payload["tool"])})
         if self.limits.arguments_oversized(payload["arguments"]):
             msg = f"arguments exceed {self.limits.max_argument_bytes} bytes"
@@ -614,6 +692,8 @@ class Pipeline:
         )
 
     def _live_pending(self, trace_id: str, request_id: str) -> _PendingEntry:
+        if trace_id in self._closed:
+            raise ContinuationRefused("session_closed")
         p = self._pending.get((trace_id, request_id))
         if p is None or p.life.state is not State.REQUIRES_APPROVAL:
             raise ContinuationRefused("no_pending_approval")
@@ -787,7 +867,7 @@ class Pipeline:
     ) -> TurnOutcome:
         """Parse one model turn and run every call it contains through the pipeline."""
         out = TurnOutcome(turn=turn, outcome="no_tool")
-        if self._pending.pop(trace_id, None):
+        if self._awaiting.pop(trace_id, None):
             self._emit(trace_id, "continue", None, turn)
         try:
             module = self.registry.get(dialect)
@@ -860,7 +940,8 @@ class Pipeline:
         elif out.rejected:
             out.outcome = "rejected"
         if pairs:
-            self._pending[trace_id] = True
+            if self._can_hold(trace_id):
+                self._awaiting[trace_id] = True
         else:
             self._emit(trace_id, "complete", None, turn)
         out.events = [

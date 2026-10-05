@@ -36,6 +36,42 @@ when the extension exists, proves origin, never authority.
 | tool requests per turn | 32 | `malformed_tool_call` on the 33rd and later |
 | `reason` / `message` length | 4096 | truncated by the producer |
 
+## Session state limits
+
+A pipeline keeps state per trace: seen `message_id`s (replay), seen `request_id`s (duplicates), the
+input ledger, approval entries (terminal ones are kept so a second continuation is refused), the
+event sequence and the trace's events. Without bounds a long-lived host grows without limit, so
+these limits apply. Like the limits above they are set by the host, default as listed, and never
+raised by a model.
+
+| Limit | Default | Violation |
+|---|---|---|
+| `max_traces`: traces held at once | 1024 | the first message of a further trace is refused `session_limit_exceeded`; nothing is recorded for it |
+| `max_messages_per_trace`: `message_id`s recorded on one trace | 4096 | the further message is refused `session_limit_exceeded` and not recorded |
+| `max_requests_per_trace`: `request_id`s recorded on one trace | 4096 | the further request is rejected `session_limit_exceeded` before any runtime contact and not recorded |
+| `max_inputs_per_trace`: InputRecords registered on one trace | 4096 | `register_input` fails (host error, as for a duplicate `input_id`); nothing is recorded. `register_input` on a trace that holds no state while `max_traces` are held fails the same way (`session limit exceeded: max_traces`) |
+
+A message or request is refused at exactly the stage, and in exactly the form, at which
+`replayed_message` and `duplicate_request_id` are refused, with the code `session_limit_exceeded`
+and the message `session limit exceeded: <limit name>`. The checks run after the replay and
+duplicate checks (a replay is still reported as `replayed_message`). The trace check applies to the
+first message of a trace that holds no state yet.
+
+**Closing a trace.** `close_trace(trace_id)` is host-only (never reachable from model output or an
+admitted envelope). It drops every piece of the trace's state listed above, including its events,
+which frees a slot for `max_traces`. Without its ledger a closed trace could not detect replays, so
+the pipeline remembers the closed id for its own lifetime, and any later message, request,
+registered input or approval continuation on that trace is refused with `session_closed` (message
+`session closed: <trace_id>`), at the same stages as above; continuations are refused like a
+continuation with no pending entry. Closing an unknown or already-closed trace is a no-op. The set
+of closed ids is the one piece of state that grows with closed traces; a host reclaims it by
+starting a new pipeline (approvals pending in the old one are then refused, case A12).
+
+`session_limit_exceeded` and `session_closed` are `ErrorCode` values (a MINOR addition,
+`VERSIONING.md`). The 0.3 trust corpus is frozen (`conformance/TRUST-DIGEST.txt`), so these limits
+are covered by unit tests in both SDKs with the same scenarios; conformance fixtures follow with the
+next corpus revision.
+
 ## Processing stages (the Crossveil lifecycle)
 
 ```
@@ -228,6 +264,8 @@ Error messages (pinned; `<x>` substituted; no other text):
 | replayed_message | `replayed message_id: <id>` |
 | unknown_capability | `no mapping for tool: <namespace.name or name>` |
 | stale_capability | `mapping table catalog digest does not match runtime catalog`, or `capability is advertised more than once with different definitions` |
+| session_limit_exceeded | `session limit exceeded: <limit name>` |
+| session_closed | `session closed: <trace_id>` |
 | capability_not_found | `unknown capability: <capability>` |
 | invalid_arguments | mock: `missing required argument: <key>` or `argument <key> must be <type>`; runtime-said-invalid uses the decision's `reason` |
 | policy_denied | the decision's `reason` |

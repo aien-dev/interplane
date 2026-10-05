@@ -1,5 +1,5 @@
 //! The reference pipeline: admit -> map -> decide -> execute -> render.
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use interplane_core::*;
@@ -46,6 +46,8 @@ pub enum Refusal {
     /// No pending approval for the call: unknown request, already executed, denied or
     /// cancelled, a second continuation, or a pipeline created after a restart.
     NoPendingApproval,
+    /// The trace was closed by the host (`close_trace`).
+    SessionClosed,
 }
 
 impl Refusal {
@@ -53,6 +55,7 @@ impl Refusal {
     pub fn as_str(self) -> &'static str {
         match self {
             Refusal::NoPendingApproval => "no_pending_approval",
+            Refusal::SessionClosed => "session_closed",
         }
     }
 }
@@ -144,6 +147,10 @@ pub struct Pipeline<'a> {
     /// Approval entries by `(trace_id, request_id)` (cut A1/A2). Host-only: only the continuation
     /// and cancel calls below read or change them, and a new pipeline starts empty.
     pending: HashMap<(String, String), PendingEntry>,
+    /// The trace each entry of `events` belongs to (same length as `events`).
+    event_traces: Vec<String>,
+    /// Traces closed by the host (session state limits); they stay refused for the pipeline's life.
+    closed: HashSet<String>,
 }
 
 /// Position in the trust order; `unknown` and anything unrecognized rank as `external_untrusted`.
@@ -278,6 +285,101 @@ impl<'a> Pipeline<'a> {
             turn: None,
             inputs: HashMap::new(),
             pending: HashMap::new(),
+            event_traces: vec![],
+            closed: HashSet::new(),
+        }
+    }
+
+    // -- session state limits (CORE.md) ----------------------------------------------
+    /// A trace is held when the pipeline keeps any state for it.
+    fn holds(&self, trace: &str) -> bool {
+        self.ledger.holds(trace)
+            || self.inputs.get(trace).is_some_and(|v| !v.is_empty())
+            || self.seq.contains_key(trace)
+            || self.pending.keys().any(|(t, _)| t == trace)
+    }
+
+    fn held_count(&self) -> usize {
+        let mut held: HashSet<&str> = self.ledger.traces().map(String::as_str).collect();
+        held.extend(
+            self.inputs
+                .iter()
+                .filter(|(_, v)| !v.is_empty())
+                .map(|(t, _)| t.as_str()),
+        );
+        held.extend(self.seq.keys().map(String::as_str));
+        held.extend(self.pending.keys().map(|(t, _)| t.as_str()));
+        held.len()
+    }
+
+    /// False for a closed trace, and for a new trace while `max_traces` are held.
+    fn can_hold(&self, trace: &str) -> bool {
+        if self.closed.contains(trace) {
+            return false;
+        }
+        self.holds(trace) || self.held_count() < self.limits.max_traces
+    }
+
+    fn closed_refusal(trace: &str) -> (ErrorCode, String) {
+        (ErrorCode::SessionClosed, format!("session closed: {trace}"))
+    }
+
+    /// `(code, message)` when a further message on the trace is refused.
+    fn message_refusal(&self, trace: &str) -> Option<(ErrorCode, String)> {
+        if self.closed.contains(trace) {
+            return Some(Self::closed_refusal(trace));
+        }
+        let limit = if !self.holds(trace) && self.held_count() >= self.limits.max_traces {
+            "max_traces"
+        } else if self.ledger.message_count(trace) >= self.limits.max_messages_per_trace {
+            "max_messages_per_trace"
+        } else {
+            return None;
+        };
+        Some((
+            ErrorCode::SessionLimitExceeded,
+            format!("session limit exceeded: {limit}"),
+        ))
+    }
+
+    /// `(code, message)` when a further request id on the trace is refused.
+    fn request_refusal(&self, trace: &str) -> Option<(ErrorCode, String)> {
+        if self.closed.contains(trace) {
+            return Some(Self::closed_refusal(trace));
+        }
+        if self.ledger.request_count(trace) >= self.limits.max_requests_per_trace {
+            return Some((
+                ErrorCode::SessionLimitExceeded,
+                "session limit exceeded: max_requests_per_trace".to_string(),
+            ));
+        }
+        None
+    }
+
+    /// Record a request id for a call that is already refused (`run_turn`'s malformed and
+    /// over-the-turn-limit calls), unless that would break a session limit.
+    fn note_refused_request(&mut self, trace: &str, request_id: &str) {
+        if self.request_refusal(trace).is_none() && self.can_hold(trace) {
+            let _ = self.ledger.note_request(trace, request_id);
+        }
+    }
+
+    /// Host-only: drop everything the pipeline keeps for the trace (ledger ids, inputs, approval
+    /// entries, event sequence, events) and refuse any later message, request, input or
+    /// continuation on it with `session_closed`. Closing an unknown or closed trace is a no-op.
+    /// Not reachable from model output or an admitted envelope.
+    pub fn close_trace(&mut self, trace: &str) {
+        if !self.closed.insert(trace.to_string()) {
+            return;
+        }
+        self.ledger.forget(trace);
+        self.inputs.remove(trace);
+        self.seq.remove(trace);
+        self.pending.retain(|(t, _), _| t != trace);
+        if self.event_traces.len() == self.events.len() {
+            let mut keep = self.event_traces.iter().map(|t| t != trace);
+            self.events.retain(|_| keep.next().unwrap_or(true));
+            self.event_traces.retain(|t| t != trace);
         }
     }
 
@@ -286,11 +388,27 @@ impl<'a> Pipeline<'a> {
     /// reachable from model output or from an admitted envelope: those paths never call it.
     /// Refuses a duplicate `input_id` on the trace.
     pub fn register_input(&mut self, rec: InputRecord) -> Result<(), String> {
-        let ledger = self.inputs.entry(rec.trace_id.clone()).or_default();
-        if ledger.iter().any(|r| r.input_id == rec.input_id) {
+        if self.closed.contains(&rec.trace_id) {
+            return Err(format!("session closed: {}", rec.trace_id));
+        }
+        let held = self.inputs.get(&rec.trace_id).map_or(0, Vec::len);
+        if self
+            .inputs
+            .get(&rec.trace_id)
+            .is_some_and(|l| l.iter().any(|r| r.input_id == rec.input_id))
+        {
             return Err(format!("duplicate input_id: {}", rec.input_id));
         }
-        ledger.push(rec);
+        if held >= self.limits.max_inputs_per_trace {
+            return Err("session limit exceeded: max_inputs_per_trace".to_string());
+        }
+        if !self.holds(&rec.trace_id) && self.held_count() >= self.limits.max_traces {
+            return Err("session limit exceeded: max_traces".to_string());
+        }
+        self.inputs
+            .entry(rec.trace_id.clone())
+            .or_default()
+            .push(rec);
         Ok(())
     }
 
@@ -326,6 +444,9 @@ impl<'a> Pipeline<'a> {
     }
 
     fn push_result_input(&mut self, trace: &str, r: &ToolResult, content_digest: String) {
+        if !self.can_hold(trace) {
+            return; // closed, or refused as a further trace: no state may grow for it
+        }
         let prov = r.provenance.as_ref();
         let ledger = self.inputs.entry(trace.to_string()).or_default();
         let mut n = ledger
@@ -354,6 +475,10 @@ impl<'a> Pipeline<'a> {
     }
 
     fn emit(&mut self, trace: &str, event: EventKind, request_id: Option<&str>) {
+        if !self.can_hold(trace) {
+            return; // closed, or refused as a further trace: nothing is recorded for it
+        }
+        self.event_traces.push(trace.to_string());
         let s = self.seq.entry(trace.to_string()).or_insert(0);
         let seq = *s;
         *s += 1;
@@ -472,10 +597,14 @@ impl<'a> Pipeline<'a> {
             };
             return self.reject(&trace, peek.as_deref(), code, &msg);
         }
-        if self.ledger.note_message(&trace, &env.message_id).is_err() {
+        if self.ledger.has_message(&trace, &env.message_id) {
             let msg = format!("replayed message_id: {}", env.message_id);
             return self.reject(&trace, peek.as_deref(), ErrorCode::ReplayedMessage, &msg);
         }
+        if let Some((code, msg)) = self.message_refusal(&trace) {
+            return self.reject(&trace, peek.as_deref(), code, &msg);
+        }
+        let _ = self.ledger.note_message(&trace, &env.message_id);
         let mut req = match env.parse_payload() {
             Ok(Payload::ToolRequest(t)) => t,
             _ => {
@@ -489,10 +618,14 @@ impl<'a> Pipeline<'a> {
         };
         let rid = req.request_id.clone();
         self.emit(&trace, EventKind::ToolRequest, Some(&rid));
-        if self.ledger.note_request(&trace, &rid).is_err() {
+        if self.ledger.has_request(&trace, &rid) {
             let msg = format!("duplicate request_id: {rid}");
             return self.reject(&trace, Some(&rid), ErrorCode::DuplicateRequestId, &msg);
         }
+        if let Some((code, msg)) = self.request_refusal(&trace) {
+            return self.reject(&trace, Some(&rid), code, &msg);
+        }
+        let _ = self.ledger.note_request(&trace, &rid);
         let size = canonicalize(&Value::Object(req.arguments.clone())).len();
         if size > self.limits.max_argument_bytes {
             let msg = format!("arguments exceed {} bytes", self.limits.max_argument_bytes);
@@ -825,6 +958,9 @@ impl<'a> Pipeline<'a> {
         request_digest: &str,
         now: &str,
     ) -> Result<(ToolResult, ObservedRecord), Refusal> {
+        if self.closed.contains(trace) {
+            return Err(Refusal::SessionClosed);
+        }
         let key = (trace.to_string(), request_id.to_string());
         let mut p = match self.pending.remove(&key) {
             Some(p) if p.lc.state() == State::RequiresApproval => p,
@@ -916,6 +1052,9 @@ impl<'a> Pipeline<'a> {
         trace: &str,
         request_id: &str,
     ) -> Result<(ToolResult, ObservedRecord), Refusal> {
+        if self.closed.contains(trace) {
+            return Err(Refusal::SessionClosed);
+        }
         let key = (trace.to_string(), request_id.to_string());
         let mut p = match self.pending.remove(&key) {
             Some(p) if p.lc.state() == State::RequiresApproval => p,
@@ -1052,7 +1191,7 @@ impl<'a> Pipeline<'a> {
             match item {
                 Item::Rejected(i) => {
                     let r = &parsed.rejected[i];
-                    let _ = self.ledger.note_request(trace_id, &r.request_id);
+                    self.note_refused_request(trace_id, &r.request_id);
                     let (res, o) =
                         self.reject(trace_id, Some(&r.request_id), r.code.clone(), &r.message);
                     out.rendered.push(self.render(dialect, &res, None));
@@ -1062,7 +1201,7 @@ impl<'a> Pipeline<'a> {
                 Item::Intent(i) => {
                     let intent = &parsed.intents[i];
                     let (res, o) = if n >= self.limits.max_requests_per_turn {
-                        let _ = self.ledger.note_request(trace_id, &intent.request_id);
+                        self.note_refused_request(trace_id, &intent.request_id);
                         self.reject(
                             trace_id,
                             Some(&intent.request_id),

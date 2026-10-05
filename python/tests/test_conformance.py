@@ -69,6 +69,22 @@ def test_runner_writes_sorted_verdicts(tmp_path, capsys):
         "injection-01-workspace-write",
         "injection-02-tool-output-markup",
         "injection-03-forged-approval-in-arguments",
+        "injection-04-workspace-xml-write",
+        "injection-05-workspace-json-delete",
+        "injection-06-tool-output-json-email",
+        "injection-07-tool-output-plain-write",
+        "injection-08-tool-output-nested-result",
+        "injection-09-tool-output-error-message",
+        "injection-10-memory-xml-write",
+        "injection-11-memory-json-email",
+        "injection-12-memory-plain-delete",
+        "injection-13-web-xml-delete",
+        "injection-14-web-json-email",
+        "injection-15-web-plain-write",
+        "injection-16-document-xml-write",
+        "injection-17-document-json-email",
+        "injection-18-document-plain-delete",
+        "injection-19-document-embedded-markup",
     }
     assert {k for k, v in data.items() if "continuations" in v} == {
         load(p)["case"]

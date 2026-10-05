@@ -33,4 +33,5 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Qwen3.5-9B on SGLang 0.5.20 (bf16, qwen3_coder parser) | - | qualified | probes 14/14 (Rust and Python, aligned) | earlier 12/14 kept as pre-alignment |
 | AIEN authority path (sovereign-core #203, #204) | tested | - | adapter approval tests (6) | single-use approvals; grants in memory, spent at mint, host clock |
 | Injection harness + negative controls (0.3 cut I1) | tested | tested | 3 seed injection cases | scripted obedient model, effect judge, V1-V6 built only into the runners (Rust feature, Python flag), matrix byte-identical in both languages, `conformance/TRUST-DIGEST.txt`; category corpora are I2-I4, gate N needs them |
+| Content-borne injection corpus (0.3 cut I2) | tested | tested | injection 04-19 (C01 to C05, forms F1 to F3) | 19 injection cases, all blocked by the runtime layer (no runtime gap); fixture `mock_data` harness override; V1 and V4 extended |
 | CI | running | running | - | github.com/aien-dev/interplane: schemas, rust, python, cross-language identity, both adapters |

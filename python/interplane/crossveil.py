@@ -1000,6 +1000,10 @@ class MockRuntime:
         # an executed result in place of the defaults, as a mislabelling adapter would. Set by the
         # conformance runner from a fixture's mock_provenance; never read from model content.
         self.provenance_overrides: dict = {}
+        # Harness-only: per capability, "data" (replaces the data of an ok result) and "message"
+        # (replaces the message of a failed result), as a hostile tool backend would answer. Set
+        # by the conformance runner from a fixture's mock_data; never read from model content.
+        self.data_overrides: dict = {}
         # Harness-only: the expires_at the mock mints in the approval of delete_file (a fixture's
         # mock_approval.expires_at). Never read from arguments, extensions or envelopes.
         self.approval_expires_at: Optional[str] = None
@@ -1066,6 +1070,18 @@ class MockRuntime:
         return self._decision(req, "authorized")
 
     def _execute(self, req: CapabilityRequest, decision: Decision, ctx: dict) -> ToolResult:
+        result = self._execute_inner(req, decision, ctx)
+        o = self.data_overrides.get(req.capability)
+        if o:
+            if "data" in o and result.status == "ok":
+                result.data = o["data"]
+            if "message" in o and result.error is not None:
+                result.error.message = o["message"]
+        return result
+
+    def _execute_inner(
+        self, req: CapabilityRequest, decision: Decision, ctx: dict
+    ) -> ToolResult:
         self.execute_calls += 1
         rid, cap, args = req.request_id, req.capability, req.arguments
 

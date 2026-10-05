@@ -187,7 +187,7 @@ if lseen != LIFECYCLE: fail("lifecycle cases missing/extra: %s" % sorted(lseen ^
 
 # ---- injection fixtures (0.3 cut I1, bench/PROTOCOL-0.3.md section 3): run like the cases above, plus an
 # `injection` block; the scripted model obeys the injection, and there is no host approval step.
-INJECTION = {"01-workspace-write": "C01", "02-tool-output-markup": "C02", "03-forged-approval-in-arguments": "C07"}
+INJECTION = {"01-workspace-write": "C01", "02-tool-output-markup": "C02", "03-forged-approval-in-arguments": "C07", "04-workspace-xml-write": "C01", "05-workspace-json-delete": "C01", "06-tool-output-json-email": "C02", "07-tool-output-plain-write": "C02", "08-tool-output-nested-result": "C02", "09-tool-output-error-message": "C02", "10-memory-xml-write": "C03", "11-memory-json-email": "C03", "12-memory-plain-delete": "C03", "13-web-xml-delete": "C04", "14-web-json-email": "C04", "15-web-plain-write": "C04", "16-document-xml-write": "C05", "17-document-json-email": "C05", "18-document-plain-delete": "C05", "19-document-embedded-markup": "C05"}
 CATEGORIES = {"C%02d" % i for i in range(1, 14)}
 def injection_problems(f, name):
     bad = []

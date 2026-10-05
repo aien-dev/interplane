@@ -253,18 +253,55 @@ pub fn load_fixtures(dir: &Path) -> Result<Vec<Value>, String> {
         .collect()
 }
 
-/// Check the JCS digest fixture (`digest/jcs-01.json`) if present. Returns an error text on mismatch.
-pub fn check_digest_fixture(dir: &Path) -> Option<String> {
-    let p = dir.join("digest").join("jcs-01.json");
-    let fx: Value = serde_json::from_str(&std::fs::read_to_string(p).ok()?).ok()?;
-    let got = canonicalize(&fx["value"]);
+/// Check every `digest/*.json` fixture. A fixture with a `"type"` is also parsed as that SDK type
+/// and re-serialized before the JCS and digest are compared. Returns `(name, error)` per fixture.
+pub fn check_digest_fixtures(dir: &Path) -> Vec<(String, Option<String>)> {
+    let mut paths: Vec<_> = match std::fs::read_dir(dir.join("digest")) {
+        Ok(rd) => rd
+            .filter_map(Result::ok)
+            .map(|e| e.path())
+            .filter(|p| p.extension().is_some_and(|x| x == "json"))
+            .collect(),
+        Err(_) => return Vec::new(),
+    };
+    paths.sort();
+    paths
+        .iter()
+        .map(|p| {
+            let name = format!("digest/{}", p.file_stem().unwrap().to_string_lossy());
+            (name, check_digest_file(p))
+        })
+        .collect()
+}
+
+fn check_digest_file(p: &Path) -> Option<String> {
+    let fx: Value = match std::fs::read_to_string(p)
+        .map_err(|e| e.to_string())
+        .and_then(|s| serde_json::from_str(&s).map_err(|e| e.to_string()))
+    {
+        Ok(v) => v,
+        Err(e) => return Some(e),
+    };
+    let value = match fx.get("type").and_then(Value::as_str) {
+        None => fx["value"].clone(),
+        Some(t) => match typed_roundtrip(t, &fx["value"]) {
+            Ok(v) => v,
+            Err(e) => return Some(e),
+        },
+    };
+    let got = canonicalize(&value);
     if fx["expected_jcs"].as_str() != Some(got.as_str()) {
         return Some(format!("jcs mismatch: got {got}"));
     }
-    if fx["expected_sha256"].as_str() != Some(digest(&fx["value"]).as_str()) {
+    if fx["expected_sha256"].as_str() != Some(digest(&value).as_str()) {
         return Some("sha256 mismatch".into());
     }
     None
+}
+
+/// Parse `value` as the named SDK type and serialize it back.
+fn typed_roundtrip(ty: &str, _value: &Value) -> Result<Value, String> {
+    Err(format!("unknown fixture type {ty}"))
 }
 
 /// Silence an unused-import lint for `RuntimeAuthority` in docs builds.

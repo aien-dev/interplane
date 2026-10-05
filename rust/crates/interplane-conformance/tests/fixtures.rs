@@ -12,7 +12,11 @@ fn every_fixture_passes() {
         let errs = compare(fx, &run);
         assert!(errs.is_empty(), "{}: {errs:?}", run.case);
     }
-    assert_eq!(check_digest_fixture(&dir), None);
+    let digests = check_digest_fixtures(&dir);
+    assert!(digests.len() >= 2);
+    for (name, err) in digests {
+        assert_eq!(err, None, "{name}");
+    }
 }
 
 #[test]

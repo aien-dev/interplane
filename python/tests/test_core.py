@@ -246,6 +246,15 @@ def test_jcs_fixture():
     assert digest(fx["value"]) == fx["expected_sha256"]
 
 
+def test_digest_fixtures_all_pass():
+    from interplane.conformance import check_digest_fixtures
+
+    results = check_digest_fixtures(str(CONF))
+    assert len(results) >= 2
+    for name, err in results:
+        assert err is None, name
+
+
 # ---- limits and ledger ----------------------------------------------------------------------
 
 

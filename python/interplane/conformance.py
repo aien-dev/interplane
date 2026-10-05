@@ -6,7 +6,16 @@ import sys
 from pathlib import Path
 from typing import Any, Optional
 
-from .core import Decision, Lifecycle, LifecycleError, Limits, ProtocolError, ToolResult, jcs
+from .core import (
+    Decision,
+    Lifecycle,
+    LifecycleError,
+    Limits,
+    ProtocolError,
+    ToolResult,
+    digest,
+    jcs,
+)
 from .crossaxis import expand, select
 from .crossveil import canonical_result_payload, default_pipeline
 
@@ -139,6 +148,32 @@ def run_lifecycle_case(case: dict) -> dict:
     return {"pass": not problems, "steps": steps, "problems": problems}
 
 
+def typed_roundtrip(type_name: str, value: Any) -> Any:
+    """Parse ``value`` as the named SDK type and serialize it back."""
+    raise ValueError(f"unknown fixture type {type_name}")
+
+
+def check_digest_fixtures(fixtures_dir: str) -> list:
+    """Check every ``digest/*.json``. A fixture with a ``type`` is parsed as that SDK type and
+    re-serialized before the JCS and digest are compared. Returns ``[(name, error or None)]``."""
+    out = []
+    for path in sorted(Path(fixtures_dir, "digest").glob("*.json")):
+        fx = json.loads(path.read_text(encoding="utf-8"))
+        err = None
+        try:
+            value = fx["value"]
+            if "type" in fx:
+                value = typed_roundtrip(fx["type"], value)
+            if jcs(value) != fx["expected_jcs"]:
+                err = f"jcs mismatch: got {jcs(value)}"
+            elif digest(value) != fx["expected_sha256"]:
+                err = "sha256 mismatch"
+        except (ValueError, ProtocolError) as e:
+            err = str(e)
+        out.append((f"digest/{path.stem}", err))
+    return out
+
+
 def main(argv: Optional[list] = None) -> int:
     ap = argparse.ArgumentParser(prog="interplane-conformance")
     ap.add_argument("fixtures_dir")
@@ -166,6 +201,11 @@ def main(argv: Optional[list] = None) -> int:
         for p in v["problems"]:
             print(f"      {p}")
         failed += not v["pass"]
+    for name, err in check_digest_fixtures(args.fixtures_dir):
+        print(f"{'PASS' if err is None else 'FAIL'}  {name}")
+        if err:
+            print(f"      {err}")
+        failed += err is not None
     total = len(verdicts) + len(lifecycle)
     print(f"{total - failed}/{total} passed")
     out = {

@@ -91,12 +91,14 @@ fn main() -> ExitCode {
         failed += usize::from(!errs.is_empty());
         rows.push((case, lifecycle_verdict(&steps, &errs)));
     }
-    match check_digest_fixture(&dir) {
-        Some(e) => {
-            println!("{:<4} {:<34} FAIL\n       - {e}", "-", "digest/jcs-01");
-            failed += 1;
+    for (name, err) in check_digest_fixtures(&dir) {
+        match err {
+            Some(e) => {
+                println!("{:<4} {:<34} FAIL\n       - {e}", "-", name);
+                failed += 1;
+            }
+            None => println!("{:<4} {:<34} PASS", "-", name),
         }
-        None => println!("{:<4} {:<34} PASS", "-", "digest/jcs-01"),
     }
     if let Some(o) = out {
         if let Err(e) = std::fs::write(&o, canonicalize(&verdicts(rows)) + "\n") {

@@ -373,6 +373,56 @@ class ToolRequest(Model):
 
 
 @dataclass
+class InputRecord(Model):
+    """``input.schema.json``: one piece of material placed in front of the model (0.3 cut P2).
+
+    ``trust`` is assigned by the runtime, never by the model. ``parent_id`` is always emitted, as
+    an explicit ``null`` for host-registered inputs.
+    """
+
+    input_id: str
+    content_kind: str
+    trust: str
+    source: Party
+    origin: str
+    content_digest: str
+    trace_id: str
+    parent_id: Optional[str] = None
+    derived_from: list = field(default_factory=list)
+    extra: dict = field(default_factory=dict)
+
+    NESTED = {"source": Party}
+    TYPES = {
+        "input_id": _STR,
+        "content_kind": _STR,
+        "trust": _STR,
+        "origin": _STR,
+        "content_digest": _STR,
+        "trace_id": _STR,
+        "parent_id": _STR,
+        "derived_from": (list,),
+    }
+
+    def to_dict(self) -> dict:
+        out = super().to_dict()
+        out.setdefault("parent_id", None)
+        return out
+
+
+@dataclass
+class Exposure(Model):
+    """``provenance.exposure`` on a tool_request (0.3 cut P2): the inputs visible to the model and
+    the least trusted level among them. The pipeline computes it; a value arriving from a model or
+    an envelope is never read (cut P3)."""
+
+    inputs: list
+    floor: str
+    extra: dict = field(default_factory=dict)
+
+    TYPES = {"inputs": (list,), "floor": _STR}
+
+
+@dataclass
 class CapabilityRequest(Model):
     KIND = "capability_request"
     request_id: str

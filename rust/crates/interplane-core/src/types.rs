@@ -306,6 +306,37 @@ pub struct ToolRequest {
     pub extensions: Extensions,
 }
 
+/// `input.schema.json`: one piece of material that was placed in front of the model (0.3 cut P2).
+/// `trust` is assigned by the runtime, never by the model. `parent_id` is serialized as an
+/// explicit `null` for host-registered inputs.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct InputRecord {
+    pub input_id: String,
+    pub content_kind: ContentKind,
+    pub trust: TrustLevel,
+    pub source: Party,
+    pub origin: String,
+    pub content_digest: String,
+    pub trace_id: String,
+    #[serde(default)]
+    pub parent_id: Option<String>,
+    #[serde(default)]
+    pub derived_from: Vec<String>,
+    #[serde(flatten)]
+    pub extensions: Extensions,
+}
+
+/// `provenance.exposure` on a `tool_request` (0.3 cut P2): the inputs visible to the model when it
+/// produced the turn and the least trusted level among them. The pipeline computes it; a value
+/// arriving from a model or an envelope is never read (cut P3).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Exposure {
+    pub inputs: Vec<String>,
+    pub floor: TrustLevel,
+    #[serde(flatten)]
+    pub extensions: Extensions,
+}
+
 /// How a capability request was mapped.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MappingInfo {

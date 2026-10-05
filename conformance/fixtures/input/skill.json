@@ -1,0 +1,14 @@
+{
+  "input_id": "in-0005",
+  "content_kind": "skill",
+  "trust": "workspace_untrusted",
+  "source": {
+    "kind": "runtime",
+    "id": "mock-skills"
+  },
+  "origin": "runtime:mock-tool-description:filesystem.read",
+  "content_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+  "trace_id": "trace-ex",
+  "parent_id": null,
+  "derived_from": []
+}

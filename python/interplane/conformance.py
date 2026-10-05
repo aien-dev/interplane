@@ -8,6 +8,8 @@ from typing import Any, Optional
 
 from .core import (
     Decision,
+    Exposure,
+    InputRecord,
     Lifecycle,
     LifecycleError,
     Limits,
@@ -150,7 +152,10 @@ def run_lifecycle_case(case: dict) -> dict:
 
 def typed_roundtrip(type_name: str, value: Any) -> Any:
     """Parse ``value`` as the named SDK type and serialize it back."""
-    raise ValueError(f"unknown fixture type {type_name}")
+    types = {"InputRecord": InputRecord, "Exposure": Exposure}
+    if type_name not in types:
+        raise ValueError(f"unknown fixture type {type_name}")
+    return types[type_name].from_dict(value).to_dict()
 
 
 def check_digest_fixtures(fixtures_dir: str) -> list:

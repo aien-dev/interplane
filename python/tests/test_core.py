@@ -13,6 +13,8 @@ from interplane.core import (
     Envelope,
     ErrorCode,
     Event,
+    Exposure,
+    InputRecord,
     Lifecycle,
     LifecycleError,
     Limits,
@@ -253,6 +255,34 @@ def test_digest_fixtures_all_pass():
     assert len(results) >= 2
     for name, err in results:
         assert err is None, name
+
+
+def test_input_record_examples_roundtrip_and_null_parent_is_explicit():
+    files = sorted((CONF / "input").glob("*.json"))
+    assert len(files) == 9
+    for f in files:
+        raw = json.loads(f.read_text(encoding="utf-8"))
+        assert InputRecord.from_dict(raw).to_dict() == raw
+    rec = InputRecord(
+        input_id="i",
+        content_kind="memory",
+        trust="made_up",
+        source=Party("runtime", "r"),
+        origin="m",
+        content_digest="sha256:00",
+        trace_id="t",
+    )
+    out = rec.to_dict()
+    assert out["parent_id"] is None and out["derived_from"] == [] and out["trust"] == "made_up"
+    with pytest.raises(ProtocolError):
+        InputRecord.from_dict({k: v for k, v in out.items() if k != "origin"})
+
+
+def test_exposure_roundtrip_and_requires_both_fields():
+    raw = {"inputs": ["a"], "floor": "unknown", "x": 1}
+    assert Exposure.from_dict(raw).to_dict() == raw
+    with pytest.raises(ProtocolError):
+        Exposure.from_dict({"inputs": ["a"]})
 
 
 # ---- limits and ledger ----------------------------------------------------------------------

@@ -1,0 +1,12 @@
+{
+  "type": "Exposure",
+  "value": {
+    "inputs": [
+      "in-0003",
+      "in-0007"
+    ],
+    "floor": "external_untrusted"
+  },
+  "expected_jcs": "{\"floor\":\"external_untrusted\",\"inputs\":[\"in-0003\",\"in-0007\"]}",
+  "expected_sha256": "sha256:f98388072bbfdd28aa2ba9ed9abb8bc0905cdf542d0e251e4ea7244916a64748"
+}

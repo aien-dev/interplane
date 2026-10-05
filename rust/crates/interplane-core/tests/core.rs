@@ -558,3 +558,38 @@ fn trust_levels_and_unknown_values() {
     );
     assert_eq!(ContentKind::parse("web_content").as_str(), "web_content");
 }
+
+#[test]
+fn input_record_examples_roundtrip_and_null_parent_is_explicit() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../conformance/fixtures/input");
+    let mut n = 0;
+    for e in std::fs::read_dir(dir).unwrap() {
+        let v: Value =
+            serde_json::from_str(&std::fs::read_to_string(e.unwrap().path()).unwrap()).unwrap();
+        let rec: InputRecord = serde_json::from_value(v.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&rec).unwrap(), v);
+        n += 1;
+    }
+    assert_eq!(n, 9);
+    let mut v = json!({
+        "input_id": "i", "content_kind": "memory", "trust": "made_up", "source": {"kind": "runtime", "id": "r"},
+        "origin": "m", "content_digest": "sha256:00", "trace_id": "t", "x": 1
+    });
+    let rec: InputRecord = serde_json::from_value(v.clone()).unwrap();
+    assert_eq!(rec.parent_id, None);
+    assert!(rec.derived_from.is_empty());
+    v["parent_id"] = Value::Null;
+    v["derived_from"] = json!([]);
+    assert_eq!(serde_json::to_value(&rec).unwrap(), v);
+}
+
+#[test]
+fn exposure_roundtrips_inside_provenance_extensions() {
+    let mut p = tool_request_payload();
+    p["provenance"]["exposure"] = json!({"inputs": ["a"], "floor": "unknown"});
+    let tr: ToolRequest = serde_json::from_value(p.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&tr).unwrap(), p);
+    let ex: Exposure = serde_json::from_value(p["provenance"]["exposure"].clone()).unwrap();
+    assert_eq!(ex.floor, TrustLevel::Undetermined);
+}

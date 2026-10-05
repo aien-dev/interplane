@@ -22,7 +22,17 @@
         "source_call_id": {"type": ["string", "null"], "maxLength": 256, "description": "The dialect-native call id if the dialect has one (e.g. OpenAI tool_call.id)."},
         "source_digest": {"oneOf": [{"$ref": "common.schema.json#/$defs/Digest"}, {"type": "null"}], "description": "SHA-256 of the original dialect-native representation. Raw text is not persisted by default."},
         "raw_name": {"type": ["string", "null"], "description": "Exactly what the model emitted as the tool name before canonicalization."},
-        "coercion": {"type": ["string", "null"], "enum": ["none", "json_guess", null], "description": "How untyped dialect values were typed."}
+        "coercion": {"type": ["string", "null"], "enum": ["none", "json_guess", null], "description": "How untyped dialect values were typed."},
+        "exposure": {
+          "type": "object",
+          "required": ["inputs", "floor"],
+          "properties": {
+            "inputs": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/Id"}, "description": "input_ids visible to the model when it produced the turn."},
+            "floor": {"$ref": "common.schema.json#/$defs/TrustLevel", "description": "Least trusted level among those inputs. Order: trusted_runtime > user_supplied > workspace_untrusted > external_untrusted; unknown counts as external_untrusted."}
+          },
+          "additionalProperties": true,
+          "description": "Computed by the pipeline from its own ledger. A value arriving inside a model-produced or admitted envelope is discarded and recomputed, never read."
+        }
       },
       "additionalProperties": true
     },

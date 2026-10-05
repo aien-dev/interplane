@@ -300,8 +300,20 @@ fn check_digest_file(p: &Path) -> Option<String> {
 }
 
 /// Parse `value` as the named SDK type and serialize it back.
-fn typed_roundtrip(ty: &str, _value: &Value) -> Result<Value, String> {
-    Err(format!("unknown fixture type {ty}"))
+fn typed_roundtrip(ty: &str, value: &Value) -> Result<Value, String> {
+    let e = |e: serde_json::Error| e.to_string();
+    match ty {
+        "InputRecord" => {
+            let t: interplane_core::InputRecord =
+                serde_json::from_value(value.clone()).map_err(e)?;
+            serde_json::to_value(t).map_err(e)
+        }
+        "Exposure" => {
+            let t: interplane_core::Exposure = serde_json::from_value(value.clone()).map_err(e)?;
+            serde_json::to_value(t).map_err(e)
+        }
+        _ => Err(format!("unknown fixture type {ty}")),
+    }
 }
 
 /// Silence an unused-import lint for `RuntimeAuthority` in docs builds.

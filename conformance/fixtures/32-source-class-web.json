@@ -1,0 +1,78 @@
+{
+  "case": "32-source-class-web",
+  "description": "Source class web: web_fetch returns a page. The pipeline records the rendered result as an InputRecord with every required field (parent_id is the request_id); the host registered nothing, so the exposure floor fails closed to external_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-32",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_32a",
+            "type": "function",
+            "function": {
+              "name": "web_fetch",
+              "arguments": "{\"url\": \"https://example.com/page\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_32a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "web_content",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-32",
+        "parent_id": "call_32a",
+        "derived_from": []
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_32a",
+        "inputs": [],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

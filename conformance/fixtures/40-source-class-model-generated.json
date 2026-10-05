@@ -1,0 +1,216 @@
+{
+  "case": "40-source-class-model-generated",
+  "description": "Source class model_generated. The pipeline does not record the model's own text: after a plain-text turn the next call still sees only the user input (floor user_supplied). The host registers the earlier model output as model_generated with trust external_untrusted when it feeds it back; the following call's floor drops to external_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-40",
+  "steps": [
+    {
+      "input": {
+        "input_id": "in-40-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "runtime:user-turn-1",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-40",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": "I will append a note."
+      }
+    },
+    {
+      "turn": 1,
+      "dialect": "openai",
+      "model": "mock-model",
+      "continues": true,
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_40a",
+            "type": "function",
+            "function": {
+              "name": "append_note",
+              "arguments": "{\"path\": \"n.txt\", \"text\": \"hi\"}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "input": {
+        "input_id": "in-40-model",
+        "content_kind": "model_generated",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "origin": "model:mock-model:turn-0",
+        "content_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "trace_id": "trace-40",
+        "parent_id": null,
+        "derived_from": []
+      }
+    },
+    {
+      "turn": 2,
+      "dialect": "openai",
+      "model": "mock-model",
+      "continues": true,
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_40b",
+            "type": "function",
+            "function": {
+              "name": "append_note",
+              "arguments": "{\"path\": \"n.txt\", \"text\": \"again\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_40a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      },
+      {
+        "request_id": "call_40b",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "no_tool",
+        "intents": 0,
+        "rejected": 0,
+        "text": "I will append a note."
+      },
+      {
+        "turn": 1,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      },
+      {
+        "turn": 2,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 2,
+      "execute_calls": 2
+    },
+    "inputs": [
+      {
+        "input_id": "in-40-user",
+        "content_kind": "user_request",
+        "trust": "user_supplied",
+        "source": {
+          "kind": "operator",
+          "id": "drake"
+        },
+        "origin": "runtime:user-turn-1",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "trace_id": "trace-40",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "workspace_content",
+        "trust": "trusted_runtime",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-40",
+        "parent_id": "call_40a",
+        "derived_from": []
+      },
+      {
+        "input_id": "in-40-model",
+        "content_kind": "model_generated",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "model",
+          "id": "mock-model"
+        },
+        "origin": "model:mock-model:turn-0",
+        "content_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "trace_id": "trace-40",
+        "parent_id": null,
+        "derived_from": []
+      },
+      {
+        "input_id": "in-auto-1",
+        "content_kind": "workspace_content",
+        "trust": "trusted_runtime",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-40",
+        "parent_id": "call_40b",
+        "derived_from": []
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_40a",
+        "inputs": [
+          "in-40-user"
+        ],
+        "floor": "user_supplied"
+      },
+      {
+        "request_id": "call_40b",
+        "inputs": [
+          "in-40-user",
+          "in-auto-0",
+          "in-40-model"
+        ],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

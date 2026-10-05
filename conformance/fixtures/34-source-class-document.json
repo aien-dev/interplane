@@ -1,0 +1,78 @@
+{
+  "case": "34-source-class-document",
+  "description": "Source class document: read_document returns an attached document, which arrives from outside the workspace. The pipeline records the rendered result as an InputRecord with every required field (parent_id is the request_id); the host registered nothing, so the exposure floor fails closed to external_untrusted.",
+  "limits": {
+    "max_argument_bytes": 65536
+  },
+  "trace_id": "trace-34",
+  "steps": [
+    {
+      "turn": 0,
+      "dialect": "openai",
+      "model": "mock-model",
+      "input": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_34a",
+            "type": "function",
+            "function": {
+              "name": "read_document",
+              "arguments": "{\"path\": \"report.pdf\"}"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "observed": [
+      {
+        "request_id": "call_34a",
+        "stage": "SUCCEEDED",
+        "decision": "authorized",
+        "status": "ok",
+        "error_code": null,
+        "decide_invoked": true,
+        "execute_invoked": true,
+        "result_digest": null
+      }
+    ],
+    "turns": [
+      {
+        "turn": 0,
+        "outcome": "tool_request",
+        "intents": 1,
+        "rejected": 0,
+        "text": ""
+      }
+    ],
+    "runtime": {
+      "decide_calls": 1,
+      "execute_calls": 1
+    },
+    "inputs": [
+      {
+        "input_id": "in-auto-0",
+        "content_kind": "document",
+        "trust": "external_untrusted",
+        "source": {
+          "kind": "runtime",
+          "id": "mock"
+        },
+        "origin": "runtime:mock",
+        "trace_id": "trace-34",
+        "parent_id": "call_34a",
+        "derived_from": []
+      }
+    ],
+    "exposure": [
+      {
+        "request_id": "call_34a",
+        "inputs": [],
+        "floor": "external_untrusted"
+      }
+    ]
+  }
+}

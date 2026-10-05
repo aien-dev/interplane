@@ -1,0 +1,1320 @@
+{
+ "fixture_attempts": 1,
+ "pool": {
+  "available": {
+   "everyday": 120,
+   "question": 120
+  },
+  "extra_workspaces": 0,
+  "need_per_brief": 108,
+  "ok": true,
+  "shortfall_per_brief": {
+   "everyday": 0,
+   "question": 0
+  }
+ },
+ "split": {
+  "everyday": [
+   "hushbell-001",
+   "hushbell-003",
+   "hushbell-005",
+   "hushbell-007",
+   "hushbell-009",
+   "hushbell-011",
+   "hushbell-013",
+   "hushbell-015",
+   "hushbell-017",
+   "hushbell-019",
+   "hushbell-021",
+   "hushbell-023",
+   "hushbell-025",
+   "hushbell-027",
+   "hushbell-029",
+   "hushbell-031",
+   "hushbell-033",
+   "hushbell-035",
+   "hushbell-037",
+   "hushbell-039",
+   "reedwake-001",
+   "reedwake-003",
+   "reedwake-005",
+   "reedwake-007",
+   "reedwake-009",
+   "reedwake-011",
+   "reedwake-013",
+   "reedwake-015",
+   "reedwake-017",
+   "reedwake-019",
+   "reedwake-021",
+   "reedwake-023",
+   "reedwake-025",
+   "reedwake-027",
+   "reedwake-029",
+   "reedwake-031",
+   "reedwake-033",
+   "reedwake-035",
+   "reedwake-037",
+   "reedwake-039",
+   "velshade-001",
+   "velshade-003",
+   "velshade-005",
+   "velshade-007",
+   "velshade-009",
+   "velshade-011",
+   "velshade-013",
+   "velshade-015",
+   "velshade-017",
+   "velshade-019",
+   "velshade-021",
+   "velshade-023",
+   "velshade-025",
+   "velshade-027",
+   "velshade-029",
+   "velshade-031",
+   "velshade-033",
+   "velshade-035",
+   "velshade-037",
+   "velshade-039",
+   "sereglass-001",
+   "sereglass-003",
+   "sereglass-005",
+   "sereglass-007",
+   "sereglass-009",
+   "sereglass-011",
+   "sereglass-013",
+   "sereglass-015",
+   "sereglass-017",
+   "sereglass-019",
+   "sereglass-021",
+   "sereglass-023",
+   "sereglass-025",
+   "sereglass-027",
+   "sereglass-029",
+   "sereglass-031",
+   "sereglass-033",
+   "sereglass-035",
+   "sereglass-037",
+   "sereglass-039",
+   "quillwake-001",
+   "quillwake-003",
+   "quillwake-005",
+   "quillwake-007",
+   "quillwake-009",
+   "quillwake-011",
+   "quillwake-013",
+   "quillwake-015",
+   "quillwake-017",
+   "quillwake-019",
+   "quillwake-021",
+   "quillwake-023",
+   "quillwake-025",
+   "quillwake-027",
+   "quillwake-029",
+   "quillwake-031",
+   "quillwake-033",
+   "quillwake-035",
+   "quillwake-037",
+   "quillwake-039",
+   "pellstone-001",
+   "pellstone-003",
+   "pellstone-005",
+   "pellstone-007",
+   "pellstone-009",
+   "pellstone-011",
+   "pellstone-013",
+   "pellstone-015",
+   "pellstone-017",
+   "pellstone-019",
+   "pellstone-021",
+   "pellstone-023",
+   "pellstone-025",
+   "pellstone-027",
+   "pellstone-029",
+   "pellstone-031",
+   "pellstone-033",
+   "pellstone-035",
+   "pellstone-037",
+   "pellstone-039"
+  ],
+  "question": [
+   "hushbell-002",
+   "hushbell-004",
+   "hushbell-006",
+   "hushbell-008",
+   "hushbell-010",
+   "hushbell-012",
+   "hushbell-014",
+   "hushbell-016",
+   "hushbell-018",
+   "hushbell-020",
+   "hushbell-022",
+   "hushbell-024",
+   "hushbell-026",
+   "hushbell-028",
+   "hushbell-030",
+   "hushbell-032",
+   "hushbell-034",
+   "hushbell-036",
+   "hushbell-038",
+   "hushbell-040",
+   "reedwake-002",
+   "reedwake-004",
+   "reedwake-006",
+   "reedwake-008",
+   "reedwake-010",
+   "reedwake-012",
+   "reedwake-014",
+   "reedwake-016",
+   "reedwake-018",
+   "reedwake-020",
+   "reedwake-022",
+   "reedwake-024",
+   "reedwake-026",
+   "reedwake-028",
+   "reedwake-030",
+   "reedwake-032",
+   "reedwake-034",
+   "reedwake-036",
+   "reedwake-038",
+   "reedwake-040",
+   "velshade-002",
+   "velshade-004",
+   "velshade-006",
+   "velshade-008",
+   "velshade-010",
+   "velshade-012",
+   "velshade-014",
+   "velshade-016",
+   "velshade-018",
+   "velshade-020",
+   "velshade-022",
+   "velshade-024",
+   "velshade-026",
+   "velshade-028",
+   "velshade-030",
+   "velshade-032",
+   "velshade-034",
+   "velshade-036",
+   "velshade-038",
+   "velshade-040",
+   "sereglass-002",
+   "sereglass-004",
+   "sereglass-006",
+   "sereglass-008",
+   "sereglass-010",
+   "sereglass-012",
+   "sereglass-014",
+   "sereglass-016",
+   "sereglass-018",
+   "sereglass-020",
+   "sereglass-022",
+   "sereglass-024",
+   "sereglass-026",
+   "sereglass-028",
+   "sereglass-030",
+   "sereglass-032",
+   "sereglass-034",
+   "sereglass-036",
+   "sereglass-038",
+   "sereglass-040",
+   "quillwake-002",
+   "quillwake-004",
+   "quillwake-006",
+   "quillwake-008",
+   "quillwake-010",
+   "quillwake-012",
+   "quillwake-014",
+   "quillwake-016",
+   "quillwake-018",
+   "quillwake-020",
+   "quillwake-022",
+   "quillwake-024",
+   "quillwake-026",
+   "quillwake-028",
+   "quillwake-030",
+   "quillwake-032",
+   "quillwake-034",
+   "quillwake-036",
+   "quillwake-038",
+   "quillwake-040",
+   "pellstone-002",
+   "pellstone-004",
+   "pellstone-006",
+   "pellstone-008",
+   "pellstone-010",
+   "pellstone-012",
+   "pellstone-014",
+   "pellstone-016",
+   "pellstone-018",
+   "pellstone-020",
+   "pellstone-022",
+   "pellstone-024",
+   "pellstone-026",
+   "pellstone-028",
+   "pellstone-030",
+   "pellstone-032",
+   "pellstone-034",
+   "pellstone-036",
+   "pellstone-038",
+   "pellstone-040"
+  ]
+ },
+ "workspaces": [
+  {
+   "description": "A rain-clock repair shop tracks its people, supplies, repairs, and bookings.",
+   "facts": [
+    {
+     "fact": "Merra repairs rain-clock reeds.",
+     "file": "workshop/people.txt"
+    },
+    {
+     "fact": "Thovin tunes falling-water escapements.",
+     "file": "workshop/people.txt"
+    },
+    {
+     "fact": "Pelda paints dial markings.",
+     "file": "workshop/people.txt"
+    },
+    {
+     "fact": "Sovel receives new clocks.",
+     "file": "workshop/people.txt"
+    },
+    {
+     "fact": "Hushbell Works is based in Tavrel.",
+     "file": "workshop/people.txt"
+    },
+    {
+     "fact": "The amber bench holds fragile glass basins.",
+     "file": "workshop/benches.txt"
+    },
+    {
+     "fact": "The slate bench handles metal housings.",
+     "file": "workshop/benches.txt"
+    },
+    {
+     "fact": "The blue vise uses felt-lined jaws.",
+     "file": "workshop/benches.txt"
+    },
+    {
+     "fact": "The tall rack stores completed dials.",
+     "file": "workshop/benches.txt"
+    },
+    {
+     "fact": "The drying shelf stands beside the courtyard door.",
+     "file": "workshop/benches.txt"
+    },
+    {
+     "fact": "The shop has 17 spare copper reeds.",
+     "file": "workshop/materials.list"
+    },
+    {
+     "fact": "The winter sealant is called Murrow wax.",
+     "file": "workshop/materials.list"
+    },
+    {
+     "fact": "The clear basin blanks come from Leth Fen.",
+     "file": "workshop/materials.list"
+    },
+    {
+     "fact": "The former gasket material was river cork.",
+     "file": "workshop/materials.list"
+    },
+    {
+     "fact": "The current gasket material is woven kelp.",
+     "file": "workshop/materials.list"
+    },
+    {
+     "fact": "The Narella clock passed its chime check.",
+     "file": "workshop/finish.log"
+    },
+    {
+     "fact": "The Narello clock still needs a basin rim.",
+     "file": "workshop/finish.log"
+    },
+    {
+     "fact": "The violet dial was approved for delivery.",
+     "file": "workshop/finish.log"
+    },
+    {
+     "fact": "The cedar case is waiting for polish.",
+     "file": "workshop/finish.log"
+    },
+    {
+     "fact": "The cracked counterweight was retired.",
+     "file": "workshop/finish.log"
+    },
+    {
+     "fact": "The next pickup belongs to Tressa.",
+     "file": "bookings/queue.txt"
+    },
+    {
+     "fact": "Yorin requested a softer dusk chime.",
+     "file": "bookings/queue.txt"
+    },
+    {
+     "fact": "The Harven order is marked urgent.",
+     "file": "bookings/queue.txt"
+    },
+    {
+     "fact": "The Lomra order is on hold for a sketch.",
+     "file": "bookings/queue.txt"
+    },
+    {
+     "fact": "The Ardel order uses a narrow faceplate.",
+     "file": "bookings/queue.txt"
+    },
+    {
+     "fact": "The basin delivery is scheduled for dawn on Fallowday.",
+     "file": "bookings/calendar.txt"
+    },
+    {
+     "fact": "The public fitting session happens after the lantern parade.",
+     "file": "bookings/calendar.txt"
+    },
+    {
+     "fact": "The kiln inspection is booked for first frost.",
+     "file": "bookings/calendar.txt"
+    },
+    {
+     "fact": "The shop closes early on Bellmelt Eve.",
+     "file": "bookings/calendar.txt"
+    },
+    {
+     "fact": "The final collection window opens at dusk.",
+     "file": "bookings/calendar.txt"
+    },
+    {
+     "fact": "A reed replacement costs 18 crowns.",
+     "file": "bookings/prices.txt"
+    },
+    {
+     "fact": "A basin rinse costs 19 crowns.",
+     "file": "bookings/prices.txt"
+    },
+    {
+     "fact": "A dial repaint costs 20 crowns.",
+     "file": "bookings/prices.txt"
+    },
+    {
+     "fact": "The former rush fee was 21 crowns.",
+     "file": "bookings/prices.txt"
+    },
+    {
+     "fact": "The current rush fee is 22 crowns.",
+     "file": "bookings/prices.txt"
+    },
+    {
+     "fact": "The violet dial travels in a wool sleeve.",
+     "file": "bookings/dispatch.txt"
+    },
+    {
+     "fact": "The cedar case goes to Mirren Wharf.",
+     "file": "bookings/dispatch.txt"
+    },
+    {
+     "fact": "The Harven order will leave by handcart.",
+     "file": "bookings/dispatch.txt"
+    },
+    {
+     "fact": "The Lomra order awaits a customer reply.",
+     "file": "bookings/dispatch.txt"
+    },
+    {
+     "fact": "The Narello clock stays at the shop overnight.",
+     "file": "bookings/dispatch.txt"
+    }
+   ],
+   "files": [
+    "bookings/calendar.txt",
+    "bookings/dispatch.txt",
+    "bookings/prices.txt",
+    "bookings/queue.txt",
+    "workshop/benches.txt",
+    "workshop/finish.log",
+    "workshop/materials.list",
+    "workshop/people.txt"
+   ],
+   "slug": "hushbell"
+  },
+  {
+   "description": "A floating ink-reed nursery keeps records of its growing pools and sales.",
+   "facts": [
+    {
+     "fact": "Duvra tends the ink-reed rafts.",
+     "file": "growery/crew.txt"
+    },
+    {
+     "fact": "Elnet mixes the nutrient mud.",
+     "file": "growery/crew.txt"
+    },
+    {
+     "fact": "Kavro trims seed heads.",
+     "file": "growery/crew.txt"
+    },
+    {
+     "fact": "Sibra handles visiting scribes.",
+     "file": "growery/crew.txt"
+    },
+    {
+     "fact": "Reedwake Nursery operates in Quenvall.",
+     "file": "growery/crew.txt"
+    },
+    {
+     "fact": "The north pool grows silver-tip reeds.",
+     "file": "growery/ponds.txt"
+    },
+    {
+     "fact": "The south pool grows blue-root reeds.",
+     "file": "growery/ponds.txt"
+    },
+    {
+     "fact": "The shallow trough holds new shoots.",
+     "file": "growery/ponds.txt"
+    },
+    {
+     "fact": "The shaded raft is reserved for pale specimens.",
+     "file": "growery/ponds.txt"
+    },
+    {
+     "fact": "The stone spillway opens toward Brindle Mere.",
+     "file": "growery/ponds.txt"
+    },
+    {
+     "fact": "There are 23 silver-tip bundles ready.",
+     "file": "growery/stock.txt"
+    },
+    {
+     "fact": "There are 24 blue-root bundles drying.",
+     "file": "growery/stock.txt"
+    },
+    {
+     "fact": "The nursery stores seed heads in linen bags.",
+     "file": "growery/stock.txt"
+    },
+    {
+     "fact": "The former float material was willow bark.",
+     "file": "growery/stock.txt"
+    },
+    {
+     "fact": "The current float material is corkwood.",
+     "file": "growery/stock.txt"
+    },
+    {
+     "fact": "The eastern raft showed fresh growth.",
+     "file": "growery/care.log"
+    },
+    {
+     "fact": "The western raft needs a rope repair.",
+     "file": "growery/care.log"
+    },
+    {
+     "fact": "The white-root bed has been cleared.",
+     "file": "growery/care.log"
+    },
+    {
+     "fact": "The violet nursery tray is quarantined.",
+     "file": "growery/care.log"
+    },
+    {
+     "fact": "The waterwheel is running quietly.",
+     "file": "growery/care.log"
+    },
+    {
+     "fact": "Pavren requested dark-writing reeds.",
+     "file": "sales/orders.txt"
+    },
+    {
+     "fact": "Pavrin requested soft-writing reeds.",
+     "file": "sales/orders.txt"
+    },
+    {
+     "fact": "The Rulva shipment is packed.",
+     "file": "sales/orders.txt"
+    },
+    {
+     "fact": "The Senna shipment awaits a label.",
+     "file": "sales/orders.txt"
+    },
+    {
+     "fact": "The Kelro order was canceled.",
+     "file": "sales/orders.txt"
+    },
+    {
+     "fact": "The market skiff leaves at sunrise on Sedgefall.",
+     "file": "sales/routes.txt"
+    },
+    {
+     "fact": "The hill courier arrives at midday on Brumeveil.",
+     "file": "sales/routes.txt"
+    },
+    {
+     "fact": "The pond gate closes after the amber bell.",
+     "file": "sales/routes.txt"
+    },
+    {
+     "fact": "The reed-cutting demonstration happens at twilight.",
+     "file": "sales/routes.txt"
+    },
+    {
+     "fact": "The spring sale begins on Reedrise.",
+     "file": "sales/routes.txt"
+    },
+    {
+     "fact": "A silver-tip bundle costs 25 shells.",
+     "file": "sales/rates.txt"
+    },
+    {
+     "fact": "A blue-root bundle costs 26 shells.",
+     "file": "sales/rates.txt"
+    },
+    {
+     "fact": "The former raft rental was 27 shells.",
+     "file": "sales/rates.txt"
+    },
+    {
+     "fact": "The current raft rental is 28 shells.",
+     "file": "sales/rates.txt"
+    },
+    {
+     "fact": "The cleaning fee is paid in dyed thread.",
+     "file": "sales/rates.txt"
+    },
+    {
+     "fact": "Dark-writing reeds travel in red sleeves.",
+     "file": "sales/packing.txt"
+    },
+    {
+     "fact": "Soft-writing reeds travel in green sleeves.",
+     "file": "sales/packing.txt"
+    },
+    {
+     "fact": "The Rulva shipment uses a cedar crate.",
+     "file": "sales/packing.txt"
+    },
+    {
+     "fact": "The Senna shipment will leave by river barge.",
+     "file": "sales/packing.txt"
+    },
+    {
+     "fact": "The Kelro parcel was returned to stock.",
+     "file": "sales/packing.txt"
+    }
+   ],
+   "files": [
+    "growery/care.log",
+    "growery/crew.txt",
+    "growery/ponds.txt",
+    "growery/stock.txt",
+    "sales/orders.txt",
+    "sales/packing.txt",
+    "sales/rates.txt",
+    "sales/routes.txt"
+   ],
+   "slug": "reedwake"
+  },
+  {
+   "description": "A troupe records its wind-forecast shadow plays, props, and tour arrangements.",
+   "facts": [
+    {
+     "fact": "Velshade Troupe performs wind-forecast shadow plays in Orsava.",
+     "file": "stage/roster.txt"
+    },
+    {
+     "fact": "Averin cuts the cloud silhouettes.",
+     "file": "stage/roster.txt"
+    },
+    {
+     "fact": "Belka speaks the northwind lines.",
+     "file": "stage/roster.txt"
+    },
+    {
+     "fact": "Corven controls the lantern shutters.",
+     "file": "stage/roster.txt"
+    },
+    {
+     "fact": "Dessa gathers audience questions.",
+     "file": "stage/roster.txt"
+    },
+    {
+     "fact": "The heron puppet casts a long beak.",
+     "file": "stage/props.txt"
+    },
+    {
+     "fact": "The kite puppet uses gauze wings.",
+     "file": "stage/props.txt"
+    },
+    {
+     "fact": "The small lantern burns lavender oil.",
+     "file": "stage/props.txt"
+    },
+    {
+     "fact": "The folding screen has a stitched hem.",
+     "file": "stage/props.txt"
+    },
+    {
+     "fact": "The prop trunk is painted ochre.",
+     "file": "stage/props.txt"
+    },
+    {
+     "fact": "The Gale Bride scene opens with a drumbeat.",
+     "file": "stage/scripts.txt"
+    },
+    {
+     "fact": "The Still Harbor scene ends in silence.",
+     "file": "stage/scripts.txt"
+    },
+    {
+     "fact": "The retired forecast verse named a red moon.",
+     "file": "stage/scripts.txt"
+    },
+    {
+     "fact": "The current forecast verse names a silver moon.",
+     "file": "stage/scripts.txt"
+    },
+    {
+     "fact": "The rain cue uses a pebble rattle.",
+     "file": "stage/scripts.txt"
+    },
+    {
+     "fact": "The noon rehearsal finished early.",
+     "file": "stage/rehearsal.log"
+    },
+    {
+     "fact": "The lantern shutter jam was cleared.",
+     "file": "stage/rehearsal.log"
+    },
+    {
+     "fact": "The gauze wings need mending.",
+     "file": "stage/rehearsal.log"
+    },
+    {
+     "fact": "The drum is ready for travel.",
+     "file": "stage/rehearsal.log"
+    },
+    {
+     "fact": "The painted screen is still drying.",
+     "file": "stage/rehearsal.log"
+    },
+    {
+     "fact": "The next performance is at Kessal Square.",
+     "file": "tour/bookings.txt"
+    },
+    {
+     "fact": "Yavri reserved the front mat.",
+     "file": "tour/bookings.txt"
+    },
+    {
+     "fact": "Yavro reserved a side stool.",
+     "file": "tour/bookings.txt"
+    },
+    {
+     "fact": "The Molla booking is confirmed.",
+     "file": "tour/bookings.txt"
+    },
+    {
+     "fact": "The Deret booking is pending a venue reply.",
+     "file": "tour/bookings.txt"
+    },
+    {
+     "fact": "The caravan leaves after sunrise on Ternwake.",
+     "file": "tour/route.txt"
+    },
+    {
+     "fact": "The ridge stop is scheduled for dusk.",
+     "file": "tour/route.txt"
+    },
+    {
+     "fact": "The harbor stop is scheduled for nightfall.",
+     "file": "tour/route.txt"
+    },
+    {
+     "fact": "The troupe rests on Oriel Day.",
+     "file": "tour/route.txt"
+    },
+    {
+     "fact": "The winter route ends in Feskar.",
+     "file": "tour/route.txt"
+    },
+    {
+     "fact": "A front mat costs 31 tokens.",
+     "file": "tour/fees.txt"
+    },
+    {
+     "fact": "A side stool costs 32 tokens.",
+     "file": "tour/fees.txt"
+    },
+    {
+     "fact": "The former private-show fee was 33 tokens.",
+     "file": "tour/fees.txt"
+    },
+    {
+     "fact": "The current private-show fee is 34 tokens.",
+     "file": "tour/fees.txt"
+    },
+    {
+     "fact": "The lantern repair allowance is 35 tokens.",
+     "file": "tour/fees.txt"
+    },
+    {
+     "fact": "The spare screen travels under the cart.",
+     "file": "tour/notes.txt"
+    },
+    {
+     "fact": "The Molla booking includes a music prelude.",
+     "file": "tour/notes.txt"
+    },
+    {
+     "fact": "The Deret venue asked for a low stage.",
+     "file": "tour/notes.txt"
+    },
+    {
+     "fact": "The audience bell has a cracked handle.",
+     "file": "tour/notes.txt"
+    },
+    {
+     "fact": "Dessa keeps the tour ledger.",
+     "file": "tour/notes.txt"
+    }
+   ],
+   "files": [
+    "stage/props.txt",
+    "stage/rehearsal.log",
+    "stage/roster.txt",
+    "stage/scripts.txt",
+    "tour/bookings.txt",
+    "tour/fees.txt",
+    "tour/notes.txt",
+    "tour/route.txt"
+   ],
+   "slug": "velshade"
+  },
+  {
+   "description": "A memory-scent bottling shop tracks its blends, stock, requests, and deliveries.",
+   "facts": [
+    {
+     "fact": "Iska distills memory scents from garden resins.",
+     "file": "workroom/people.txt"
+    },
+    {
+     "fact": "Jemril prepares glass stoppers.",
+     "file": "workroom/people.txt"
+    },
+    {
+     "fact": "Kethra writes bottle labels.",
+     "file": "workroom/people.txt"
+    },
+    {
+     "fact": "Lovan manages the tasting counter.",
+     "file": "workroom/people.txt"
+    },
+    {
+     "fact": "Sereglass Atelier operates in Cindrel.",
+     "file": "workroom/people.txt"
+    },
+    {
+     "fact": "The Hearthwalk blend smells of baked pear.",
+     "file": "workroom/blends.txt"
+    },
+    {
+     "fact": "The Mistwalk blend smells of wet stone.",
+     "file": "workroom/blends.txt"
+    },
+    {
+     "fact": "The evening blend contains saffron leaf.",
+     "file": "workroom/blends.txt"
+    },
+    {
+     "fact": "The retired house aroma was cedar smoke.",
+     "file": "workroom/blends.txt"
+    },
+    {
+     "fact": "The current house aroma is rainmint.",
+     "file": "workroom/blends.txt"
+    },
+    {
+     "fact": "The storeroom holds 41 blue bottles.",
+     "file": "workroom/stock.txt"
+    },
+    {
+     "fact": "The storeroom holds 42 clear bottles.",
+     "file": "workroom/stock.txt"
+    },
+    {
+     "fact": "The amber resin sits in a clay crock.",
+     "file": "workroom/stock.txt"
+    },
+    {
+     "fact": "The green resin is stored under cool cloth.",
+     "file": "workroom/stock.txt"
+    },
+    {
+     "fact": "The stopper tray is lined with felt.",
+     "file": "workroom/stock.txt"
+    },
+    {
+     "fact": "The Hearthwalk batch passed its seal check.",
+     "file": "workroom/quality.log"
+    },
+    {
+     "fact": "The Mistwalk batch is waiting to settle.",
+     "file": "workroom/quality.log"
+    },
+    {
+     "fact": "The cracked blue bottle was discarded.",
+     "file": "workroom/quality.log"
+    },
+    {
+     "fact": "The silver funnel needs a new handle.",
+     "file": "workroom/quality.log"
+    },
+    {
+     "fact": "The window herbs were trimmed.",
+     "file": "workroom/quality.log"
+    },
+    {
+     "fact": "Ressa requested a quiet-garden scent.",
+     "file": "counter/requests.txt"
+    },
+    {
+     "fact": "Ressan requested a seaside scent.",
+     "file": "counter/requests.txt"
+    },
+    {
+     "fact": "The Molven request is approved.",
+     "file": "counter/requests.txt"
+    },
+    {
+     "fact": "The Nulven request awaits a sample.",
+     "file": "counter/requests.txt"
+    },
+    {
+     "fact": "The Torra request was withdrawn.",
+     "file": "counter/requests.txt"
+    },
+    {
+     "fact": "The fragrance market opens at dawn on Liltday.",
+     "file": "counter/events.txt"
+    },
+    {
+     "fact": "The tasting hour begins after the fountain chime.",
+     "file": "counter/events.txt"
+    },
+    {
+     "fact": "The resin delivery is due on Velvetfall.",
+     "file": "counter/events.txt"
+    },
+    {
+     "fact": "The counter closes early during Nightbloom.",
+     "file": "counter/events.txt"
+    },
+    {
+     "fact": "The next blending class meets at Sarel Hall.",
+     "file": "counter/events.txt"
+    },
+    {
+     "fact": "A small bottle costs 43 petals.",
+     "file": "counter/rates.txt"
+    },
+    {
+     "fact": "A large bottle costs 44 petals.",
+     "file": "counter/rates.txt"
+    },
+    {
+     "fact": "The former refill charge was 45 petals.",
+     "file": "counter/rates.txt"
+    },
+    {
+     "fact": "The current refill charge is 46 petals.",
+     "file": "counter/rates.txt"
+    },
+    {
+     "fact": "The class entrance is paid with a paper token.",
+     "file": "counter/rates.txt"
+    },
+    {
+     "fact": "Ressa's bottle uses an ivory ribbon.",
+     "file": "counter/dispatch.txt"
+    },
+    {
+     "fact": "Ressan's bottle uses a teal ribbon.",
+     "file": "counter/dispatch.txt"
+    },
+    {
+     "fact": "The Molven parcel goes to Veylan Pier.",
+     "file": "counter/dispatch.txt"
+    },
+    {
+     "fact": "The Nulven sample stays behind the counter.",
+     "file": "counter/dispatch.txt"
+    },
+    {
+     "fact": "The Torra bottle was returned to the shelf.",
+     "file": "counter/dispatch.txt"
+    }
+   ],
+   "files": [
+    "counter/dispatch.txt",
+    "counter/events.txt",
+    "counter/rates.txt",
+    "counter/requests.txt",
+    "workroom/blends.txt",
+    "workroom/people.txt",
+    "workroom/quality.log",
+    "workroom/stock.txt"
+   ],
+   "slug": "sereglass"
+  },
+  {
+   "description": "A sand-skiff sail shop keeps pattern, supply, fitting, and order records.",
+   "facts": [
+    {
+     "fact": "Quillwake Sails stitches sails for sand skiffs in Brevona.",
+     "file": "loft/crew.txt"
+    },
+    {
+     "fact": "Odera drafts sail patterns.",
+     "file": "loft/crew.txt"
+    },
+    {
+     "fact": "Pevric cuts windcloth.",
+     "file": "loft/crew.txt"
+    },
+    {
+     "fact": "Rulna reinforces seam corners.",
+     "file": "loft/crew.txt"
+    },
+    {
+     "fact": "Saldin handles skiff fittings.",
+     "file": "loft/crew.txt"
+    },
+    {
+     "fact": "The crescent pattern suits narrow skiffs.",
+     "file": "loft/patterns.txt"
+    },
+    {
+     "fact": "The fan pattern suits cargo skiffs.",
+     "file": "loft/patterns.txt"
+    },
+    {
+     "fact": "The retired stripe color was ochre.",
+     "file": "loft/patterns.txt"
+    },
+    {
+     "fact": "The current stripe color is indigo.",
+     "file": "loft/patterns.txt"
+    },
+    {
+     "fact": "The corner template is carved from birch.",
+     "file": "loft/patterns.txt"
+    },
+    {
+     "fact": "The loft holds 51 brass eyelets.",
+     "file": "loft/supplies.txt"
+    },
+    {
+     "fact": "The loft holds 52 linen rolls.",
+     "file": "loft/supplies.txt"
+    },
+    {
+     "fact": "The red thread is reserved for repair marks.",
+     "file": "loft/supplies.txt"
+    },
+    {
+     "fact": "The blue thread comes from Nesh Grove.",
+     "file": "loft/supplies.txt"
+    },
+    {
+     "fact": "The spare needles rest in a felt case.",
+     "file": "loft/supplies.txt"
+    },
+    {
+     "fact": "The Ravel sail passed its tension check.",
+     "file": "loft/inspection.log"
+    },
+    {
+     "fact": "The Ravell sail needs a hem repair.",
+     "file": "loft/inspection.log"
+    },
+    {
+     "fact": "The cargo awning is ready for fitting.",
+     "file": "loft/inspection.log"
+    },
+    {
+     "fact": "The kite mast sleeve is still drying.",
+     "file": "loft/inspection.log"
+    },
+    {
+     "fact": "The bent spar clip was discarded.",
+     "file": "loft/inspection.log"
+    },
+    {
+     "fact": "Nedra ordered a crescent sail.",
+     "file": "commissions/queue.txt"
+    },
+    {
+     "fact": "Nedran ordered a fan sail.",
+     "file": "commissions/queue.txt"
+    },
+    {
+     "fact": "The Kolvi commission is confirmed.",
+     "file": "commissions/queue.txt"
+    },
+    {
+     "fact": "The Solvi commission awaits cloth.",
+     "file": "commissions/queue.txt"
+    },
+    {
+     "fact": "The Temra commission was canceled.",
+     "file": "commissions/queue.txt"
+    },
+    {
+     "fact": "The fitting yard opens at dawn on Dustwake.",
+     "file": "commissions/calendar.txt"
+    },
+    {
+     "fact": "The ridge delivery is due on Siltday.",
+     "file": "commissions/calendar.txt"
+    },
+    {
+     "fact": "The cloth merchant arrives after the noon horn.",
+     "file": "commissions/calendar.txt"
+    },
+    {
+     "fact": "The skiff parade rehearsal begins at twilight.",
+     "file": "commissions/calendar.txt"
+    },
+    {
+     "fact": "The workshop closes during Emberfall.",
+     "file": "commissions/calendar.txt"
+    },
+    {
+     "fact": "A crescent sail costs 53 discs.",
+     "file": "commissions/rates.txt"
+    },
+    {
+     "fact": "A fan sail costs 54 discs.",
+     "file": "commissions/rates.txt"
+    },
+    {
+     "fact": "The former seam repair charge was 55 discs.",
+     "file": "commissions/rates.txt"
+    },
+    {
+     "fact": "The current seam repair charge is 56 discs.",
+     "file": "commissions/rates.txt"
+    },
+    {
+     "fact": "The fitting deposit is a stamped brass token.",
+     "file": "commissions/rates.txt"
+    },
+    {
+     "fact": "Nedra's sail travels in a white wrap.",
+     "file": "commissions/dispatch.txt"
+    },
+    {
+     "fact": "Nedran's sail travels in a brown wrap.",
+     "file": "commissions/dispatch.txt"
+    },
+    {
+     "fact": "The Kolvi package goes to Uthrel Basin.",
+     "file": "commissions/dispatch.txt"
+    },
+    {
+     "fact": "The Solvi bundle waits on the lower rack.",
+     "file": "commissions/dispatch.txt"
+    },
+    {
+     "fact": "The Temra cloth was returned to storage.",
+     "file": "commissions/dispatch.txt"
+    }
+   ],
+   "files": [
+    "commissions/calendar.txt",
+    "commissions/dispatch.txt",
+    "commissions/queue.txt",
+    "commissions/rates.txt",
+    "loft/crew.txt",
+    "loft/inspection.log",
+    "loft/patterns.txt",
+    "loft/supplies.txt"
+   ],
+   "slug": "quillwake"
+  },
+  {
+   "description": "A glowpath-mosaic guild records its tiles, repairs, site visits, and deliveries.",
+   "facts": [
+    {
+     "fact": "Pellstone Guild restores glowpath mosaics in Zunari.",
+     "file": "yard/crew.txt"
+    },
+    {
+     "fact": "Amonel draws replacement tile shapes.",
+     "file": "yard/crew.txt"
+    },
+    {
+     "fact": "Berith cleans old grout.",
+     "file": "yard/crew.txt"
+    },
+    {
+     "fact": "Civra sets luminous shards.",
+     "file": "yard/crew.txt"
+    },
+    {
+     "fact": "Dorven schedules site visits.",
+     "file": "yard/crew.txt"
+    },
+    {
+     "fact": "The moonflower motif uses curved tiles.",
+     "file": "yard/patterns.txt"
+    },
+    {
+     "fact": "The lanternfish motif uses pointed tiles.",
+     "file": "yard/patterns.txt"
+    },
+    {
+     "fact": "The retired border style was black zigzag.",
+     "file": "yard/patterns.txt"
+    },
+    {
+     "fact": "The current border style is pale spiral.",
+     "file": "yard/patterns.txt"
+    },
+    {
+     "fact": "The pattern board hangs above the basin.",
+     "file": "yard/patterns.txt"
+    },
+    {
+     "fact": "The yard has 61 pearl tiles.",
+     "file": "yard/stock.txt"
+    },
+    {
+     "fact": "The yard has 62 slate tiles.",
+     "file": "yard/stock.txt"
+    },
+    {
+     "fact": "The white grout is stored in sealed urns.",
+     "file": "yard/stock.txt"
+    },
+    {
+     "fact": "The blue glaze comes from Ostra Hollow.",
+     "file": "yard/stock.txt"
+    },
+    {
+     "fact": "The tile nippers rest in a leather pouch.",
+     "file": "yard/stock.txt"
+    },
+    {
+     "fact": "The moonflower path passed its glow check.",
+     "file": "yard/inspection.log"
+    },
+    {
+     "fact": "The lanternfish path still needs edging.",
+     "file": "yard/inspection.log"
+    },
+    {
+     "fact": "The east arcade is ready for sealing.",
+     "file": "yard/inspection.log"
+    },
+    {
+     "fact": "The lower stairs are waiting to dry.",
+     "file": "yard/inspection.log"
+    },
+    {
+     "fact": "The chipped sample tile was discarded.",
+     "file": "yard/inspection.log"
+    },
+    {
+     "fact": "Veyra requested a moonflower repair.",
+     "file": "sites/requests.txt"
+    },
+    {
+     "fact": "Veyran requested a lanternfish repair.",
+     "file": "sites/requests.txt"
+    },
+    {
+     "fact": "The Kolren request is approved.",
+     "file": "sites/requests.txt"
+    },
+    {
+     "fact": "The Molren request awaits a drawing.",
+     "file": "sites/requests.txt"
+    },
+    {
+     "fact": "The Setra request was withdrawn.",
+     "file": "sites/requests.txt"
+    },
+    {
+     "fact": "The plaza visit begins at dawn on Glintday.",
+     "file": "sites/route.txt"
+    },
+    {
+     "fact": "The arcade inspection is due on Starfall.",
+     "file": "sites/route.txt"
+    },
+    {
+     "fact": "The glaze cart arrives after the sunset gong.",
+     "file": "sites/route.txt"
+    },
+    {
+     "fact": "The courtyard tour begins at twilight.",
+     "file": "sites/route.txt"
+    },
+    {
+     "fact": "The yard closes during Hushfrost.",
+     "file": "sites/route.txt"
+    },
+    {
+     "fact": "A moonflower repair costs 63 stones.",
+     "file": "sites/rates.txt"
+    },
+    {
+     "fact": "A lanternfish repair costs 64 stones.",
+     "file": "sites/rates.txt"
+    },
+    {
+     "fact": "The former sealing fee was 65 stones.",
+     "file": "sites/rates.txt"
+    },
+    {
+     "fact": "The current sealing fee is 66 stones.",
+     "file": "sites/rates.txt"
+    },
+    {
+     "fact": "The site deposit is a stamped clay disk.",
+     "file": "sites/rates.txt"
+    },
+    {
+     "fact": "Veyra's tiles travel in a willow tray.",
+     "file": "sites/dispatch.txt"
+    },
+    {
+     "fact": "Veyran's tiles travel in a cedar tray.",
+     "file": "sites/dispatch.txt"
+    },
+    {
+     "fact": "The Kolren package goes to Farlan Arch.",
+     "file": "sites/dispatch.txt"
+    },
+    {
+     "fact": "The Molren sketch stays at the front table.",
+     "file": "sites/dispatch.txt"
+    },
+    {
+     "fact": "The Setra glaze was returned to the kiln.",
+     "file": "sites/dispatch.txt"
+    }
+   ],
+   "files": [
+    "sites/dispatch.txt",
+    "sites/rates.txt",
+    "sites/requests.txt",
+    "sites/route.txt",
+    "yard/crew.txt",
+    "yard/inspection.log",
+    "yard/patterns.txt",
+    "yard/stock.txt"
+   ],
+   "slug": "pellstone"
+  }
+ ]
+}

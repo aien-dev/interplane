@@ -1,0 +1,8 @@
+round 0: counts {'nonfile': 4, 'default': 24}, log 72
+round 1: counts {'nonfile': 4, 'default': 24}, log 84
+WARNING: target/requests-r2-everyday returned 48 requests, asked 24
+round 2: counts {'nonfile': 6, 'default': 24}, log 132
+WARNING: target/requests-r3-everyday returned 0 requests, asked 36
+round 3: counts {'nonfile': 6, 'default': 24}, log 132
+groups still short after 3 top-ups: {'nonfile': 6, 'default': 24}
+pool {'ok': True, 'need_per_brief': 108, 'available': {'everyday': 120, 'question': 120}, 'shortfall_per_brief': {'everyday': 0, 'question': 0}, 'extra_workspaces': 0}

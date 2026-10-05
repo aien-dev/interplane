@@ -240,7 +240,8 @@ written before any task, fixture or request exists). None changes a threshold, a
 ## 6b. Open points
 
 - **Runner support.** `run_bench.py` accepts only `--corpus 0.2` and `0.2x`; the calibration run and every later
-  0.2y run need a `0.2y` corpus option or a `--tasks-dir` path in the runner. Not built here.
+  0.2y run need a `0.2y` corpus option or a `--tasks-dir` path in the runner. Built after this file: `--corpus 0.2y` and
+  `0.2y-cal` (#67).
 - **Lint strictness.** 45 catalog name tokens are banned that are not keywords, among them everyday words (`with`,
   `get`, `list`, `read`, `send`, `stop`, ...). "next meeting with the harbour team" is rejected for `with`. The
   pre-registered rule applied literally; the three top-ups are the safeguard.
@@ -249,4 +250,17 @@ written before any task, fixture or request exists). None changes a threshold, a
 
 ## 7. Authoring record
 
-(Empty until authoring starts: date, model and exact command used, one line per call.)
+Date, model and exact command used, one line per call, time = when the call finished (from `attempt-1/calls.jsonl`; Codex's session logs show
+the same model and an empty scratch working directory for each call).
+
+- 2026-10-05T16:35:58Z attempt 1, `target/fixtures-call1`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 374 s, 31475 bytes
+- 2026-10-05T16:37:44Z attempt 1, `target/requests-r0-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 89 s, 6394 bytes
+- 2026-10-05T16:39:12Z attempt 1, `target/requests-r0-question`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 87 s, 5886 bytes
+- 2026-10-05T16:40:07Z attempt 1, `target/requests-r1-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 55 s, 2086 bytes
+- 2026-10-05T16:42:23Z attempt 1, `target/requests-r2-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 135 s, 10941 bytes
+- 2026-10-05T16:42:40Z attempt 1, `target/requests-r3-everyday`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 16 s, 215 bytes
+- 2026-10-05T16:43:41Z attempt 1, `calibration/fixtures-call1`: `gpt-6-sol`, `codex exec --skip-git-repo-check -c model="gpt-6-sol" "<brief>"`, exit 0, 446 s, 29956 bytes
+
+**Attempt 1 stopped short (2026-10-05):** the non-file group reached 6 of 24 after three top-ups, so the corpus is not
+frozen (PREREG-0.2y section 5). Report, log and every prompt and answer: `attempt-1/REPORT.md`. The authoring rules
+are revised under section 11 before attempt 2.

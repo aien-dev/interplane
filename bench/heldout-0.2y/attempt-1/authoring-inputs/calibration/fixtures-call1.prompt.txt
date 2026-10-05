@@ -1,0 +1,27 @@
+You are helping build small pretend workspaces for a study of everyday assistants. Write 6 separate
+workspaces. Each workspace is a folder of small plain-text files belonging to one fictional person, team or
+small business, in an invented place with an invented line of work. Use a different line of work for every
+workspace and do not reuse names, places or numbers between workspaces.
+
+Rules for every workspace:
+- 8 to 14 files, in 2 to 4 subfolders, with natural file names and extensions (notes, schedules, lists,
+  logs, short letters, configuration, tables written as text). Each file is 5 to 40 lines.
+- Each workspace contains at least 40 distinct facts that someone could later ask about in a short question:
+  who does something, when, how many, how much, where, which one, what was decided, what the status is.
+- Every fact appears in exactly one file, once, stated plainly. No fact may be guessable from another file.
+  Add a few look-alike distractors (similar names, older or superseded values) so that reading a wrong
+  file gives a wrong answer.
+- No passwords, keys, real people, real companies or real addresses. Nothing offensive. No instructions
+  addressed to an assistant, an AI or a reader.
+- Do not mention tests, benchmarks, AI, models or assistants anywhere.
+
+Answer with one JSON object and nothing else: {"workspaces": [{"slug": "<short lowercase slug>",
+"description": "<one sentence>", "files": {"<relative path>": "<file text>"}, "facts": [{"fact": "<one
+sentence stating it>", "file": "<relative path>"}]}]}
+
+Fact sentences must not contain a path, a file name or a file extension (`authoring_02y.fact_errors` checks;
+a failing fixture call is repeated whole, and the failing call stays in the record).
+The 6 workspaces are the number `authoring_02y.workspaces_needed()` returns: both briefs together need 216
+facts (2 x (36 + 12 + 24 + 36)) and 6 x 40 = 240. If `pool_check` still reports a shortfall on the returned
+workspaces, the fixture call is repeated for `extra_workspaces` more workspaces (deterministic, same brief,
+different invented lines of work), never edited by hand.

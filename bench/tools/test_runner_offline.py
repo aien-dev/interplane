@@ -420,6 +420,20 @@ def main() -> int:
         run_bench.main(["--tasks", "dev", "--condition", "both", "--endpoint", f"http://127.0.0.1:{srv.server_port}/v1",
                         "--out", str(out), "--tasks-dir", str(tdir), "--allow-nonfrozen", "--no-warmup", "--resume"])
         assert len(Handler.log) == before
+    # receipt `attempt` = runs of that condition (REPORT-0.2x: both-failed pairs were labelled 3)
+    saved = (run_bench.run_condition, run_bench.measure_run_tokens, run_bench.make_receipt, run_bench.write_json)
+    seen = {}
+    run_bench.run_condition = lambda cx, task, cond, rid: {"infra_failure": cond == "A", "infra_error": "HTTPError 500" if cond == "A" else None}
+    run_bench.measure_run_tokens = lambda cx, run: None
+    run_bench.make_receipt = lambda cx, task, cond, run, attempt, prior, pm, rid: seen.setdefault(cond, (attempt, len(prior)))
+    run_bench.write_json = lambda path, obj: None
+    try:
+        for campaign, want in ((True, {"A": (2, 2), "B1": (1, 2)}), (False, {"A": (3, 3), "B1": (3, 3)})):
+            seen.clear()
+            run_bench.run_pair({"campaign_mode": campaign}, {"id": "t"}, ["A", "B1"], "r", Path("."), ["A", "B1"])
+            assert seen == want, (campaign, seen)
+    finally:
+        run_bench.run_condition, run_bench.measure_run_tokens, run_bench.make_receipt, run_bench.write_json = saved
     print("offline runner test: PASS")
     return 0
 

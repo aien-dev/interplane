@@ -721,6 +721,7 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
 def run_pair(cx: dict, task: dict, order: list, run_id: str, out: Path, conds: list) -> dict:
     prior: list = []
     runs: dict = {}
+    tries = {c: 0 for c in order}  # runs per condition; the receipt's `attempt`
     campaign = cx["campaign_mode"]
     # 0.2: up to 3 whole-pair attempts. Campaign (PROTOCOL-0.2x.md section 6): a run with an
     # infrastructure failure is re-run once, only the failed conditions.
@@ -731,6 +732,7 @@ def run_pair(cx: dict, task: dict, order: list, run_id: str, out: Path, conds: l
             if campaign and cond in runs and not runs[cond]["infra_failure"]:
                 continue
             runs[cond] = run_condition(cx, task, cond, run_id)
+            tries[cond] += 1
         bad = [c for c in order if runs[c]["infra_failure"]]
         if not bad:
             break
@@ -744,7 +746,7 @@ def run_pair(cx: dict, task: dict, order: list, run_id: str, out: Path, conds: l
     if "A" in runs and "B" in runs and not (runs["A"]["infra_failure"] or runs["B"]["infra_failure"]):
         pm = pair_measure(cx, task, runs)
     for cond in order:
-        rc = make_receipt(cx, task, cond, runs[cond], len(prior) + 1, prior, pm, run_id)
+        rc = make_receipt(cx, task, cond, runs[cond], tries[cond], prior, pm, run_id)
         write_json(out / "receipts" / f"{task['id']}.{cond}.json", rc)
     return {c: runs[c] for c in order}
 

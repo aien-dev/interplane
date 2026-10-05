@@ -127,11 +127,19 @@ def write_json(path: Path, obj) -> None:
 # ------------------------------------------------------------------------------- backend client
 
 class Client:
-    def __init__(self, endpoint: str, model: str, timeout: float, seed: int, temperature: float, max_tokens: int):
+    def __init__(self, endpoint: str, model: str, timeout: float, seed: int, temperature: float, max_tokens: int,
+                 reasoning_field: str = "reasoning_effort"):
         self.endpoint, self.model, self.timeout = endpoint.rstrip("/"), model, timeout
         self.seed, self.temperature, self.max_tokens = seed, temperature, max_tokens
+        self.reasoning_field = reasoning_field
 
-    def chat(self, messages: list, tools, max_tokens=None) -> tuple:
+    def reasoning_off_fields(self) -> dict:
+        """The request-body field that turns reasoning off (PROTOCOL-0.2x.md section 4, arm 4)."""
+        if self.reasoning_field == "chat_template_kwargs":
+            return {"chat_template_kwargs": {"enable_thinking": False}}
+        return {"reasoning_effort": "none"}
+
+    def chat(self, messages: list, tools, max_tokens=None, reasoning_off: bool = False) -> tuple:
         body = {
             "model": self.model,
             "messages": messages,
@@ -141,6 +149,8 @@ class Client:
         }
         if tools is not None:
             body["tools"] = tools
+        if reasoning_off:
+            body.update(self.reasoning_off_fields())
         data = jcs(body).encode("utf-8")
         headers = {"Content-Type": "application/json"}
         key = os.environ.get("INTERPLANE_PROBE_API_KEY")
@@ -168,10 +178,10 @@ class LiveCounter:
     def __init__(self, client: Client):
         self.client, self.cache, self.requests = client, {}, 0
 
-    def count_prompt(self, messages: list, tools) -> int:
-        key = digest_of([messages, tools])
+    def count_prompt(self, messages: list, tools, reasoning_off: bool = False) -> int:
+        key = digest_of([messages, tools, reasoning_off] if reasoning_off else [messages, tools])
         if key not in self.cache:
-            resp, _, _ = self.client.chat(messages, tools, max_tokens=1)
+            resp, _, _ = self.client.chat(messages, tools, max_tokens=1, reasoning_off=reasoning_off)
             self.requests += 1
             n = (resp.get("usage") or {}).get("prompt_tokens")
             if not isinstance(n, int):
@@ -266,6 +276,33 @@ def raw_ok(raw: dict) -> bool:
 
 RUNTIME_POLICY = "runtime-v1"
 EXPANSION_POLICIES = ("0.2", RUNTIME_POLICY)
+# PROTOCOL-0.2x.md section 4: one id per condition. The id fixes family (judge, rendering), prompt
+# addendum, reasoning switch and expansion policy. "B" is the 0.2 id (policy from --expansion-policy).
+CAMPAIGN_CONDITIONS = ("A", "A2", "A4", "B1", "B2", "B3", "B4")  # canonical order, section 8
+CONDITION_IDS = ("A", "B") + CAMPAIGN_CONDITIONS[1:]
+_SPECS = {
+    "A": (False, False, None), "A2": (True, False, None), "A4": (False, True, None),
+    "B": (False, False, "flag"), "B1": (False, False, "0.2"), "B2": (True, False, "0.2"),
+    "B3": (False, False, RUNTIME_POLICY), "B4": (False, True, "0.2"),
+}
+REASONING_FIELDS = ("reasoning_effort", "chat_template_kwargs")
+ADDENDUM_REL = Path("prompts") / "discovery-addendum.md"  # under the held-out root
+HELDOUT_SEEDS = (42, 43, 44)
+CAMPAIGN_CORPUS = "0.2x"
+
+
+def condition_spec(cx: dict, cond: str) -> dict:
+    addendum, off, policy = _SPECS[cond]
+    if policy == "flag":
+        policy = cx["expansion_policy"]
+    return {"id": cond, "family": cond[0], "addendum": addendum, "reasoning_off": off,
+            "expansion_policy": policy if cond[0] == "B" else None}
+
+
+def rotated(conds: list, idx: int) -> list:
+    """Section 8: canonical order rotated left by (task index mod len). Two conditions give the 0.2 rule."""
+    k = idx % len(conds)
+    return list(conds[k:]) + list(conds[:k])
 SCHEMA_BUDGET_RATIO = 0.30
 DISCOVER_LIMIT = 8
 MISSING_CODES = ("capability_not_found", "stale_capability")
@@ -372,7 +409,7 @@ class RuntimeExpansion:
 
 def render(by_name: dict, names: list, cond: str) -> list:
     tools = openai_tools_renderer([by_name[n] for n in names])
-    return tools + [DISCOVERY_SPEC] if cond == "B" else tools
+    return tools + [DISCOVERY_SPEC] if cond[0] == "B" else tools
 
 
 def parse_args_of(tc) -> tuple:
@@ -406,19 +443,22 @@ def run_condition(cx: dict, task: dict, cond: str, run_id: str) -> dict:
 
 def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
     client, catalog, by_name = cx["client"], cx["catalog"], cx["by_name"]
+    spec = condition_spec(cx, cond)
+    fam, reasoning_off = spec["family"], spec["reasoning_off"]
+    system_prompt = cx["system_prompt_addendum"] if spec["addendum"] else cx["system_prompt"]
     stubs = {cap: json.loads((cx["bench"] / s["path"]).read_text(encoding="utf-8"))
              for cap, s in task["stub_results"].items()}
-    sim = sim_backends.SimSession(ws, task["workspace_fixture"], cx["backend_registry"]) if cx["backends"] == "sim-1" else None
+    sim = sim_backends.SimSession(ws, task["workspace_fixture"], cx["backend_registry"], stores_dir=cx["stores_dir"]) if cx["backends"] == "sim-1" else None
     authority = BenchAuthority(ws, task, stubs, sim=sim)
     if not authority.available:
         raise SystemExit("Odysseus is not importable: set ODYSSEUS_SRC")
     pipe = Pipeline(make_registry(), mapping_table(), authority)
     trace_id = f"bench-{run_id}-{task['id']}-{cond}"
-    base_messages = [{"role": "system", "content": cx["system_prompt"]}, {"role": "user", "content": task["user_request"]}]
+    base_messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": task["user_request"]}]
     messages = copy.deepcopy(base_messages)
     all_names = [c.name for c in catalog.capabilities]
     selection = None
-    if cond == "B":
+    if fam == "B":
         selection, _ = select(catalog, task["requested_domains"], always_include=ALWAYS_INCLUDE,
                               renderer=openai_tools_renderer)
 
@@ -426,7 +466,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         return all_names if selection is None else [e["name"] for e in selection.selected]
 
     rt = None
-    if cond == "B" and cx.get("expansion_policy") == RUNTIME_POLICY:
+    if fam == "B" and spec["expansion_policy"] == RUNTIME_POLICY:
         rt = RuntimeExpansion(catalog, by_name, cx["full_tools_bytes"],
                               lambda names: len(jcs(render(by_name, names, "B")).encode("utf-8")))
 
@@ -441,7 +481,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         round_tools.append(tools)
         coverage_trace.append({"round": turn + 1, "effective_expansions": n_eff, "covered": bench_eval.covered(task, names)})
         try:
-            resp, ms, req_digest = client.chat(messages, tools)
+            resp, ms, req_digest = client.chat(messages, tools, reasoning_off=reasoning_off)
         except InfraError as err:
             infra_error, ended = str(err), "infra_failure"
             round_tools.pop()
@@ -452,7 +492,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         usage = resp.get("usage") or {}
         orig = msg.get("tool_calls") if isinstance(msg.get("tool_calls"), list) else []
         disc_idx = [i for i, tc in enumerate(orig)
-                    if cond == "B" and isinstance(tc, dict) and isinstance(tc.get("function"), dict)
+                    if fam == "B" and isinstance(tc, dict) and isinstance(tc.get("function"), dict)
                     and tc["function"].get("name") == DISCOVERY]
         filt_idx = [i for i in range(len(orig)) if i not in disc_idx]
         if disc_idx:
@@ -472,7 +512,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
             "tools_bytes": len(jcs(tools).encode("utf-8")),
             "exposed_tools_count": len(tools),
             "exposed_caps_count": len(names),
-            "exposed_names": list(names) if cond == "B" else None,
+            "exposed_names": list(names) if fam == "B" else None,
             "prompt_tokens": usage.get("prompt_tokens"),
             "completion_tokens": usage.get("completion_tokens"),
             "latency_ms": ms,
@@ -522,7 +562,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
                     tool_msgs[i] = tm
             elif i in recs:
                 cap = recs[i]["capability"]
-                if cond == "B" and cap is not None and cap in by_name and cap not in set(current_names()):
+                if fam == "B" and cap is not None and cap in by_name and cap not in set(current_names()):
                     try:
                         selection = expand(selection, catalog, {"kind": "requested_excluded", "name": cap})
                         entry = selection.extra["expansions"][-1]
@@ -583,6 +623,7 @@ def _run(cx: dict, task: dict, cond: str, run_id: str, ws: str) -> dict:
         "rounds": rounds, "calls": calls, "expansions": [{k: v for k, v in e.items()} for e in expansion_events],
         "final_exposed_names": list(final_names), "coverage_trace": coverage_trace, "wall_ms": wall_ms,
         "selection": selection, "base_messages": base_messages, "_round_tools": round_tools,
+        "reasoning_off": reasoning_off, "system_prompt": system_prompt, "spec": spec,
         "trace_id": trace_id, "workspace_events": dict(authority.bench_events),
         "runtime_triggers": rt.log if rt is not None else None,
     }
@@ -592,11 +633,12 @@ def measure_run_tokens(cx: dict, run: dict) -> None:
     """Outside the timed window: per-round tool-schema cost by prompt difference (memoized by digest)."""
     counter = cx["counter"]
     base_messages = run["base_messages"]
-    base = counter.count_prompt(base_messages, None)
+    off = run.get("reasoning_off", False)
+    base = counter.count_prompt(base_messages, None, off)
     run["base_context"] = base
     per_round = []
     for tools in run["_round_tools"]:
-        per_round.append(max(counter.count_prompt(base_messages, tools) - base, 0))
+        per_round.append(max(counter.count_prompt(base_messages, tools, off) - base, 0))
     run["tool_schema_tokens"] = per_round
 
 
@@ -629,8 +671,8 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
     if run["infra_failure"]:
         verdict = {"success": False, "infra_failure": True, "checks": [], "failed": ["infra_failure"]}
     else:
-        verdict = bench_eval.judge(task, cond, tr)
-    metrics = bench_eval.run_metrics(task, cond, run)
+        verdict = bench_eval.judge(task, cond[0], tr)
+    metrics = bench_eval.run_metrics(task, cond[0], run)
     sel = run["selection"]
     selection_block = None
     if sel is not None:
@@ -639,21 +681,21 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
         d["kind"] = "selection"
         selection_block = {"round1": d, "round1_digest": selection_digest(r1), "final_digest": selection_digest(sel),
                            "final_selected": [e["name"] for e in sel.selected]}
-    return {
+    rec = {
         "kind": "interplane_bench_receipt", "receipt_version": RECEIPT_VERSION, "run_id": run_id,
         "task": {"id": task["id"], "category": task["category"], "split": task["split"],
                  "digest": file_sha(cx["tasks_dir"] / f"{task['id']}.json")},
         "condition": cond, "attempt": attempt, "prior_infra_failures": prior,
-        "system_prompt_digest": text_sha(cx["system_prompt"]),
+        "system_prompt_digest": text_sha(run["base_messages"][0]["content"]),
         "user_request_digest": text_sha(task["user_request"]),
         "authority_profile": task["authority_profile"],
         "fixture": {"name": task["workspace_fixture"], "digest": cx["fixture_digests"][task["workspace_fixture"]]},
         "generation": cx["generation"],
-        "discovery_tool": DISCOVERY if cond == "B" else None,
+        "discovery_tool": DISCOVERY if cond[0] == "B" else None,
         "selection": selection_block,
         "rounds": run["rounds"], "calls": run["calls"], "expansions": run["expansions"],
         **({"runtime_triggers": run["runtime_triggers"]} if run.get("runtime_triggers") is not None else {}),
-        "final_exposed_names": run["final_exposed_names"] if cond == "B" else None,
+        "final_exposed_names": run["final_exposed_names"] if cond[0] == "B" else None,
         "coverage_trace": run["coverage_trace"],
         "ended": run["ended"], "infra_error": run["infra_error"],
         "transcript": tr, "judge": verdict, "metrics": metrics,
@@ -661,14 +703,30 @@ def make_receipt(cx: dict, task: dict, cond: str, run: dict, attempt: int, prior
         "measure": pair_meas,
         "timings": {"wall_ms": run["wall_ms"], "model_ms": sum(r["latency_ms"] for r in run["rounds"])},
     }
+    if cx["campaign_mode"]:  # 0.2x: extra receipt blocks; the 0.2 receipt layout stays unchanged
+        sp = run["spec"]
+        rec["condition_spec"] = {"id": cond, "family": sp["family"], "prompt_addendum": sp["addendum"],
+                                 "reasoning_off": sp["reasoning_off"], "expansion_policy": sp["expansion_policy"]}
+        present = sum(1 for r in run["rounds"] if r["reasoning_present"])
+        rec["reasoning"] = {"off_requested": sp["reasoning_off"],
+                            "field": cx["client"].reasoning_field if sp["reasoning_off"] else None,
+                            "rounds_with_reasoning": present,
+                            "invalid_for_arm4": bool(sp["reasoning_off"] and present)}
+    return rec
 
 
 def run_pair(cx: dict, task: dict, order: list, run_id: str, out: Path, conds: list) -> dict:
     prior: list = []
     runs: dict = {}
-    for attempt in range(1, 4):
-        runs = {}
+    campaign = cx["campaign_mode"]
+    # 0.2: up to 3 whole-pair attempts. Campaign (PROTOCOL-0.2x.md section 6): a run with an
+    # infrastructure failure is re-run once, only the failed conditions.
+    for attempt in range(1, 3 if campaign else 4):
+        if not campaign:
+            runs = {}
         for cond in order:
+            if campaign and cond in runs and not runs[cond]["infra_failure"]:
+                continue
             runs[cond] = run_condition(cx, task, cond, run_id)
         bad = [c for c in order if runs[c]["infra_failure"]]
         if not bad:
@@ -776,8 +834,13 @@ def build_identity(cx: dict, tasks: list) -> dict:
     }
     if cx["backends"] != "reference":  # the 0.2 reference identity stays byte-identical
         ident["backends"] = backends_identity(cx)
-    if cx["expansion_policy"] != "0.2":
-        ident["expansion_policy"] = {"name": cx["expansion_policy"], "schema_budget_ratio": SCHEMA_BUDGET_RATIO,
+    if cx["campaign_mode"]:
+        ident["campaign"] = {"corpus": cx["corpus"], "conditions": {c: condition_spec(cx, c) for c in cx["conditions"]},
+                             "addendum_prompt_digest": text_sha(cx["system_prompt_addendum"]),
+                             "reasoning_off_field": cx["client"].reasoning_off_fields()}
+    if cx["expansion_policy"] != "0.2" or "B3" in cx["conditions"]:
+        ident["expansion_policy"] = {"name": RUNTIME_POLICY if "B3" in cx["conditions"] else cx["expansion_policy"],
+                                     **({"applies_to": ["B3"]} if "B3" in cx["conditions"] else {}), "schema_budget_ratio": SCHEMA_BUDGET_RATIO,
                                      "full_tools_bytes": cx["full_tools_bytes"], "discover_limit": DISCOVER_LIMIT,
                                      "triggers": ["T1", "T2", "T3"], "suppressed": sorted(SUPPRESSED.values())}
     ident["identity_digest"] = digest_of(ident)
@@ -785,21 +848,30 @@ def build_identity(cx: dict, tasks: list) -> dict:
 
 
 def backends_identity(cx: dict) -> dict:
-    stores = sorted(sim_backends.STORES_DIR.glob("*.json"))
+    stores = sorted(cx["stores_dir"].glob("*.json"))
     return {"mode": cx["backends"], "registry_sha256": file_sha(sim_backends.BACKENDS_PATH),
             "sim_backends_sha256": file_sha(Path(sim_backends.__file__)),
             "stores": {p.name: file_sha(p) for p in stores}}
 
 
-def make_cx(args, tasks_dir: Path) -> dict:
+def make_cx(args, tasks_dir: Path, root: Path = BENCH, conds=None) -> dict:
+    """``root`` is the corpus root (task fixture and stub paths are relative to it): bench/ for the 0.2
+    corpus, bench/heldout-0.2x for the held-out set. system.md always comes from bench/."""
     catalog = catalog_with_domains()
     sp = (BENCH / "prompts" / "system.md").read_text(encoding="utf-8")
+    campaign = bool(getattr(args, "campaign_mode", False))
+    sp2 = None
+    if campaign:
+        sp2 = sp.rstrip("\n") + "\n\n" + (BENCH / "heldout-0.2x" / ADDENDUM_REL).read_text(encoding="utf-8")
     fixtures = sorted({(t["workspace_fixture"]) for t in load_tasks(tasks_dir, "all", [])})
-    client = Client(args.endpoint, args.model, args.timeout, args.seed, args.temperature, args.max_tokens)
+    client = Client(args.endpoint, args.model, args.timeout, args.seed, args.temperature, args.max_tokens,
+                    getattr(args, "reasoning_field", "reasoning_effort"))
     return {
-        "bench": BENCH, "tasks_dir": tasks_dir, "catalog": catalog, "by_name": {c.name: c for c in catalog.capabilities},
+        "bench": root, "corpus": getattr(args, "corpus", "0.2"), "campaign_mode": campaign,
+        "conditions": list(conds or []), "system_prompt_addendum": sp2,
+        "stores_dir": (root / "stores") if root != BENCH else sim_backends.STORES_DIR, "tasks_dir": tasks_dir, "catalog": catalog, "by_name": {c.name: c for c in catalog.capabilities},
         "system_prompt": sp, "client": client, "counter": LiveCounter(client), "max_rounds": args.max_rounds,
-        "fixture_digests": {f: tree_digest(BENCH / f) for f in fixtures},
+        "fixture_digests": {f: tree_digest(root / f) for f in fixtures},
         "backends": args.backends,
         "expansion_policy": args.expansion_policy,
         "full_tools_bytes": len(jcs(openai_tools_renderer(catalog.capabilities)).encode("utf-8")),
@@ -809,10 +881,11 @@ def make_cx(args, tasks_dir: Path) -> dict:
     }
 
 
-def check_corpus(strict: bool) -> dict:
+def check_corpus(strict: bool, corpus: str = "0.2") -> dict:
     import validate  # bench/tools/validate.py
 
-    frozen, now_d = validate.read_digest_file(), validate.digests()
+    cfg = validate.CORPORA[corpus]
+    frozen, now_d = validate.read_digest_file(cfg), validate.digests(cfg)
     for k in ("tasks_digest", "inputs_digest", "protocol_sha256"):
         if frozen.get(k) != now_d.get(k):
             if strict:
@@ -821,25 +894,49 @@ def check_corpus(strict: bool) -> dict:
             "match": all(frozen.get(k) == now_d.get(k) for k in ("tasks_digest", "inputs_digest", "protocol_sha256"))}
 
 
-def token_stability(cx: dict, task: dict) -> dict:
+def token_stability(cx: dict, task: dict, reasoning_off: bool = False) -> dict:
     """Same (messages, tools) counted twice must give the same number (no prompt-cache undercount)."""
     msgs = [{"role": "system", "content": cx["system_prompt"]}, {"role": "user", "content": task["user_request"]}]
     tools = openai_tools_renderer(cx["catalog"].capabilities)
     c = LiveCounter(cx["client"])
-    a = c.count_prompt(msgs, tools)
+    a = c.count_prompt(msgs, tools, reasoning_off)
     c.cache.clear()
-    b = c.count_prompt(msgs, tools)
+    b = c.count_prompt(msgs, tools, reasoning_off)
     c.cache.clear()
-    base1 = c.count_prompt(msgs, None)
-    return {"task": task["id"], "tools_count_1": a, "tools_count_2": b, "stable": a == b, "base_context": base1}
+    base1 = c.count_prompt(msgs, None, reasoning_off)
+    out = {"task": task["id"], "tools_count_1": a, "tools_count_2": b, "stable": a == b, "base_context": base1}
+    return {**out, "reasoning_off": True} if reasoning_off else out
+
+
+def gpu_report() -> dict:
+    """PROTOCOL-0.2x.md section 8: compute processes and other inference or training processes."""
+    apps = sh("nvidia-smi --query-compute-apps=pid,process_name,used_gpu_memory --format=csv")
+    procs = [ln for ln in sh("pgrep -af 'ollama runner|llama-server|sglang|vllm|train'").splitlines()
+             if "pgrep" not in ln and not ln.startswith(str(os.getpid()))]
+    foreign = [ln for ln in apps.splitlines()[1:] if ln.strip() and "ollama" not in ln]
+    runners = [ln for ln in procs if "ollama runner" in ln]
+    other = [ln for ln in procs if "ollama runner" not in ln]
+    reasons = (["another process holds the GPU"] if foreign else []) + (["more than one ollama runner"] if len(runners) > 1 else []) \
+        + (["another inference or training process is running"] if other else [])
+    text = f"{now()}\n{apps}\npgrep:\n" + "\n".join(procs) + "\n"
+    return {"text": text, "clear": not reasons, "reasons": reasons}
 
 
 # ------------------------------------------------------------------------------- main
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--tasks", choices=["dev", "qual", "all"], default="dev")
-    ap.add_argument("--condition", choices=["A", "B", "both"], default="both")
+    ap.add_argument("--tasks", choices=["dev", "qual", "all"], default=None,
+                    help="default: dev for corpus 0.2, qual for corpus 0.2x")
+    ap.add_argument("--corpus", choices=["0.2", CAMPAIGN_CORPUS], default="0.2",
+                    help="0.2 = bench/tasks; 0.2x = the held-out set bench/heldout-0.2x (PROTOCOL-0.2x.md); needs --backends sim-1")
+    ap.add_argument("--condition", choices=list(CONDITION_IDS) + ["both", "all"], default="both",
+                    help="A/B/both = 0.2. A2, A4, B1..B4 = the PROTOCOL-0.2x.md conditions; all = the seven, in order "
+                         "A A2 A4 B1 B2 B3 B4 rotated left by (task index mod 7). B3 is arm 3 (runtime-v1), "
+                         "A2/B2 add the discovery addendum, A4/B4 turn reasoning off")
+    ap.add_argument("--reasoning-field", choices=list(REASONING_FIELDS), default="reasoning_effort",
+                    help="request field that turns reasoning off for A4/B4: reasoning_effort=none (Ollama) or "
+                         "chat_template_kwargs.enable_thinking=false (SGLang, llama.cpp)")
     ap.add_argument("--endpoint", default="http://127.0.0.1:11434/v1")
     ap.add_argument("--model", default="qwen3.5:9b")
     ap.add_argument("--out", required=True)
@@ -853,7 +950,7 @@ def main(argv=None) -> int:
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--prepare", action="store_true", help="write manifest.json (identity) and exit; no model request")
     ap.add_argument("--no-warmup", action="store_true")
-    ap.add_argument("--tasks-dir", default=str(BENCH / "tasks"))
+    ap.add_argument("--tasks-dir", default=None, help="default: the corpus's tasks folder")
     ap.add_argument("--allow-nonfrozen", action="store_true", help="offline tests with synthetic tasks only")
     ap.add_argument("--backends", choices=["reference", "sim-1"], default="reference",
                     help="reference = 0.2 behaviour (only read_file/ls/glob/grep and task stubs execute); "
@@ -865,7 +962,24 @@ def main(argv=None) -> int:
 
     out = Path(args.out)
     run_id = out.name.rstrip("/")
-    tasks_dir = Path(args.tasks_dir)
+    heldout = args.corpus == CAMPAIGN_CORPUS
+    root = BENCH / "heldout-0.2x" if heldout else BENCH
+    tasks_dir = Path(args.tasks_dir) if args.tasks_dir else root / "tasks"
+    args.tasks = args.tasks or ("qual" if heldout else "dev")
+    args.campaign_mode = heldout or args.condition not in ("A", "B", "both")
+    if args.campaign_mode:
+        if args.backends != "sim-1":
+            raise SystemExit("0.2x conditions and the held-out corpus need --backends sim-1 (PROTOCOL-0.2x.md section 10)")
+        if args.expansion_policy != "0.2":
+            raise SystemExit("--expansion-policy is fixed by the condition id in 0.2x (B3 = runtime-v1, others 0.2)")
+        if heldout and args.seed not in HELDOUT_SEEDS and not args.allow_nonfrozen:
+            raise SystemExit(f"held-out runs use seeds {list(HELDOUT_SEEDS)} (PROTOCOL-0.2x.md section 8)")
+    if args.condition == "both":
+        conds = list(CAMPAIGN_CONDITIONS[:1]) + ["B"] if not args.campaign_mode else list(CAMPAIGN_CONDITIONS)
+    elif args.condition == "all":
+        conds = list(CAMPAIGN_CONDITIONS)
+    else:
+        conds = [args.condition]
     src = os.environ.get("ODYSSEUS_SRC", "")
     ody = _odysseus.load()
     if ody is None or not src:
@@ -875,10 +989,10 @@ def main(argv=None) -> int:
     ody_commit = sh(f"git -C {src} rev-parse HEAD")
     if not ody_commit.startswith(ODYSSEUS_COMMIT) and not args.allow_nonfrozen:
         raise SystemExit(f"Odysseus is at {ody_commit}, expected {ODYSSEUS_COMMIT}")
-    cx = make_cx(args, tasks_dir)
+    cx = make_cx(args, tasks_dir, root, conds)
     if text_sha(cx["system_prompt"]) != "sha256:" + FROZEN_PROMPT_SHA and not args.allow_nonfrozen:
         raise SystemExit("prompts/system.md does not match the digest every task pins")
-    corpus = check_corpus(strict=not args.allow_nonfrozen)
+    corpus = check_corpus(not args.allow_nonfrozen, args.corpus)
     tasks = load_tasks(tasks_dir, args.tasks, [s for s in args.only.split(",") if s])
     if not tasks:
         raise SystemExit("no tasks selected")
@@ -893,7 +1007,6 @@ def main(argv=None) -> int:
     identity = build_identity(cx, tasks)
     probe = json.loads(Path(args.probe).read_text(encoding="utf-8"))
     env = environment(args.endpoint, args.model, src)
-    conds = ["A", "B"] if args.condition == "both" else [args.condition]
     manifest_path = out / "manifest.json"
     manifest = {
         "kind": "interplane_bench_manifest", "manifest_version": "0.2.0", "run_id": run_id,
@@ -915,9 +1028,16 @@ def main(argv=None) -> int:
         "corpus": corpus, "system_prompt_digest": identity["system_prompt_digest"], "generation": cx["generation"],
         "backends": identity.get("backends", {"mode": "reference"}),
         "expansion_policy": identity.get("expansion_policy", {"name": "0.2"}),
-        "order_rule": "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)",
+        "order_rule": ("tasks in id order; canonical condition order A A2 A4 B1 B2 B3 B4 rotated left by (task index mod 7) "
+                       "(PROTOCOL-0.2x.md section 8)" if args.campaign_mode else
+                       "tasks in id order; A first for even 0-based index, B first for odd (PROTOCOL-0.2.md section 2)"),
         "deterministic_identity": identity,
     }
+    if args.campaign_mode:
+        manifest["campaign"] = {
+            "corpus": args.corpus, "seed": args.seed, "conditions": {c: condition_spec(cx, c) for c in conds},
+            "reasoning_off_field": cx["client"].reasoning_off_fields(), "addendum_prompt_digest": text_sha(cx["system_prompt_addendum"]),
+            "seeds_protocol": list(HELDOUT_SEEDS), "gate_seed": HELDOUT_SEEDS[0]}
     if manifest_path.exists():
         old = json.loads(manifest_path.read_text(encoding="utf-8"))
         if old.get("deterministic_identity", {}).get("identity_digest") != identity["identity_digest"]:
@@ -935,14 +1055,25 @@ def main(argv=None) -> int:
     stoch = manifest.get("stochastic_execution", {})
     stoch["started_at"] = stoch.get("started_at") or now()
     samples = [load_snapshot()]
-    stoch["token_stability"] = token_stability(cx, tasks[0])
+    gpu0 = gpu_report() if args.campaign_mode else None
+    if gpu0 is not None:
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "gpu_at_start.txt").write_text(gpu0["text"], encoding="utf-8")
+    modes = sorted({condition_spec(cx, c)["reasoning_off"] for c in conds})  # counted the way each run is
+    stoch["token_stability"] = token_stability(cx, tasks[0], modes[0])
+    if len(modes) == 2:
+        stoch["token_stability_reasoning_off"] = token_stability(cx, tasks[0], True)
     if not args.no_warmup and not manifest.get("stochastic_execution", {}).get("warmup"):
-        warm = next((t for t in load_tasks(tasks_dir, "dev", ["filesystem-001"])), None)
+        # one untimed dev-task run per seed block (section 8); the held-out set has no dev task
+        wcx = make_cx(args, BENCH / "tasks", BENCH, conds) if heldout else cx
+        wtasks_dir = BENCH / "tasks" if heldout else tasks_dir
+        wcond = "B1" if args.campaign_mode else "B"
+        warm = next((t for t in load_tasks(wtasks_dir, "dev", ["filesystem-001"])), None)
         if warm is not None:
             t0 = time.monotonic()
             try:
-                run_condition(cx, warm, "B", run_id + "-warmup")
-                stoch["warmup"] = {"task": warm["id"], "condition": "B", "wall_ms": int((time.monotonic() - t0) * 1000), "timed": False}
+                run_condition(wcx, warm, wcond, run_id + "-warmup")
+                stoch["warmup"] = {"task": warm["id"], "condition": wcond, "wall_ms": int((time.monotonic() - t0) * 1000), "timed": False}
             except InfraError as err:
                 stoch["warmup"] = {"task": warm["id"], "error": str(err)}
     manifest["stochastic_execution"] = stoch
@@ -955,7 +1086,7 @@ def main(argv=None) -> int:
         rpaths = [out / "receipts" / f"{task['id']}.{c}.json" for c in conds]
         if args.resume and all(p.exists() for p in rpaths):
             continue
-        order = list(conds) if len(conds) == 1 else (["A", "B"] if idx % 2 == 0 else ["B", "A"])
+        order = rotated(conds, idx)
         samples.append(load_snapshot())
         res = run_pair(cx, task, order, run_id, out, conds)
         done += 1
@@ -978,6 +1109,12 @@ def main(argv=None) -> int:
         "gpu_util_percent_max_sampled_at_pair_starts": max(utils + [old_load.get("gpu_util_percent_max_sampled_at_pair_starts") or 0]) if utils else None,
         "note": "sampled at start, before each pair, and at end; wall-clock is a reported metric and is affected by other GPU users",
     }
+    if gpu0 is not None:
+        gpu1 = gpu_report()
+        (out / "gpu_at_end.txt").write_text(gpu1["text"], encoding="utf-8")
+        manifest["latency_validity"] = {
+            "valid": gpu0["clear"] and gpu1["clear"], "reasons": sorted(set(gpu0["reasons"]) | set(gpu1["reasons"])),
+            "note": "section 8: an invalid block keeps its success and token figures; only latency is labelled invalid"}
     write_json(manifest_path, manifest)
     print(f"done: {done} pairs run; manifest {manifest_path}")
     return 0

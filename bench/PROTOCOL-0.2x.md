@@ -322,3 +322,11 @@ digests differ from the frozen ones does not count.
   checking the 0.2 qual receipts: condition B produced 0 `unknown_capability` and 0
   `capability_not_found` results, so a gate change toward what arm 3 can reach was rejected;
   O1 and O2 are unchanged. No held-out run exists.
+- 2026-10-04: section 10 still lists arm 3 as not yet built. It is built: the arm 3 policy
+  (`runtime-v1`, section 5) merged as #25 at ed92ea7, and its negative controls N1 and N2 (denied
+  and approval-pending calls cause no expansion and no execution) are tested offline in
+  `bench/tools/test_runner_offline.py`. The runner preparation of section 10 (`--corpus 0.2x`,
+  the seven condition ids, the addendum, the reasoning-off field, seeds 42, 43 and 44, and the
+  campaign analyzer with O2a, O2b, per-kind figures and the fragile label) is built in the PR that
+  adds this line. Section 10 is left as written. No gate, threshold, task or input changed. No
+  held-out run exists.

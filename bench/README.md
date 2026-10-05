@@ -176,3 +176,38 @@ exist.
 - Corpus digests: adding `stubs/backends.json` and `stubs/stores/` changed `inputs_digest` in
   `CORPUS-DIGEST.txt`. `tasks_digest` and `protocol_sha256` are unchanged. The 0.2 runs carry the
   digests they ran against in their own `manifest.json`, which is unchanged.
+
+## Running the 0.2x campaign (PROTOCOL-0.2x.md, section 10)
+
+Nothing here has been run on the held-out set. The runner switches, all required with `--backends sim-1`:
+
+| Switch | What it does |
+|---|---|
+| `--corpus 0.2x` | Task root `bench/heldout-0.2x` (fixtures, stubs and stores resolve there), `--tasks` defaults to `qual` (all 120), the three frozen digests are checked and the run is refused if one differs. Seeds other than 42, 43, 44 are refused. |
+| `--condition A\|A2\|A4\|B1\|B2\|B3\|B4` or `all` | The seven conditions of section 4. The id fixes everything else: `B3` runs `runtime-v1` (arm 3), `B1`, `B2` and `B4` run the 0.2 mechanism, `A2` and `B2` append `heldout-0.2x/prompts/discovery-addendum.md` to `system.md` after one blank line, `A4` and `B4` turn reasoning off. `all` runs the seven in the order A, A2, A4, B1, B2, B3, B4, rotated left by (task index mod 7). `--expansion-policy` must stay at its default. |
+| `--reasoning-field reasoning_effort\|chat_template_kwargs` | The request field that turns reasoning off: `reasoning_effort: "none"` (Ollama, the default) or `chat_template_kwargs.enable_thinking = false` (SGLang, llama.cpp). Sent on every request of an A4 or B4 run, including the `max_tokens = 1` token measurements. Receipts record `reasoning.invalid_for_arm4` when any round shows reasoning. |
+| `--seed 42\|43\|44` | One seed block per run. Every receipt carries the seed in `generation` and the condition id in `condition` and `condition_spec`. |
+
+Each seed block also writes `gpu_at_start.txt`, `gpu_at_end.txt` and `latency_validity` in its manifest (section 8), runs one untimed dev-task warm-up from `bench/tasks`, and re-runs an infrastructure failure once.
+
+**Pilot on dev tasks only, all seven conditions** (about 0.9 h, 44 tasks x 7 conditions):
+
+```
+ODYSSEUS_SRC=<odysseus@2992bf6> <odysseus-venv>/bin/python bench/tools/run_bench.py \
+    --corpus 0.2 --tasks all --condition all --backends sim-1 --seed 42 --out bench/runs/pilot-0.2x-<ts>
+```
+
+**Campaign** (120 tasks x 7 conditions x 3 seeds = 2520 runs, about 7.6 h at the 0.2 median of 10.8 s per run, plus the token measurements; reasoning-off runs should be shorter). Needs an uncontended GPU. Write the manifests first, commit them, then run the three seed blocks one after another:
+
+```
+export ODYSSEUS_SRC=<odysseus@2992bf6>
+PY=<odysseus-venv>/bin/python
+RUN=bench/runs/heldout-0.2x-$(date -u +%Y%m%dT%H%MZ)
+for s in 42 43 44; do $PY bench/tools/run_bench.py --corpus 0.2x --condition all --backends sim-1 --seed $s --out $RUN/seed-$s --prepare; done
+for s in 42 43 44; do $PY bench/tools/run_bench.py --corpus 0.2x --condition all --backends sim-1 --seed $s --out $RUN/seed-$s --resume; done
+python3 bench/tools/analyze.py $RUN/seed-42 --campaign --stability $RUN/seed-43,$RUN/seed-44 --out $RUN/analysis
+```
+
+Run the loop detached (`setsid nohup ... &`), and never kill a GPU process. `--resume` continues after an interruption. The analyzer writes `campaign-summary.json` and `.md`: per arm the gates T, S, O1, O2 (seed 42 only), O2a and O2b, O1 and O2 per expansion kind (named, path, nopath), trigger counts, refusals, the negative controls (must be zero for arm 3), results per category and per template, the secondary comparisons against B1, and the label `fragile` when a gate criterion flips under seed 43 or 44.
+
+Offline tests for every switch: `tools/test_runner_offline.py` (conditions, addendum, reasoning field, seeds, corpus switch) and `tools/test_analyze.py` (campaign analyzer on synthetic seed blocks).

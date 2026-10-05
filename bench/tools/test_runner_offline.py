@@ -93,12 +93,18 @@ def script(messages, tools):
         if n_tool == 0:
             return None, [call(0, "summarize_repo", {})]
         return "summarize_repo is not available", None
+    if Handler.lenient:  # real held-out and dev tasks in the corpus-switch test: any answer will do
+        return "ok", None
     raise AssertionError("unscripted request")
 
 
 class Handler(BaseHTTPRequestHandler):
     log = []
     tool_contents = []
+    seen = []  # every request body's switch fields, including the max_tokens=1 measurement requests
+    lenient = False
+    fake_reasoning = False   # reply with a reasoning field unless the request turned reasoning off
+    force_reasoning = False  # ... even when it did (an invalid arm 4 run)
 
     def log_message(self, *a):
         pass
@@ -106,12 +112,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
         tools = body.get("tools") or []
+        off = body.get("reasoning_effort") == "none" or (body.get("chat_template_kwargs") or {}).get("enable_thinking") is False
+        Handler.seen.append({"system": body["messages"][0]["content"], "reasoning_effort": body.get("reasoning_effort"),
+                             "chat_template_kwargs": body.get("chat_template_kwargs"), "seed": body.get("seed"),
+                             "max_tokens": body.get("max_tokens")})
         prompt = 50 + 7 * len(tools) + 3 * len(body["messages"])
         if body.get("max_tokens") == 1:
             msg = {"role": "assistant", "content": "x"}
         else:
             text, calls = script(body["messages"], tools)
             msg = {"role": "assistant", "content": text or ""}
+            if Handler.fake_reasoning and (not off or Handler.force_reasoning):
+                msg["reasoning"] = "thinking"
             if calls:
                 msg["tool_calls"] = calls
             Handler.log.append((body["messages"][1]["content"][:6], [t["function"]["name"] for t in tools]))
@@ -293,6 +305,116 @@ def main() -> int:
         for t in rt_tasks.values():
             rr = json.loads((rtout / "receipts" / f"{t['id']}.B.json").read_text())
             assert bench_eval.judge(t, "B", rr["transcript"]) == rr["judge"]
+        # ---- 0.2x campaign switches (PROTOCOL-0.2x.md sections 4, 8, 10): the seven conditions, no model needed
+        assert run_bench.rotated(list(run_bench.CAMPAIGN_CONDITIONS), 0) == ["A", "A2", "A4", "B1", "B2", "B3", "B4"]
+        assert run_bench.rotated(list(run_bench.CAMPAIGN_CONDITIONS), 1)[:2] == ["A2", "A4"]
+        assert run_bench.rotated(list(run_bench.CAMPAIGN_CONDITIONS), 9) == run_bench.rotated(list(run_bench.CAMPAIGN_CONDITIONS), 2)
+        assert run_bench.rotated(["A", "B"], 0) == ["A", "B"] and run_bench.rotated(["A", "B"], 1) == ["B", "A"]  # the 0.2 rule
+        sp = (BENCH / "prompts" / "system.md").read_text()
+        add = (BENCH / "heldout-0.2x" / "prompts" / "discovery-addendum.md").read_text()
+        sp2 = sp + "\n" + add  # system.md ends with a newline: exactly one blank line between them
+        assert run_bench.text_sha(sp2) != run_bench.text_sha(sp)
+        ep = f"http://127.0.0.1:{srv.server_port}/v1"
+        cout = Path(td) / "camp"
+        Handler.fake_reasoning = True
+        rc = run_bench.main(["--tasks", "dev", "--condition", "all", "--endpoint", ep, "--out", str(cout), "--tasks-dir", str(rdir),
+                             "--allow-nonfrozen", "--no-warmup", "--backends", "sim-1", "--seed", "43"])
+        Handler.fake_reasoning = False
+        assert rc == 0
+        conds7 = list(run_bench.CAMPAIGN_CONDITIONS)
+        C = lambda k, c: json.loads((cout / "receipts" / f"{rt_tasks[k]['id']}.{c}.json").read_text())
+        cm = json.loads((cout / "manifest.json").read_text())
+        assert cm["conditions"] == conds7 and sorted(cm["campaign"]["conditions"]) == sorted(conds7), cm["conditions"]
+        assert cm["campaign"]["seed"] == 43 and cm["generation"]["seed"] == 43 and cm["campaign"]["reasoning_off_field"] == {"reasoning_effort": "none"}
+        assert (cout / "gpu_at_start.txt").exists() and (cout / "gpu_at_end.txt").exists() and "valid" in cm["latency_validity"]
+        for k in rt_tasks:
+            for c in conds7:
+                r = C(k, c)
+                assert r["condition"] == c and r["condition_spec"]["id"] == c and r["generation"]["seed"] == 43
+                assert all(isinstance(x["prompt_tokens"], int) and isinstance(x["completion_tokens"], int) for x in r["rounds"])
+                assert len(r["tool_schema_tokens_per_round"]) == len(r["rounds"]) and r["base_context_tokens"] > 0
+        # addendum: only A2 and B2 carry it; the digest is of the composed prompt
+        for c in conds7:
+            want = run_bench.text_sha(sp2) if c in ("A2", "B2") else run_bench.text_sha(sp)
+            assert C("RT-T2", c)["system_prompt_digest"] == want, c
+            assert C("RT-T2", c)["condition_spec"]["prompt_addendum"] is (c in ("A2", "B2"))
+        # reasoning off: only A4 and B4 send the field, and then no round carries reasoning
+        for c in conds7:
+            r = C("RT-T2", c)
+            if c in ("A4", "B4"):
+                assert r["reasoning"] == {"off_requested": True, "field": "reasoning_effort", "rounds_with_reasoning": 0, "invalid_for_arm4": False}, r["reasoning"]
+            else:
+                assert r["reasoning"]["off_requested"] is False and r["reasoning"]["rounds_with_reasoning"] == len(r["rounds"]), (c, r["reasoning"])
+        # family: A family renders the full catalog and has no discovery tool; B family does
+        for c in ("A", "A2", "A4"):
+            r = C("RT-T2", c)
+            assert r["metrics"]["exposed_tools_first"] == 71 and r["discovery_tool"] is None and r["final_exposed_names"] is None
+        for c in ("B1", "B2", "B3", "B4"):
+            r = C("RT-T2", c)
+            assert r["metrics"]["exposed_tools_first"] < 15 and r["discovery_tool"] == run_bench.DISCOVERY
+        # policy by condition id: only B3 runs runtime-v1 (T1 on an unknown tool, N1 and N2 as trigger rules)
+        for c in ("B1", "B2", "B4"):
+            assert "runtime_triggers" not in C("RT-T1", c) and C("RT-T1", c)["expansions"] == [], c
+            (ev,) = C("RT-T2", c)["expansions"]
+            assert ev["trigger"] == "requested_excluded" and ev["added"] == ["read_file"], ev
+            assert len(C("RT-N1", c)["expansions"]) == 1  # the 0.2 mechanism still exposes after a denied call
+        r = C("RT-T1", "B3")
+        assert [e["trigger"] for e in r["expansions"]] == ["T1"] and r["runtime_triggers"]
+        for k in ("RT-N1", "RT-N2"):  # negative controls: no expansion, no execution
+            r = C(k, "B3")
+            assert r["expansions"] == [] and all(not c["executed"] for c in r["calls"] if c["decision"] in ("denied", "requires_approval"))
+            assert any(c["decision"] in ("denied", "requires_approval") for c in r["calls"])
+        # the switch fields reach the request body only when asked for
+        tt = rdir / "one"
+        tt.mkdir()
+        (tt / f"{rt_tasks['RT-T2']['id']}.json").write_text(json.dumps(rt_tasks["RT-T2"]))
+        def bodies(cond, *extra):
+            Handler.seen.clear()
+            o = Path(td) / f"sw-{cond}-{'-'.join(extra) or 'plain'}"
+            assert run_bench.main(["--tasks", "dev", "--condition", cond, "--endpoint", ep, "--out", str(o), "--tasks-dir", str(tt),
+                                   "--allow-nonfrozen", "--no-warmup", "--backends", "sim-1", *extra]) == 0
+            return list(Handler.seen), o
+        seen_a, _ = bodies("A")
+        assert seen_a and all(b["reasoning_effort"] is None and b["chat_template_kwargs"] is None and b["seed"] == 42 for b in seen_a)
+        seen4, _ = bodies("A4")
+        assert any(b["max_tokens"] == 1 for b in seen4) and all(b["reasoning_effort"] == "none" for b in seen4), seen4
+        seen4k, _ = bodies("B4", "--reasoning-field", "chat_template_kwargs")
+        assert all(b["chat_template_kwargs"] == {"enable_thinking": False} and b["reasoning_effort"] is None for b in seen4k)
+        seen2, _ = bodies("A2")
+        assert all(b["system"] == sp2 for b in seen2 if b["max_tokens"] != 1)  # every model turn
+        assert any(b["system"] == sp2 and b["max_tokens"] == 1 for b in seen2)  # and the token measurement
+        Handler.fake_reasoning = Handler.force_reasoning = True
+        _, o = bodies("B4", "--seed", "44")
+        Handler.fake_reasoning = Handler.force_reasoning = False
+        r = json.loads(next((o / "receipts").glob("*.B4.json")).read_text())
+        assert r["reasoning"]["invalid_for_arm4"] is True and r["generation"]["seed"] == 44, r["reasoning"]  # reasoning present: invalid
+        # refusals: the campaign needs sim-1, the condition fixes the policy, held-out seeds are 42 to 44
+        for bad in (["--condition", "B1"], ["--condition", "B1", "--backends", "sim-1", "--expansion-policy", "runtime-v1"],
+                    ["--corpus", "0.2x", "--backends", "sim-1", "--seed", "7"]):
+            try:
+                run_bench.main(["--tasks", "dev", "--endpoint", ep, "--out", str(Path(td) / "bad"), "--tasks-dir", str(tt), "--allow-nonfrozen" if "7" not in bad else "--no-warmup", *bad])
+                raise AssertionError(f"accepted {bad}")
+            except SystemExit as e:
+                assert str(e) != "0" and e.code != 0, bad
+        # corpus switch: the real held-out set, frozen digests checked (no --allow-nonfrozen), fixtures,
+        # stubs and stores resolved under bench/heldout-0.2x, the dev warm-up taken from bench/tasks
+        hids = sorted(p.stem for p in (BENCH / "heldout-0.2x" / "tasks").glob("*.json"))
+        pick = [next(i for i in hids if i.startswith("expansion-")), next(i for i in hids if i.startswith("multidomain-"))]
+        hout = Path(td) / "held"
+        Handler.lenient = True
+        rc = run_bench.main(["--corpus", "0.2x", "--condition", "all", "--backends", "sim-1", "--seed", "42", "--endpoint", ep,
+                             "--out", str(hout), "--only", ",".join(pick)])
+        Handler.lenient = False
+        assert rc == 0
+        hm = json.loads((hout / "manifest.json").read_text())
+        assert hm["corpus"]["match"] is True and hm["tasks"] == "qual" and hm["task_ids"] == pick, hm["task_ids"]
+        assert hm["stochastic_execution"]["warmup"]["task"] == "filesystem-001" and hm["stochastic_execution"]["warmup"]["condition"] == "B1"
+        assert hm["backends"]["stores"] and all(p.endswith(".json") for p in hm["backends"]["stores"])
+        for tid in pick:
+            for c in conds7:
+                r = json.loads((hout / "receipts" / f"{tid}.{c}.json").read_text())
+                assert r["task"]["split"] == "qual" and r["fixture"]["name"].startswith("fixtures/") and r["fixture"]["digest"]
+        assert hm["order_rule"].startswith("tasks in id order; canonical condition order")
         # resume: nothing is rerun
         before = len(Handler.log)
         run_bench.main(["--tasks", "dev", "--condition", "both", "--endpoint", f"http://127.0.0.1:{srv.server_port}/v1",

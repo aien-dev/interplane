@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@0bdc97a76ce5a3d198dca718f89fad9bc56deb8e` (main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
+`aien-dev/aien-sovereign-core@d5b78ff7a6be14d23e3cb00d3f9c4b4751442ffa` (main 2026-10-06, omega.lock c0369e67; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -118,6 +118,18 @@ PR body (not filed). Other limits: grants and the minted handles live in memory 
 pending request, fail closed); the minted `approval.expires_at` is left empty, so expiry is AIEN's
 (`now >= expires_at` against the epoch the host passes), and the pipeline's string clock is a
 second, separate check; the desk is separated from other desks by handle discipline, not by type.
+
+## Not the production effect path
+
+The adapter reaches AIEN through `aien-mcp` (`EffectLane`, `EffectClassAuthority`, `ApprovalDesk`,
+in-memory single-use grants). At the pinned rev no other sovereign-core crate depends on
+`aien-mcp` or `aien-capability`. The production effect path is `aien compose` (`aien-cli`
+`src/compose.rs`): a CLI step talks to the `aien-runtime` daemon, which runs omega COMPOSITION-2
+through `aien-omega-compose` (FFI to `librx_compose.a`, pinned by `omega.lock`); the approval is a
+durable Cortex `authorization` record, the write is bracketed by durable `effect` intent/ack
+records (`aien-runtime/src/effects.rs`), and every step leaves an `aien-cli`
+`record_effect_receipt` file. None of that is reached here, so adapter conformance proves the
+`aien-mcp` authority path, not the compose/World/Cortex boundary.
 
 ## Reimplemented, and why
 

@@ -589,6 +589,13 @@ fn check_aien(a: &Archive, l: &Value) -> Result<(), Fail> {
     } else {
         None
     };
+    if cand.is_none() && s(l, &["candidate_id"]).is_some() {
+        // A candidate claim must be backed by its manifest; absence is only honest with candidate_id null.
+        return fail(
+            "binding_mismatch",
+            "candidate_id without candidate_manifest",
+        );
+    }
     if let Some(b) = cand {
         let t = toml_table(&String::from_utf8_lossy(b));
         let get = |sec: &str, k: &str| t.get(&(sec.to_string(), k.to_string())).map(String::as_str);

@@ -360,3 +360,15 @@ fn real_load_log_for_other_model_bytes_is_refused() {
     restamp(&d, "aien_load_log");
     assert_eq!(verify(&d), "FAIL binding_mismatch: aien_load.model_sha256");
 }
+
+#[test]
+fn candidate_claim_without_manifest_is_refused() {
+    let d = scratch(REAL_TJ, "real_tj_candidate_claim_no_manifest");
+    let mut c = companion(&d);
+    c["aien"]["candidate_id"] = Value::from("CAND-4");
+    write_companion(&d, &c);
+    assert_eq!(
+        verify(&d),
+        "FAIL binding_mismatch: candidate_id without candidate_manifest"
+    );
+}

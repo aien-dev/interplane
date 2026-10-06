@@ -97,8 +97,8 @@ sessions, models, memory, documents, image). Earlier choices replaced before reg
 (`list` is a capability-name token) and `In my to-dos,` (`to-dos` is not a keyword, so it derived the default list)
 failed this check; `At the meeting,`, `About the model,` and `From memory,` passed it but read as "I was there", "a
 question about the assistant" and "answer without looking", so they were replaced by the table above after an
-independent review, and the check was run again on the final table with the same counts. An independent review (a separate Sonnet 5.5 session, recorded on PR #74,
-with its script) reproduced these numbers from the same files. This check is design evidence on dev data, not a 0.2z result.
+independent review, and the check was run again on the final table with the same counts. An independent review (a separate Sonnet 5.5 session, recorded in a PR #74
+comment) reproduced these numbers from the same files. This check is design evidence on dev data, not a 0.2z result.
 
 ## 4. Honest limits stated now
 

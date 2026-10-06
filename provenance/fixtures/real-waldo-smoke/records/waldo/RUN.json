@@ -1,0 +1,70 @@
+{
+  "kind": "waldo-training-run",
+  "schema": 1,
+  "id": "80b1d6cbe8ca88a1",
+  "state": "complete",
+  "bom_sha256": "79f7421b7c75a879ab3c5b1f6345a02b1740e4c8fe479bf097d874475fb1f036",
+  "planned": "2026-10-06T20:13:58.647843479Z",
+  "started": "2026-10-06T20:13:58.662466805Z",
+  "finished": "2026-10-06T20:13:59.9837424Z",
+  "observation": {
+    "simulated": false,
+    "steps": 2,
+    "consumed_tokens": 187,
+    "final_loss": 5.553492546081543,
+    "checkpoints": [
+      {
+        "step": 2,
+        "tokens": 187,
+        "artifacts": [
+          {
+            "path": "artifacts/checkpoints/step-00000002/model.safetensors",
+            "sha256": "831fbb91e8732c9e02ca3619fee5b538bd26a09dcb01a2a5e985c258c723d995",
+            "bytes": 36512
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000002/runtime.pt",
+            "sha256": "82c8ca074a651b1472e39ca26b490aff30ee9fa715932b6d147d338ac188e642",
+            "bytes": 155581
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000002/state.json",
+            "sha256": "8b3fb31cfef13ca3bae7bcd139451415daf028d1661c86daf9518b6755569809",
+            "bytes": 433
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "artifacts/model.safetensors",
+        "sha256": "03466262cc79653d7001bb02954511d9e4015e95a716f1cebcdd824186a959fd",
+        "bytes": 36504
+      },
+      {
+        "path": "artifacts/config.json",
+        "sha256": "434ab98bde73a289679845c74d4a2d4fc94d9ba9593b92178ecaf4f09b8086a8",
+        "bytes": 1883
+      },
+      {
+        "path": "artifacts/tokenizer.json",
+        "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
+        "bytes": 175
+      }
+    ],
+    "consumption": [
+      {
+        "corpus": "core/e2e/pytorch",
+        "token_targets": 187
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "ordinal": 1,
+      "started": "2026-10-06T20:13:58.662466805Z",
+      "finished": "2026-10-06T20:13:59.9837424Z",
+      "state": "complete"
+    }
+  ]
+}

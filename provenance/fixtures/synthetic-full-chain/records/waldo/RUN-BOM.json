@@ -1,0 +1,52 @@
+{
+  "corpus_bom": {
+    "index": {
+      "commit": "0000000000000000000000000000000000000000",
+      "dirty": false,
+      "remote": "synthetic"
+    },
+    "kind": "openwaldo-bom",
+    "license_policy": {},
+    "licenses": {
+      "CC0-1.0": {
+        "bytes": 64,
+        "docs": 1,
+        "shards": 1,
+        "tokens": 20
+      }
+    },
+    "manifests": [],
+    "paths": [
+      "synthetic/notes"
+    ],
+    "schema": 1,
+    "shards": [],
+    "subject": "corpus",
+    "totals": {
+      "bytes": 64,
+      "docs": 1,
+      "files": 1,
+      "tokens": 20
+    }
+  },
+  "corpus_bom_sha256": "a170741b90e1a59264e1116aa021fa2306358a20dece6e48b188d96084d4627e",
+  "execution": {
+    "backend": {
+      "name": "pytorch",
+      "revision": "synthetic-worker-r0"
+    },
+    "framework": "pytorch"
+  },
+  "id": "5e7a0c1d2b3f4a59",
+  "kind": "openwaldo-bom",
+  "model_id": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74",
+  "objective": "causal-lm",
+  "preflight": {
+    "bytes": 70,
+    "path": "PREFLIGHT.json",
+    "sha256": "ab7a45f0aad32406b1361d799d3551fa35460ad5c7541498fae3c994a4bc97d4"
+  },
+  "schema": 1,
+  "stage": "pretrain",
+  "subject": "training-run"
+}

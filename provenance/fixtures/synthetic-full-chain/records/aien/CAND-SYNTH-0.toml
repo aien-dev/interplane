@@ -1,0 +1,13 @@
+# SYNTHETIC candidate manifest, CandidateManifestV1 subset (aien-architecture qualification/candidates).
+schema = "CandidateManifestV1"
+id = "CAND-SYNTH-0"
+status = "synthetic"
+
+[executables]
+aien-cli-native-release = "be0196b6bf36be4eb97aaa63b23421b964ed5c62905c5dfa144b0618f3f216ec"
+
+[model]
+model-id = "synthetic-notes"
+model-safetensors-sha256 = "c0d9ed56f7631be1c67dad8eb6900c22019f0f74036ba256dab82e3eca601f9c"
+tokenizer-json-sha256 = "e133d05dd5781f7667288e2834e68e8b0702134d477679b3651940455ea7c17c"
+config-json-sha256 = "09d7fb97a11a43d90794540b082f32db524e6989d8372aeb9d2f2d292124e97d"

@@ -1,0 +1,137 @@
+{
+  "aien": {
+    "candidate_id": "CAND-SYNTH-0",
+    "executable": "aien-cli-native-release",
+    "executable_sha256": "be0196b6bf36be4eb97aaa63b23421b964ed5c62905c5dfa144b0618f3f216ec"
+  },
+  "completeness": {
+    "missing": [],
+    "state": "complete"
+  },
+  "effect": {
+    "receipt": "effect_receipt"
+  },
+  "export": {
+    "chat_template": "export_chat_template",
+    "conversion_tool": {
+      "checked": false,
+      "commit": "synthetic",
+      "name": "waldo model export --format huggingface"
+    },
+    "format": "huggingface",
+    "model_revision": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74/5e7a0c1d2b3f4a59"
+  },
+  "fixture": {
+    "class": "synthetic",
+    "generator": "provenance/src/synth.rs",
+    "note": "Every byte is synthetic. The export carries a Hugging Face tokenizer.json, which a real WALDO Hugging Face export does not; no AIEN process loaded this model and no runtime wrote this receipt."
+  },
+  "interplane": {
+    "request_id": "call-prov-01",
+    "trace_id": "trace-prov-01"
+  },
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "corpus_license_assertions": [
+      "CC0-1.0"
+    ],
+    "kind": "waldo_run",
+    "model_id": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74",
+    "run_id": "5e7a0c1d2b3f4a59",
+    "training_backend": {
+      "name": "pytorch",
+      "revision": "synthetic-worker-r0"
+    },
+    "training_code": {
+      "checked": false,
+      "commit": "synthetic",
+      "repository": "github.com/openwaldo/waldo"
+    }
+  },
+  "load_support": {
+    "declared": "supported_structural"
+  },
+  "records": {
+    "aien_load_log": {
+      "bytes": 310,
+      "path": "records/aien/daemon-load.log",
+      "sha256": "e0f6ce1c7a36fbaa48991f1f7be8b5103e4df298ea3a1eba4c98a9106a978d98"
+    },
+    "candidate_manifest": {
+      "bytes": 596,
+      "path": "records/aien/CAND-SYNTH-0.toml",
+      "sha256": "262ca8551313f6d42cde6eed4c229e81c2613cecc202784eaa52ca35f0acbfc2"
+    },
+    "effect_receipt": {
+      "bytes": 336,
+      "path": "records/aien/effect-receipt.json",
+      "sha256": "86d5f8908a1e6aad2d6974f3c51ea4528e7de716467a463ee45f3175fd9860ea"
+    },
+    "export_chat_template": {
+      "bytes": 86,
+      "path": "records/export/chat_template.jinja",
+      "sha256": "b8ea5aa4e20237c9293fc855c1e93f4bfcfbcebba497b75d56771bf978e3987f"
+    },
+    "export_config": {
+      "bytes": 359,
+      "path": "records/export/config.json",
+      "sha256": "09d7fb97a11a43d90794540b082f32db524e6989d8372aeb9d2f2d292124e97d"
+    },
+    "export_tokenizer": {
+      "bytes": 550,
+      "path": "records/export/tokenizer.json",
+      "sha256": "e133d05dd5781f7667288e2834e68e8b0702134d477679b3651940455ea7c17c"
+    },
+    "export_weights": {
+      "bytes": 160,
+      "path": "records/export/model.safetensors",
+      "sha256": "c0d9ed56f7631be1c67dad8eb6900c22019f0f74036ba256dab82e3eca601f9c"
+    },
+    "interplane_trace": {
+      "bytes": 2881,
+      "path": "records/interplane/trace.json",
+      "sha256": "39be67a206679a3044290824cb71bc46e7ba4a216c7713010d0f1f82b3972e0c"
+    },
+    "release_bom": {
+      "bytes": 1172,
+      "path": "records/export/BOM.json",
+      "sha256": "1f86892bceb5a3f7e5ee9d1c8afaee3890bdcb728f6ac4057391532196b4c572",
+      "waldo_sha256": "1b7c640f7c7ccb08fb3d8b59f365e7229b1a59bddf7dd44671f94c733ec25213"
+    },
+    "run_weights": {
+      "bytes": 152,
+      "path": "records/waldo/model.safetensors",
+      "sha256": "c577e4eca87be69ec21ae758c3f81edb91d9fed486ba517d25da321da3e51a6f"
+    },
+    "waldo_model_bom": {
+      "bytes": 952,
+      "path": "records/waldo/MODEL-BOM.json",
+      "sha256": "4831e493bf03d9ade6de3ebcc23b142caae4573642576f872ea654db2aea4332",
+      "waldo_sha256": "cb0d013088156cb472b3d9c7c65863b789efbc271baa9c8350dad1196b7c1c61"
+    },
+    "waldo_plan": {
+      "bytes": 170,
+      "path": "records/waldo/PLAN.json",
+      "sha256": "a28a8f6f471d7bdf866146a010b22ad34cd31102c28f5c7642d2810dad09f870",
+      "waldo_sha256": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74"
+    },
+    "waldo_preflight": {
+      "bytes": 70,
+      "path": "records/waldo/PREFLIGHT.json",
+      "sha256": "ab7a45f0aad32406b1361d799d3551fa35460ad5c7541498fae3c994a4bc97d4"
+    },
+    "waldo_run": {
+      "bytes": 185,
+      "path": "records/waldo/RUN.json",
+      "sha256": "be02496c96536753f56b03fee91a037f5bdf4e262fd2d678adb43397ae60e4f7",
+      "waldo_sha256": "4ed1d6932df873dbaf5de248425dbc6b10e72eb60322bdcd5fdfae7ebee78cac"
+    },
+    "waldo_run_bom": {
+      "bytes": 1180,
+      "path": "records/waldo/RUN-BOM.json",
+      "sha256": "7e97fe67211cc6976695f30eead40c7a727e53076a24c09f611d75dbddd5de17",
+      "waldo_sha256": "2afc802676a08df19a94facc7b287f99236b18aad1b88c9df14d0bd3019b10d2"
+    }
+  },
+  "schema": 0
+}

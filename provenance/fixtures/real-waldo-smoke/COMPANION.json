@@ -1,0 +1,110 @@
+{
+  "aien": null,
+  "completeness": {
+    "missing": [
+      "link:aien",
+      "link:effect",
+      "link:interplane"
+    ],
+    "reason": "load_support check result is unsupported_tokenizer; no AIEN load, trace or receipt exists for this model",
+    "state": "incomplete"
+  },
+  "effect": null,
+  "export": {
+    "chat_template": null,
+    "conversion_tool": {
+      "checked": false,
+      "commit": "0fd421ab832e9763eebc9a9558f245762c0a68b8",
+      "name": "waldo model export --format huggingface",
+      "source": "waldo-29 logs/L2.log line 1"
+    },
+    "format": "huggingface",
+    "model_revision": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691/80b1d6cbe8ca88a1"
+  },
+  "fixture": {
+    "class": "real",
+    "note": "Real WALDO bytes. AIEN cannot load this export as shipped: its tokenizer is OpenWALDOByteTokenizer custom code, not a Hugging Face tokenizer.json, so the AIEN, INTERPLANE and effect links are absent and labelled.",
+    "source": "waldo-29 leg L2: openwaldo/waldo tree 0fd421ab832e9763eebc9a9558f245762c0a68b8, PyTorch backend, CPU smoke model pytorch-smoke, run 0002 (2026-10-06T20:13Z); bytes copied unmodified"
+  },
+  "interplane": null,
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "corpus_license_assertions": [
+      "CC0-1.0"
+    ],
+    "kind": "waldo_run",
+    "model_id": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+    "run_id": "80b1d6cbe8ca88a1",
+    "training_backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "training_code": {
+      "checked": false,
+      "commit": "0fd421ab832e9763eebc9a9558f245762c0a68b8",
+      "repository": "github.com/openwaldo/waldo",
+      "source": "waldo-29 logs/L2.log line 1"
+    }
+  },
+  "load_support": {
+    "declared": "unsupported_tokenizer:OpenWALDOByteTokenizer"
+  },
+  "records": {
+    "export_config": {
+      "bytes": 455,
+      "path": "records/export/config.json",
+      "sha256": "0c766e310dbf9d1cfcaaef010d7c21832c5350589f49fa3abb66b9e4ad0f80e6"
+    },
+    "export_tokenizer": {
+      "bytes": 294,
+      "path": "records/export/tokenizer_config.json",
+      "sha256": "30de54691b6efe51abfdce648693b272c4cf9634640ec0bec8702914ce7c051e"
+    },
+    "export_weights": {
+      "bytes": 36632,
+      "path": "records/export/model.safetensors",
+      "sha256": "926db1cbbcea200d1acd12fa4b8a942a6b29f2339d2d35098b52231142dcec40"
+    },
+    "release_bom": {
+      "bytes": 2114,
+      "path": "records/export/BOM.json",
+      "sha256": "2f83d1a1b437f98c8bacd92951682fc2b057b49209b9328fdcffad642be18a18",
+      "waldo_sha256": "835aa1aeb1de899ae87bbadd62177c34e97a38f45fd2a668a304415adde27f5e"
+    },
+    "run_weights": {
+      "bytes": 36504,
+      "path": "records/waldo/model.safetensors",
+      "sha256": "03466262cc79653d7001bb02954511d9e4015e95a716f1cebcdd824186a959fd"
+    },
+    "waldo_model_bom": {
+      "bytes": 3054,
+      "path": "records/waldo/MODEL-BOM.json",
+      "sha256": "ed55660bc107478d738f3a1037a0fd89691377a36e5a1bd06da35291b5346b58",
+      "waldo_sha256": "dc75685521daf9af5cce4ef0dda95eec08b8b8f68c9b11bd451d28d617371d9c"
+    },
+    "waldo_plan": {
+      "bytes": 731,
+      "path": "records/waldo/PLAN.json",
+      "sha256": "f5e28f826596874689db252d6f5eccd65c93b8b8c83a8a522a2bff35445e13b3",
+      "waldo_sha256": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691"
+    },
+    "waldo_preflight": {
+      "bytes": 1340,
+      "path": "records/waldo/PREFLIGHT.json",
+      "sha256": "0cebca4d5c1bf00778938a35dead3310b7ea68e631f19fcd5a945af7cc36de2e"
+    },
+    "waldo_run": {
+      "bytes": 2036,
+      "path": "records/waldo/RUN.json",
+      "sha256": "dc38a4e86321006a705b2469bde586af1425290bb7641bbc100f6b6186581a20",
+      "waldo_sha256": "3c10e8e7835762e6d70b3899b1a29771bc4a340392e1b1a7d999a8451e41515e"
+    },
+    "waldo_run_bom": {
+      "bytes": 6594,
+      "path": "records/waldo/RUN-BOM.json",
+      "sha256": "b31cedd6efb7f2829fc620bec532794358346f0329e7dfd595bfc89deab8b516",
+      "waldo_sha256": "79f7421b7c75a879ab3c5b1f6345a02b1740e4c8fe479bf097d874475fb1f036"
+    }
+  },
+  "schema": 0
+}

@@ -1,0 +1,13 @@
+{
+  "auto_map": {
+    "AutoTokenizer": [
+      "tokenization_openwaldo.OpenWALDOByteTokenizer",
+      null
+    ]
+  },
+  "bos_token": "\u003cbos\u003e",
+  "eos_token": "\u003ceos\u003e",
+  "model_max_length": 16,
+  "pad_token": "\u003cpad\u003e",
+  "tokenizer_class": "OpenWALDOByteTokenizer"
+}

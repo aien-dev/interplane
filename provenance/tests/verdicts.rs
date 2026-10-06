@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 
 const SYN: &str = "fixtures/synthetic-full-chain";
 const REAL: &str = "fixtures/real-waldo-smoke";
+const REAL_TJ: &str = "fixtures/real-waldo-tokenizer-json";
 
 fn copy_dir(from: &Path, to: &Path) {
     std::fs::create_dir_all(to).unwrap();
@@ -338,4 +339,24 @@ fn export_weights_not_derived_from_trained_run() {
         verify(&d),
         "FAIL conversion_mismatch: safetensors data section run_weights != export_weights"
     );
+}
+
+#[test]
+fn real_waldo_tokenizer_json_loaded_by_aien_is_labelled_incomplete() {
+    assert_eq!(
+        verify(Path::new(REAL_TJ)),
+        "PASS_LABELLED_INCOMPLETE missing=link:effect,link:interplane"
+    );
+}
+
+#[test]
+fn real_load_log_for_other_model_bytes_is_refused() {
+    let d = scratch(REAL_TJ, "real_tj_load_log_swapped");
+    let p = path_of(&d, "aien_load_log");
+    let text = std::fs::read_to_string(&p).unwrap();
+    let c = companion(&d);
+    let sha = c["records"]["export_weights"]["sha256"].as_str().unwrap();
+    std::fs::write(&p, text.replace(sha, &"0".repeat(64))).unwrap();
+    restamp(&d, "aien_load_log");
+    assert_eq!(verify(&d), "FAIL binding_mismatch: aien_load.model_sha256");
 }

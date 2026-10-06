@@ -583,7 +583,13 @@ fn toml_table(text: &str) -> BTreeMap<(String, String), String> {
 }
 
 fn check_aien(a: &Archive, l: &Value) -> Result<(), Fail> {
-    if let Some(b) = a.bytes("candidate_manifest")? {
+    // Optional record: no entry at all means no AIEN candidate manifest exists (not a missing record).
+    let cand = if a.has("candidate_manifest") {
+        a.bytes("candidate_manifest")?
+    } else {
+        None
+    };
+    if let Some(b) = cand {
         let t = toml_table(&String::from_utf8_lossy(b));
         let get = |sec: &str, k: &str| t.get(&(sec.to_string(), k.to_string())).map(String::as_str);
         if get("", "schema") != Some("CandidateManifestV1") {

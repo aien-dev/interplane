@@ -29,6 +29,9 @@ use interplane_crossaxis::MappingTable;
 use interplane_crossveil::{CallContext, ObservedRecord, Pipeline, Refusal, RuntimeAuthority};
 use serde_json::{json, Map, Value};
 
+pub mod compose_ledger;
+pub use compose_ledger::{ComposeLedgerAuthority, LedgerClient, DEFAULT_APPROVER, LEDGER_BOUNDARY};
+
 /// Runtime id carried in every decision, result and catalog.
 pub const RUNTIME_ID: &str = "aien";
 /// Pinned reply for everything the reference adapter does not run.
@@ -431,6 +434,12 @@ impl AienAuthority {
     /// unexecuted effect was dropped.
     pub fn discard_unexecuted(&mut self, request_id: &str) -> bool {
         self.authorized.remove(request_id).is_some() | self.replayed.remove(request_id).is_some()
+    }
+
+    /// Whether AIEN minted an effect for `request_id` that has not run yet (the ledger route of
+    /// [`ComposeLedgerAuthority`] opens only for such an effect).
+    pub fn holds_minted_effect(&self, request_id: &str) -> bool {
+        self.authorized.contains_key(request_id)
     }
 
     /// What a successful result is (CROSSVEIL.md rule 7, 0.3 cut E4). A file's text is workspace

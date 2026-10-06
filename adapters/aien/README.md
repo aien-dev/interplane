@@ -131,6 +131,26 @@ records (`aien-runtime/src/effects.rs`), and every step leaves an `aien-cli`
 `record_effect_receipt` file. None of that is reached here, so adapter conformance proves the
 `aien-mcp` authority path, not the compose/World/Cortex boundary.
 
+## Durable effect ledger (`ComposeLedgerAuthority`, opt-in)
+
+`src/compose_ledger.rs` wraps `AienShared` (approval desk, `decide` and reads unchanged) and routes
+an approved `write_file` through a running `aien-cli daemon` instead of the in-process provider:
+`ComposeNote` kind `authorization` (the durable grant: proposal, path, content and target digests,
+approver, the adapter's receipt digest, the target's prior digest), `ComposeEffectIntent` (the
+daemon refuses stop, revoke, spent and stale grants and records the intent before anything is
+written), the write (tmp + rename inside the workspace), and `ComposeEffectAck` (the daemon reads
+the disk and records DONE / NOT_DONE / UNRESOLVED). The ledger route opens only when AIEN's
+`EffectLane` minted the effect for that request (`holds_minted_effect`); that in-process effect is
+then dropped unexecuted. The socket client speaks the daemon's JSON line protocol directly, so
+`aien-runtime` (whose build needs the omega libraries) is not a dependency.
+
+Boundary, stated on every receipt: `boundary = durable effect ledger + Cortex journal (NEXT-PHASE-2
+path); verify step NOT exercised`. The daemon's compose.verify / AEGIS / J-Space / World commit run
+only inside `RunComposeTask` with the daemon's own proposer and are not reached.
+Evidence: `tests/compose_ledger.rs` rows 1-7 (approved write, forged approval id, stale target,
+replay, operator stop/resume, adapter restart, the T4 injection subset). They need `AIEN_BIN`
+(an `aien-cli` binary) and `cargo test -- --ignored`; a plain `cargo test` reports them ignored.
+
 ## Reimplemented, and why
 
 - **The workspace read provider** (`read_file`, `list_dir`) behind `MemoryWire`. AIEN ships no

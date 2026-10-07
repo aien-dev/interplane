@@ -136,10 +136,22 @@ fn echoed_model_text_in_a_refusal_keeps_its_taint_and_later_effects_stay_held() 
     let mut p = pipe(&mut rt);
     user(&mut p);
     let out = go(&mut p, INJECTED, json!({}), "c1", 0);
-    assert!(out.rendered[0]["content"].as_str().unwrap().contains(INJECTED));
+    assert!(out.rendered[0]["content"]
+        .as_str()
+        .unwrap()
+        .contains(INJECTED));
     assert!(rank(&floor(&p)) < rank("user_supplied"));
-    let later = go(&mut p, "append_note", json!({"path": "n", "text": "x"}), "c2", 1);
-    assert_eq!(later.records[0].decision.as_deref(), Some("requires_approval"));
+    let later = go(
+        &mut p,
+        "append_note",
+        json!({"path": "n", "text": "x"}),
+        "c2",
+        1,
+    );
+    assert_eq!(
+        later.records[0].decision.as_deref(),
+        Some("requires_approval")
+    );
     assert!(!later.records[0].execute_invoked);
 }
 
@@ -148,13 +160,31 @@ fn adapter_reason_with_injected_text_is_recorded_and_lowers_the_floor() {
     let mut rt = HostileReason(MockRuntime::new());
     let mut p = pipe(&mut rt);
     user(&mut p);
-    let out = go(&mut p, "write_file", json!({"path": "p", "content": "c"}), "c1", 0);
-    assert!(out.rendered[0]["content"].as_str().unwrap().contains(INJECTED));
+    let out = go(
+        &mut p,
+        "write_file",
+        json!({"path": "p", "content": "c"}),
+        "c1",
+        0,
+    );
+    assert!(out.rendered[0]["content"]
+        .as_str()
+        .unwrap()
+        .contains(INJECTED));
     assert!(rank(&floor(&p)) < rank("user_supplied"));
     let (_, trust, _, _) = last(&p);
     assert!(trust == "unknown" || trust == "external_untrusted");
-    let later = go(&mut p, "append_note", json!({"path": "n", "text": "x"}), "c2", 1);
-    assert_eq!(later.records[0].decision.as_deref(), Some("requires_approval"));
+    let later = go(
+        &mut p,
+        "append_note",
+        json!({"path": "n", "text": "x"}),
+        "c2",
+        1,
+    );
+    assert_eq!(
+        later.records[0].decision.as_deref(),
+        Some("requires_approval")
+    );
 }
 
 #[test]
@@ -179,8 +209,17 @@ fn held_then_approved_then_executed_never_raises_the_floor() {
         assert_eq!(res.status.as_str(), "ok");
         assert!(rec.execute_invoked);
         assert!(rank(&floor(&p)) <= rank(&f_held));
-        let later = go(&mut p, "append_note", json!({"path": "n", "text": "x"}), "c2", 1);
-        assert_eq!(later.records[0].decision.as_deref(), Some("requires_approval"));
+        let later = go(
+            &mut p,
+            "append_note",
+            json!({"path": "n", "text": "x"}),
+            "c2",
+            1,
+        );
+        assert_eq!(
+            later.records[0].decision.as_deref(),
+            Some("requires_approval")
+        );
     }
     assert_eq!(rt.execute_calls, 1);
 }
@@ -227,7 +266,12 @@ fn todo_sequence_floor_before_each_call() {
     floors.push(floor(&p));
     assert_eq!(
         floors,
-        ["user_supplied", "workspace_untrusted", "external_untrusted", "external_untrusted"]
+        [
+            "user_supplied",
+            "workspace_untrusted",
+            "external_untrusted",
+            "external_untrusted"
+        ]
     );
 }
 
@@ -284,7 +328,11 @@ fn documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_exte
             .as_ref()
             .map_or(true, |pv| pv.content_kind.is_none()));
         let (kind, trust, _, _) = last(&p);
-        assert_eq!((kind.as_str(), trust.as_str()), ("unknown", "unknown"), "{name}");
+        assert_eq!(
+            (kind.as_str(), trust.as_str()),
+            ("unknown", "unknown"),
+            "{name}"
+        );
         assert_eq!(floor(&p), "external_untrusted", "{name}");
     }
 }

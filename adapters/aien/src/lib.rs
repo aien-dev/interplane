@@ -29,6 +29,12 @@ use interplane_crossaxis::MappingTable;
 use interplane_crossveil::{CallContext, ObservedRecord, Pipeline, Refusal, RuntimeAuthority};
 use serde_json::{json, Map, Value};
 
+pub mod compose_ledger;
+pub use compose_ledger::{
+    hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
+    APPROVAL_BINDING_VERSION, DEFAULT_APPROVER, LEDGER_BOUNDARY,
+};
+
 /// Runtime id carried in every decision, result and catalog.
 pub const RUNTIME_ID: &str = "aien";
 /// Pinned reply for everything the reference adapter does not run.
@@ -110,6 +116,17 @@ fn descriptors(overrides: &BTreeMap<String, ToolEffects>) -> Vec<ToolDescriptor>
         .collect()
 }
 
+/// The real host clock for approval expiry: seconds since the Unix epoch (aien-mcp reads no
+/// clock itself; `now` and `expires_at` are in this unit).
+pub fn host_clock() -> aien_mcp::Clock {
+    Arc::new(|| {
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(u64::MAX)
+    })
+}
+
 /// The reference adapter. See the crate README for what is reused and what is reimplemented.
 pub struct AienAuthority {
     workspace: Option<PathBuf>,
@@ -128,6 +145,12 @@ pub struct AienAuthority {
     minted: HashMap<String, String>,
     /// Receipts AIEN's ledger returned for a replayed request, handed back by `execute`.
     replayed: HashMap<String, EffectReceipt>,
+    /// Host clock for approval expiry (epoch seconds by default, [`host_clock`]). AIEN's effect lane
+    /// re-checks expiry with it when an approved effect commits; the ledger route checks it
+    /// before the daemon handoff.
+    clock: aien_mcp::Clock,
+    /// `expires_at` of every grant issued through [`AienAuthority::issue_approval`], by approval id.
+    expiries: HashMap<Digest32, u64>,
     /// The pipeline's exposure at `decide`, per request id, handed to AIEN again when the host
     /// presents a grant: the approval answers what the model saw when it asked (0.3 cut E4).
     exposures: HashMap<String, Option<AienExposure>>,
@@ -175,7 +198,9 @@ impl AienAuthority {
             descriptors: descriptors(&BTreeMap::new()),
             overrides: BTreeMap::new(),
             lane: SpeculativeLane::new(aien_mcp::McpBroker::new()),
-            effect_lane: EffectLane::new(aien_mcp::McpBroker::new()),
+            effect_lane: EffectLane::new(aien_mcp::McpBroker::new()).with_clock(host_clock()),
+            clock: host_clock(),
+            expiries: HashMap::new(),
             authorized: HashMap::new(),
             desk: None,
             minted: HashMap::new(),
@@ -200,7 +225,7 @@ impl AienAuthority {
             .block_on(mgr.enroll(self.provider.clone(), Arc::new(wire)))
             .map_err(|e| e.to_string())?;
         self.lane = mgr.speculative_lane();
-        self.effect_lane = mgr.effect_lane();
+        self.effect_lane = mgr.effect_lane().with_clock(self.clock.clone());
         self.desk = Some(mgr.approval_desk());
         Ok(())
     }
@@ -324,7 +349,9 @@ impl AienAuthority {
             .stage(req)
             .map_err(|d| d.reason.clone().unwrap_or_default())?;
         let desk = self.desk.as_ref().ok_or(UNAVAILABLE)?;
-        Ok(desk.issue(&intent, scope, expires_at))
+        let grant = desk.issue(&intent, scope, expires_at);
+        self.expiries.insert(grant.approval_id(), expires_at);
+        Ok(grant)
     }
 
     /// Host-only (cut A3): the approval channel. The approver calls this with a grant it got from
@@ -333,13 +360,14 @@ impl AienAuthority {
     /// helper, which does both and cleans up). It is the only place a grant is spent: `decide`
     /// never reads one, so nothing the model writes can stand in for a grant.
     ///
-    /// Spend point: AIEN spends the grant here, when `EffectLane::authorize_approved` mints the
-    /// effect, not when the provider runs it. Outcomes: the pipeline then runs the effect once
-    /// (`execute`); if the pipeline refuses the continuation (stale digest or clock) the minted
-    /// effect is dropped by `discard_unexecuted` and nothing runs; if the provider rejects the call
-    /// AIEN's ledger entry is removed, and if the provider outcome is unknown the ledger keeps
-    /// `Uncertain`. In every case the same grant is `Consumed` or the same effect is reported
-    /// `ReconciliationRequired`; a second effect never runs silently. `now` is host-supplied
+    /// Spend point (sovereign-core #260, two-phase): `EffectLane::authorize_approved` RESERVES the
+    /// grant when it mints the effect; `EffectLane::execute_effect` COMMITS (spends) it just
+    /// before the provider call, re-checking expiry with the lane's clock ([`host_clock`] unless
+    /// [`AienAuthority::set_clock`]). If the pipeline refuses the continuation (stale digest or
+    /// clock) the minted effect is dropped by `discard_unexecuted`, nothing runs and the grant is
+    /// RELEASED; a grant presented while it is reserved is refused (`Reserved`). If the provider
+    /// rejects the call AIEN's ledger entry is removed (the grant stays spent), and if the provider
+    /// outcome is unknown the ledger keeps `Uncertain`. A second effect never runs silently. `now` is host-supplied
     /// epoch time (aien-mcp reads no clock).
     pub fn present_approval(
         &mut self,
@@ -417,6 +445,12 @@ impl AienAuthority {
                 });
                 d
             }
+            // sovereign-core #260: the grant is reserved by an effect that has neither run nor been
+            // released (another presentation of the same grant is in flight). Nothing is minted.
+            Err(AuthorityOutcome::Approval(ApprovalError::Reserved)) => refuse(
+                self,
+                "approval refused: Reserved (this grant already holds an effect that has not run or been released)".into(),
+            ),
             Err(AuthorityOutcome::Approval(e)) => refuse(self, format!("approval refused: {e:?}")),
             Err(AuthorityOutcome::Denied(r)) | Err(AuthorityOutcome::Contained(r)) => {
                 refuse(self, r)
@@ -427,10 +461,67 @@ impl AienAuthority {
     }
 
     /// Host-only: drop an effect AIEN minted for `request_id` that `execute` did not run (the
-    /// pipeline refused the continuation). The grant stays spent; nothing ran. Returns whether an
-    /// unexecuted effect was dropped.
+    /// pipeline refused the continuation). Nothing ran. Since sovereign-core #260 the grant is not
+    /// spent at mint, only reserved: dropping the effect RELEASES it (AIEN records the reason), and
+    /// a later mint re-checks expiry, revocation and the binding. Returns whether an unexecuted
+    /// effect was dropped.
     pub fn discard_unexecuted(&mut self, request_id: &str) -> bool {
-        self.authorized.remove(request_id).is_some() | self.replayed.remove(request_id).is_some()
+        let effect = self.authorized.remove(request_id);
+        let had = effect.is_some();
+        if let Some(e) = effect {
+            e.cancel("interplane: the pipeline did not run the effect");
+        }
+        had | self.replayed.remove(request_id).is_some()
+    }
+
+    /// Host-only (tests, or a host with its own time source): the clock AIEN's effect lane and the
+    /// ledger route use for approval expiry. Defaults to [`host_clock`].
+    pub fn set_clock(&mut self, clock: aien_mcp::Clock) {
+        self.effect_lane = self.effect_lane.with_clock(clock.clone());
+        self.clock = clock;
+    }
+
+    /// Drop a replayed receipt held for `request_id` (the ledger route never hands one back).
+    pub(crate) fn discard_replayed(&mut self, request_id: &str) {
+        self.replayed.remove(request_id);
+    }
+
+    /// Take the effect AIEN minted for `request_id` out of the adapter (the ledger route holds it,
+    /// and with it the grant reservation, while the daemon runs the write).
+    pub(crate) fn take_minted(
+        &mut self,
+        request_id: &str,
+    ) -> Option<AuthorizedEffect<EffectIntent>> {
+        self.authorized.remove(request_id)
+    }
+
+    /// Expiry check at the ledger route's commit point, with this adapter's clock: `Ok` while
+    /// `now < expires_at` of the grant the effect holds; refused when it expired, or when the
+    /// effect holds no grant this adapter issued (expiry unknown: fail closed).
+    pub(crate) fn check_expiry(
+        &self,
+        effect: &AuthorizedEffect<EffectIntent>,
+    ) -> Result<(), String> {
+        let id = effect
+            .approval_id()
+            .ok_or("approval refused: the effect holds no approval grant")?;
+        let exp = *self
+            .expiries
+            .get(&id)
+            .ok_or("approval refused: expiry unknown (grant not issued through this adapter)")?;
+        let now = (self.clock)();
+        if now >= exp {
+            return Err(format!(
+                "approval refused: ApprovalExpired (now {now} >= expires_at {exp}) before the write"
+            ));
+        }
+        Ok(())
+    }
+
+    /// Whether AIEN minted an effect for `request_id` that has not run yet (the ledger route of
+    /// [`ComposeLedgerAuthority`] opens only for such an effect).
+    pub fn holds_minted_effect(&self, request_id: &str) -> bool {
+        self.authorized.contains_key(request_id)
     }
 
     /// What a successful result is (CROSSVEIL.md rule 7, 0.3 cut E4). A file's text is workspace

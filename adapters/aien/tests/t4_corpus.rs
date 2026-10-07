@@ -198,8 +198,12 @@ fn run(plan: &Value) -> Value {
                         let grant = shared
                             .with(|x| x.issue_approval(&pa.capability_request, exp))
                             .expect("host issues a grant for the pending request");
+                        // The case's synthetic `now` is also the adapter's clock, which
+                        // sovereign-core #260 checks again at commit.
+                        let t = epoch(now);
                         let d = shared.with(|x| {
-                            x.present_approval(&pa.capability_request, &grant, epoch(now))
+                            x.set_clock(std::sync::Arc::new(move || t));
+                            x.present_approval(&pa.capability_request, &grant, t)
                         });
                         let dg = match a.get("arguments") {
                             Some(args) => {

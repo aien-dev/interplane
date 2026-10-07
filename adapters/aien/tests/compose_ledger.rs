@@ -243,8 +243,12 @@ fn turn(calls: Vec<Value>) -> Value {
 }
 
 /// Adapter + ledger authority over the daemon's workspace.
+/// The adapter's clock is pinned to the synthetic epoch these rows use (`now` 10, `expires_at`
+/// 1000); row 10 moves it.
 fn ledger(d: &Daemon) -> ComposeLedgerAuthority {
-    let shared = AienShared::new(AienAuthority::new(d.ws()).unwrap());
+    let mut a = AienAuthority::new(d.ws()).unwrap();
+    a.set_clock(std::sync::Arc::new(|| 10));
+    let shared = AienShared::new(a);
     ComposeLedgerAuthority::new(shared, d.ws(), &d.sock, d.desk()).unwrap()
 }
 
@@ -1158,4 +1162,107 @@ fn binding_and_mac_match_the_daemon_form() {
 
 fn hex_bytes(b: &[u8]) -> String {
     b.iter().map(|x| format!("{x:02x}")).collect()
+}
+
+/// sovereign-core #260 on the ledger route: the host approved at time 10 (grant expires at 1000),
+/// but by the time the route runs the host clock reads 1000. The adapter checks expiry with the
+/// same clock AIEN's effect lane uses, just before the handoff: refused as `ApprovalExpired`, no
+/// handoff, no daemon record, no write, and the AIEN grant is released with the reason recorded.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn row10_approval_expiring_between_grant_and_commit_writes_nothing() {
+    let _g = lock();
+    let Some(d) = daemon("row10") else { return };
+    let c = d.client();
+    let before = count(&c);
+    let l = ledger(&d);
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    propose(&mut p, 0, "e1", "summary.txt", EXPECTED);
+    l.shared()
+        .with(|a| a.set_clock(std::sync::Arc::new(|| 1_000)));
+    let (res, g) = approve(&mut p, &l, "e1");
+    assert_ne!(res.status, ResultStatus::Ok, "{res:?}");
+    let msg = res
+        .error
+        .as_ref()
+        .map(|e| e.message.clone())
+        .unwrap_or_default();
+    assert!(msg.contains("ApprovalExpired"), "{res:?}");
+    assert_eq!(count(&c), before, "no handoff, no grant, no intent");
+    assert!(!d.ws().join("summary.txt").exists(), "nothing written");
+    assert_eq!(l.grants_minted(), 0);
+    let (status, reason) = l.shared().with(|a| {
+        let desk = a.approval_desk().unwrap();
+        (desk.status(&g), desk.release_reason(&g))
+    });
+    assert_eq!(status, Some(aien_mcp::GrantStatus::Available));
+    assert!(reason.unwrap_or_default().contains("refused"));
+    save(
+        &d,
+        "row10",
+        json!({"verdict": "PASS", "records_before": before, "records_after": count(&c),
+        "refusal": msg}),
+    );
+}
+
+/// sovereign-core #260, the aien-mcp half of the re-mint refusal: after a successful ledger write
+/// the route releases the AIEN grant (the daemon's durable replay ledger spent the approval). The
+/// SAME grant, re-minted by AIEN on a re-proposed request with the same approval_id, is answered
+/// by the daemon with the original result (ALREADY_COMMITTED, no second compose run) and refused
+/// by the adapter. No second grant, no new record, the file unchanged.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn row11_released_grant_reminted_is_refused_by_the_daemon() {
+    let _g = lock();
+    let Some(d) = daemon("row11") else { return };
+    let c = d.client();
+    let l = ledger(&d);
+    let g = {
+        let mut rt = l.clone();
+        let mut p = pipe(&mut rt, &l);
+        propose(&mut p, 0, "m1", "summary.txt", EXPECTED);
+        let (res, g) = approve(&mut p, &l, "m1");
+        assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+        g
+    };
+    let (status, reason) = l.shared().with(|a| {
+        let desk = a.approval_desk().unwrap();
+        (desk.status(&g), desk.release_reason(&g))
+    });
+    assert_eq!(
+        status,
+        Some(aien_mcp::GrantStatus::Available),
+        "released, not spent, on the AIEN side"
+    );
+    assert!(reason
+        .unwrap_or_default()
+        .contains("durable replay ledger spent"));
+    let sha_before = hex(&std::fs::read(d.ws().join("summary.txt")).unwrap());
+    let before = count(&c);
+    let mut rt2 = l.clone();
+    let mut p2 = pipe(&mut rt2, &l);
+    propose(&mut p2, 0, "m1", "summary.txt", EXPECTED);
+    let (re, _) = l
+        .continue_approval(&mut p2, TRACE, "m1", &g, 10, NOW, Some("drake"))
+        .expect("continued");
+    assert_ne!(re.status, ResultStatus::Ok, "{re:?}");
+    let msg = re
+        .error
+        .as_ref()
+        .map(|e| e.message.clone())
+        .unwrap_or_default();
+    assert!(msg.contains("ALREADY_COMMITTED"), "{re:?}");
+    assert_eq!(l.grants_minted(), 1, "no second grant");
+    assert_eq!(count(&c), before, "the refusal appends nothing");
+    assert_eq!(
+        hex(&std::fs::read(d.ws().join("summary.txt")).unwrap()),
+        sha_before
+    );
+    save(
+        &d,
+        "row11",
+        json!({"verdict": "PASS", "records_before": before, "records_after": count(&c),
+        "remint_refusal": msg}),
+    );
 }

@@ -224,8 +224,12 @@ fn turn(calls: Vec<Value>) -> Value {
 }
 
 /// Adapter + ledger authority over the daemon's workspace.
+/// The adapter's clock is pinned to the synthetic epoch these rows use (`now` 10, `expires_at`
+/// 1000), as in `compose_ledger.rs` (sovereign-core #260 checks expiry before the handoff).
 fn ledger(d: &Daemon) -> ComposeLedgerAuthority {
-    let shared = AienShared::new(AienAuthority::new(d.ws()).unwrap());
+    let mut a = AienAuthority::new(d.ws()).unwrap();
+    a.set_clock(std::sync::Arc::new(|| 10));
+    let shared = AienShared::new(a);
     ComposeLedgerAuthority::new(shared, d.ws(), &d.sock, d.desk()).unwrap()
 }
 

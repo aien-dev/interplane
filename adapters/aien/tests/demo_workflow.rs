@@ -161,7 +161,7 @@ fn executed_effects(log: &[Value]) -> Vec<String> {
 fn demo_read_propose_approve_write() {
     let (_keep, root) = out_dir("demo");
     let ws = workspace(&root);
-    let shared = AienShared::new(AienAuthority::new(&ws).unwrap());
+    let shared = AienShared::new(authority(&ws));
     // Explicit catalog + mapping pinned to AIEN's own catalog digest.
     let catalog = shared.with(|a| a.catalog());
     let table = shared.with(|a| a.mapping_table(true));
@@ -442,7 +442,7 @@ fn record(name: &str, v: Value) {
 fn setup(name: &str) -> (Option<tempfile::TempDir>, PathBuf, AienShared, MappingTable) {
     let (keep, root) = out_dir(&format!("step7-ws/{name}"));
     let ws = workspace(&root);
-    let shared = AienShared::new(AienAuthority::new(&ws).unwrap());
+    let shared = AienShared::new(authority(&ws));
     let table = shared.with(|a| a.mapping_table(true));
     (keep, ws, shared, table)
 }
@@ -482,8 +482,7 @@ fn s7_stale_catalog_digest_is_refused() {
     let (_k, ws, shared, old_table) = setup("stale");
     // The runtime's catalog changes (write_file re-declared): AIEN's catalog digest moves.
     let changed = AienShared::new(
-        AienAuthority::new(&ws)
-            .unwrap()
+        authority(&ws)
             .with_effects("write_file", aien_capability::ToolEffects::LOCAL_EPHEMERAL)
             .unwrap(),
     );
@@ -636,7 +635,7 @@ fn s7_restart_drops_pending_approvals_fail_closed() {
         (g, pa.capability_request)
     };
     drop(shared); // process restart: pipeline, adapter, desk and minted handles were in memory.
-    let fresh = AienShared::new(AienAuthority::new(&ws).unwrap());
+    let fresh = AienShared::new(authority(&ws));
     let mut rt = fresh.clone();
     let mut p = pipe(&mut rt, table);
     user(&mut p);
@@ -663,8 +662,7 @@ fn negative_control_misenrolled_write_lets_the_injection_through() {
     let (_k, root) = out_dir("negative-control");
     let ws = workspace(&root);
     let shared = AienShared::new(
-        AienAuthority::new(&ws)
-            .unwrap()
+        authority(&ws)
             .with_effects("write_file", aien_capability::ToolEffects::LOCAL_EPHEMERAL)
             .unwrap(),
     );
@@ -701,4 +699,13 @@ fn negative_control_misenrolled_write_lets_the_injection_through() {
         json!({"injected_write": "executed", "file": "pwned.txt",
         "content": "CANARY-DOC", "meaning": "the judge detects an unauthorized effect when the runtime is wrong", "verdict": "RED as expected"}),
     );
+}
+
+/// The adapter reads a real host clock by default (sovereign-core #260 checks expiry at commit).
+/// These tests use synthetic epochs (`now` 10, `expires_at` 1000), so the adapter's clock is
+/// pinned to the same synthetic time.
+fn authority(ws: &Path) -> AienAuthority {
+    let mut a = AienAuthority::new(ws).unwrap();
+    a.set_clock(std::sync::Arc::new(|| 10));
+    a
 }

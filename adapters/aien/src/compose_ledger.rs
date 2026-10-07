@@ -706,7 +706,7 @@ impl ComposeLedgerAuthority {
             }
         };
         let intent_id = intent["id"].as_u64().ok_or("intent without id")?;
-        let written = atomic_write(&target, content.as_bytes());
+        let written = atomic_write(Path::new(&ws), &target, content.as_bytes());
         let disk = file_sha256(&target);
         let reported = json!({"written_sha256": disk.as_ref().ok().cloned().flatten(),
             "bytes": content.len(), "error": written.as_ref().err()});
@@ -742,19 +742,61 @@ impl ComposeLedgerAuthority {
     }
 }
 
-fn atomic_write(target: &Path, bytes: &[u8]) -> Result<(), String> {
+/// The parent of `target` must still resolve (symlinks followed) to itself, inside `workspace`
+/// (canonical). Checked before the temp file is created and again just before the rename.
+fn parent_confined(workspace: &Path, target: &Path) -> Result<PathBuf, String> {
+    let parent = target
+        .parent()
+        .ok_or_else(|| format!("write {}: no parent directory", target.display()))?;
+    let real =
+        fs::canonicalize(parent).map_err(|e| format!("write {}: parent: {e}", target.display()))?;
+    if real != parent || !real.starts_with(workspace) {
+        return Err(format!(
+            "write {}: refused, parent {} resolves to {} (outside the workspace or through a symlink)",
+            target.display(),
+            parent.display(),
+            real.display()
+        ));
+    }
+    Ok(real)
+}
+
+/// A random hex suffix for the temp file name (no new dependency: /dev/urandom).
+fn random_suffix() -> Result<String, String> {
+    let mut b = [0u8; 16];
+    fs::File::open("/dev/urandom")
+        .and_then(|mut f| f.read_exact(&mut b))
+        .map_err(|e| format!("random temp name: {e}"))?;
+    Ok(b.iter().map(|x| format!("{x:02x}")).collect())
+}
+
+/// Write `bytes` to `target` through a temp file in the same, confined directory: the temp file
+/// gets an unpredictable name and is opened `create_new` + `O_NOFOLLOW`, mode 0600, so a symlink
+/// planted at a guessed name is never followed (476ca4 x4); the parent is re-checked inside the
+/// workspace just before the rename, which is refused otherwise.
+fn atomic_write(workspace: &Path, target: &Path, bytes: &[u8]) -> Result<(), String> {
+    let parent = parent_confined(workspace, target)?;
     let name = target
         .file_name()
         .map(|n| n.to_string_lossy().into_owned())
         .unwrap_or_default();
-    let tmp = target.with_file_name(format!(".{name}.interplane-{}.tmp", std::process::id()));
-    let r = fs::File::create(&tmp)
+    let tmp = parent.join(format!(".{name}.interplane-{}.tmp", random_suffix()?));
+    let r = fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .mode(0o600)
+        .custom_flags(libc_o_nofollow())
+        .open(&tmp)
         .and_then(|mut f| f.write_all(bytes).and_then(|_| f.sync_all()))
-        .and_then(|_| fs::rename(&tmp, target));
+        .map_err(|e| format!("write {}: temp file: {e}", target.display()))
+        .and_then(|_| parent_confined(workspace, target).map(|_| ()))
+        .and_then(|_| {
+            fs::rename(&tmp, target).map_err(|e| format!("write {}: {e}", target.display()))
+        });
     if r.is_err() {
         let _ = fs::remove_file(&tmp);
     }
-    r.map_err(|e| format!("write {}: {e}", target.display()))
+    r
 }
 
 impl RuntimeAuthority for ComposeLedgerAuthority {
@@ -777,9 +819,20 @@ impl RuntimeAuthority for ComposeLedgerAuthority {
         }
         let rid = req.request_id.as_str();
         // Only an effect AIEN's EffectLane minted for this request opens the ledger path. The
-        // in-process provider never runs it: the effect runs through the daemon instead.
-        let minted = self.shared.with(|a| a.holds_minted_effect(rid));
-        self.shared.with(|a| a.discard_unexecuted(rid));
+        // in-process provider never runs it: the effect runs through the daemon instead. The
+        // route holds the effect (and its grant reservation, sovereign-core #260) until the daemon
+        // answers; the grant's expiry is checked with the adapter's clock just before the handoff
+        // (the commit point of this route). The daemon's durable replay ledger is what spends the
+        // approval; afterwards AIEN's reservation is released with that reason.
+        let effect = self.shared.with(|a| {
+            a.discard_replayed(rid);
+            a.take_minted(rid)
+        });
+        let expiry = match &effect {
+            Some(e) => self.shared.with(|a| a.check_expiry(e)),
+            None => Ok(()),
+        };
+        let minted = effect.is_some();
         let approver = self
             .state
             .borrow()
@@ -792,7 +845,9 @@ impl RuntimeAuthority for ComposeLedgerAuthority {
             .as_ref()
             .map(|a| a.approval_id.clone())
             .unwrap_or_default();
-        let out = if minted {
+        let out = if let Err(e) = expiry {
+            Err(e)
+        } else if minted {
             self.write_through_ledger(req, &ctx.trace_id, &approver, &approval_id)
         } else {
             Err(format!(
@@ -800,6 +855,12 @@ impl RuntimeAuthority for ComposeLedgerAuthority {
                 crate::NOT_EXECUTED
             ))
         };
+        if let Some(e) = effect {
+            e.cancel(match &out {
+                Ok(_) => "interplane ledger route: the daemon's durable replay ledger spent this approval",
+                Err(_) => "interplane ledger route: refused, nothing written by this route",
+            });
+        }
         let mut r = match out {
             Ok(rc) => ToolResult::ok(rid, json!({"receipt": rc})),
             Err(e) => ToolResult::failed(
@@ -824,5 +885,40 @@ impl RuntimeAuthority for ComposeLedgerAuthority {
 
     fn catalog(&self) -> Catalog {
         self.shared.catalog()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// 476ca4 x4 hardening: the write stays in a confined parent and never follows a symlink.
+    #[test]
+    fn atomic_write_stays_inside_the_workspace() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = fs::canonicalize(tmp.path()).unwrap();
+        let ws = root.join("ws");
+        let outdir = root.join("outdir");
+        fs::create_dir_all(&ws).unwrap();
+        fs::create_dir_all(&outdir).unwrap();
+        // Honest write: lands, mode of the result is the temp file's 0600, no temp left behind.
+        atomic_write(&ws, &ws.join("a.txt"), b"one\n").unwrap();
+        assert_eq!(fs::read(ws.join("a.txt")).unwrap(), b"one\n");
+        assert_eq!(
+            fs::read_dir(&ws).unwrap().count(),
+            1,
+            "temp file left behind"
+        );
+        // Parent directory is a symlink to outside: refused, nothing written outside.
+        std::os::unix::fs::symlink(&outdir, ws.join("sub")).unwrap();
+        let e = atomic_write(&ws, &ws.join("sub/b.txt"), b"two\n").unwrap_err();
+        assert!(e.contains("refused"), "{e}");
+        assert_eq!(fs::read_dir(&outdir).unwrap().count(), 0);
+        // A parent outside the workspace altogether: refused.
+        let e = atomic_write(&ws, &outdir.join("c.txt"), b"three\n").unwrap_err();
+        assert!(e.contains("refused"), "{e}");
+        assert_eq!(fs::read_dir(&outdir).unwrap().count(), 0);
+        // Two temp names never repeat.
+        assert_ne!(random_suffix().unwrap(), random_suffix().unwrap());
     }
 }

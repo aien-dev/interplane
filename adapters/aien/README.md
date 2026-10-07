@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@d5b78ff7a6be14d23e3cb00d3f9c4b4751442ffa` (main 2026-10-06, omega.lock c0369e67; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
+`aien-dev/aien-sovereign-core@7d37da16073560533c77416624b2482977fb1c9b` (main 2026-10-07, omega.lock c0369e67, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -90,7 +90,7 @@ id). That decision goes to `Pipeline::continue_approval`. Because the pipeline b
 for its whole life, hosts wrap the adapter in `AienShared` (give the pipeline a clone) and call
 `AienShared::continue_approval(&mut pipeline, trace, request_id, &grant, now_epoch, now)`, which
 reads the request and digest from the pipeline's own pending entry, runs the continuation, and
-drops any minted effect the pipeline did not run. Refusals (`Unknown`, `Mismatch`, `Consumed`,
+drops any minted effect the pipeline did not run. Refusals (`Unknown`, `Mismatch`, `Consumed`, `Reserved`,
 `Expired`) come back as `denied` with `approval refused: <variant>` and the pipeline denies the
 request for good (terminal; the host starts a new request). A spent grant presented again for the
 same completed effect is a replay at the adapter: AIEN's ledger returns the existing receipt
@@ -107,8 +107,8 @@ provider call. Outcomes, all tested in `tests/approval.rs`:
 
 | What fails after the mint | What happens | Second effect? |
 |---|---|---|
-| the pipeline refuses the continuation (wrong digest, stale clock, catalog change) | `denied` reported; the minted effect is dropped (`discard_unexecuted`); the grant stays `Consumed` | no: nothing ran |
-| the provider rejects the call (`CallOutcome::Rejected`, e.g. missing directory) | `error` reported; AIEN removes the ledger entry; the grant stays `Consumed`, the request is terminal | no: the host recovers with a new request and a new grant after fixing the cause |
+| the pipeline refuses the continuation (wrong digest, stale clock, catalog change) | `denied` reported; the minted effect is dropped (`discard_unexecuted`); the grant is RELEASED (sovereign-core #260: reserved at mint, never spent here; AIEN records the reason, a later mint re-checks expiry, revocation and binding) | no: nothing ran |
+| the provider rejects the call (`CallOutcome::Rejected`, e.g. missing directory) | `error` reported; AIEN removes the ledger entry; the grant stays `Consumed` (spent at commit, just before the provider call), the request is terminal | no: the host recovers with a new request and a new grant after fixing the cause |
 | the provider outcome is unknown (`Uncertain` or a wire error) | `error` reported; AIEN's ledger keeps `Uncertain`; the same effect (same idempotency key) is `ReconciliationRequired` for any later grant (`broker.rs` `execute_effect`) | no, but it needs reconciliation by the host; not exercised by a test because the in-process provider cannot return `Uncertain` |
 
 What AIEN cannot do: reserve a grant and commit it only when the effect runs, so a refusal between
@@ -173,13 +173,15 @@ adapter restart, the T4 injection subset, forged handoffs) need `AIEN_BIN` (an `
 built from sovereign-core #249) and `cargo test -- --ignored`; row 9 (desk key out of the model's
 reach, key file rules) always runs.
 
-Open until sovereign-core #260 (two-phase spend in `aien-mcp`) merges; `aien-mcp` stays pinned at
-d5b78ff until then, never at an unmerged branch: the `ApprovalError::Reserved` arm in the
-approval presenter; the two table rows above that say "the grant stays `Consumed`" (under #260
-`discard_unexecuted` returns the grant); building the `EffectLane` `with_clock` from a real host
-clock; a test that an approval expiring between grant and commit is refused with no write; and
-the `aien-mcp` half of "a re-minted grant with the same approval id is refused" (the daemon half,
-the same approval id under a new request refused by the durable replay ledger, is row 4).
+Since sovereign-core #260 (pinned 7d37da1): the effect lane is built `with_clock(host_clock())`
+(epoch seconds; `AienAuthority::set_clock` for tests), a grant presented while reserved is
+refused as `Reserved`, and a dropped effect releases its grant. On the ledger route the adapter
+holds the minted effect (and its reservation) while the daemon runs, checks the grant's expiry
+with the same clock just before the handoff (row 10: expired between grant and commit, refused,
+no handoff, no write), and releases the reservation afterwards: the daemon's durable replay
+ledger is what spends the approval. Row 11: the released grant re-minted with the same approval
+id is answered by the daemon with the original result (ALREADY_COMMITTED, no second compose) and
+refused by the adapter, with no second write.
 
 ## Reimplemented, and why
 

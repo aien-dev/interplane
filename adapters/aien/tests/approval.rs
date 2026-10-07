@@ -61,7 +61,7 @@ fn approve(
 #[test]
 fn without_a_grant_it_stays_pending() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let dec = pend(&mut rt, &req("r1", "a.txt", "x"));
     assert!(dec.approval.is_some(), "a minted handle is carried");
     assert_eq!((rt.execute_calls, rt.wire_calls()), (0, 0));
@@ -70,7 +70,7 @@ fn without_a_grant_it_stays_pending() {
 #[test]
 fn a_grant_never_changes_what_decide_answers() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "x");
     // Issued ahead of time and never presented through the approval channel: decide ignores it.
     let _grant = rt.issue_approval(&r, 100).unwrap();
@@ -81,7 +81,7 @@ fn a_grant_never_changes_what_decide_answers() {
 #[test]
 fn approved_effect_executes_once() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "hello");
     pend(&mut rt, &r);
     let grant = rt.issue_approval(&r, 100).unwrap();
@@ -100,7 +100,7 @@ fn approved_effect_executes_once() {
 #[test]
 fn a_continuation_without_a_pending_request_is_refused() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "hello");
     let grant = rt.issue_approval(&r, 100).unwrap();
     // decide never ran for r1, so no handle was minted and the grant is not spent.
@@ -111,19 +111,24 @@ fn a_continuation_without_a_pending_request_is_refused() {
 }
 
 #[test]
-fn spent_grant_used_again_is_consumed_and_runs_nothing() {
+fn grant_held_by_a_minted_effect_is_reserved_and_runs_nothing() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "hello");
     pend(&mut rt, &r);
     let grant = rt.issue_approval(&r, 100).unwrap();
-    // The continuation decision spends the grant (AIEN mints the effect) but execute is never
-    // called, so the ledger has no receipt and a second continuation is not a replay.
+    // The continuation decision RESERVES the grant (sovereign-core #260: AIEN mints the effect
+    // and holds the grant for it) but execute is never called, so the grant is not spent and
+    // the ledger has no receipt. A second continuation while that effect is held is Reserved.
     assert!(rt.present_approval(&r, &grant, 10).is_authorized());
+    assert_eq!(
+        rt.approval_desk().unwrap().status(&grant),
+        Some(aien_mcp::GrantStatus::Reserved)
+    );
     let (dec, res) = approve(&mut rt, &r, &grant, 10);
     assert_eq!(dec.decision, DecisionKind::Denied);
     assert!(
-        dec.reason.as_deref().unwrap().contains("Consumed"),
+        dec.reason.as_deref().unwrap().contains("Reserved"),
         "{dec:?}"
     );
     assert!(res.is_none());
@@ -138,7 +143,7 @@ fn spent_grant_used_again_is_consumed_and_runs_nothing() {
 #[test]
 fn replay_of_the_same_request_returns_the_existing_receipt() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "hello");
     pend(&mut rt, &r);
     let grant = rt.issue_approval(&r, 100).unwrap();
@@ -159,7 +164,7 @@ fn replay_of_the_same_request_returns_the_existing_receipt() {
 #[test]
 fn grant_for_a_different_effect_is_a_mismatch() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let approved = req("r1", "a.txt", "approved content");
     pend(&mut rt, &approved);
     let grant = rt.issue_approval(&approved, 100).unwrap();
@@ -183,7 +188,7 @@ fn grant_for_a_different_effect_is_a_mismatch() {
 #[test]
 fn expired_grant_is_refused() {
     let d = ws();
-    let mut rt = AienAuthority::new(d.path()).unwrap();
+    let mut rt = adapter(d.path());
     let r = req("r1", "a.txt", "x");
     pend(&mut rt, &r);
     let grant = rt.issue_approval(&r, 50).unwrap();
@@ -224,7 +229,7 @@ fn turn(p: &mut Pipeline<'_>, n: u64, id: &str, args: Value, extra: Value) -> Tu
 
 fn setup() -> (tempfile::TempDir, AienShared, MappingTable) {
     let d = ws();
-    let rt = AienAuthority::new(d.path()).unwrap();
+    let rt = adapter(d.path());
     let table = rt.mapping_table(false);
     (d, AienShared::new(rt), table)
 }
@@ -375,7 +380,8 @@ fn cancel_is_terminal_and_a_later_grant_runs_nothing() {
 }
 
 /// Spend point, case 1: the pipeline refuses the continuation AFTER AIEN minted the effect (the
-/// grant is already spent). Nothing runs, the minted effect is dropped, the grant stays spent.
+/// grant is reserved, not spent). Nothing runs, the minted effect is dropped and the grant is
+/// released with a recorded reason (sovereign-core #260).
 #[test]
 fn spend_point_pipeline_refusal_after_mint_runs_nothing_and_is_reported() {
     let (d, shared, table) = setup();
@@ -404,11 +410,28 @@ fn spend_point_pipeline_refusal_after_mint_runs_nothing_and_is_reported() {
     );
     assert!(!shared.with(|a| a.discard_unexecuted("c1")));
     assert_eq!(shared.with(|a| a.wire_calls()), 0);
-    // The same grant is spent: reported as Consumed, still nothing runs. The host starts a new
-    // request with a new grant.
+    // Since sovereign-core #260 the dropped effect RELEASES the grant (it never ran, so it was
+    // never spent) and AIEN records why. The grant may be minted again, but request c1 is
+    // terminal in the pipeline, so nothing can run it: the re-minted effect is discarded too and
+    // the host starts a new request with a new grant.
+    let desk_status = |s: &AienAuthority| s.approval_desk().unwrap().status(&g);
+    assert_eq!(
+        shared.with(|a| desk_status(a)),
+        Some(aien_mcp::GrantStatus::Available)
+    );
+    assert!(shared
+        .with(|a| a.approval_desk().unwrap().release_reason(&g))
+        .unwrap()
+        .contains("did not run the effect"));
     let again = shared.with(|a| a.present_approval(&pa.capability_request, &g, 10));
-    assert_eq!(again.decision, DecisionKind::Denied);
-    assert!(again.reason.unwrap().contains("Consumed"));
+    assert!(again.is_authorized(), "released, so mintable: {again:?}");
+    assert_eq!(
+        p.continue_approval("t", "c1", &again, "sha256:wrong", NOW)
+            .unwrap_err(),
+        Refusal::NoPendingApproval
+    );
+    assert!(shared.with(|a| a.discard_unexecuted("c1")));
+    assert_eq!(shared.with(|a| a.wire_calls()), 0);
     turn(
         &mut p,
         1,
@@ -475,4 +498,12 @@ fn spend_point_provider_failure_after_mint_is_reported_and_recoverable() {
         std::fs::read_to_string(d.path().join("sub/a.txt")).unwrap(),
         "x"
     );
+}
+
+/// These tests use synthetic epochs (`now` 10, `expires_at` 50..1000): the adapter's clock (used by
+/// AIEN's effect lane to re-check expiry at commit, sovereign-core #260) is fixed at 10 to match.
+fn adapter(p: &std::path::Path) -> AienAuthority {
+    let mut a = AienAuthority::new(p).unwrap();
+    a.set_clock(std::sync::Arc::new(|| 10));
+    a
 }

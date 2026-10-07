@@ -83,7 +83,7 @@ dependencies = [
 [[package]]
 name = "aien-capability"
 version = "0.1.0"
-source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=7d37da16073560533c77416624b2482977fb1c9b#7d37da16073560533c77416624b2482977fb1c9b"
+source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=8bcd79b406077a5901197bff01a634aa3085cd4e#8bcd79b406077a5901197bff01a634aa3085cd4e"
 dependencies = [
  "sha2 0.10.9",
 ]
@@ -134,7 +134,7 @@ dependencies = [
 [[package]]
 name = "aien-mcp"
 version = "0.1.0"
-source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=7d37da16073560533c77416624b2482977fb1c9b#7d37da16073560533c77416624b2482977fb1c9b"
+source = "git+https://github.com/aien-dev/aien-sovereign-core.git?rev=8bcd79b406077a5901197bff01a634aa3085cd4e#8bcd79b406077a5901197bff01a634aa3085cd4e"
 dependencies = [
  "aien-capability",
  "async-trait",

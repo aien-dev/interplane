@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@7d37da16073560533c77416624b2482977fb1c9b` (main 2026-10-07, omega.lock c0369e67, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
+`aien-dev/aien-sovereign-core@8bcd79b406077a5901197bff01a634aa3085cd4e` (main 2026-10-07, omega.lock c0369e67, after PR #262 merged: the authenticated `ComposeApprovedProposal` daemon command the ledger route uses; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 7d37da1, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -166,14 +166,14 @@ directly, so `aien-runtime` (whose build needs the omega libraries) is not a dep
 Boundary, stated on every receipt (`LEDGER_BOUNDARY`): authenticated daemon handoff -> compose
 verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon grant on
 compose_proposal_sha256 -> effect intent -> write -> ack. It is the production effect path; it is
-not WALDO provenance, and `record_effect_receipt` still carries no trace or request id (#76).
+not WALDO provenance and not a full provenance chain: trace_id and request_id are on the handoff, the replay claim and the daemon grant, but not yet on the effect intent, the ack or `record_effect_receipt` (#76).
 Evidence: `tests/compose_ledger.rs` rows 1-8 (approved write with both hash identities, forged
 approval id, stale target, replay including a re-presented approval id, operator stop/resume,
 adapter restart, the T4 injection subset, forged handoffs) need `AIEN_BIN` (an `aien-cli` binary
-built from sovereign-core #249) and `cargo test -- --ignored`; row 9 (desk key out of the model's
+built from sovereign-core main 8bcd79b, where #262 merged) and `cargo test -- --ignored`; rows 10 and 11 (#260 expiry and re-mint) likewise; row 9 (desk key out of the model's
 reach, key file rules) always runs.
 
-Since sovereign-core #260 (pinned 7d37da1): the effect lane is built `with_clock(host_clock())`
+Since sovereign-core #260 (in the pinned 8bcd79b): the effect lane is built `with_clock(host_clock())`
 (epoch seconds; `AienAuthority::set_clock` for tests), a grant presented while reserved is
 refused as `Reserved`, and a dropped effect releases its grant. On the ledger route the adapter
 holds the minted effect (and its reservation) while the daemon runs, checks the grant's expiry

@@ -188,3 +188,32 @@ def test_policy_pin_current_refusal_is_unknown_and_lowers_floor_to_external():
     rec = p.inputs(T)[-1]
     assert (rec["content_kind"], rec["trust"]) == ("unknown", "unknown")
     assert floor(p) == "external_untrusted"
+
+
+class NotFound(MockRuntime):
+    def decide(self, req, ctx):
+        d = super().decide(req, ctx)
+        if req.capability == "list_dir":
+            d.decision = "not_found"
+        return d
+
+
+def test_documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_external():
+    """CORE.md (non-executed results) and CROSSVEIL rule 6: denied, requires_approval, not_found,
+    invalid and rejected are rendered, recorded `unknown` / `unknown`, and count as external_untrusted."""
+    cases = [
+        ("write_file", {"path": "p", "content": "c"}, "denied"),
+        ("delete_file", {"path": "p"}, "requires_approval"),
+        ("list_dir", {"path": "p"}, "not_found"),
+        ("read_file", {}, "rejected"),
+        ("no_such_tool", {}, "rejected"),
+    ]
+    for i, (name, args, status) in enumerate(cases):
+        p = pipe(NotFound())
+        user(p)
+        out = go(p, name, args, f"c{i}", 0)
+        assert out.results[0].status == status, name
+        assert out.results[0].provenance.get("content_kind") is None
+        rec = p.inputs(T)[-1]
+        assert (rec["content_kind"], rec["trust"]) == ("unknown", "unknown"), name
+        assert floor(p) == "external_untrusted", name

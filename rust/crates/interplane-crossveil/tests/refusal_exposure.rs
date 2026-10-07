@@ -242,3 +242,49 @@ fn policy_pin_current_refusal_is_unknown_and_lowers_floor_to_external() {
     assert_eq!((kind.as_str(), trust.as_str()), ("unknown", "unknown"));
     assert_eq!(floor(&p), "external_untrusted");
 }
+
+struct NotFound(MockRuntime);
+impl RuntimeAuthority for NotFound {
+    fn runtime_id(&self) -> &str {
+        "mock"
+    }
+    fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
+        let mut d = self.0.decide(req, ctx);
+        if req.capability == "list_dir" {
+            d.decision = DecisionKind::NotFound;
+        }
+        d
+    }
+    fn execute(&mut self, req: &CapabilityRequest, d: &Decision, ctx: &CallContext) -> ToolResult {
+        self.0.execute(req, d, ctx)
+    }
+    fn catalog(&self) -> Catalog {
+        self.0.catalog()
+    }
+}
+
+#[test]
+fn documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_external() {
+    // CORE.md (non-executed results) and CROSSVEIL rule 6.
+    let cases = [
+        ("write_file", json!({"path": "p", "content": "c"}), "denied"),
+        ("delete_file", json!({"path": "p"}), "requires_approval"),
+        ("list_dir", json!({"path": "p"}), "not_found"),
+        ("read_file", json!({}), "rejected"),
+        ("no_such_tool", json!({}), "rejected"),
+    ];
+    for (i, (name, args, status)) in cases.into_iter().enumerate() {
+        let mut rt = NotFound(MockRuntime::new());
+        let mut p = pipe(&mut rt);
+        user(&mut p);
+        let out = go(&mut p, name, args, &format!("c{i}"), 0);
+        assert_eq!(out.results[0].status.as_str(), status, "{name}");
+        assert!(out.results[0]
+            .provenance
+            .as_ref()
+            .map_or(true, |pv| pv.content_kind.is_none()));
+        let (kind, trust, _, _) = last(&p);
+        assert_eq!((kind.as_str(), trust.as_str()), ("unknown", "unknown"), "{name}");
+        assert_eq!(floor(&p), "external_untrusted", "{name}");
+    }
+}

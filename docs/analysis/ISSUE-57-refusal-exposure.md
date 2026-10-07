@@ -1,6 +1,9 @@
 # Issue 57: refused and held calls and the exposure floor
 
-Status: analysis only. No behaviour change. Rust and Python agree (see the tests at the end).
+Status: RESOLVED by option C (keep fail-closed), decided by the coordinator on 2026-10-07. No behaviour
+or fixture change. The rule is now stated in `spec/CORE.md` (non-executed results in the exposure
+ledger) and `spec/CROSSVEIL.md` rule 6. Options R and V are tracked in issue #80, to be taken up only
+when a host shows a real usability cost.
 Evidence is CPU evidence: no model, no GPU.
 
 ## 1. What happens today
@@ -127,17 +130,18 @@ The remaining choices (C, R, V) are all safe. They differ in cost, not in safety
   A wrong vouch only matters when the reason really carries fresh untrusted content, and a vouch can
   never raise the floor above the turn floor.
 
-That is a product call (how much usability is worth a new protocol field and a new adapter duty),
-not a security call, so this note stops here. Until it is made, the two files below pin what must
-hold under C, R and V alike, and pin today's behaviour in two clearly named tests.
+That was a product call (how much usability is worth a new protocol field and a new adapter duty).
+It was made for C. R and V are kept as a revision candidate in
+https://github.com/aien-dev/interplane/issues/80 with the trigger "real usability cost observed in a
+host". The tests below pin what must hold under C, R and V alike, and pin today's behaviour.
 
 ## 7. Tests added (no behaviour change)
 
-`python/tests/test_refusal_exposure.py` (8) and
-`rust/crates/interplane-crossveil/tests/refusal_exposure.rs` (8): same scenarios and strings.
+`python/tests/test_refusal_exposure.py` (9) and
+`rust/crates/interplane-crossveil/tests/refusal_exposure.rs` (9): same scenarios and strings.
 Covered: I1, I2, echoed tool name with a later effect still held, an adapter reason carrying
 injected text, held then approved then executed, a mixed chain ending in an untrusted read, a
 todo-shaped floor sequence on the mock, and the current-policy pin.
 
-Red check: with refusals patched to `trusted_runtime` (policy A) 6 of 8 fail in each SDK; the real
-code passes all 8.
+Red check: with refusals patched to `trusted_runtime` (policy A) 6 of 8 fail in each SDK (of the first 8); the real
+code passes all 9.

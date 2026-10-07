@@ -257,6 +257,19 @@ execute (denied, requires_approval, not_found, invalid, unknown decision, decide
 `provenance.runtime` and `capability` are set and `content_kind`, `trust` and `trusted` are `null`:
 no data was produced, so there is no content to classify. The defaults `tool_result` / `unknown`
 apply only to executed results whose runtime said nothing about their content (absent or null).
+
+**Non-executed results in the exposure ledger (clarification, issue #57).** The null labels above
+describe the result payload. They do not make a non-executed result invisible to the exposure
+ledger: a denied, requires_approval, not_found, invalid or otherwise rejected result is rendered to
+the model, so the pipeline records it as an input with `content_kind` `unknown` and `trust`
+`unknown` (CROSSVEIL rule 6), and it counts as `external_untrusted`. The reason is that a refusal
+body can carry echoed model text, the adapter's `reason` text and adapter-minted ids, and the
+pipeline cannot tell any of them from content the model could be steered by. After a refusal or a
+hold, the floor of every later turn in the trace is therefore `external_untrusted`. This is
+intended: a host that reads the floor will hold later effects, and that is the fail-closed
+direction. Recording refusals as trusted, or not recording them, is not allowed (an empty ledger
+would become the highest trust, or adapter text would reach the model outside the ledger); see
+`docs/analysis/ISSUE-57-refusal-exposure.md`.
 On an executed result, a `content_kind` the pipeline does not recognize (or a non-string) becomes
 `unknown`, a `trust` it does not recognize (or a non-string) becomes `external_untrusted`, and an
 adapter-supplied `trusted` is replaced by the value derived from `trust`.

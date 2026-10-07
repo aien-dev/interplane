@@ -111,7 +111,11 @@ proposal are never flattened into indistinguishable text. Rules:
    `content_kind` are the result's normalized provenance, `unknown` when it has none), and the
    host adds any other input before a turn through a host-only registration call that model
    output and envelopes cannot reach. All `tool_request`s of a turn, and the `CallContext` passed
-   to `decide` and `execute`, carry the ledger as it stood when the turn began. Exposure fails
+   to `decide` and `execute`, carry the ledger as it stood when the turn began.
+   A result with no classified body is recorded `unknown` and counts as `external_untrusted`, on
+   purpose; this covers results that were not executed (denied, requires_approval, not_found,
+   rejected, an unknown decision value, a decide fault) and executed `error` and `timed_out`
+   results (CORE.md, issue #57). Exposure fails
    closed: an empty ledger, an input of unknown or unrecognized trust, and an input whose
    `derived_from` names an id the ledger does not hold all count as `external_untrusted`.
 7. **Source classes.** The trust each class receives, and who records it. `Recorded by` is the

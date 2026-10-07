@@ -170,7 +170,10 @@ jobs:
       - run: cargo test --locked
       - name: fixture verdicts from the CLI
         run: |
-          test "$(cargo run -q --locked -- verify fixtures/synthetic-full-chain)" = "PASS complete"
+          test "$(cargo run -q --locked -- verify fixtures/synthetic-full-chain)" = "PASS complete effect=aien-ledger-slice/1:strong proposal=scripted_turn"
+          test "$(cargo run -q --locked -- verify fixtures/synthetic-weak-receipt)" = "PASS complete effect=record_effect_receipt/1:weak"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-aien-chain)" = "PASS complete effect=aien-ledger-slice/1:strong proposal=scripted_turn"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-tokenizer-json)" = "PASS_LABELLED_INCOMPLETE missing=link:effect,link:interplane"
           test "$(cargo run -q --locked -- verify fixtures/real-waldo-smoke)" = "PASS_LABELLED_INCOMPLETE missing=link:aien,link:effect,link:interplane"
   adapter-aien:
     runs-on: ubuntu-latest

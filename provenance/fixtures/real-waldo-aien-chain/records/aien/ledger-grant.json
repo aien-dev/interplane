@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "04cbe4465673b57d54b5802cf03e446b362320c8af8beb44620a9cda0df59a2d",
+  "id": 19,
+  "kind": 65556,
+  "links": [
+    16,
+    15,
+    6,
+    0
+  ],
+  "note": "authorization",
+  "subject": 0,
+  "tag": 3,
+  "text": "{\"approval_id\":\"aien-approval:w1:c32f6a1235828648\",\"approval_key\":\"a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"78ca6bfb3c6f63b2\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"w1\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"trace_id\":\"real-run-01\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws\"}",
+  "verified": true
+}

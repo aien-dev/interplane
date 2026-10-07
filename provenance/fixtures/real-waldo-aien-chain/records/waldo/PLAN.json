@@ -1,0 +1,30 @@
+{
+  "kind": "waldo-model-plan",
+  "schema": 1,
+  "name": "prov-tiny",
+  "architecture_sha256": "ccd069683aad2b316f5a37c0ac0f3a46d27e94b562ef00762fa4cb367412b1f4",
+  "architecture": {
+    "family": "decoder-transformer",
+    "context_tokens": 1024,
+    "vocabulary_size": 259,
+    "hidden_size": 32,
+    "intermediate_size": 64,
+    "layers": 1,
+    "attention_heads": 4,
+    "key_value_heads": 2,
+    "tie_embeddings": true,
+    "parameter_dtype": "bfloat16",
+    "tokenizer": {
+      "name": "byte",
+      "revision": "builtin-byte-schema-1"
+    }
+  },
+  "interaction": {
+    "template": "chatml-v1"
+  },
+  "forecast": {
+    "approximate_parameters": 17600,
+    "parameter_bytes": 35200,
+    "formula": "embedding + decoder projections + gated MLP + norms; biases excluded"
+  }
+}

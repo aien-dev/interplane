@@ -1,0 +1,183 @@
+[
+  {
+    "destination": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-1",
+    "payload": {
+      "arguments": {
+        "content": "Decisions: ship v0.3 on Friday.\nOwners: Ada (release), Lin (docs).\n",
+        "path": "summary.txt"
+      },
+      "kind": "tool_request",
+      "provenance": {
+        "coercion": "none",
+        "dialect": "openai",
+        "dialect_version": "1",
+        "exposure": {
+          "floor": "user_supplied",
+          "inputs": [
+            "in-user"
+          ]
+        },
+        "model": "scripted",
+        "parser_version": "1.0.0",
+        "raw_name": "write_file",
+        "source_call_id": "w1",
+        "source_digest": "sha256:efaca124736121fe9cecad36e570ce98bed978356597f020d5041d6dad795e41",
+        "source_turn": 0
+      },
+      "request_id": "w1",
+      "tool": {
+        "name": "write_file",
+        "namespace": null
+      }
+    },
+    "source": {
+      "id": "scripted",
+      "kind": "model"
+    },
+    "timestamp": "2026-10-07T23:10:09Z",
+    "trace_id": "real-run-01"
+  },
+  {
+    "destination": {
+      "id": "scripted",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-2",
+    "parent_id": "m-1",
+    "payload": {
+      "data": null,
+      "decision": {
+        "approval": {
+          "approval_id": "aien-approval:w1:c32f6a1235828648",
+          "expires_at": null,
+          "scope": "c32f6a123582864804b99027881aa0354aa1c2f40407da930394d120ee87bcc9"
+        },
+        "authority": {
+          "decision_id": null,
+          "policy_engine": "aien-mcp.EffectClassAuthority",
+          "runtime": "aien"
+        },
+        "capability": "write_file",
+        "constraints": [],
+        "decision": "requires_approval",
+        "kind": "decision",
+        "reason": "tool `write_file` needs approval (effect bits 0x8)",
+        "request_id": "w1",
+        "runtime_state": {
+          "values": [
+            "effect_class=WorldMutation",
+            "staged=true",
+            "intent_digest=c32f6a123582864804b99027881aa0354aa1c2f40407da930394d120ee87bcc9"
+          ],
+          "vocabulary": "aien.effect_intent"
+        }
+      },
+      "error": {
+        "code": "approval_required",
+        "message": "approval required: aien-approval:w1:c32f6a1235828648",
+        "retryable": false
+      },
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": null,
+        "duration_ms": null,
+        "runtime": "aien",
+        "trust": null,
+        "trusted": null
+      },
+      "request_id": "w1",
+      "status": "requires_approval"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-07T23:10:09Z",
+    "trace_id": "real-run-01"
+  },
+  {
+    "destination": {
+      "id": "scripted",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-3",
+    "parent_id": "m-1",
+    "payload": {
+      "data": {
+        "receipt": {
+          "ack_digest": "3824f1decb48065854f8a8b8f70656d567f71b3575fb744d14c741f3da24129c",
+          "ack_record_id": 21,
+          "approval_id": "aien-approval:w1:c32f6a1235828648",
+          "approved_proposal_sha256": "f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb",
+          "approver": "drake",
+          "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+          "compose_proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+          "content_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+          "disk_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+          "grant_digest": "04cbe4465673b57d54b5802cf03e446b362320c8af8beb44620a9cda0df59a2d",
+          "grant_id": 19,
+          "handoff": {
+            "aegis_pass_mask": 1,
+            "approval_key": "a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9",
+            "approved_grant": 19,
+            "branch_count": 1,
+            "committed": true,
+            "cx_evidence": 15,
+            "cx_goal": 8,
+            "cx_promotion": 16,
+            "desk_key_id": "78ca6bfb3c6f63b2",
+            "grant_links": [
+              16,
+              15
+            ],
+            "outcome": 1,
+            "proposer": "hook:approved-proposal",
+            "record_digest": "72902ae4c99fe65f9edd13456ff6e7c233b094aa1eb3c32a4a1d4b0a7d7820ee",
+            "replay_claim": 6,
+            "state": "COMMITTED",
+            "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt",
+            "task": 10595037721773029291,
+            "winner": 0,
+            "winner_digest": "0298a37304827bf63c02a5b8d0f4c3fce2b271a8212cb95a318cd0a1397f75c9"
+          },
+          "intent_digest": "bb6696d89eb3350b0fbad6ff193294d40b8204492ae8321488a15aa6bee30519",
+          "intent_id": 20,
+          "path": "summary.txt",
+          "prior_sha256": null,
+          "proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+          "request_id": "w1",
+          "state": "DONE",
+          "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt",
+          "trace_id": "real-run-01"
+        }
+      },
+      "decision": null,
+      "error": null,
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": "tool_result",
+        "duration_ms": 0,
+        "runtime": "aien",
+        "trust": "trusted_runtime",
+        "trusted": true
+      },
+      "request_id": "w1",
+      "status": "ok"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-07T23:10:09Z",
+    "trace_id": "real-run-01"
+  }
+]

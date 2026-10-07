@@ -1,0 +1,91 @@
+{
+  "kind": "waldo-training-run",
+  "schema": 1,
+  "id": "f4cb9ccbcc55d32f",
+  "state": "complete",
+  "bom_sha256": "489b1e383a570d5832ce077ba9177061ff2aad2726f18e3eb35eeb307a5c3201",
+  "planned": "2026-10-07T23:00:02.78792939Z",
+  "started": "2026-10-07T23:00:02.801048461Z",
+  "finished": "2026-10-07T23:00:06.805249206Z",
+  "observation": {
+    "simulated": false,
+    "steps": 10,
+    "consumed_tokens": 1280,
+    "final_loss": 4.743206977844238,
+    "checkpoints": [
+      {
+        "step": 5,
+        "tokens": 640,
+        "artifacts": [
+          {
+            "path": "artifacts/checkpoints/step-00000005/model.safetensors",
+            "sha256": "b16ea1c63b1b2173d9e9fcb648bf766e830b0b80386bc7cec57ec58eb20d6ce0",
+            "bytes": 36512
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000005/runtime.pt",
+            "sha256": "99d19ca78aa3c19807c06b5244ff4983e96f79f61cad440936b619c60739f9be",
+            "bytes": 155581
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000005/state.json",
+            "sha256": "f07aae56ac9d68d321f4c29e199861dbdf036954435ee43ae3bb40d4a52926e5",
+            "bytes": 430
+          }
+        ]
+      },
+      {
+        "step": 10,
+        "tokens": 1280,
+        "artifacts": [
+          {
+            "path": "artifacts/checkpoints/step-00000010/model.safetensors",
+            "sha256": "87edde6d64730326d39d00a4013c1a35aad488f4a65703373007c48c42ae3bec",
+            "bytes": 36512
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000010/runtime.pt",
+            "sha256": "3182a360fd672adc4e18bbb43fc5c7db5ff1a217ce32df7c3b2fc4c4dfe87bc7",
+            "bytes": 155581
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000010/state.json",
+            "sha256": "07d33bee551a5b443692443324f3387f1dd28412dfdb8c22d5cbc3163be9d192",
+            "bytes": 433
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "artifacts/model.safetensors",
+        "sha256": "ca3501aa46e9b22c9a47cc2e4c02b50e44245a8849eb40de73d959a542b2e48f",
+        "bytes": 36504
+      },
+      {
+        "path": "artifacts/config.json",
+        "sha256": "0c60675d46dc3f55a3ed783d2bb49a51a30cdb34946985cfb6c458b4568bd2b2",
+        "bytes": 1606
+      },
+      {
+        "path": "artifacts/tokenizer.json",
+        "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
+        "bytes": 175
+      }
+    ],
+    "consumption": [
+      {
+        "corpus": "core/e2e/prov",
+        "token_targets": 1280
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "ordinal": 1,
+      "started": "2026-10-07T23:00:02.801048461Z",
+      "finished": "2026-10-07T23:00:06.805249206Z",
+      "state": "complete"
+    }
+  ]
+}

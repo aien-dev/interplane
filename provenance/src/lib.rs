@@ -328,8 +328,23 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
         };
         match s(e, &["binding"]) {
             Some(LEDGER_BINDING) => {
+                // Who authored the proposal must be stated, never implied by silence. The
+                // approved path does not consult the loaded model, so only a scripted turn has a
+                // binding; a model-authored proposal is refused rather than half-checked.
+                let origin = match s(e, &["proposal_origin"]) {
+                    Some("scripted_turn") => "scripted_turn",
+                    Some(other) => {
+                        return fail(
+                            "unsupported_binding",
+                            format!(
+                                "effect.proposal_origin={other} (only scripted_turn has a binding)"
+                            ),
+                        )
+                    }
+                    None => return fail("malformed_companion", "effect.proposal_origin"),
+                };
                 ledger::check(&archive, e, t, aien, call.as_ref())?;
-                effect_label = Some(format!("{LEDGER_BINDING}:strong"));
+                effect_label = Some(format!("{LEDGER_BINDING}:strong proposal={origin}"));
             }
             Some(RECEIPT_BINDING) => {
                 // Weaker: tool + digests only. The label stays on the verdict.

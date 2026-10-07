@@ -1,0 +1,157 @@
+{
+  "aien": {
+    "candidate_id": null,
+    "executable": "aien-cli",
+    "executable_sha256": "45ea0f51f3f48dffba75baf6e62ac6c5a9b300bc58418e8ae63240e5487784f8",
+    "note": "no frozen AIEN candidate: no candidate_manifest record; executable is aien-dev/aien-sovereign-core main 4528c64954b4dc49a712dcee743fc6028e3b8b51 (sc#296 merged), debug build, CPU-reference backend (Omega GPU engine not linked)"
+  },
+  "completeness": {
+    "missing": [],
+    "state": "complete"
+  },
+  "effect": {
+    "approval_binding": "aien.approval.v2",
+    "binding": "aien-ledger-slice/1",
+    "proposal_origin": "scripted_turn"
+  },
+  "export": {
+    "chat_template": "export_chat_template",
+    "conversion_tool": {
+      "checked": false,
+      "commit": "4c407d7f5ed33feaf234dd8ebed34ac197cfc0ef",
+      "name": "waldo model export --format huggingface",
+      "source": "github.com/aien-dev/waldo branch export-tokenizer-json (writes tokenizer.json and the standard plain ChatML template text)"
+    },
+    "format": "huggingface",
+    "model_revision": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad/f4cb9ccbcc55d32f"
+  },
+  "fixture": {
+    "class": "real",
+    "note": "Real bytes from one run on this machine (CPU): a tiny WALDO chatml-v1 model trained on a corpus we wrote (run-inputs/corpus.txt), exported with tokenizer.json and an explicit chat template, loaded by the AIEN daemon (aien-cli from sovereign-core main 4528c64), then one approved write_file driven through the merged INTERPLANE AIEN adapter (interplane main 0ff60f2) with the daemon-written ledger records retained. NOT proven here: the loaded model did not author the proposal (the approved path does not consult the model) and the model turn in the INTERPLANE trace is a scripted turn.",
+    "source": "driver/main.rs (run driver), run-inputs/ (corpus, compose, script)"
+  },
+  "interplane": {
+    "request_id": "w1",
+    "trace_id": "real-run-01"
+  },
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "corpus_license_assertions": [
+      "CC0-1.0"
+    ],
+    "kind": "waldo_run",
+    "model_id": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad",
+    "run_id": "f4cb9ccbcc55d32f",
+    "training_backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "training_code": {
+      "checked": false,
+      "commit": "4c407d7f5ed33feaf234dd8ebed34ac197cfc0ef",
+      "repository": "github.com/aien-dev/waldo",
+      "source": "fork branch export-tokenizer-json, tree that trained and exported this model"
+    }
+  },
+  "load_support": {
+    "declared": "supported_structural"
+  },
+  "records": {
+    "aien_load_log": {
+      "bytes": 1275,
+      "path": "records/aien/daemon-load.log",
+      "sha256": "ef8fa2e83f9027cff4bb224d15edf50f77ee31265fb4785d8850033aa173b1c5"
+    },
+    "daemon_run": {
+      "bytes": 505,
+      "path": "records/aien/daemon-run.json",
+      "sha256": "5e5d602c1ddf6a841dd8c4eb9d937d4f72b5216e49a723f116399d5f1b986f8a"
+    },
+    "export_chat_template": {
+      "bytes": 197,
+      "path": "records/export/chat_template.jinja",
+      "sha256": "4d773c6800c326634a217c28d11c096dced7551c3af32ef35f59f0cb20881a72"
+    },
+    "export_config": {
+      "bytes": 457,
+      "path": "records/export/config.json",
+      "sha256": "c5a2cf6e20801c9a7cfb04cc46e800ff18354777778f78439068f3191ba6cdb5"
+    },
+    "export_tokenizer": {
+      "bytes": 9061,
+      "path": "records/export/tokenizer.json",
+      "sha256": "c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd"
+    },
+    "export_weights": {
+      "bytes": 36632,
+      "path": "records/export/model.safetensors",
+      "sha256": "cb28b4b79a2bcad22306232b7b2cc12ac8f677515b986b699b8f2b625ecd953c"
+    },
+    "interplane_trace": {
+      "bytes": 6062,
+      "path": "records/interplane/trace.json",
+      "sha256": "a3cc9b1044b0fbe73cd82c4688833db04451215db716593487a7caef3ebd96b5"
+    },
+    "ledger_ack": {
+      "bytes": 707,
+      "path": "records/aien/ledger-ack.json",
+      "sha256": "a7c73bfaee108f43d10d71286894829f302eee9ae8c69812c2b5d77bfd9c367d"
+    },
+    "ledger_claim": {
+      "bytes": 527,
+      "path": "records/aien/ledger-claim.json",
+      "sha256": "8f294d8e60ec0a5022d2261bd8d6612e57a358c679c02a8a39950469216e7b0f"
+    },
+    "ledger_committed": {
+      "bytes": 482,
+      "path": "records/aien/ledger-committed.json",
+      "sha256": "d77d33766826f026584f8a52322f403ef3debc83d6dac3cca8b41e3c764abc0e"
+    },
+    "ledger_grant": {
+      "bytes": 1097,
+      "path": "records/aien/ledger-grant.json",
+      "sha256": "855f2f834982124fa6eccd0543bbdc7c2e55d3e3c41fc17a4b52c7a001aa6a7f"
+    },
+    "ledger_intent": {
+      "bytes": 688,
+      "path": "records/aien/ledger-intent.json",
+      "sha256": "6773637244de6a0152b2e70e422e8e8d2ff7f7654c2ec7c677bc9ded03437a34"
+    },
+    "release_bom": {
+      "bytes": 2529,
+      "path": "records/export/BOM.json",
+      "sha256": "ebbe0e3f1e5daaf1769ff5376669f973acf82614bc22a336253dd6e460edabc9"
+    },
+    "run_weights": {
+      "bytes": 36504,
+      "path": "records/waldo/model.safetensors",
+      "sha256": "ca3501aa46e9b22c9a47cc2e4c02b50e44245a8849eb40de73d959a542b2e48f"
+    },
+    "waldo_model_bom": {
+      "bytes": 1814,
+      "path": "records/waldo/MODEL-BOM.json",
+      "sha256": "5b80a95974baac91b81227b2357c8ecee2f94d21ef041e5bd6bdadc61a2d1111"
+    },
+    "waldo_plan": {
+      "bytes": 781,
+      "path": "records/waldo/PLAN.json",
+      "sha256": "73402931e1a2009f25b480a1f34c49d3c19a817f6b55715893e1c7c33d0fe6f7"
+    },
+    "waldo_preflight": {
+      "bytes": 1307,
+      "path": "records/waldo/PREFLIGHT.json",
+      "sha256": "6ee9278d44808a881977be6dea78a8b12c609c79ebd6d9e3dd0b91f64ffdab86"
+    },
+    "waldo_run": {
+      "bytes": 2774,
+      "path": "records/waldo/RUN.json",
+      "sha256": "6a2813efdc8110c35fb607fa3816391bbb99f18c28a47b56bd651eb2feb978e6"
+    },
+    "waldo_run_bom": {
+      "bytes": 6219,
+      "path": "records/waldo/RUN-BOM.json",
+      "sha256": "006d1a6306823fac14c7ef3be47c50eb44273caed85f673e056c1f8aeb3a3da9"
+    }
+  },
+  "schema": 0
+}

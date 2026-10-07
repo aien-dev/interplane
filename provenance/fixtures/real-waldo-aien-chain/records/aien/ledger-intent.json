@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "bb6696d89eb3350b0fbad6ff193294d40b8204492ae8321488a15aa6bee30519",
+  "id": 20,
+  "kind": 65554,
+  "links": [
+    19,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":196516,\"start\":12819081},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+  "verified": true
+}

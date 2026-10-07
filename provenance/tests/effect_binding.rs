@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 
 const SYN: &str = "fixtures/synthetic-full-chain";
 const WEAK: &str = "fixtures/synthetic-weak-receipt";
-const STRONG: &str = "effect=aien-ledger-slice/1:strong";
+const STRONG: &str = "effect=aien-ledger-slice/1:strong proposal=scripted_turn";
 
 fn fresh(name: &str, o: &Opts) -> PathBuf {
     let d = Path::new(env!("CARGO_TARGET_TMPDIR"))

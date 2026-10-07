@@ -462,7 +462,7 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
         "effect": if o.weak {
             json!({"binding": RECEIPT_BINDING, "digest_form": SERDE_DIGEST_FORM, "receipt": "effect_receipt"})
         } else {
-            json!({"binding": LEDGER_BINDING, "approval_binding": APPROVAL_BINDING})
+            json!({"binding": LEDGER_BINDING, "approval_binding": APPROVAL_BINDING, "proposal_origin": "scripted_turn"})
         }
     });
     seal(dir, skeleton)

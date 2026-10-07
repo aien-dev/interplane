@@ -20,7 +20,7 @@ const WEAK: &str = "fixtures/synthetic-weak-receipt";
 fn valid_self_contained_archive() {
     assert_eq!(
         verify(Path::new(SYN)),
-        "PASS complete effect=aien-ledger-slice/1:strong"
+        "PASS complete effect=aien-ledger-slice/1:strong proposal=scripted_turn"
     );
     assert_eq!(
         verify(Path::new(WEAK)),
@@ -145,7 +145,7 @@ fn missing_bom_correctly_labelled_incomplete() {
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),
-        "PASS_LABELLED_INCOMPLETE missing=record:waldo_model_bom effect=aien-ledger-slice/1:strong"
+        "PASS_LABELLED_INCOMPLETE missing=record:waldo_model_bom effect=aien-ledger-slice/1:strong proposal=scripted_turn"
     );
 }
 

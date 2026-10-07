@@ -10,7 +10,8 @@
   },
   "effect": {
     "approval_binding": "aien.approval.v2",
-    "binding": "aien-ledger-slice/1"
+    "binding": "aien-ledger-slice/1",
+    "proposal_origin": "scripted_turn"
   },
   "export": {
     "chat_template": "export_chat_template",

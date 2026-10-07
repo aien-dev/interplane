@@ -1,0 +1,32 @@
+kind: waldo-model-compose
+schema: 1
+interaction:
+  template: chatml-v1
+architecture:
+  family: decoder-transformer
+  context_tokens: 1024
+  vocabulary_size: 259
+  hidden_size: 32
+  intermediate_size: 64
+  layers: 1
+  attention_heads: 4
+  key_value_heads: 2
+  tie_embeddings: true
+  parameter_dtype: bfloat16
+  tokenizer:
+    name: byte
+    revision: builtin-byte-schema-1
+stages:
+  - name: pretrain
+    type: pre-training
+    objective: causal-language-modeling
+    corpora:
+      - core/e2e/prov
+    parameters:
+      steps: 10
+      batch_size: 2
+      sequence_length: 64
+      learning_rate: 0.003
+      seed: 7
+      checkpoint_every: 5
+      evaluate_every: 5

@@ -25,7 +25,8 @@ accepted (it was in v0) and labelled; it is never upgraded.
 `COMPANION.json`:
 
 ```json
-"effect": { "binding": "aien-ledger-slice/1", "approval_binding": "aien.approval.v2" }
+"effect": { "binding": "aien-ledger-slice/1", "approval_binding": "aien.approval.v2",
+            "proposal_origin": "scripted_turn" }
 ```
 
 Retained records (raw files, each named in `records` with path, sha256, bytes):
@@ -42,6 +43,11 @@ Retained records (raw files, each named in `records` with path, sha256, bytes):
 Each of the first five is one `ComposeRecordView` exactly as the daemon's `ComposeRecall` command
 returns it (`id, cls, kind, subject, tag, links, digest, verified, note, text`); `text` is the
 record's JSON as a string. No sovereign-core change is needed to export them.
+
+`proposal_origin` must be stated. The approved path does not consult the loaded model, so
+`scripted_turn` is the only origin with a binding; `model_turn` is refused with
+`unsupported_binding`, an absent field with `malformed_companion`. The verdict repeats it:
+`effect=aien-ledger-slice/1:strong proposal=scripted_turn`.
 
 ### Checks (fixed order, first failure wins)
 
@@ -97,8 +103,9 @@ as `\u00xx` (lowercase hex). U+007F, U+2028 and all non-ASCII are written as raw
 | WALDO record pins | Go `json.Marshal` of the record (whitespace-stripped `MarshalIndent`) | SHA-256 |
 
 Test `approval_binding_bytes_are_the_daemons_sorted_compact_object` checks the approval bytes
-against a `serde_json` map of the same fields. The first real fixture additionally recomputes the
-approval key the real daemon wrote (see `fixtures/real-waldo-aien-chain`).
+against a `serde_json` map of the same fields. `fixtures/real-waldo-aien-chain` recomputes the
+approval key the real daemon wrote, so producer and verifier are checked against each other byte
+for byte on real output.
 
 ### Trust, stated plainly
 

@@ -9,8 +9,9 @@
     "state": "complete"
   },
   "effect": {
-    "approval_binding": "aien.approval.v2",
-    "binding": "aien-ledger-slice/1"
+    "binding": "record_effect_receipt/1",
+    "digest_form": "serde_json.to_vec.sorted-keys/1",
+    "receipt": "effect_receipt"
   },
   "export": {
     "chat_template": "export_chat_template",
@@ -63,10 +64,10 @@
       "path": "records/aien/CAND-SYNTH-0.toml",
       "sha256": "262ca8551313f6d42cde6eed4c229e81c2613cecc202784eaa52ca35f0acbfc2"
     },
-    "daemon_run": {
-      "bytes": 344,
-      "path": "records/aien/daemon-run.json",
-      "sha256": "2a35005acd1d13bf5394b2f78e5643609f4256828ead93154ee40bc177a4e037"
+    "effect_receipt": {
+      "bytes": 336,
+      "path": "records/aien/effect-receipt.json",
+      "sha256": "86d5f8908a1e6aad2d6974f3c51ea4528e7de716467a463ee45f3175fd9860ea"
     },
     "export_chat_template": {
       "bytes": 86,
@@ -89,34 +90,9 @@
       "sha256": "c0d9ed56f7631be1c67dad8eb6900c22019f0f74036ba256dab82e3eca601f9c"
     },
     "interplane_trace": {
-      "bytes": 5826,
+      "bytes": 4320,
       "path": "records/interplane/trace.json",
-      "sha256": "ad290838f3ddb544ffe3336452537acbfc6aabd5c3b89dde80310a51c28a1080"
-    },
-    "ledger_ack": {
-      "bytes": 567,
-      "path": "records/aien/ledger-ack.json",
-      "sha256": "bd2c40b3f0ba0b3cb81d0a9e064cf4fac428c041c897ca86d2143a327c0b0f57"
-    },
-    "ledger_claim": {
-      "bytes": 536,
-      "path": "records/aien/ledger-claim.json",
-      "sha256": "af94b10a9bce2cdad71bd943dc1dbada9f97d602949d1a40500b749dacde3f12"
-    },
-    "ledger_committed": {
-      "bytes": 462,
-      "path": "records/aien/ledger-committed.json",
-      "sha256": "ac9fb42d5c0d7bff32c1c391860a206829af4dbf339ebeaee95838268b523cdb"
-    },
-    "ledger_grant": {
-      "bytes": 1019,
-      "path": "records/aien/ledger-grant.json",
-      "sha256": "93f90d9fc46cb59bf4cfe44c506d77793c0103131751d34816be967f2ee32d5d"
-    },
-    "ledger_intent": {
-      "bytes": 630,
-      "path": "records/aien/ledger-intent.json",
-      "sha256": "48a90a4bb80d6ef8affcae7b3c2358ac65d55f292ede4ca7ea8d434c3e861cb8"
+      "sha256": "66674c677b0ffff5df1c252efe94d84e0f96962e3691fa160674d7e07a0c027b"
     },
     "release_bom": {
       "bytes": 1172,

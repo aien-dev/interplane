@@ -2,90 +2,59 @@
 //! these bytes. Mutations happen on copies under CARGO_TARGET_TMPDIR; committed fixtures are
 //! never rewritten.
 
-use interplane_provenance::gojson::{sha256_hex, waldo_sha256};
+mod common;
+
+use common::*;
+use interplane_provenance::gojson::sha256_hex;
 use interplane_provenance::synth::{self, Opts};
 use interplane_provenance::verify;
 use serde_json::{json, Value};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 const SYN: &str = "fixtures/synthetic-full-chain";
 const REAL: &str = "fixtures/real-waldo-smoke";
 const REAL_TJ: &str = "fixtures/real-waldo-tokenizer-json";
-
-fn copy_dir(from: &Path, to: &Path) {
-    std::fs::create_dir_all(to).unwrap();
-    for e in std::fs::read_dir(from).unwrap() {
-        let e = e.unwrap();
-        let dst = to.join(e.file_name());
-        if e.file_type().unwrap().is_dir() {
-            copy_dir(&e.path(), &dst);
-        } else {
-            std::fs::copy(e.path(), dst).unwrap();
-        }
-    }
-}
-
-fn scratch(fixture: &str, name: &str) -> PathBuf {
-    let d = Path::new(env!("CARGO_TARGET_TMPDIR"))
-        .join("verdicts")
-        .join(name);
-    let _ = std::fs::remove_dir_all(&d);
-    copy_dir(&Path::new(env!("CARGO_MANIFEST_DIR")).join(fixture), &d);
-    d
-}
-
-fn companion(d: &Path) -> Value {
-    serde_json::from_slice(&std::fs::read(d.join("COMPANION.json")).unwrap()).unwrap()
-}
-
-fn write_companion(d: &Path, v: &Value) {
-    std::fs::write(
-        d.join("COMPANION.json"),
-        serde_json::to_vec_pretty(v).unwrap(),
-    )
-    .unwrap();
-}
-
-fn path_of(d: &Path, rec: &str) -> PathBuf {
-    d.join(companion(d)["records"][rec]["path"].as_str().unwrap())
-}
-
-/// What an attacker (or a careless tool) does after changing a record: update its entry in the
-/// manifest so the file-level digest matches. The chain must still refuse.
-fn restamp(d: &Path, rec: &str) {
-    let b = std::fs::read(path_of(d, rec)).unwrap();
-    let mut c = companion(d);
-    c["records"][rec]["sha256"] = json!(sha256_hex(&b));
-    c["records"][rec]["bytes"] = json!(b.len());
-    if c["records"][rec].get("waldo_sha256").is_some() {
-        c["records"][rec]["waldo_sha256"] = json!(waldo_sha256(&b));
-    }
-    write_companion(d, &c);
-}
+const WEAK: &str = "fixtures/synthetic-weak-receipt";
 
 #[test]
 fn valid_self_contained_archive() {
-    assert_eq!(verify(Path::new(SYN)), "PASS complete");
+    assert_eq!(
+        verify(Path::new(SYN)),
+        "PASS complete effect=aien-ledger-slice/1:strong"
+    );
+    assert_eq!(
+        verify(Path::new(WEAK)),
+        "PASS complete effect=record_effect_receipt/1:weak"
+    );
 }
 
 #[test]
-fn synthetic_fixture_is_reproducible_byte_for_byte() {
-    let d = Path::new(env!("CARGO_TARGET_TMPDIR")).join("regen");
-    let _ = std::fs::remove_dir_all(&d);
-    synth::write_synthetic(&d, &Opts::default()).unwrap();
-    let c = companion(&d);
-    for (_, r) in c["records"].as_object().unwrap() {
-        let p = r["path"].as_str().unwrap();
+fn synthetic_fixtures_are_reproducible_byte_for_byte() {
+    for (fixture, weak) in [(SYN, false), (WEAK, true)] {
+        let d = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("regen-{weak}"));
+        let _ = std::fs::remove_dir_all(&d);
+        synth::write_synthetic(
+            &d,
+            &Opts {
+                weak,
+                ..Opts::default()
+            },
+        )
+        .unwrap();
+        let c = companion(&d);
+        for (_, r) in c["records"].as_object().unwrap() {
+            let p = r["path"].as_str().unwrap();
+            assert_eq!(
+                std::fs::read(d.join(p)).unwrap(),
+                std::fs::read(Path::new(fixture).join(p)).unwrap(),
+                "{p}"
+            );
+        }
         assert_eq!(
-            std::fs::read(d.join(p)).unwrap(),
-            std::fs::read(Path::new(SYN).join(p)).unwrap(),
-            "{p}"
+            std::fs::read(d.join("COMPANION.json")).unwrap(),
+            std::fs::read(Path::new(fixture).join("COMPANION.json")).unwrap()
         );
     }
-    assert_eq!(
-        std::fs::read(d.join("COMPANION.json")).unwrap(),
-        std::fs::read(Path::new(SYN).join("COMPANION.json")).unwrap()
-    );
 }
 
 #[test]
@@ -148,6 +117,7 @@ fn config_vocab_disagrees_with_tokenizer() {
         &d,
         &Opts {
             config_vocab: Some(9),
+            ..Opts::default()
         },
     )
     .unwrap();
@@ -175,7 +145,7 @@ fn missing_bom_correctly_labelled_incomplete() {
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),
-        "PASS_LABELLED_INCOMPLETE missing=record:waldo_model_bom"
+        "PASS_LABELLED_INCOMPLETE missing=record:waldo_model_bom effect=aien-ledger-slice/1:strong"
     );
 }
 
@@ -253,7 +223,7 @@ fn truncated_manifest_write() {
 
 #[test]
 fn receipt_for_another_request_substituted() {
-    let d = scratch(SYN, "receipt_other_request");
+    let d = scratch(WEAK, "receipt_other_request");
     let other = synth::receipt_bytes(
         "write_file",
         &synth::request_args(synth::OTHER_REQUEST_ID),
@@ -270,7 +240,7 @@ fn receipt_for_another_request_substituted() {
 
 #[test]
 fn receipt_claimed_for_another_trace() {
-    let d = scratch(SYN, "receipt_other_trace");
+    let d = scratch(WEAK, "receipt_other_trace");
     let mut c = companion(&d);
     c["interplane"]["trace_id"] = json!("trace-prov-99");
     write_companion(&d, &c);

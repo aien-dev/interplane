@@ -12,9 +12,12 @@
 //! first failure, so the same archive always yields the same bytes:
 //! `PASS complete`, `PASS_LABELLED_INCOMPLETE missing=<sorted list>` or `FAIL <code>: <detail>`.
 
+pub mod binding;
 pub mod gojson;
+mod ledger;
 pub mod synth;
 
+use binding::{compact_sorted, LEDGER_BINDING, RECEIPT_BINDING, SERDE_DIGEST_FORM};
 use gojson::{compact, sha256_hex, top_level_member, waldo_sha256};
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -110,16 +113,30 @@ fn safe_relative(p: &str) -> bool {
 /// Verify the archive rooted at `dir`. Never panics on hostile input; always one line.
 pub fn verify(dir: &Path) -> String {
     match verify_inner(dir) {
-        Ok(missing) if missing.is_empty() => "PASS complete".to_string(),
-        Ok(missing) => format!(
-            "PASS_LABELLED_INCOMPLETE missing={}",
-            missing.into_iter().collect::<Vec<_>>().join(",")
-        ),
+        Ok((missing, effect)) => {
+            let mut line = if missing.is_empty() {
+                "PASS complete".to_string()
+            } else {
+                format!(
+                    "PASS_LABELLED_INCOMPLETE missing={}",
+                    missing.into_iter().collect::<Vec<_>>().join(",")
+                )
+            };
+            if let Some(e) = effect {
+                line.push_str(&format!(" effect={e}"));
+            }
+            line
+        }
         Err(Fail(line)) => line,
     }
 }
 
-fn verify_inner(dir: &Path) -> Result<BTreeSet<String>, Fail> {
+/// What the effect link proved, named by binding and strength.
+/// `aien-ledger-slice/1:strong` binds request, trace, approval and bytes through records the
+/// daemon wrote; `record_effect_receipt/1:weak` binds tool, outcome and digests only.
+type EffectLabel = String;
+
+fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), Fail> {
     let raw = match std::fs::read(dir.join(COMPANION_FILE)) {
         Ok(b) => b,
         Err(_) => return fail("missing_companion", COMPANION_FILE),
@@ -296,23 +313,45 @@ fn verify_inner(dir: &Path) -> Result<BTreeSet<String>, Fail> {
         check_aien(&archive, a)?;
     }
 
-    // 7 and 8. INTERPLANE trace, then the effect receipt for exactly that request.
-    let mut call: Option<(Value, Value)> = None;
+    // 7 and 8. INTERPLANE trace, then the effect for exactly that request.
+    let mut call: Option<Call> = None;
     if let Some(t) = link("interplane") {
         if link("aien").is_none() {
             return fail("malformed_companion", "interplane without aien");
         }
         call = check_trace(&archive, t)?;
     }
-    if link("effect").is_some() {
-        let Some(t) = link("interplane") else {
+    let mut effect_label = None;
+    if let Some(e) = link("effect") {
+        let (Some(t), Some(aien)) = (link("interplane"), link("aien")) else {
             return fail("malformed_companion", "effect without interplane");
         };
-        if let Some((args, result)) = &call {
-            check_receipt(&archive, t, args, result)?;
+        match s(e, &["binding"]) {
+            Some(LEDGER_BINDING) => {
+                ledger::check(&archive, e, t, aien, call.as_ref())?;
+                effect_label = Some(format!("{LEDGER_BINDING}:strong"));
+            }
+            Some(RECEIPT_BINDING) => {
+                // Weaker: tool + digests only. The label stays on the verdict.
+                if s(e, &["digest_form"]) != Some(SERDE_DIGEST_FORM) {
+                    return fail(
+                        "canonicalization_mismatch",
+                        format!(
+                            "effect.digest_form={} (producer form is {SERDE_DIGEST_FORM})",
+                            s(e, &["digest_form"]).unwrap_or("absent")
+                        ),
+                    );
+                }
+                if let Some(c) = &call {
+                    check_receipt(&archive, t, &c.args, &c.result)?;
+                }
+                effect_label = Some(format!("{RECEIPT_BINDING}:weak"));
+            }
+            Some(other) => return fail("unsupported_binding", format!("effect.binding={other}")),
+            None => return fail("malformed_companion", "effect.binding"),
         }
     }
-    Ok(actually_missing)
+    Ok((actually_missing, effect_label))
 }
 
 fn check_waldo_lineage(a: &Archive, l: &Value) -> Result<(String, String), Fail> {
@@ -649,8 +688,15 @@ fn check_aien(a: &Archive, l: &Value) -> Result<(), Fail> {
     Ok(())
 }
 
-/// Returns the request's arguments and its result payload, when the trace bytes are retained.
-fn check_trace(a: &Archive, t: &Value) -> Result<Option<(Value, Value)>, Fail> {
+/// The retained request, as the trace holds it.
+pub(crate) struct Call {
+    pub tool: String,
+    pub args: Value,
+    pub result: Value,
+}
+
+/// Returns the request's tool, arguments and result payload, when the trace bytes are retained.
+fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
     let Some(trace) = a.json("interplane_trace")? else {
         return Ok(None);
     };
@@ -660,7 +706,7 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<(Value, Value)>, Fail> {
     let Some(envs) = trace.as_array() else {
         return fail("unparseable_record", "interplane_trace");
     };
-    let (mut args, mut result) = (None, None);
+    let (mut req, mut result) = (None, None);
     for (i, e) in envs.iter().enumerate() {
         if let Err(code) = interplane_core::validate_envelope_value(e) {
             return fail(
@@ -677,18 +723,24 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<(Value, Value)>, Fail> {
         let p = &e["payload"];
         if s(p, &["request_id"]) == Some(rid) {
             match s(p, &["kind"]) {
-                Some("tool_request") => args = p.get("arguments").cloned(),
+                Some("tool_request") => {
+                    req = Some((
+                        s(p, &["tool", "name"]).unwrap_or("").to_string(),
+                        p.get("arguments").cloned().unwrap_or(Value::Null),
+                    ))
+                }
                 Some("result") => result = Some(p.clone()),
                 _ => {}
             }
         }
     }
-    match (args, result) {
-        (Some(x), Some(r)) => Ok(Some((x, r))),
+    match (req, result) {
+        (Some((tool, args)), Some(result)) => Ok(Some(Call { tool, args, result })),
         _ => fail("not_in_trace", format!("{tid}/{rid}")),
     }
 }
 
+/// SHA-256 of JCS (RFC 8785) bytes. Used only to recognise a digest made in the wrong form.
 fn jcs_digest(v: &Value) -> String {
     format!(
         "sha256:{}",
@@ -696,9 +748,22 @@ fn jcs_digest(v: &Value) -> String {
     )
 }
 
-/// The aien-cli effect receipt (crates/aien-cli/src/tools.rs `record_effect_receipt`) carries no
-/// trace or request id; it is bound to the request through its tool, outcome and the digests of
-/// the request's arguments and the runtime's result data.
+/// The digest aien-cli computes: SHA-256 of `serde_json::to_vec` (form
+/// `serde_json.to_vec.sorted-keys/1`, see binding.rs), refused when not reproducible.
+fn producer_digest(what: &str, v: &Value) -> Result<String, Fail> {
+    match compact_sorted(v) {
+        Ok(b) => Ok(format!("sha256:{}", sha256_hex(&b))),
+        Err(why) => fail(
+            "canonicalization_mismatch",
+            format!("{what}: producer form {SERDE_DIGEST_FORM} not reproduced: {why}"),
+        ),
+    }
+}
+
+/// Weaker binding. The aien-cli effect receipt (crates/aien-cli/src/tools.rs
+/// `record_effect_receipt`, version 1) carries no trace or request id; it is bound to the request
+/// only through its tool, outcome and the digests of the request's arguments and result data.
+/// Two requests with identical tool, arguments and result data are not told apart.
 fn check_receipt(a: &Archive, t: &Value, args: &Value, result: &Value) -> Result<(), Fail> {
     let Some(r) = a.json("effect_receipt")? else {
         return Ok(());
@@ -713,17 +778,21 @@ fn check_receipt(a: &Archive, t: &Value, args: &Value, result: &Value) -> Result
             format!("effect_receipt.tool request={rid}"),
         );
     }
-    if s(&r, &["arguments_digest"]) != Some(jcs_digest(args).as_str()) {
-        return fail(
-            "binding_mismatch",
-            format!("effect_receipt.arguments_digest request={rid}"),
-        );
-    }
-    if s(&r, &["result_digest"]) != Some(jcs_digest(&result["data"]).as_str()) {
-        return fail(
-            "binding_mismatch",
-            format!("effect_receipt.result_digest request={rid}"),
-        );
+    for (field, value) in [
+        ("arguments_digest", args),
+        ("result_digest", &result["data"]),
+    ] {
+        let what = format!("effect_receipt.{field}");
+        let want = producer_digest(&what, value)?;
+        if s(&r, &[field]) != Some(want.as_str()) {
+            if s(&r, &[field]) == Some(jcs_digest(value).as_str()) {
+                return fail(
+                    "canonicalization_mismatch",
+                    format!("{what} is the JCS form; the producer form is {SERDE_DIGEST_FORM}"),
+                );
+            }
+            return fail("binding_mismatch", format!("{what} request={rid}"));
+        }
     }
     let ok = s(result, &["status"]) == Some("ok");
     if r.get("success") != Some(&Value::Bool(ok)) {

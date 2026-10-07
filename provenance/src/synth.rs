@@ -7,6 +7,10 @@
 //! export carries a Hugging Face `tokenizer.json`, which a real WALDO Hugging Face export does not
 //! (it ships `tokenizer_config.json` plus custom tokenizer code; see the real fixture).
 
+use crate::binding::{
+    approval_binding_bytes, approved_proposal_bytes, compact_sorted, compose_proposal_bytes,
+    ApprovalFields, APPROVAL_BINDING, LEDGER_BINDING, RECEIPT_BINDING, SERDE_DIGEST_FORM,
+};
 use crate::gojson::{sha256_hex, waldo_sha256};
 use crate::COMPANION_FILE;
 use serde_json::{json, Value};
@@ -15,6 +19,11 @@ use std::path::Path;
 pub const TRACE_ID: &str = "trace-prov-01";
 pub const REQUEST_ID: &str = "call-prov-01";
 pub const OTHER_REQUEST_ID: &str = "call-prov-02";
+/// Same tool, arguments and result data as `REQUEST_ID`, in the same trace.
+pub const IDENTICAL_REQUEST_ID: &str = "call-prov-03";
+pub const WORKSPACE: &str = "/synthetic/workspace";
+pub const DAEMON_PID: u64 = 4242;
+pub const DAEMON_START_TICKS: u64 = 777_000;
 const RUN_ID: &str = "5e7a0c1d2b3f4a59";
 const CAND: &str = "CAND-SYNTH-0";
 const EXE: &str = "aien-cli-native-release";
@@ -24,6 +33,12 @@ const EXE: &str = "aien-cli-native-release";
 pub struct Opts {
     /// Write this `vocab_size` into config.json instead of the tokenizer's real size.
     pub config_vocab: Option<u64>,
+    /// Trace id of the INTERPLANE trace and the ledger (default [`TRACE_ID`]).
+    pub trace_id: Option<String>,
+    /// The request the effect link names (default [`REQUEST_ID`]).
+    pub request_id: Option<String>,
+    /// Write the weaker `record_effect_receipt/1` binding instead of the ledger slice.
+    pub weak: bool,
 }
 
 fn pretty(v: &Value) -> Vec<u8> {
@@ -55,13 +70,13 @@ fn artifact(role: &str, path: &str, b: &[u8]) -> Value {
     json!({"role": role, "path": path, "sha256": sha256_hex(b), "bytes": b.len()})
 }
 
-/// The aien-cli effect receipt shape (`record_effect_receipt`, version 1). Digests here use JCS;
-/// aien-cli uses `serde_json::to_vec`, which is the same bytes for these string-only values.
+/// The aien-cli effect receipt shape (`record_effect_receipt`, version 1). Digests use the
+/// producer's form (`serde_json.to_vec.sorted-keys/1`, see binding.rs).
 pub fn receipt_bytes(tool: &str, args: &Value, data: &Value, success: bool) -> Vec<u8> {
     let d = |v: &Value| {
         format!(
             "sha256:{}",
-            sha256_hex(interplane_core::canonicalize(v).as_bytes())
+            sha256_hex(&compact_sorted(v).expect("integers only"))
         )
     };
     serde_json::to_vec_pretty(&json!({
@@ -72,11 +87,12 @@ pub fn receipt_bytes(tool: &str, args: &Value, data: &Value, success: bool) -> V
     .expect("json")
 }
 
+/// Requests 01 and 03 are identical calls; 02 differs.
 pub fn request_args(request_id: &str) -> Value {
-    if request_id == REQUEST_ID {
-        json!({"path": "notes/today.md", "content": "hello world"})
-    } else {
+    if request_id == OTHER_REQUEST_ID {
         json!({"path": "notes/other.md", "content": "note append"})
+    } else {
+        json!({"path": "notes/today.md", "content": "hello world"})
     }
 }
 
@@ -85,7 +101,131 @@ pub fn result_data(request_id: &str) -> Value {
     json!({"path": a["path"], "bytes_written": a["content"].as_str().unwrap_or("").len()})
 }
 
+/// One Cortex record as `ComposeRecall` exports it (`ComposeRecordView`). SYNTHETIC digest.
+fn record_view(id: u64, links: [u64; 4], note: &str, text: &Value) -> Value {
+    let text = text.to_string();
+    json!({"id": id, "cls": 0, "kind": 0, "subject": 0, "tag": 0, "links": links,
+        "digest": sha256_hex(format!("synthetic-record:{id}:{text}").as_bytes()),
+        "verified": true, "note": note, "text": text})
+}
+
+/// The five daemon-written ledger records of one approved write, SYNTHETIC but built through the
+/// same binding functions the verifier uses. `index` spaces the record ids apart.
+pub fn ledger_slice(trace_id: &str, request_id: &str, index: u64) -> Vec<(&'static str, Value)> {
+    let a = request_args(request_id);
+    let (path, content) = (a["path"].as_str().unwrap(), a["content"].as_str().unwrap());
+    let base = 20 + 10 * index;
+    let (claim, evidence, promotion, committed, grant, intent, ack) = (
+        base,
+        base + 4,
+        base + 5,
+        base + 6,
+        base + 7,
+        base + 8,
+        base + 9,
+    );
+    let content_sha = sha256_hex(content.as_bytes());
+    let approved_sha = sha256_hex(&approved_proposal_bytes(path, content));
+    let compose_sha = sha256_hex(&compose_proposal_bytes(path, content));
+    let approval_id = format!("aien-approval:{request_id}:synthetic");
+    let desk = "0123456789abcdef";
+    let key = sha256_hex(&approval_binding_bytes(&ApprovalFields {
+        approval_id: &approval_id,
+        approved_proposal_sha256: &approved_sha,
+        approver: "drake",
+        content_sha256: &content_sha,
+        desk_key_id: desk,
+        path,
+        request_id,
+        trace_id,
+        workspace: WORKSPACE,
+    }));
+    let target = format!("{WORKSPACE}/{path}");
+    vec![
+        (
+            "ledger_claim",
+            record_view(
+                claim,
+                [0; 4],
+                "effect",
+                &json!({
+            "approved_submission": "accepted", "approval_key": key, "request_id": request_id,
+            "approval_id": approval_id, "trace_id": trace_id,
+            "executor": {"pid": DAEMON_PID, "start": DAEMON_START_TICKS}}),
+            ),
+        ),
+        (
+            "ledger_committed",
+            record_view(
+                committed,
+                [claim, 0, 0, 0],
+                "effect",
+                &json!({
+            "approved_submission": "committed", "claim": claim,
+            "evidence": {"compose_proposal_sha256": compose_sha, "cx_promotion": promotion,
+                         "cx_evidence": evidence, "task": 1}}),
+            ),
+        ),
+        (
+            "ledger_grant",
+            record_view(
+                grant,
+                [promotion, evidence, claim, 0],
+                "authorization",
+                &json!({
+            "approved_grant": 1, "proposal_sha256": compose_sha, "path": path,
+            "content_sha256": content_sha, "approver": "drake", "target": target,
+            "workspace": WORKSPACE, "prior_sha256": null, "approval_key": key,
+            "replay_claim": claim, "cx_promotion": promotion, "cx_evidence": evidence,
+            "request_id": request_id, "trace_id": trace_id, "approval_id": approval_id,
+            "desk_key_id": desk, "approved_proposal_sha256": approved_sha}),
+            ),
+        ),
+        (
+            "ledger_intent",
+            record_view(
+                intent,
+                [grant, 0, 0, 0],
+                "effect",
+                &json!({
+            "phase": "intent", "tool": "write_file", "authorization": grant,
+            "proposal_sha256": compose_sha, "path": path, "target": target,
+            "content_sha256": content_sha, "prior_sha256": null,
+            "executor": {"pid": 9, "start": 9}}),
+            ),
+        ),
+        (
+            "ledger_ack",
+            record_view(
+                ack,
+                [intent, grant, 0, 0],
+                "effect",
+                &json!({
+            "phase": "ack", "intent": intent, "authorization": grant, "tool": "write_file",
+            "path": path, "content_sha256": content_sha, "state": "DONE",
+            "disk_sha256": content_sha, "disk_error": null}),
+            ),
+        ),
+    ]
+}
+
+/// The adapter's receipt as it appears in the INTERPLANE result (`data.receipt`).
+fn adapter_receipt(trace_id: &str, request_id: &str, index: u64) -> Value {
+    let s = ledger_slice(trace_id, request_id, index);
+    let r = |n: &str| {
+        s.iter()
+            .find(|(k, _)| *k == n)
+            .map(|(_, v)| v)
+            .expect("record")
+    };
+    json!({"state": "DONE", "trace_id": trace_id, "request_id": request_id,
+        "grant_id": r("ledger_grant")["id"], "grant_digest": r("ledger_grant")["digest"],
+        "intent_id": r("ledger_intent")["id"], "intent_digest": r("ledger_intent")["digest"],
+        "ack_record_id": r("ledger_ack")["id"], "ack_digest": r("ledger_ack")["digest"]})
+}
+
 fn envelope(
+    trace_id: &str,
     n: u32,
     parent: Option<String>,
     src: (&str, &str),
@@ -93,20 +233,26 @@ fn envelope(
     payload: Value,
 ) -> Value {
     json!({
-        "interplane_version": "0.1", "message_id": format!("m-{n}"), "trace_id": TRACE_ID,
-        "parent_id": parent, "timestamp": format!("2026-10-06T00:00:0{n}Z"),
+        "interplane_version": "0.1", "message_id": format!("m-{n}"), "trace_id": trace_id,
+        "parent_id": parent, "timestamp": format!("2026-10-06T00:00:{n:02}Z"),
         "source": {"kind": src.0, "id": src.1}, "destination": {"kind": dst.0, "id": dst.1},
         "payload": payload
     })
 }
 
-fn trace() -> Value {
+/// Three requests in one trace: 01, 02 and 03, where 03 repeats 01 exactly. In ledger mode each
+/// result carries the adapter receipt of its own request.
+fn trace(trace_id: &str, weak: bool) -> Value {
     let mut envs = Vec::new();
     let mut n = 0;
-    for rid in [REQUEST_ID, OTHER_REQUEST_ID] {
+    for (i, rid) in [REQUEST_ID, OTHER_REQUEST_ID, IDENTICAL_REQUEST_ID]
+        .into_iter()
+        .enumerate()
+    {
         n += 1;
         let req = n;
         envs.push(envelope(
+            trace_id,
             n,
             None,
             ("model", "synthetic-notes"),
@@ -119,8 +265,12 @@ fn trace() -> Value {
             }),
         ));
         n += 1;
-        envs.push(envelope(n, Some(format!("m-{req}")), ("runtime", "aien"), ("model", "synthetic-notes"), json!({
-            "kind": "result", "request_id": rid, "status": "ok", "data": result_data(rid),
+        let mut data = result_data(rid);
+        if !weak {
+            data["receipt"] = adapter_receipt(trace_id, rid, i as u64);
+        }
+        envs.push(envelope(trace_id, n, Some(format!("m-{req}")), ("runtime", "aien"), ("model", "synthetic-notes"), json!({
+            "kind": "result", "request_id": rid, "status": "ok", "data": data,
             "error": null, "decision": null,
             "provenance": {"capability": "write_file", "content_kind": "tool_result", "duration_ms": null,
                            "runtime": "aien", "trust": "trusted_runtime", "trusted": true}
@@ -217,16 +367,19 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
         sha256_hex(&exp_w), sha256_hex(&tokenizer), sha256_hex(&config)
     );
     let load = format!(
-        "checkpoint loaded from /models/synthetic-notes/model.safetensors (tokenizer loaded, model_id=synthetic-notes, config=synthetic-notes (config.json), model_sha256={}, tokenizer_sha256={})\n",
+        "checkpoint loaded from /models/synthetic-notes/model.safetensors (tokenizer loaded, model_id=synthetic-notes, config=synthetic-notes (config.json), model_sha256={}, tokenizer_sha256={})\n\u{2713} Binding socket at /synthetic/run/aien.sock\n",
         sha256_hex(&exp_w), sha256_hex(&tokenizer)
     );
-    let trace = pretty(&trace());
-    let receipt = receipt_bytes(
-        "write_file",
-        &request_args(REQUEST_ID),
-        &result_data(REQUEST_ID),
-        true,
-    );
+    let trace_id = o.trace_id.clone().unwrap_or_else(|| TRACE_ID.to_string());
+    let request_id = o
+        .request_id
+        .clone()
+        .unwrap_or_else(|| REQUEST_ID.to_string());
+    let index = [REQUEST_ID, OTHER_REQUEST_ID, IDENTICAL_REQUEST_ID]
+        .iter()
+        .position(|r| *r == request_id)
+        .expect("request id is one of the synthetic requests") as u64;
+    let trace = pretty(&trace(&trace_id, o.weak));
 
     let files: Vec<(&str, &str, Vec<u8>)> = vec![
         ("waldo_plan", "records/waldo/PLAN.json", plan),
@@ -259,12 +412,33 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
             load.into_bytes(),
         ),
         ("interplane_trace", "records/interplane/trace.json", trace),
-        (
+    ];
+    let mut files = files;
+    if o.weak {
+        files.push((
             "effect_receipt",
             "records/aien/effect-receipt.json",
-            receipt,
-        ),
-    ];
+            receipt_bytes(
+                "write_file",
+                &request_args(&request_id),
+                &result_data(&request_id),
+                true,
+            ),
+        ));
+    } else {
+        for (name, view) in ledger_slice(&trace_id, &request_id, index) {
+            files.push((name, ledger_path(name), pretty(&view)));
+        }
+        files.push((
+            "daemon_run",
+            "records/aien/daemon-run.json",
+            pretty(&json!({"kind": "aien-daemon-run", "pid": DAEMON_PID,
+                "start_ticks": DAEMON_START_TICKS, "boot_id": "synthetic-boot",
+                "socket": "/synthetic/run/aien.sock", "workspace": WORKSPACE,
+                "executable_sha256": exe_sha,
+                "note": "SYNTHETIC: written by the generator, not by a run harness"})),
+        ));
+    }
     let mut records = serde_json::Map::new();
     for (name, rel, bytes) in &files {
         put(dir, rel, bytes)?;
@@ -284,10 +458,24 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
             "conversion_tool": {"name": "waldo model export --format huggingface", "commit": "synthetic", "checked": false}},
         "load_support": {"declared": crate::SUPPORTED},
         "aien": {"candidate_id": CAND, "executable": EXE, "executable_sha256": exe_sha},
-        "interplane": {"trace_id": TRACE_ID, "request_id": REQUEST_ID},
-        "effect": {"receipt": "effect_receipt"}
+        "interplane": {"trace_id": trace_id, "request_id": request_id},
+        "effect": if o.weak {
+            json!({"binding": RECEIPT_BINDING, "digest_form": SERDE_DIGEST_FORM, "receipt": "effect_receipt"})
+        } else {
+            json!({"binding": LEDGER_BINDING, "approval_binding": APPROVAL_BINDING})
+        }
     });
     seal(dir, skeleton)
+}
+
+fn ledger_path(name: &str) -> &'static str {
+    match name {
+        "ledger_claim" => "records/aien/ledger-claim.json",
+        "ledger_committed" => "records/aien/ledger-committed.json",
+        "ledger_grant" => "records/aien/ledger-grant.json",
+        "ledger_intent" => "records/aien/ledger-intent.json",
+        _ => "records/aien/ledger-ack.json",
+    }
 }
 
 /// Fill `sha256`, `bytes` (and `waldo_sha256` for WALDO JSON records) of every retained record

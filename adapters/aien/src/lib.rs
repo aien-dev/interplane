@@ -30,7 +30,10 @@ use interplane_crossveil::{CallContext, ObservedRecord, Pipeline, Refusal, Runti
 use serde_json::{json, Map, Value};
 
 pub mod compose_ledger;
-pub use compose_ledger::{ComposeLedgerAuthority, LedgerClient, DEFAULT_APPROVER, LEDGER_BOUNDARY};
+pub use compose_ledger::{
+    hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
+    APPROVAL_BINDING_VERSION, DEFAULT_APPROVER, LEDGER_BOUNDARY,
+};
 
 /// Runtime id carried in every decision, result and catalog.
 pub const RUNTIME_ID: &str = "aien";

@@ -12,8 +12,16 @@
 //! Model: `AIEN_LEDGER_MODEL_DIR` (default: the unsloth Llama-3.2-1B-Instruct snapshot 5a8abab in
 //! the Hugging Face cache). `LEDGER_OUT=<dir>` keeps each row's daemon home, log and receipt.
 //!
-//! Boundary of every row: durable effect ledger + Cortex journal (NEXT-PHASE-2 path); the
-//! daemon's compose.verify / AEGIS / J-Space / World commit are NOT exercised.
+//! Boundary of every row: [`LEDGER_BOUNDARY`]. An approved `write_file` is handed to the daemon as
+//! an authenticated `ComposeApprovedProposal` (desk-key MAC, durable replay claim), runs through
+//! compose verify + AEGIS, a J-Space branch, a World commit and Cortex promotion/evidence records,
+//! and only then gets a grant keyed on the returned `compose_proposal_sha256`, an intent, the write
+//! and the ack. The desk key is made by `AIEN_BIN compose desk-key --create 1` in the daemon's
+//! compose home, outside the workspace. Journal deltas are exact: records are numbered in order,
+//! so a committed write appends `ack_id - replay_claim + 1` records (claim, compose records,
+//! replay commit, grant, intent, ack).
+//!
+//! `row9` needs no daemon and always runs: the desk key is out of reach of the model tools.
 use interplane_adapter_aien::*;
 use interplane_core::*;
 use interplane_crossveil::{CallContext, Pipeline, Refusal, RuntimeAuthority};
@@ -44,6 +52,7 @@ struct Daemon {
     child: Child,
     root: PathBuf,
     sock: PathBuf,
+    desk_key_id: String,
     log: PathBuf,
     started_ms: u128,
     _keep: Option<tempfile::TempDir>,
@@ -62,6 +71,9 @@ impl Daemon {
     }
     fn ws(&self) -> PathBuf {
         self.root.join("ws")
+    }
+    fn desk(&self) -> PathBuf {
+        self.root.join("compose").join("approval-desk.key")
     }
 }
 
@@ -93,6 +105,25 @@ fn daemon(row: &str) -> Option<Daemon> {
     }
     let root = std::fs::canonicalize(root).unwrap();
     let (sock, log) = (root.join("aien.sock"), root.join("daemon.log"));
+    // The approval desk key, made by the CLI step in the compose home (outside the workspace).
+    let made = Command::new(&bin)
+        .args(["compose", "desk-key", "--create", "1"])
+        .env("AIEN_COMPOSE_DIR", root.join("compose"))
+        .output()
+        .expect("aien compose desk-key");
+    assert!(made.status.success(), "desk-key: {made:?}");
+    let out = String::from_utf8_lossy(&made.stdout);
+    let desk: Value = out
+        .lines()
+        .rev()
+        .find_map(|l| serde_json::from_str(l).ok())
+        .unwrap_or_else(|| panic!("desk-key printed no JSON: {out}"));
+    let key_text = std::fs::read_to_string(root.join("compose/approval-desk.key")).unwrap();
+    assert!(!out.contains(key_text.trim()), "desk-key printed the key");
+    let desk_key_id = desk["desk_key_id"]
+        .as_str()
+        .expect("desk_key_id")
+        .to_string();
     let t0 = Instant::now();
     let child = Command::new(&bin)
         .arg("daemon")
@@ -114,6 +145,7 @@ fn daemon(row: &str) -> Option<Daemon> {
         child,
         root: root.clone(),
         sock: sock.clone(),
+        desk_key_id,
         log: log.clone(),
         started_ms: 0,
         _keep: keep,
@@ -213,7 +245,56 @@ fn turn(calls: Vec<Value>) -> Value {
 /// Adapter + ledger authority over the daemon's workspace.
 fn ledger(d: &Daemon) -> ComposeLedgerAuthority {
     let shared = AienShared::new(AienAuthority::new(d.ws()).unwrap());
-    ComposeLedgerAuthority::new(shared, d.ws(), &d.sock).unwrap()
+    ComposeLedgerAuthority::new(shared, d.ws(), &d.sock, d.desk()).unwrap()
+}
+
+/// `(replay_claim, grant_id)` of a receipt that reached the grant.
+fn claim_grant(rc: &Value) -> (u64, u64) {
+    (
+        rc["handoff"]["replay_claim"]
+            .as_u64()
+            .expect("replay_claim"),
+        rc["grant_id"].as_u64().expect("grant_id"),
+    )
+}
+
+/// The approved `{content, path}` digest (INTERPLANE form) and the compose form.
+fn approved_sha(path: &str, content: &str) -> String {
+    hex(json!({"content": content, "path": path})
+        .to_string()
+        .as_bytes())
+}
+fn compose_sha(path: &str, content: &str) -> String {
+    hex(format!("filename: {path}\n{content}").as_bytes())
+}
+
+/// A handoff for `ComposeApprovedProposal`, MAC'd with `key` (`None`: no MAC).
+fn handoff(key: Option<&DeskKey>, b: &ApprovalBinding, content: &str) -> Value {
+    json!({"request_id": b.request_id, "trace_id": b.trace_id, "approval_id": b.approval_id,
+        "approver": b.approver, "path": b.path, "content": content,
+        "approved_proposal_sha256": b.approved_proposal_sha256, "content_sha256": b.content_sha256,
+        "approval_mac": key.map(|k| k.mac(b)).unwrap_or_default()})
+}
+
+fn binding(
+    d: &Daemon,
+    rid: &str,
+    aid: &str,
+    approver: &str,
+    path: &str,
+    content: &str,
+) -> ApprovalBinding {
+    ApprovalBinding {
+        trace_id: TRACE.into(),
+        request_id: rid.into(),
+        approval_id: aid.into(),
+        approver: approver.into(),
+        path: path.into(),
+        content_sha256: hex(content.as_bytes()),
+        approved_proposal_sha256: approved_sha(path, content),
+        desk_key_id: d.desk_key_id.clone(),
+        workspace: d.ws().to_str().unwrap().into(),
+    }
 }
 
 fn pipe<'a>(rt: &'a mut ComposeLedgerAuthority, l: &ComposeLedgerAuthority) -> Pipeline<'a> {
@@ -304,13 +385,57 @@ fn row1_approved_write_lands_and_is_done() {
     assert!(recs.iter().all(|r| r["verified"] == true));
     assert_eq!(recs[0]["text"]["approver"], "drake");
     assert_eq!(recs[0]["text"]["prior_sha256"], Value::Null);
+    // Hash identities: approved form at the handoff, compose form on grant and intent.
+    let (claim, grant) = claim_grant(&rc);
+    let (asha, csha) = (
+        approved_sha("summary.txt", EXPECTED),
+        compose_sha("summary.txt", EXPECTED),
+    );
+    assert_eq!(rc["approved_proposal_sha256"], json!(asha));
+    assert_eq!(rc["compose_proposal_sha256"], json!(csha));
+    assert_eq!(rc["proposal_sha256"], json!(csha));
+    assert_eq!(rc["handoff"]["state"], "COMMITTED");
+    assert_eq!(rc["handoff"]["committed"], true);
+    assert_eq!(rc["handoff"]["desk_key_id"], json!(d.desk_key_id));
+    assert_eq!(rc["trace_id"], TRACE);
+    assert_eq!(rc["request_id"], "w1");
+    assert_eq!(recs[0]["text"]["proposal_sha256"], json!(csha));
+    assert_eq!(
+        recs[0]["text"]["approved_grant"], 1,
+        "the daemon wrote the grant"
+    );
+    assert_eq!(rc["grant_id"], rc["handoff"]["approved_grant"]);
+    assert_eq!(recs[0]["text"]["approved_proposal_sha256"], json!(asha));
+    assert_eq!(recs[0]["text"]["replay_claim"], json!(claim));
+    assert_eq!(recs[0]["text"]["request_id"], "w1");
+    assert_eq!(recs[0]["text"]["trace_id"], TRACE);
+    assert_eq!(recs[1]["text"]["proposal_sha256"], json!(csha));
+    assert_eq!(
+        rc["handoff"]["grant_links"],
+        json!([
+            recs[0]["text"]["cx_promotion"],
+            recs[0]["text"]["cx_evidence"]
+        ])
+    );
+    // The durable claim names this request, trace and approval.
+    let cl = &records(&c, &[claim])[0];
+    assert_eq!(cl["note"], "effect");
+    assert_eq!(cl["text"]["approved_submission"], "accepted");
+    assert_eq!(cl["text"]["request_id"], "w1");
+    assert_eq!(cl["text"]["trace_id"], TRACE);
+    assert_eq!(cl["text"]["approval_id"], rc["approval_id"]);
+    assert!(claim < grant && ids == [grant, grant + 1, grant + 2]);
     assert_eq!(recs[2]["text"]["state"], "DONE");
     assert_eq!(
         recs[2]["text"]["disk_sha256"],
         json!(hex(EXPECTED.as_bytes()))
     );
     let after = count(&c);
-    assert_eq!(after, before + 3, "grant + intent + ack");
+    assert_eq!(
+        after - before,
+        ids[2] - claim + 1,
+        "handoff + grant + intent + ack"
+    );
     assert_eq!(l.grants_minted(), 1);
     save(
         &d,
@@ -418,7 +543,8 @@ fn row3_target_changed_after_grant_is_stale() {
     let grant = rc["grant_id"].as_u64().unwrap();
     assert!(effects_for(&c, grant).is_empty(), "no intent, no ack");
     let after = count(&c);
-    assert_eq!(after, before + 1, "the grant only");
+    let (claim, g2) = claim_grant(&rc);
+    assert_eq!(after - before, g2 - claim + 1, "handoff + the grant only");
     save(
         &d,
         "row3",
@@ -460,6 +586,65 @@ fn row4_spent_grant_is_refused_on_replay() {
         )
         .unwrap_err();
     assert!(b.contains("EFFECT_REFUSED AlreadySpent"), "{b}");
+    // (c) the exact approval handed to the daemon again: the original result, no second run
+    let key = DeskKey::load(&d.desk()).unwrap();
+    let b0 = binding(
+        &d,
+        "r1",
+        rc["approval_id"].as_str().unwrap(),
+        "drake",
+        "summary.txt",
+        EXPECTED,
+    );
+    let again = c
+        .approved(
+            &handoff(Some(&key), &b0, EXPECTED),
+            d.ws().to_str().unwrap(),
+        )
+        .unwrap();
+    assert_eq!(again["state"], "ALREADY_COMMITTED");
+    assert!(again["task"].is_null());
+    assert_eq!(again["replay_claim"], rc["handoff"]["replay_claim"]);
+    // (e) the same approval id re-presented under a fresh request id (what a released and
+    // re-minted grant with the same approval_id would hand off): refused by the durable ledger
+    let b1 = binding(
+        &d,
+        "r1-again",
+        rc["approval_id"].as_str().unwrap(),
+        "drake",
+        "summary.txt",
+        EXPECTED,
+    );
+    let reminted = c
+        .approved(
+            &handoff(Some(&key), &b1, EXPECTED),
+            d.ws().to_str().unwrap(),
+        )
+        .unwrap_err();
+    assert!(
+        reminted.starts_with("REPLAY_REFUSED AlreadyCommitted"),
+        "{reminted}"
+    );
+    // (d) a restarted adapter re-proposes request r1 and the host approves again. The adapter
+    // derives the approval id from the request id and the intent digest, so this is the SAME
+    // approval: the daemon answers ALREADY_COMMITTED (the original result, no second compose run)
+    // and the adapter refuses it as not a fresh commit. No grant, no write.
+    let fresh = ledger(&d);
+    let mut rt2 = fresh.clone();
+    let mut p2 = pipe(&mut rt2, &fresh);
+    propose(&mut p2, 0, "r1", "summary.txt", EXPECTED);
+    let (re, _) = approve(&mut p2, &fresh, "r1");
+    assert_ne!(re.status, ResultStatus::Ok);
+    let re_msg = re
+        .error
+        .as_ref()
+        .map(|e| e.message.clone())
+        .unwrap_or_default();
+    assert!(
+        re_msg.contains("daemon \"ALREADY_COMMITTED\", expected \"COMMITTED\""),
+        "{re:?}"
+    );
+    assert_eq!(fresh.grants_minted(), 0);
     let after = count(&c);
     assert_eq!(after, before, "refusals append nothing");
     assert_eq!(
@@ -471,7 +656,9 @@ fn row4_spent_grant_is_refused_on_replay() {
         &d,
         "row4",
         json!({"verdict": "PASS", "records_before_replay": before, "records_after_replay": after,
-        "pipeline_replay": format!("{a:?}"), "daemon_replay": b, "receipt": rc}),
+        "pipeline_replay": format!("{a:?}"), "daemon_replay": b, "handoff_replay": again,
+        "restarted_adapter_replay": re_msg, "same_approval_id_new_request": reminted,
+        "receipt": rc}),
     );
 }
 
@@ -503,7 +690,12 @@ fn row5_operator_stop_refuses_and_old_grant_stays_stale() {
     let rc = l.receipts().pop().unwrap();
     let grant = rc["grant_id"].as_u64().unwrap();
     let mid = count(&c);
-    assert_eq!(mid, before + 2, "grant + stop record");
+    let (claim, _) = claim_grant(&rc);
+    assert_eq!(
+        mid - before,
+        grant - claim + 2,
+        "handoff + grant + stop record"
+    );
     let resume = c.control("resume", "drake", None).unwrap();
     let mid2 = count(&c);
     let stale = c
@@ -661,6 +853,7 @@ fn row7_injection_corpus_executes_nothing() {
             AienShared::new(AienAuthority::new(&ws).unwrap()),
             &ws,
             &d.sock,
+            d.desk(),
         )
         .unwrap();
         let (requests, executed): (Rc<RefCell<Vec<_>>>, Rc<RefCell<HashSet<String>>>) =
@@ -741,4 +934,228 @@ fn row7_injection_corpus_executes_nothing() {
         json!({"verdict": "PASS", "cases": rows.len(), "violations": 0, "grants_minted": 0,
         "records_before": before, "records_after": after, "rows": rows}),
     );
+}
+
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn row8_forged_handoff_is_refused_before_compose() {
+    let _g = lock();
+    let Some(d) = daemon("row8") else { return };
+    let c = d.client();
+    let ws = d.ws().to_str().unwrap().to_string();
+    let before = count(&c);
+    let key = DeskKey::load(&d.desk()).unwrap();
+    let b = binding(
+        &d,
+        "h1",
+        "aien-approval:h1",
+        "drake",
+        "forged.txt",
+        "CANARY-HANDOFF\n",
+    );
+    // A second key the daemon does not hold (same file rules, other bytes).
+    let other_path = d.root.join("other-desk.key");
+    {
+        use std::io::Write;
+        use std::os::unix::fs::OpenOptionsExt;
+        let mut f = std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&other_path)
+            .unwrap();
+        writeln!(f, "{}", "ab".repeat(32)).unwrap();
+    }
+    let other = DeskKey::load(&other_path).unwrap();
+    let mut cases: Vec<(&str, Value)> = vec![
+        ("no MAC", handoff(None, &b, "CANARY-HANDOFF\n")),
+        ("other key", handoff(Some(&other), &b, "CANARY-HANDOFF\n")),
+    ];
+    // Honest MAC, one field changed after signing.
+    let honest = handoff(Some(&key), &b, "CANARY-HANDOFF\n");
+    for (name, k, v) in [
+        ("approver changed", "approver", json!("someone-else")),
+        ("request id changed", "request_id", json!("h2")),
+        ("trace id changed", "trace_id", json!("other-trace")),
+        (
+            "approval id changed",
+            "approval_id",
+            json!("aien-approval:other"),
+        ),
+    ] {
+        let mut h = honest.clone();
+        h[k] = v;
+        cases.push((name, h));
+    }
+    // Path changed with the approved digest recomputed (else the daemon refuses it earlier as
+    // Unverified): the MAC still binds the old path.
+    let mut h = honest.clone();
+    h["path"] = json!("other.txt");
+    h["approved_proposal_sha256"] = json!(approved_sha("other.txt", "CANARY-HANDOFF\n"));
+    cases.push(("path changed", h));
+    // Content changed with both digests recomputed: the MAC still binds the old ones.
+    let mut h = honest.clone();
+    h["content"] = json!("CANARY-SWAPPED\n");
+    h["content_sha256"] = json!(hex(b"CANARY-SWAPPED\n"));
+    h["approved_proposal_sha256"] = json!(approved_sha("forged.txt", "CANARY-SWAPPED\n"));
+    cases.push(("content swapped", h));
+    let mut h = honest.clone();
+    h["approval_mac"] = json!(h["approval_mac"].as_str().unwrap().to_uppercase());
+    cases.push(("uppercase MAC", h));
+    let mut seen = vec![];
+    for (name, h) in &cases {
+        let e = c.approved(h, &ws).unwrap_err();
+        assert!(
+            e.starts_with("PROPOSAL_REFUSED Unauthenticated"),
+            "{name}: {e}"
+        );
+        seen.push(json!({"case": name, "refusal": e}));
+    }
+    // The honest approval presented for another workspace (476ca4 c17): the MAC binds the
+    // canonical workspace, so the redirect is unauthenticated and consumes nothing.
+    let other_ws = d.root.join("other-ws");
+    std::fs::create_dir_all(&other_ws).unwrap();
+    let e = c.approved(&honest, other_ws.to_str().unwrap()).unwrap_err();
+    assert!(
+        e.starts_with("PROPOSAL_REFUSED Unauthenticated"),
+        "redirect: {e}"
+    );
+    seen.push(json!({"case": "workspace redirected", "refusal": e}));
+    let mid = count(&c);
+    assert_eq!(mid, before, "a refused handoff appends nothing");
+    assert!(!d.ws().join("forged.txt").exists() && !d.ws().join("other.txt").exists());
+    // Positive control: the honest handoff commits (and writes nothing by itself).
+    let ok = c.approved(&honest, &ws).unwrap();
+    assert_eq!(ok["state"], "COMMITTED");
+    assert_eq!(
+        ok["compose_proposal_sha256"],
+        json!(compose_sha("forged.txt", "CANARY-HANDOFF\n"))
+    );
+    assert!(
+        !d.ws().join("forged.txt").exists(),
+        "the handoff writes nothing"
+    );
+    let after = count(&c);
+    save(
+        &d,
+        "row8",
+        json!({"verdict": "PASS", "records_before": before, "records_after_refusals": mid,
+        "records_after_control": after, "refused": seen, "control": ok}),
+    );
+}
+
+/// No daemon: the desk key is out of the model's reach and its file rules hold.
+#[test]
+fn row9_desk_key_is_out_of_model_reach() {
+    use std::os::unix::fs::PermissionsExt;
+    let t = tempfile::tempdir().unwrap();
+    let root = std::fs::canonicalize(t.path()).unwrap();
+    let (ws, compose) = (root.join("ws"), root.join("compose"));
+    std::fs::create_dir_all(&ws).unwrap();
+    std::fs::create_dir_all(&compose).unwrap();
+    let key = compose.join("approval-desk.key");
+    let secret = "5a".repeat(32);
+    let write_key = |p: &Path, mode: u32| {
+        std::fs::write(p, format!("{secret}\n")).unwrap();
+        std::fs::set_permissions(p, std::fs::Permissions::from_mode(mode)).unwrap();
+    };
+    write_key(&key, 0o600);
+    let sock = root.join("absent.sock");
+    let mk = |w: &Path, k: &Path| {
+        ComposeLedgerAuthority::new(AienShared::new(AienAuthority::new(w).unwrap()), w, &sock, k)
+    };
+    let l = mk(&ws, &key).expect("key outside the workspace is accepted");
+    // (a) A key inside the workspace, or a workspace inside the key's directory: refused.
+    let inside = ws.join("approval-desk.key");
+    write_key(&inside, 0o600);
+    let e = mk(&ws, &inside).err().expect("key inside the workspace");
+    assert!(e.contains("overlap"), "{e}");
+    std::fs::remove_file(&inside).unwrap();
+    let nested = compose.join("ws");
+    std::fs::create_dir_all(&nested).unwrap();
+    let e = mk(&nested, &key)
+        .err()
+        .expect("workspace inside the compose home");
+    assert!(e.contains("overlap"), "{e}");
+    // (b) File rules: group/other bits, a symlink, malformed text.
+    let keys = root.join("keys");
+    std::fs::create_dir_all(&keys).unwrap();
+    for mode in [0o640, 0o604, 0o644] {
+        let k = keys.join(format!("k{mode:o}"));
+        write_key(&k, mode);
+        let e = mk(&ws, &k).err().expect("loose mode");
+        assert!(e.contains("mode 0600"), "{mode:o}: {e}");
+    }
+    let link = keys.join("link.key");
+    std::os::unix::fs::symlink(&key, &link).unwrap();
+    assert!(mk(&ws, &link).err().expect("symlink").contains("symlink"));
+    let bad = keys.join("bad.key");
+    std::fs::write(&bad, "5A".repeat(32)).unwrap();
+    std::fs::set_permissions(&bad, std::fs::Permissions::from_mode(0o600)).unwrap();
+    assert!(mk(&ws, &bad)
+        .err()
+        .expect("uppercase")
+        .contains("lowercase hex"));
+    // (c) The model's tools cannot read it: relative escape, absolute path, a symlink planted in
+    // the workspace, and listing the parent.
+    std::os::unix::fs::symlink(&key, ws.join("innocent.txt")).unwrap();
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    let calls = vec![
+        call(
+            "k1",
+            "read_file",
+            json!({"path": "../compose/approval-desk.key"}),
+        ),
+        call("k2", "read_file", json!({"path": key.to_str().unwrap()})),
+        call("k3", "read_file", json!({"path": "innocent.txt"})),
+        call("k4", "list_dir", json!({"path": "../compose"})),
+        call("k5", "list_dir", json!({"path": ".."})),
+    ];
+    let out = p.run_turn("openai", "scripted", &turn(calls), TRACE, 0);
+    assert_eq!(out.results.len(), 5);
+    for r in &out.results {
+        let text = serde_json::to_string(r).unwrap();
+        assert!(
+            !text.contains(&secret),
+            "key bytes reached the model: {text}"
+        );
+        assert!(
+            !text.contains("approval-desk.key") || r.status != ResultStatus::Ok,
+            "{text}"
+        );
+        assert_ne!(r.status, ResultStatus::Ok, "{text}");
+    }
+    // Debug never shows the key.
+    let dk = DeskKey::load(&key).unwrap();
+    assert!(!format!("{dk:?}").contains(&secret));
+}
+
+/// The adapter's binding is byte-for-byte the daemon's (`approved_auth::binding_bytes` unit test
+/// vector), and the HMAC is RFC 4231 test case 2.
+#[test]
+fn binding_and_mac_match_the_daemon_form() {
+    let b = ApprovalBinding {
+        trace_id: "t".into(),
+        request_id: "r".into(),
+        approval_id: "a".into(),
+        approver: "p".into(),
+        path: "N.md".into(),
+        content_sha256: "c".into(),
+        approved_proposal_sha256: "s".into(),
+        desk_key_id: "k".into(),
+        workspace: "/w".into(),
+    };
+    assert_eq!(
+        String::from_utf8(b.bytes()).unwrap(),
+        r#"{"approval_id":"a","approved_proposal_sha256":"s","approver":"p","content_sha256":"c","desk_key_id":"k","path":"N.md","request_id":"r","trace_id":"t","v":"aien.approval.v2","workspace":"/w"}"#
+    );
+    assert_eq!(
+        hex_bytes(&hmac_sha256(b"Jefe", b"what do ya want for nothing?")),
+        "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"
+    );
+}
+
+fn hex_bytes(b: &[u8]) -> String {
+    b.iter().map(|x| format!("{x:02x}")).collect()
 }

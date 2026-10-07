@@ -128,28 +128,58 @@ in-memory single-use grants). At the pinned rev no other sovereign-core crate de
 through `aien-omega-compose` (FFI to `librx_compose.a`, pinned by `omega.lock`); the approval is a
 durable Cortex `authorization` record, the write is bracketed by durable `effect` intent/ack
 records (`aien-runtime/src/effects.rs`), and every step leaves an `aien-cli`
-`record_effect_receipt` file. None of that is reached here, so adapter conformance proves the
-`aien-mcp` authority path, not the compose/World/Cortex boundary.
+`record_effect_receipt` file. None of that is reached by the default adapter, so adapter
+conformance proves the `aien-mcp` authority path; the opt-in `ComposeLedgerAuthority` below is
+the route that reaches the compose/World/Cortex boundary.
 
 ## Durable effect ledger (`ComposeLedgerAuthority`, opt-in)
 
 `src/compose_ledger.rs` wraps `AienShared` (approval desk, `decide` and reads unchanged) and routes
-an approved `write_file` through a running `aien-cli daemon` instead of the in-process provider:
-`ComposeNote` kind `authorization` (the durable grant: proposal, path, content and target digests,
-approver, the adapter's receipt digest, the target's prior digest), `ComposeEffectIntent` (the
-daemon refuses stop, revoke, spent and stale grants and records the intent before anything is
-written), the write (tmp + rename inside the workspace), and `ComposeEffectAck` (the daemon reads
-the disk and records DONE / NOT_DONE / UNRESOLVED). The ledger route opens only when AIEN's
-`EffectLane` minted the effect for that request (`holds_minted_effect`); that in-process effect is
-then dropped unexecuted. The socket client speaks the daemon's JSON line protocol directly, so
-`aien-runtime` (whose build needs the omega libraries) is not a dependency.
+an approved `write_file` through a running `aien-cli daemon` (sovereign-core #249) instead of the
+in-process provider. The route opens only when AIEN's `EffectLane` minted the effect for that
+request (`holds_minted_effect`); that in-process effect is then dropped unexecuted. An approved
+write has exactly one route:
 
-Boundary, stated on every receipt: `boundary = durable effect ledger + Cortex journal (NEXT-PHASE-2
-path); verify step NOT exercised`. The daemon's compose.verify / AEGIS / J-Space / World commit run
-only inside `RunComposeTask` with the daemon's own proposer and are not reached.
-Evidence: `tests/compose_ledger.rs` rows 1-7 (approved write, forged approval id, stale target,
-replay, operator stop/resume, adapter restart, the T4 injection subset). They need `AIEN_BIN`
-(an `aien-cli` binary) and `cargo test -- --ignored`; a plain `cargo test` reports them ignored.
+1. **Authenticated handoff.** `ComposeApprovedProposal` with an `ApprovedProposal` (trace id,
+   request id, approval id, approver, path, content, approved `{content, path}` digest, content
+   digest) and `approval_mac`, HMAC-SHA256 under the approval desk key (`DeskKey`, made by
+   `aien compose desk-key --create 1` in the daemon's compose home) over the canonical binding.
+   The daemon re-checks the MAC and claims the request id, approval id and approval key durably;
+   any replay (same request, same approval id, after a restart, after a crash) is refused.
+2. **Compose.** The approved text runs through the daemon's compose path: J-Space branch, AEGIS
+   verify, World commit, Cortex promotion and evidence records.
+3. **Grant.** The daemon itself writes the grant: a reserved `approved_grant` authorization keyed
+   on the returned `compose_proposal_sha256`, confined to the workspace, linked to the promotion,
+   evidence and replay claim. The adapter reads it back and checks every field; it never writes a
+   grant, so there is no client-minted fallback.
+4. **Intent, write, ack.** `ComposeEffectIntent` (stop, revoke, spent, stale, confinement and the
+   grant's committed backing checked by the daemon), the write (tmp + rename inside the
+   workspace), `ComposeEffectAck` (the daemon reads the disk: DONE / NOT_DONE / UNRESOLVED).
+
+The desk key never reaches the model: `ComposeLedgerAuthority::new` refuses a key inside the
+workspace (or a workspace inside the key's directory) and a key file that is a symlink, not owned
+by this user, group- or world-readable, or malformed; only its `desk_key_id` is recorded. The MAC
+proves that the holder of the desk key approved these exact fields, not that a particular human
+did; the OS user is the outer boundary. The socket client speaks the daemon's JSON line protocol
+directly, so `aien-runtime` (whose build needs the omega libraries) is not a dependency.
+
+Boundary, stated on every receipt (`LEDGER_BOUNDARY`): authenticated daemon handoff -> compose
+verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon grant on
+compose_proposal_sha256 -> effect intent -> write -> ack. It is the production effect path; it is
+not WALDO provenance, and `record_effect_receipt` still carries no trace or request id (#76).
+Evidence: `tests/compose_ledger.rs` rows 1-8 (approved write with both hash identities, forged
+approval id, stale target, replay including a re-presented approval id, operator stop/resume,
+adapter restart, the T4 injection subset, forged handoffs) need `AIEN_BIN` (an `aien-cli` binary
+built from sovereign-core #249) and `cargo test -- --ignored`; row 9 (desk key out of the model's
+reach, key file rules) always runs.
+
+Open until sovereign-core #260 (two-phase spend in `aien-mcp`) merges; `aien-mcp` stays pinned at
+d5b78ff until then, never at an unmerged branch: the `ApprovalError::Reserved` arm in the
+approval presenter; the two table rows above that say "the grant stays `Consumed`" (under #260
+`discard_unexecuted` returns the grant); building the `EffectLane` `with_clock` from a real host
+clock; a test that an approval expiring between grant and commit is refused with no write; and
+the `aien-mcp` half of "a re-minted grant with the same approval id is refused" (the daemon half,
+the same approval id under a new request refused by the durable replay ledger, is row 4).
 
 ## Reimplemented, and why
 

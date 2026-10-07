@@ -1,23 +1,34 @@
-//! `write_file` through AIEN's durable effect ledger (NEXT-PHASE-2 path of `aien-cli daemon`).
+//! `write_file` through AIEN's production compose path and durable effect ledger (`aien-cli
+//! daemon`, sovereign-core #249).
 //!
 //! [`ComposeLedgerAuthority`] wraps [`AienShared`]: the approval desk, `decide` and every read are
 //! the tested in-process adapter, unchanged. Only an authorized `write_file` takes a different
-//! route: instead of the in-process `EffectLane` provider, the adapter asks the running daemon on
-//! its control socket for a durable grant (`ComposeNote` kind `authorization`), a durable intent
-//! (`ComposeEffectIntent`, where the daemon checks stop, revoke, spent and stale), writes the bytes
-//! itself (tmp + rename inside the workspace), and reports back (`ComposeEffectAck`, where the
-//! daemon reads the disk and records the state). Grants, intents and acks live in the daemon's
-//! Cortex journal (`$AIEN_COMPOSE_DIR`).
+//! route, after the host approved it through the host-only continuation:
 //!
-//! Limits: the daemon's compose.verify / AEGIS / J-Space / World commit run only inside
-//! `RunComposeTask` (the daemon's own model proposer); they are NOT reached here. Every result says
-//! so ([`LEDGER_BOUNDARY`]). The socket client speaks the daemon's JSON line protocol directly
-//! (`aien-runtime` is not a dependency: its build scripts need the omega libraries).
+//! 1. the authenticated handoff: an `ApprovedProposal` (trace id, request id, approval id,
+//!    approver, path, content, approved proposal digest, content digest) with `approval_mac`, the
+//!    HMAC-SHA256 under the approval desk key ([`DeskKey`]) over the canonical binding, sent as
+//!    `ComposeApprovedProposal`. The daemon re-checks the MAC, claims the request id, approval id
+//!    and approval key durably (replay refused across restarts), then runs the approved text
+//!    through compose: J-Space branch, AEGIS verify callback, World commit, Cortex records;
+//! 2. the returned `ApprovedComposeReport` is checked field by field (ids, both hash identities);
+//! 3. the grant is the daemon's own reserved `approved_grant` record (returned as
+//!    `approved_grant`): keyed on `compose_proposal_sha256` (never the pre-compose approved
+//!    digest), confined to the workspace, linked to the Cortex promotion, evidence and replay claim
+//!    records; it is read back and checked. This authority writes no grant itself, so an approved
+//!    write has exactly one route;
+//! 4. `ComposeEffectIntent` (stop, revoke, spent, stale checked by the daemon), the write (tmp +
+//!    rename inside the workspace), `ComposeEffectAck` (the daemon reads the disk).
+//!
+//! The desk key never reaches the model: it is read from a host-configured path outside the
+//! workspace ([`ComposeLedgerAuthority::new`] refuses a key inside it) and only its id is recorded.
+//! The socket client speaks the daemon's JSON line protocol directly (`aien-runtime` is not a
+//! dependency: its build scripts need the omega libraries). Boundary: [`LEDGER_BOUNDARY`].
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs;
-use std::io::{BufRead, BufReader, Write};
-use std::os::unix::fs::MetadataExt;
+use std::io::{BufRead, BufReader, Read, Write};
+use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
 use std::os::unix::net::UnixStream;
 use std::path::{Component, Path, PathBuf};
 use std::rc::Rc;
@@ -33,13 +44,164 @@ use sha2::{Digest, Sha256};
 use crate::{AienShared, RUNTIME_ID};
 
 /// The label every receipt of this authority carries.
-pub const LEDGER_BOUNDARY: &str = "boundary = durable effect ledger + Cortex journal (NEXT-PHASE-2 path); verify step NOT exercised";
+pub const LEDGER_BOUNDARY: &str = "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance";
+/// Version tag inside every approval binding (sovereign-core `approved_auth`).
+pub const APPROVAL_BINDING_VERSION: &str = "aien.approval.v2";
 /// Approver recorded in the grant when the host names none.
 pub const DEFAULT_APPROVER: &str = "interplane-host";
 
 /// sha256 hex (the daemon's digest form: lowercase, no prefix).
 pub fn sha256_hex(b: &[u8]) -> String {
     format!("{:x}", Sha256::digest(b))
+}
+
+/// HMAC-SHA256 (RFC 2104) over sha2.
+pub fn hmac_sha256(key: &[u8], msg: &[u8]) -> [u8; 32] {
+    let mut k = [0u8; 64];
+    if key.len() > 64 {
+        k[..32].copy_from_slice(&Sha256::digest(key));
+    } else {
+        k[..key.len()].copy_from_slice(key);
+    }
+    let (mut ipad, mut opad) = ([0x36u8; 64], [0x5cu8; 64]);
+    for i in 0..64 {
+        ipad[i] ^= k[i];
+        opad[i] ^= k[i];
+    }
+    let inner = Sha256::new()
+        .chain_update(ipad)
+        .chain_update(msg)
+        .finalize();
+    Sha256::new()
+        .chain_update(opad)
+        .chain_update(inner)
+        .finalize()
+        .into()
+}
+
+/// The fields one approval covers, in the canonical binding the daemon re-computes (compact
+/// JSON, keys sorted, plus `"v": APPROVAL_BINDING_VERSION`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ApprovalBinding {
+    pub trace_id: String,
+    pub request_id: String,
+    pub approval_id: String,
+    pub approver: String,
+    pub path: String,
+    pub content_sha256: String,
+    pub approved_proposal_sha256: String,
+    pub desk_key_id: String,
+    /// The canonical absolute workspace the effect may land in (the daemon binds the
+    /// canonicalised workspace of the command, so another workspace fails the MAC).
+    pub workspace: String,
+}
+
+impl ApprovalBinding {
+    pub fn bytes(&self) -> Vec<u8> {
+        let mut m = Map::new();
+        for (k, v) in [
+            ("approval_id", &self.approval_id),
+            ("approved_proposal_sha256", &self.approved_proposal_sha256),
+            ("approver", &self.approver),
+            ("content_sha256", &self.content_sha256),
+            ("desk_key_id", &self.desk_key_id),
+            ("path", &self.path),
+            ("request_id", &self.request_id),
+            ("trace_id", &self.trace_id),
+            ("workspace", &self.workspace),
+        ] {
+            m.insert(k.into(), json!(v));
+        }
+        m.insert("v".into(), json!(APPROVAL_BINDING_VERSION));
+        Value::Object(m).to_string().into_bytes()
+    }
+}
+
+/// The approval desk key (`<compose dir>/approval-desk.key`, made by `aien compose desk-key
+/// --create 1`). Loaded with the daemon's rules: a regular file (no symlink, `O_NOFOLLOW`) owned
+/// by this user, no group or other bits, 64 lowercase hex digits. `Debug` shows only the id.
+pub struct DeskKey {
+    key: [u8; 32],
+    id: String,
+}
+
+impl std::fmt::Debug for DeskKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "DeskKey {{ id: {} }}", self.id)
+    }
+}
+
+impl DeskKey {
+    pub fn load(path: &Path) -> Result<Self, String> {
+        let bad = |w: String| format!("approval desk key {}: {w}", path.display());
+        let l = fs::symlink_metadata(path).map_err(|e| bad(e.to_string()))?;
+        if l.file_type().is_symlink() {
+            return Err(bad("is a symlink".into()));
+        }
+        let f = fs::OpenOptions::new()
+            .read(true)
+            .custom_flags(libc_o_nofollow())
+            .open(path)
+            .map_err(|e| bad(e.to_string()))?;
+        let m = f.metadata().map_err(|e| bad(e.to_string()))?;
+        let me = fs::metadata("/proc/self")
+            .map_err(|e| bad(e.to_string()))?
+            .uid();
+        if !m.file_type().is_file() || m.uid() != me || m.mode() & 0o077 != 0 {
+            return Err(bad(
+                "must be a regular file owned by this user with mode 0600".into(),
+            ));
+        }
+        let mut s = String::new();
+        f.take(256)
+            .read_to_string(&mut s)
+            .map_err(|e| bad(e.to_string()))?;
+        let h = s.trim_end_matches('\n');
+        if h.len() != 64
+            || !h
+                .bytes()
+                .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+        {
+            return Err(bad("not 64 lowercase hex digits".into()));
+        }
+        let mut key = [0u8; 32];
+        for (i, o) in key.iter_mut().enumerate() {
+            *o = u8::from_str_radix(&h[2 * i..2 * i + 2], 16).map_err(|e| bad(e.to_string()))?;
+        }
+        let id = sha256_hex(&key)[..16].to_string();
+        Ok(Self { key, id })
+    }
+
+    /// First 16 hex digits of sha256 of the key.
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+
+    /// `approval_mac` for `b` (whose `desk_key_id` must be [`Self::id`]).
+    pub fn mac(&self, b: &ApprovalBinding) -> String {
+        hmac_sha256(&self.key, &b.bytes())
+            .iter()
+            .map(|x| format!("{x:02x}"))
+            .collect()
+    }
+}
+
+impl Drop for DeskKey {
+    fn drop(&mut self) {
+        for b in self.key.iter_mut() {
+            // SAFETY: a valid, aligned, exclusively borrowed byte.
+            unsafe { std::ptr::write_volatile(b, 0) };
+        }
+    }
+}
+
+/// `O_NOFOLLOW` on Linux (aarch64 and x86_64 differ; the adapter is Linux-only like the daemon).
+fn libc_o_nofollow() -> i32 {
+    if cfg!(target_arch = "aarch64") {
+        0o100000
+    } else {
+        0o400000
+    }
 }
 
 /// sha256 of a file, `None` when absent; an error for anything that is not a regular file
@@ -164,6 +326,25 @@ impl LedgerClient {
         )
     }
 
+    /// `ComposeApprovedProposal` (sovereign-core #249). `Ok` = the `ComposeApprovedResult` report;
+    /// a `ComposeApprovedRefused` is `Err` with `"<refused_by> <name>: <detail>"`.
+    pub fn approved(&self, proposal: &Value, workspace: &str) -> Result<Value, String> {
+        let v = self.send(
+            json!({"ComposeApprovedProposal": {"proposal": proposal, "workspace": workspace}}),
+        )?;
+        if let Some(r) = v.get("ComposeApprovedRefused") {
+            return Err(format!(
+                "{} {}: {}",
+                r["refused_by"].as_str().unwrap_or("REFUSED"),
+                r["name"].as_str().unwrap_or("?"),
+                r["detail"].as_str().unwrap_or("")
+            ));
+        }
+        v.get("ComposeApprovedResult")
+            .cloned()
+            .ok_or_else(|| format!("expected ComposeApprovedResult, got {v}"))
+    }
+
     /// `ComposeRecall`; returns the `ComposeRecalled` report.
     pub fn recall(&self, ids: &[u64], prefix: Option<u64>) -> Result<Value, String> {
         self.body(
@@ -198,6 +379,7 @@ type Hook = Box<dyn FnMut(&Path)>;
 struct LedgerState {
     client: LedgerClient,
     workspace: PathBuf,
+    desk_key: PathBuf,
     approvers: HashMap<String, String>,
     before_intent: Option<Hook>,
     grants_minted: u32,
@@ -213,19 +395,41 @@ pub struct ComposeLedgerAuthority {
 }
 
 impl ComposeLedgerAuthority {
-    /// `shared` must be enrolled over the same `workspace`; `socket` is `$AIEN_RUNTIME_SOCK`.
+    /// `shared` must be enrolled over the same `workspace`; `socket` is `$AIEN_RUNTIME_SOCK`;
+    /// `desk_key` is the daemon's approval desk key (`aien compose desk-key`). Refused when the key
+    /// fails the file rules or sits inside the workspace (the model-facing tools read there).
     pub fn new(
         shared: AienShared,
         workspace: impl AsRef<Path>,
         socket: impl Into<PathBuf>,
+        desk_key: impl AsRef<Path>,
     ) -> Result<Self, String> {
         let workspace =
             fs::canonicalize(workspace.as_ref()).map_err(|e| format!("workspace: {e}"))?;
+        let desk_key = fs::canonicalize(desk_key.as_ref().parent().unwrap_or(Path::new("/")))
+            .map_err(|e| format!("approval desk key: {e}"))?
+            .join(
+                desk_key
+                    .as_ref()
+                    .file_name()
+                    .ok_or("approval desk key: no file name")?,
+            );
+        if desk_key.starts_with(&workspace)
+            || workspace.starts_with(desk_key.parent().unwrap_or(Path::new("/")))
+        {
+            return Err(format!(
+                "approval desk key {} and workspace {} overlap; refusing",
+                desk_key.display(),
+                workspace.display()
+            ));
+        }
+        DeskKey::load(&desk_key)?;
         Ok(Self {
             shared,
             state: Rc::new(RefCell::new(LedgerState {
                 client: LedgerClient::new(socket),
                 workspace,
+                desk_key,
                 approvers: HashMap::new(),
                 before_intent: None,
                 grants_minted: 0,
@@ -244,7 +448,8 @@ impl ComposeLedgerAuthority {
         self.state.borrow().client.clone()
     }
 
-    /// Grants (authorization records) this authority asked the daemon to write.
+    /// Daemon-written grants (reserved `approved_grant` records) this authority received for
+    /// approvals it handed off and checked; it never writes a grant itself.
     pub fn grants_minted(&self) -> u32 {
         self.state.borrow().grants_minted
     }
@@ -303,10 +508,12 @@ impl ComposeLedgerAuthority {
         Ok(parent.join(name))
     }
 
-    /// grant -> intent -> atomic write -> ack. `Err` before the intent means nothing was written.
+    /// handoff -> grant -> intent -> atomic write -> ack. `Err` before the intent means nothing
+    /// was written.
     fn write_through_ledger(
         &self,
         req: &CapabilityRequest,
+        trace_id: &str,
         approver: &str,
         approval_id: &str,
     ) -> Result<Value, String> {
@@ -319,33 +526,172 @@ impl ComposeLedgerAuthority {
         let (path, content) = (arg("path")?, arg("content")?);
         let target = self.target(path)?;
         let tgt = target.to_str().ok_or("target is not UTF-8")?.to_string();
-        // Canonical proposal: keys in sorted order whatever serde_json's map ordering.
+        let ws = self
+            .state
+            .borrow()
+            .workspace
+            .to_str()
+            .ok_or("workspace is not UTF-8")?
+            .to_string();
+        // approved_proposal_sha256: the approved {content, path} object, keys sorted.
         let mut prop = Map::new();
         prop.insert("content".into(), json!(content));
         prop.insert("path".into(), json!(path));
-        let proposal_sha256 = sha256_hex(Value::Object(prop).to_string().as_bytes());
+        let approved_sha = sha256_hex(Value::Object(prop).to_string().as_bytes());
         let content_sha256 = sha256_hex(content.as_bytes());
-        let prior = file_sha256(&target)?;
-        let own = json!({"tool": "write_file", "args": req.arguments, "approver": approver, "approval_id": approval_id});
-        let receipt_sha256 = sha256_hex(own.to_string().as_bytes());
-        let text = json!({"proposal_sha256": proposal_sha256, "path": path, "content_sha256": content_sha256,
-            "approver": approver, "receipt_sha256": receipt_sha256, "target": tgt, "prior_sha256": prior});
+        let rid = req.request_id.as_str();
+        if approval_id.is_empty() {
+            return Err("no approval id for this request".into());
+        }
+        // 1. The authenticated handoff.
+        let desk = DeskKey::load(&self.state.borrow().desk_key)?;
+        let binding = ApprovalBinding {
+            trace_id: trace_id.into(),
+            request_id: rid.into(),
+            approval_id: approval_id.into(),
+            approver: approver.into(),
+            path: path.into(),
+            content_sha256: content_sha256.clone(),
+            approved_proposal_sha256: approved_sha.clone(),
+            desk_key_id: desk.id().into(),
+            workspace: ws.clone(),
+        };
+        let proposal = json!({"request_id": rid, "trace_id": trace_id, "approval_id": approval_id,
+            "approver": approver, "path": path, "content": content,
+            "approved_proposal_sha256": approved_sha, "content_sha256": content_sha256,
+            "approval_mac": desk.mac(&binding)});
+        drop(desk);
         let client = self.client();
-        let grant = client.note("authorization", &text.to_string(), &[])?;
+        let mut rc = json!({"boundary": LEDGER_BOUNDARY, "trace_id": trace_id, "request_id": rid,
+            "approval_id": approval_id, "approver": approver, "path": path, "target": tgt,
+            "approved_proposal_sha256": approved_sha, "content_sha256": content_sha256});
+        let report = match client.approved(&proposal, &ws) {
+            Ok(r) => r,
+            Err(e) => {
+                rc["state"] = json!("REFUSED");
+                rc["handoff_error"] = json!(e);
+                self.state.borrow_mut().receipts.push(rc);
+                return Err(e);
+            }
+        };
+        // 2. Check what came back: ids unchanged, both hash identities, a fresh commit.
+        let compose_sha = sha256_hex(format!("filename: {path}\n{content}").as_bytes());
+        let field = |k: &str| report[k].as_str().unwrap_or_default().to_string();
+        let checks = [
+            ("state", field("state"), "COMMITTED".to_string()),
+            ("trace_id", field("trace_id"), trace_id.to_string()),
+            ("request_id", field("request_id"), rid.to_string()),
+            ("approval_id", field("approval_id"), approval_id.to_string()),
+            (
+                "approved_proposal_sha256",
+                field("approved_proposal_sha256"),
+                approved_sha.clone(),
+            ),
+            (
+                "content_sha256",
+                field("content_sha256"),
+                content_sha256.clone(),
+            ),
+            (
+                "compose_proposal_sha256",
+                field("compose_proposal_sha256"),
+                compose_sha.clone(),
+            ),
+        ];
+        let task = &report["task"];
+        let links: Vec<u64> = report["grant_links"]
+            .as_array()
+            .map(|a| a.iter().filter_map(Value::as_u64).collect())
+            .unwrap_or_default();
+        let claim = report["replay_claim"].as_u64().unwrap_or(0);
+        rc["compose_proposal_sha256"] = json!(compose_sha);
+        rc["handoff"] = json!({"state": report["state"], "desk_key_id": report["desk_key_id"],
+            "approved_grant": report["approved_grant"], "target": report["target"],
+            "approval_key": report["approval_key"], "replay_claim": claim,
+            "task": task["task"], "outcome": task["outcome"], "committed": task["committed"],
+            "branch_count": task["branch_count"], "winner": task["winner"],
+            "aegis_pass_mask": task["aegis_pass_mask"], "proposer": task["proposer"],
+            "cx_goal": task["cx_goal"], "cx_evidence": task["cx_evidence"],
+            "cx_promotion": task["cx_promotion"], "winner_digest": task["winner_digest"],
+            "record_digest": task["record_digest"], "grant_links": links});
+        let bad: Vec<String> = checks
+            .iter()
+            .filter(|(_, got, want)| got != want)
+            .map(|(k, got, want)| format!("{k}: daemon {got:?}, expected {want:?}"))
+            .collect();
+        let committed = task["committed"] == json!(true)
+            && task["proposal_sha256"].as_str() == Some(compose_sha.as_str())
+            && links.len() == 2
+            && links.iter().all(|&x| x != 0)
+            && claim != 0;
+        if !bad.is_empty() || !committed {
+            let e = format!(
+                "handoff report does not match the approval ({}{})",
+                bad.join("; "),
+                if committed {
+                    ""
+                } else {
+                    "; no fresh committed compose run"
+                }
+            );
+            rc["state"] = json!("REFUSED");
+            rc["handoff_error"] = json!(e);
+            self.state.borrow_mut().receipts.push(rc);
+            return Err(e);
+        }
+        // 3. The grant: written by the daemon itself after the committed compose (a reserved
+        // `approved_grant` record keyed on compose_proposal_sha256, linked to promotion, evidence
+        // and the replay claim). This authority never writes its own grant: there is no second
+        // route to an effect.
+        let grant_id = report["approved_grant"].as_u64().unwrap_or(0);
+        let g = client
+            .recall(&[grant_id], None)
+            .ok()
+            .and_then(|r| r["cited"].as_array().and_then(|a| a.first().cloned()))
+            .unwrap_or(Value::Null);
+        let gt: Value = g["text"]
+            .as_str()
+            .and_then(|t| serde_json::from_str(t).ok())
+            .unwrap_or(Value::Null);
+        let glinks: Vec<u64> = g["links"]
+            .as_array()
+            .map(|a| a.iter().filter_map(Value::as_u64).collect())
+            .unwrap_or_default();
+        let grant_ok = grant_id != 0
+            && g["verified"] == json!(true)
+            && g["note"] == json!("authorization")
+            && gt["approved_grant"] == json!(1)
+            && gt["proposal_sha256"].as_str() == Some(compose_sha.as_str())
+            && gt["path"].as_str() == Some(path)
+            && gt["content_sha256"].as_str() == Some(content_sha256.as_str())
+            && gt["target"].as_str() == Some(tgt.as_str())
+            && report["target"].as_str() == Some(tgt.as_str())
+            && gt["replay_claim"].as_u64() == Some(claim)
+            && [links[0], links[1], claim]
+                .iter()
+                .all(|x| glinks.contains(x));
+        if !grant_ok {
+            let e = format!("daemon grant #{grant_id} does not match the committed approval: {g}");
+            rc["state"] = json!("REFUSED");
+            rc["handoff_error"] = json!(e);
+            self.state.borrow_mut().receipts.push(rc);
+            return Err(e);
+        }
         self.state.borrow_mut().grants_minted += 1;
-        let grant_id = grant["id"].as_u64().ok_or("grant without id")?;
+        let prior = gt["prior_sha256"].clone();
         let hook = self.state.borrow_mut().before_intent.take();
         if let Some(mut h) = hook {
             h(&target);
             self.state.borrow_mut().before_intent = Some(h);
         }
-        let mut rc = json!({"boundary": LEDGER_BOUNDARY, "request_id": req.request_id.as_str(),
-            "approval_id": approval_id, "approver": approver, "path": path, "target": tgt,
-            "proposal_sha256": proposal_sha256, "content_sha256": content_sha256, "prior_sha256": prior,
-            "receipt_sha256": receipt_sha256, "grant_id": grant_id, "grant_digest": grant["digest"]});
+        rc["prior_sha256"] = prior;
+        rc["grant_id"] = json!(grant_id);
+        rc["grant_digest"] = g["digest"].clone();
+        rc["proposal_sha256"] = json!(compose_sha);
+        // 4. Intent (on compose_proposal_sha256), write, ack.
         let intent = match client.intent(
             grant_id,
-            &proposal_sha256,
+            &compose_sha,
             path,
             &tgt,
             &content_sha256,
@@ -447,7 +793,7 @@ impl RuntimeAuthority for ComposeLedgerAuthority {
             .map(|a| a.approval_id.clone())
             .unwrap_or_default();
         let out = if minted {
-            self.write_through_ledger(req, &approver, &approval_id)
+            self.write_through_ledger(req, &ctx.trace_id, &approver, &approval_id)
         } else {
             Err(format!(
                 "{}: no AIEN-minted effect for this request",

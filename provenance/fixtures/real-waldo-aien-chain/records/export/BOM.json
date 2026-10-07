@@ -3,21 +3,21 @@
   "schema": 1,
   "subject": "model-release",
   "format": "huggingface",
-  "model_id": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad",
-  "name": "prov-tiny",
+  "model_id": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+  "name": "toolcall-tiny",
   "interaction": {
     "template": "chatml-v1"
   },
   "source_type": "run",
-  "source_id": "f4cb9ccbcc55d32f",
-  "run_id": "f4cb9ccbcc55d32f",
-  "source_bom_sha256": "0666976c2a29711bc5c5b5bb03a4a759d9d48f61099ca31f729f1b69a4ddd7b6",
+  "source_id": "19dfc4470530354c",
+  "run_id": "19dfc4470530354c",
+  "source_bom_sha256": "c88e2701f9dd77b285ce2bb8073746971b376539ce46dfb0c186540a3363c97a",
   "artifacts": [
     {
       "role": "regulatory-disclosure",
       "path": "EU-BOM.json",
-      "sha256": "f0140a2371f0845d8a6abb757fe85c1bd3c09a1577862dd7ec4921261f542fd1",
-      "bytes": 5861
+      "sha256": "221b29f661ff6811455b3f4b3f1115c61136587d5123852294accbfd3c84c581",
+      "bytes": 6591
     },
     {
       "role": "documentation",
@@ -40,8 +40,8 @@
     {
       "role": "configuration",
       "path": "config.json",
-      "sha256": "c5a2cf6e20801c9a7cfb04cc46e800ff18354777778f78439068f3191ba6cdb5",
-      "bytes": 457
+      "sha256": "d0b5e56149d14e8f481a901fdbfe4f7fb23a1e5a1d774adcfcb874f31f15cbb7",
+      "bytes": 459
     },
     {
       "role": "generation-configuration",
@@ -52,8 +52,8 @@
     {
       "role": "weights",
       "path": "model.safetensors",
-      "sha256": "cb28b4b79a2bcad22306232b7b2cc12ac8f677515b986b699b8f2b625ecd953c",
-      "bytes": 36632
+      "sha256": "552fb3a85f5871a45a5243f3ae066b7b51711caf0ae8dc7412bbd5c9e505f8ad",
+      "bytes": 659824
     },
     {
       "role": "tokenizer",
@@ -76,9 +76,9 @@
     {
       "role": "tokenizer",
       "path": "tokenizer_config.json",
-      "sha256": "d9feec465ce2cf29ba4d3a32e750c0866e133f9caaefcf9ae9cec2b01216cc85",
+      "sha256": "be46da5e766f6da3d46cbae6ee9cb11de375793546bddb0516142cf8acc54360",
       "bytes": 548
     }
   ],
-  "generated": "2026-10-07T23:00:06.811422676Z"
+  "generated": "2026-10-07T23:33:33.351517317Z"
 }

@@ -2,50 +2,50 @@
   "kind": "openwaldo-bom",
   "schema": 1,
   "subject": "model",
-  "model_id": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad",
-  "name": "prov-tiny",
-  "plan_sha256": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad",
-  "architecture_sha256": "ccd069683aad2b316f5a37c0ac0f3a46d27e94b562ef00762fa4cb367412b1f4",
+  "model_id": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+  "name": "toolcall-tiny",
+  "plan_sha256": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+  "architecture_sha256": "f2896605c42b00448354c181f31166adce5146898d58c6fec96f942d81fe1e6c",
   "interaction": {
     "template": "chatml-v1"
   },
   "path_base": "model-root",
-  "current_run_id": "f4cb9ccbcc55d32f",
+  "current_run_id": "19dfc4470530354c",
   "runs": [
     {
-      "id": "f4cb9ccbcc55d32f",
-      "stage": "pretrain",
+      "id": "19dfc4470530354c",
+      "stage": "toolcall-sft",
       "ordinal": 1,
-      "run_bom": "runs/0001-pretrain-f4cb9ccbcc55d32f/RUN-BOM.json",
-      "bom_sha256": "489b1e383a570d5832ce077ba9177061ff2aad2726f18e3eb35eeb307a5c3201",
+      "run_bom": "runs/0001-toolcall-sft-19dfc4470530354c/RUN-BOM.json",
+      "bom_sha256": "7f0e1393cf2195592296c3944647231e9d6f6febba6365a8acf2501c8702a6ad",
       "state": "complete",
       "backend": {
         "name": "pytorch",
         "revision": "builtin-pytorch-worker-schema-1-r7"
       },
       "simulated": false,
-      "observation_sha256": "26db9ca4f01d0d4df83f2626e04fd552fe8caa5b98e60ad4cc278896957152a4",
+      "observation_sha256": "f51ebcb6e211c4e0b4bc575ba996d21ce3427d44ce6f81f4e3864a661d851a90",
       "artifacts": [
         {
           "role": "weights",
-          "path": "runs/0001-pretrain-f4cb9ccbcc55d32f/artifacts/model.safetensors",
-          "sha256": "ca3501aa46e9b22c9a47cc2e4c02b50e44245a8849eb40de73d959a542b2e48f",
-          "bytes": 36504
+          "path": "runs/0001-toolcall-sft-19dfc4470530354c/artifacts/model.safetensors",
+          "sha256": "bd841997042ae5da411e1d8c3bb2040c650d4b4b6cdb36057a176335474c8ce3",
+          "bytes": 659640
         },
         {
           "role": "configuration",
-          "path": "runs/0001-pretrain-f4cb9ccbcc55d32f/artifacts/config.json",
-          "sha256": "0c60675d46dc3f55a3ed783d2bb49a51a30cdb34946985cfb6c458b4568bd2b2",
-          "bytes": 1606
+          "path": "runs/0001-toolcall-sft-19dfc4470530354c/artifacts/config.json",
+          "sha256": "04616cc0a644a533e6b4b920b7998cb678b7c7cf05aa98bced24b10b39ad248e",
+          "bytes": 1616
         },
         {
           "role": "tokenizer",
-          "path": "runs/0001-pretrain-f4cb9ccbcc55d32f/artifacts/tokenizer.json",
+          "path": "runs/0001-toolcall-sft-19dfc4470530354c/artifacts/tokenizer.json",
           "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
           "bytes": 175
         }
       ]
     }
   ],
-  "generated": "2026-10-07T23:00:06.811422676Z"
+  "generated": "2026-10-07T23:33:33.351517317Z"
 }

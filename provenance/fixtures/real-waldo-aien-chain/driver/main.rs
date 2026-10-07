@@ -7,11 +7,15 @@ use interplane_crossveil::{Pipeline, RuntimeAuthority};
 use interplane_lenshift::DialectRegistry;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
+use std::io::{BufRead, BufReader, Write};
+use std::os::unix::net::UnixStream;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-const TRACE: &str = "real-run-01";
+const TRACE: &str = "real-run-02";
+const PROMPT: &str = "Save the meeting summary to summary.txt.";
+const MODEL_LABEL: &str = "toolcall-tiny";
 const NOW: &str = "2026-10-06T00:00:00Z";
 const CONTENT: &str = "Decisions: ship v0.3 on Friday.\nOwners: Ada (release), Lin (docs).\n";
 
@@ -99,12 +103,29 @@ fn main() {
         "source":{"kind":"operator","id":"drake"},"origin":"operator:turn-0",
         "content_digest": format!("sha256:{}", hex(body.as_bytes())),"trace_id":TRACE,
         "parent_id":null,"derived_from":[]})).unwrap()).unwrap();
-    let rid = "w1";
-    let turn = json!({"role":"assistant","content":null,"tool_calls":[{"id":rid,"type":"function",
-        "function":{"name":"write_file","arguments": json!({"path":"summary.txt","content":CONTENT}).to_string()}}]});
+    // The model turn: AIEN's own generation path (StreamTurn) on the model this daemon loaded.
+    let count0 = client.records_total().unwrap();
+    let t_gen0 = ts();
+    let messages = json!([{"role":"user","content":PROMPT}]);
+    let (gen_text, gen_tokens) = stream_turn(&sock, &messages, 400);
+    let t_gen1 = ts();
+    let count1 = client.records_total().unwrap();
+    wr_top(&out, "generation.json", &json!({
+        "kind":"aien-generation-observation","written_by":"run-driver",
+        "note":"written by the run driver from the daemon's StreamTurn reply; the daemon wrote no record of this generation",
+        "command":"StreamTurn","messages":messages,"max_tokens":400,"temperature":0.0,
+        "output_text":gen_text,"output_sha256":hex(gen_text.as_bytes()),"total_tokens":gen_tokens,
+        "model_sha256_from_load_log": load_log_digest(&log,"model_sha256="),
+        "daemon_pid":pid,"daemon_start_ticks":start_ticks,
+        "journal_records_before":count0,"journal_records_after":count1,
+        "started":t_gen0,"finished":t_gen1}));
+    wr_top(&out, "model-turn.json", &json!({"dialect":"aien_legacy","model":MODEL_LABEL,"trace_id":TRACE,"turn":0,"input":gen_text}));
     let t_req = ts();
-    let o = p.run_turn("openai", "scripted", &turn, TRACE, 0);
+    let o = p.run_turn("aien_legacy", MODEL_LABEL, &json!(gen_text), TRACE, 0);
+    assert_eq!(o.results.len(), 1, "{o:?}");
     assert_eq!(o.results[0].status, ResultStatus::RequiresApproval, "{:?}", o.results[0]);
+    let rid = o.intents[0].request_id.clone();
+    let rid = rid.as_str();
     let intent = serde_json::to_value(&o.intents[0]).unwrap();
     let pending_result = serde_json::to_value(&o.results[0]).unwrap();
     let pa = p.pending_approval(TRACE, rid).expect("pending");
@@ -142,9 +163,9 @@ fn main() {
         e
     };
     let trace = json!([
-        env(1, None, ("model", "scripted"), ("runtime", "aien"), &t_req, intent),
-        env(2, Some("m-1"), ("runtime", "aien"), ("model", "scripted"), &t_req, pending_result),
-        env(3, Some("m-1"), ("runtime", "aien"), ("model", "scripted"), &t_done, final_result.clone()),
+        env(1, None, ("model", MODEL_LABEL), ("runtime", "aien"), &t_req, intent),
+        env(2, Some("m-1"), ("runtime", "aien"), ("model", MODEL_LABEL), &t_req, pending_result),
+        env(3, Some("m-1"), ("runtime", "aien"), ("model", MODEL_LABEL), &t_done, final_result.clone()),
     ]);
     for e in trace.as_array().unwrap() {
         validate_envelope_value(e).unwrap_or_else(|c| panic!("envelope invalid {c:?}: {e}"));
@@ -156,4 +177,34 @@ fn main() {
     let _ = child.kill();
     let _ = child.wait();
     println!("OK claim={claim} ack={ack} pid={pid}");
+}
+
+fn wr_top(out: &Path, name: &str, v: &Value) {
+    let d = out.join("records");
+    std::fs::create_dir_all(&d).unwrap();
+    std::fs::write(d.join(name), serde_json::to_vec_pretty(v).unwrap()).unwrap();
+}
+
+fn load_log_digest(log: &Path, key: &str) -> String {
+    let t = std::fs::read_to_string(log).unwrap();
+    let i = t.find(key).expect("digest in load log") + key.len();
+    t[i..].chars().take_while(|c| c.is_ascii_hexdigit()).collect()
+}
+
+/// One `StreamTurn` on the daemon socket (the path `aien-cli chat` uses): returns the finished text.
+fn stream_turn(sock: &Path, messages: &Value, max_tokens: u64) -> (String, u64) {
+    let mut s = UnixStream::connect(sock).unwrap();
+    s.set_read_timeout(Some(Duration::from_secs(300))).unwrap();
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap();
+    let env = json!({"protocol_version":1,"request_id":now.as_millis() as u64,"operation_id":now.as_nanos() as u64,
+        "operator_session":1,"command":{"StreamTurn":{"messages":messages,"max_tokens":max_tokens,"temperature":0.0}}});
+    s.write_all(format!("{env}\n").as_bytes()).unwrap();
+    for line in BufReader::new(&s).lines() {
+        let v: Value = serde_json::from_str(&line.unwrap()).unwrap();
+        if let Some(f) = v.get("TurnFinished") {
+            return (f["text"].as_str().unwrap().to_string(), f["total_tokens"].as_u64().unwrap());
+        }
+        assert!(v.get("Error").is_none(), "{v}");
+    }
+    panic!("no TurnFinished");
 }

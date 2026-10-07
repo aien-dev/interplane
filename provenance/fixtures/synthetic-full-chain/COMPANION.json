@@ -5,8 +5,11 @@
     "executable_sha256": "be0196b6bf36be4eb97aaa63b23421b964ed5c62905c5dfa144b0618f3f216ec"
   },
   "completeness": {
-    "missing": [],
-    "state": "complete"
+    "missing": [
+      "link:model_turn"
+    ],
+    "reason": "the INTERPLANE model turn is synthetic: nothing links this model to the effect's content",
+    "state": "incomplete"
   },
   "effect": {
     "approval_binding": "aien.approval.v2",

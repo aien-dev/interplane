@@ -1,26 +1,28 @@
 {
   "kind": "openwaldo-stage-preflight",
   "schema": 1,
-  "identity_sha256": "031f193dba03c0ffcec67f24e86b1f6593c534756299538c10127bf8a52b62de",
+  "identity_sha256": "1508e854f805da3b7ccc5c15a19b92b35c0786509270fdaebadd5985741ac4d9",
   "evaluation": {
     "selection": "lowest-sha256-v1",
     "seed": 7,
-    "records": 0,
-    "token_targets": 0,
-    "text_bytes": 0,
-    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "records": 1,
+    "token_targets": 145,
+    "text_bytes": 286,
+    "sha256": "cf7c657e1abb07ef70bbb71f32063e4ca8128e9a92b77ba6ef3d220cbf07f900"
   },
-  "selected_records": [],
+  "selected_records": [
+    "418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b:34"
+  ],
   "eligible_records": {
-    "core/e2e/prov": 1
+    "post-train/sft/aien-toolcall-own": 45
   },
   "parameters": {
     "profile": "causal-pretrain-shuffled",
     "profile_schema": 1,
-    "epochs": 1,
-    "steps": 10,
-    "batch_size": 2,
-    "sequence_length": 64,
+    "epochs": 90,
+    "steps": 921,
+    "batch_size": 4,
+    "sequence_length": 256,
     "learning_rate": 0.003,
     "seed": 7,
     "optimizer": {
@@ -32,7 +34,7 @@
     },
     "schedule": {
       "name": "cosine",
-      "warmup_steps": 1,
+      "warmup_steps": 92,
       "minimum_rate_ratio": 0.1
     },
     "data": {
@@ -44,11 +46,11 @@
     "evaluation": {
       "selection": "lowest-sha256-v1",
       "fraction": 0.01,
-      "max_records": 256,
+      "max_records": 1,
       "max_bytes": 1048576
     },
-    "checkpoint_every": 5,
-    "evaluate_every": 5,
-    "planned_token_capacity": 1280
+    "checkpoint_every": 500,
+    "evaluate_every": 500,
+    "planned_token_capacity": 943104
   }
 }

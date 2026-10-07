@@ -15,6 +15,7 @@
 pub mod binding;
 pub mod gojson;
 mod ledger;
+mod modelturn;
 pub mod synth;
 
 use binding::{compact_sorted, LEDGER_BINDING, RECEIPT_BINDING, SERDE_DIGEST_FORM};
@@ -220,6 +221,9 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
             }
         }
     }
+    for item in modelturn::implied_missing(&archive, &m) {
+        actually_missing.insert(item);
+    }
     let state = s(&m, &["completeness", "state"]);
     let declared: BTreeSet<String> = m
         .get("completeness")
@@ -328,22 +332,24 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
         };
         match s(e, &["binding"]) {
             Some(LEDGER_BINDING) => {
-                // Who authored the proposal must be stated, never implied by silence. The
-                // approved path does not consult the loaded model, so only a scripted turn has a
-                // binding; a model-authored proposal is refused rather than half-checked.
+                // Who authored the proposal must be stated, never implied by silence. A scripted
+                // turn leaves `link:model_turn` missing; a model generation is checked in
+                // `modelturn` and still leaves `link:daemon_generation_record` missing.
                 let origin = match s(e, &["proposal_origin"]) {
-                    Some("scripted_turn") => "scripted_turn",
+                    Some(modelturn::SCRIPTED) => modelturn::SCRIPTED,
+                    Some(modelturn::GENERATED) => modelturn::GENERATED,
                     Some(other) => {
                         return fail(
                             "unsupported_binding",
-                            format!(
-                                "effect.proposal_origin={other} (only scripted_turn has a binding)"
-                            ),
+                            format!("effect.proposal_origin={other}"),
                         )
                     }
                     None => return fail("malformed_companion", "effect.proposal_origin"),
                 };
                 ledger::check(&archive, e, t, aien, call.as_ref())?;
+                if origin == modelturn::GENERATED {
+                    modelturn::check(&archive, t, call.as_ref())?;
+                }
                 effect_label = Some(format!("{LEDGER_BINDING}:strong proposal={origin}"));
             }
             Some(RECEIPT_BINDING) => {
@@ -708,6 +714,9 @@ pub(crate) struct Call {
     pub tool: String,
     pub args: Value,
     pub result: Value,
+    /// The `tool_request` payload and the envelope's `source`, as the trace holds them.
+    pub req_payload: Value,
+    pub req_source: Value,
 }
 
 /// Returns the request's tool, arguments and result payload, when the trace bytes are retained.
@@ -742,6 +751,8 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
                     req = Some((
                         s(p, &["tool", "name"]).unwrap_or("").to_string(),
                         p.get("arguments").cloned().unwrap_or(Value::Null),
+                        p.clone(),
+                        e.get("source").cloned().unwrap_or(Value::Null),
                     ))
                 }
                 Some("result") => result = Some(p.clone()),
@@ -750,7 +761,13 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
         }
     }
     match (req, result) {
-        (Some((tool, args)), Some(result)) => Ok(Some(Call { tool, args, result })),
+        (Some((tool, args, req_payload, req_source)), Some(result)) => Ok(Some(Call {
+            tool,
+            args,
+            result,
+            req_payload,
+            req_source,
+        })),
         _ => fail("not_in_trace", format!("{tid}/{rid}")),
     }
 }

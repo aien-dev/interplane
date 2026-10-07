@@ -2,12 +2,18 @@
   "kind": "openwaldo-bom",
   "schema": 1,
   "subject": "training-run",
-  "id": "f4cb9ccbcc55d32f",
-  "model_id": "f2f80f694849557801a1f5ddf6b561cb8f4a8172b23b0b53d1e53626a8c250ad",
-  "stage": "pretrain",
-  "stage_type": "pre-training",
+  "id": "19dfc4470530354c",
+  "model_id": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+  "stage": "toolcall-sft",
+  "stage_type": "fine-tuning",
   "ordinal": 1,
-  "objective": "causal-language-modeling",
+  "objective": "assistant-response-modeling",
+  "conversation": {
+    "template": "chatml-v1",
+    "supervised_roles": [
+      "assistant"
+    ]
+  },
   "execution": {
     "backend": {
       "name": "pytorch",
@@ -22,48 +28,50 @@
     "nodes": 1,
     "world_size": 1
   },
-  "architecture_sha256": "ccd069683aad2b316f5a37c0ac0f3a46d27e94b562ef00762fa4cb367412b1f4",
-  "corpus_bom_sha256": "e7b589b397982eae1dedb9c8bc630d4a58c74a038e976e54b2c620a8dde94069",
+  "architecture_sha256": "f2896605c42b00448354c181f31166adce5146898d58c6fec96f942d81fe1e6c",
+  "corpus_bom_sha256": "b2459684270f11d9a2b3d987ba81da8c77f119a43f399e836ef3b39848abc46c",
   "corpus_bom": {
     "kind": "openwaldo-bom",
     "schema": 1,
     "subject": "corpus",
     "index": {},
     "paths": [
-      "core/e2e/prov"
+      "post-train/sft/aien-toolcall-own"
     ],
     "license_policy": {},
     "manifests": [
       {
-        "path": "core/e2e/prov/prov.yaml",
-        "sha256": "34a36a69248de912b418caed74225bf5e5976b9d6b78b463facbf96fd6505bbb",
-        "name": "prov",
-        "title": "Provenance-fixture-corpus",
-        "description": "Own-tiny-corpus",
+        "path": "post-train/sft/aien-toolcall-own/aien-toolcall-own.yaml",
+        "sha256": "aec4cc8ab61668a73a9284be002e289d99530ffa5855aba687a78d5c8559cc78",
+        "name": "aien-toolcall-own",
+        "title": "AIEN tool-call conversations",
+        "description": "Own tiny corpus: write_file tool calls, written for the provenance fixture",
         "license": "CC0-1.0",
         "format": "parquet",
-        "record_schema": 2,
-        "record_kind": "pretrain",
+        "record_schema": 1,
+        "record_kind": "conversation",
         "converted_by": {
           "tool": "waldo index ingest",
           "version": "0.1.0-dev",
-          "profile": "canonical-text-schema-2",
-          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/v9-privacy-redaction",
+          "profile": "canonical-text-schema-2@sha256:ccc58c86c1b971b569a9494d41b56ec072aa06a92933b5eda6d752213b496627",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
           "tokenizer": "tiktoken/cl100k_base"
         },
         "sources": [
           {
-            "name": "prov",
-            "source": "prov",
+            "name": "aien-toolcall-own",
+            "source": "aien-toolcall-own",
+            "version": "1",
+            "input_formats": [
+              "jsonl"
+            ],
             "license": "CC0-1.0",
-            "url": "https://example.invalid/own",
+            "license_evidence": {
+              "declaration": "CC0-1.0"
+            },
+            "url": "https://example.invalid/aien-toolcall-own",
             "category": "public-dataset",
-            "sha256": "23300bf3da887c6b5d84f8e8bfe9edb6c70e5b15b417fe4a95f26065e83bccf8",
-            "content": {
-              "languages": [
-                "en"
-              ]
-            }
+            "sha256": "8c2e43abf0f65cb01abee1c2430a1d674ae9da372fd3a3104b763b5d734c7162"
           }
         ],
         "assessment": {
@@ -73,11 +81,11 @@
           },
           "repetitive_content": {
             "detector": "waldo/gopher-ngram-repetition-v1",
-            "records": 1
+            "records": 0
           },
           "boilerplate_content": {
             "detector": "waldo/gopher-structural-duplication-v1",
-            "records": 1
+            "records": 0
           }
         },
         "redaction": {
@@ -91,42 +99,78 @@
         },
         "totals": {
           "shards": 1,
-          "docs": 1,
-          "tokens": 2180,
-          "bytes": 6289
+          "docs": 46,
+          "tokens": 3816,
+          "bytes": 8627
         },
         "licenses": {
           "CC0-1.0": {
             "shards": 1,
-            "docs": 1,
-            "tokens": 2180,
-            "bytes": 6289
+            "docs": 46,
+            "tokens": 3816,
+            "bytes": 8627
           }
         }
       }
     ],
     "shards": [
       {
-        "manifest": "core/e2e/prov/prov.yaml",
-        "url": "file:///home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train/work/look/a9/d2/a9d26e775a0ff9336b272c5ebd56eb48c2e0844917481242d571243fe7139bd8",
-        "sha256": "a9d26e775a0ff9336b272c5ebd56eb48c2e0844917481242d571243fe7139bd8",
+        "manifest": "post-train/sft/aien-toolcall-own/aien-toolcall-own.yaml",
+        "url": "file:///home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/look/41/8a/418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b",
+        "sha256": "418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b",
         "format": "parquet",
-        "record_schema": 2,
-        "record_kind": "pretrain",
+        "record_schema": 1,
+        "record_kind": "conversation",
         "license": "CC0-1.0",
         "sources": [
-          "prov"
+          "aien-toolcall-own"
         ],
         "converted_by": {
           "tool": "waldo index ingest",
           "version": "0.1.0-dev",
-          "profile": "canonical-text-schema-2",
-          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/v9-privacy-redaction",
+          "profile": "canonical-text-schema-2@sha256:ccc58c86c1b971b569a9494d41b56ec072aa06a92933b5eda6d752213b496627",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
           "tokenizer": "tiktoken/cl100k_base"
         },
-        "docs": 1,
-        "tokens": 2180,
-        "bytes": 6289,
+        "docs": 46,
+        "tokens": 3816,
+        "bytes": 8627,
+        "attestation": {
+          "status": "embedded",
+          "writer_recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+          "bom_sha256": "bed2d11d7e4fa2e267c4705a015ffe5d74980cdada2208106f972682b386b715",
+          "bom": {
+            "kind": "openwaldo-bom",
+            "schema": 1,
+            "subject": "shard",
+            "plan_sha256": "434a1aa04b5ea08c44f2e2a71f5586a78c0dd6ef96efa33ea5f5de1f2c3ada35",
+            "record_kind": "conversation",
+            "record_schema": 1,
+            "writer_recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+            "tokenizer": "tiktoken/cl100k_base",
+            "records": 46,
+            "tokens": 3816,
+            "content_bytes": 13114,
+            "redaction": {
+              "policy": "waldo/privacy-redaction-v1",
+              "names_retained": true,
+              "email_addresses": 0,
+              "ip_addresses": 0,
+              "phone_numbers": 0,
+              "mail_routing_headers": 0,
+              "credentials": 0
+            },
+            "licenses": [
+              "CC0-1.0"
+            ],
+            "validation": {
+              "canonical_records": true,
+              "content_hashes": true,
+              "token_counts": true,
+              "exact_license_partition_dedup": true
+            }
+          }
+        },
         "assessment": {
           "email_addresses": {
             "detector": "waldo/email-address-v1",
@@ -134,11 +178,11 @@
           },
           "repetitive_content": {
             "detector": "waldo/gopher-ngram-repetition-v1",
-            "records": 1
+            "records": 0
           },
           "boilerplate_content": {
             "detector": "waldo/gopher-structural-duplication-v1",
-            "records": 1
+            "records": 0
           }
         },
         "redaction": {
@@ -154,26 +198,26 @@
     ],
     "totals": {
       "shards": 1,
-      "docs": 1,
-      "tokens": 2180,
-      "bytes": 6289
+      "docs": 46,
+      "tokens": 3816,
+      "bytes": 8627
     },
     "licenses": {
       "CC0-1.0": {
         "shards": 1,
-        "docs": 1,
-        "tokens": 2180,
-        "bytes": 6289
+        "docs": 46,
+        "tokens": 3816,
+        "bytes": 8627
       }
     }
   },
   "parameters": {
     "profile": "causal-pretrain-shuffled",
     "profile_schema": 1,
-    "epochs": 1,
-    "steps": 10,
-    "batch_size": 2,
-    "sequence_length": 64,
+    "epochs": 90,
+    "steps": 921,
+    "batch_size": 4,
+    "sequence_length": 256,
     "learning_rate": 0.003,
     "seed": 7,
     "optimizer": {
@@ -185,7 +229,7 @@
     },
     "schedule": {
       "name": "cosine",
-      "warmup_steps": 1,
+      "warmup_steps": 92,
       "minimum_rate_ratio": 0.1
     },
     "data": {
@@ -197,24 +241,24 @@
     "evaluation": {
       "selection": "lowest-sha256-v1",
       "fraction": 0.01,
-      "max_records": 256,
+      "max_records": 1,
       "max_bytes": 1048576
     },
-    "checkpoint_every": 5,
-    "evaluate_every": 5,
-    "planned_token_capacity": 1280
+    "checkpoint_every": 500,
+    "evaluate_every": 500,
+    "planned_token_capacity": 943104
   },
   "evaluation_set": {
     "selection": "lowest-sha256-v1",
     "seed": 7,
-    "records": 0,
-    "token_targets": 0,
-    "text_bytes": 0,
-    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "records": 1,
+    "token_targets": 145,
+    "text_bytes": 286,
+    "sha256": "cf7c657e1abb07ef70bbb71f32063e4ca8128e9a92b77ba6ef3d220cbf07f900"
   },
   "preflight": {
     "path": "PREFLIGHT.json",
-    "sha256": "6ee9278d44808a881977be6dea78a8b12c609c79ebd6d9e3dd0b91f64ffdab86",
-    "bytes": 1307
+    "sha256": "18fb4d320e98c22743deeedc96d8b27972ddcfd9f64ac48e49424119dedf21bf",
+    "bytes": 1416
   }
 }

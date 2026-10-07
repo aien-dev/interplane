@@ -77,10 +77,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "interplane-lenshift"
+version = "0.3.0"
+dependencies = [
+ "interplane-core",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "interplane-provenance"
 version = "0.0.1"
 dependencies = [
  "interplane-core",
+ "interplane-lenshift",
  "serde_json",
  "sha2",
 ]

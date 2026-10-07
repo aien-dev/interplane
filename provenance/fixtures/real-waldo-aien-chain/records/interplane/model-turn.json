@@ -1,0 +1,7 @@
+{
+  "dialect": "aien_legacy",
+  "input": "<tool_call>\n{\"name\": \"write_file\", \"arguments\": {\"path\": \"summary.txt\", \"content\": \"Decisions: ship v0.3 on Friday.\\nOwners: Ada (release), Lin (docs).\\n\"}}\n</tool_call><|im_end|>\n",
+  "model": "toolcall-tiny",
+  "trace_id": "real-run-02",
+  "turn": 0
+}

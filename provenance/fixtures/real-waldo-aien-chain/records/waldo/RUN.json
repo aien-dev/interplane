@@ -1,71 +1,92 @@
 {
   "kind": "waldo-training-run",
   "schema": 1,
-  "id": "f4cb9ccbcc55d32f",
+  "id": "19dfc4470530354c",
   "state": "complete",
-  "bom_sha256": "489b1e383a570d5832ce077ba9177061ff2aad2726f18e3eb35eeb307a5c3201",
-  "planned": "2026-10-07T23:00:02.78792939Z",
-  "started": "2026-10-07T23:00:02.801048461Z",
-  "finished": "2026-10-07T23:00:06.805249206Z",
+  "bom_sha256": "7f0e1393cf2195592296c3944647231e9d6f6febba6365a8acf2501c8702a6ad",
+  "planned": "2026-10-07T23:31:16.497614435Z",
+  "started": "2026-10-07T23:31:16.511298775Z",
+  "finished": "2026-10-07T23:33:33.339001225Z",
   "observation": {
     "simulated": false,
-    "steps": 10,
-    "consumed_tokens": 1280,
-    "final_loss": 4.743206977844238,
+    "steps": 921,
+    "consumed_tokens": 605250,
+    "final_loss": 0.056180987507104874,
     "checkpoints": [
       {
-        "step": 5,
-        "tokens": 640,
+        "step": 500,
+        "tokens": 328712,
         "artifacts": [
           {
-            "path": "artifacts/checkpoints/step-00000005/model.safetensors",
-            "sha256": "b16ea1c63b1b2173d9e9fcb648bf766e830b0b80386bc7cec57ec58eb20d6ce0",
-            "bytes": 36512
+            "path": "artifacts/checkpoints/step-00000500/model.safetensors",
+            "sha256": "f88be5364a9992025b5d6ed0e4a09795e00e77204eece42e8583d0c7a448070e",
+            "bytes": 659640
           },
           {
-            "path": "artifacts/checkpoints/step-00000005/runtime.pt",
-            "sha256": "99d19ca78aa3c19807c06b5244ff4983e96f79f61cad440936b619c60739f9be",
-            "bytes": 155581
+            "path": "artifacts/checkpoints/step-00000500/runtime.pt",
+            "sha256": "fe7684b0eefc8ccd4bef88c78e1f50029fa269ea9681d3938fa5d1ead3e96699",
+            "bytes": 2651564
           },
           {
-            "path": "artifacts/checkpoints/step-00000005/state.json",
-            "sha256": "f07aae56ac9d68d321f4c29e199861dbdf036954435ee43ae3bb40d4a52926e5",
-            "bytes": 430
+            "path": "artifacts/checkpoints/step-00000500/state.json",
+            "sha256": "1c119b5eebbcbfa6009b5305b8006c958625077a97f84920ca14fbf04b80fdf1",
+            "bytes": 457
           }
         ]
       },
       {
-        "step": 10,
-        "tokens": 1280,
+        "step": 921,
+        "tokens": 605250,
         "artifacts": [
           {
-            "path": "artifacts/checkpoints/step-00000010/model.safetensors",
-            "sha256": "87edde6d64730326d39d00a4013c1a35aad488f4a65703373007c48c42ae3bec",
-            "bytes": 36512
+            "path": "artifacts/checkpoints/step-00000921/model.safetensors",
+            "sha256": "11de89395b8eb29b5ea06d3aba2c78ec720974ae9d501399668cc3b2f987bb95",
+            "bytes": 659640
           },
           {
-            "path": "artifacts/checkpoints/step-00000010/runtime.pt",
-            "sha256": "3182a360fd672adc4e18bbb43fc5c7db5ff1a217ce32df7c3b2fc4c4dfe87bc7",
-            "bytes": 155581
+            "path": "artifacts/checkpoints/step-00000921/runtime.pt",
+            "sha256": "302f6d8858eaae953346857d2badbeff7649e0517b4d7d2e9520011fac19885c",
+            "bytes": 2651564
           },
           {
-            "path": "artifacts/checkpoints/step-00000010/state.json",
-            "sha256": "07d33bee551a5b443692443324f3387f1dd28412dfdb8c22d5cbc3163be9d192",
-            "bytes": 433
+            "path": "artifacts/checkpoints/step-00000921/state.json",
+            "sha256": "689c4eeadafe66d75fa4c1f719c4a381f7284765946ac9322972a87741747be8",
+            "bytes": 457
           }
         ]
+      }
+    ],
+    "evaluations": [
+      {
+        "step": 500,
+        "tokens": 328712,
+        "metrics": {
+          "heldout_loss": 0.02673229513497188,
+          "heldout_perplexity": 1.0270928082148478
+        }
+      },
+      {
+        "step": 921,
+        "tokens": 605250,
+        "metrics": {
+          "artifact_heldout_loss": 0.00066661202702029,
+          "artifact_heldout_perplexity": 1.0006668342621963,
+          "artifact_loss_delta": -0.000010005256225322856,
+          "heldout_loss": 0.0006766172832456129,
+          "heldout_perplexity": 1.0006768462403555
+        }
       }
     ],
     "artifacts": [
       {
         "path": "artifacts/model.safetensors",
-        "sha256": "ca3501aa46e9b22c9a47cc2e4c02b50e44245a8849eb40de73d959a542b2e48f",
-        "bytes": 36504
+        "sha256": "bd841997042ae5da411e1d8c3bb2040c650d4b4b6cdb36057a176335474c8ce3",
+        "bytes": 659640
       },
       {
         "path": "artifacts/config.json",
-        "sha256": "0c60675d46dc3f55a3ed783d2bb49a51a30cdb34946985cfb6c458b4568bd2b2",
-        "bytes": 1606
+        "sha256": "04616cc0a644a533e6b4b920b7998cb678b7c7cf05aa98bced24b10b39ad248e",
+        "bytes": 1616
       },
       {
         "path": "artifacts/tokenizer.json",
@@ -75,16 +96,16 @@
     ],
     "consumption": [
       {
-        "corpus": "core/e2e/prov",
-        "token_targets": 1280
+        "corpus": "post-train/sft/aien-toolcall-own",
+        "token_targets": 605250
       }
     ]
   },
   "attempts": [
     {
       "ordinal": 1,
-      "started": "2026-10-07T23:00:02.801048461Z",
-      "finished": "2026-10-07T23:00:06.805249206Z",
+      "started": "2026-10-07T23:31:16.511298775Z",
+      "finished": "2026-10-07T23:33:33.339001225Z",
       "state": "complete"
     }
   ]

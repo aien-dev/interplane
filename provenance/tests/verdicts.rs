@@ -20,11 +20,11 @@ const WEAK: &str = "fixtures/synthetic-weak-receipt";
 fn valid_self_contained_archive() {
     assert_eq!(
         verify(Path::new(SYN)),
-        "PASS complete effect=aien-ledger-slice/1:strong proposal=scripted_turn"
+        "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn"
     );
     assert_eq!(
         verify(Path::new(WEAK)),
-        "PASS complete effect=record_effect_receipt/1:weak"
+        "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=record_effect_receipt/1:weak"
     );
 }
 
@@ -141,11 +141,12 @@ fn missing_bom_correctly_labelled_incomplete() {
     std::fs::remove_file(path_of(&d, "waldo_model_bom")).unwrap();
     let mut c = companion(&d);
     c["records"]["waldo_model_bom"]["retained"] = json!(false);
-    c["completeness"] = json!({"state": "incomplete", "missing": ["record:waldo_model_bom"]});
+    c["completeness"] =
+        json!({"state": "incomplete", "missing": ["link:model_turn", "record:waldo_model_bom"]});
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),
-        "PASS_LABELLED_INCOMPLETE missing=record:waldo_model_bom effect=aien-ledger-slice/1:strong proposal=scripted_turn"
+        "PASS_LABELLED_INCOMPLETE missing=link:model_turn,record:waldo_model_bom effect=aien-ledger-slice/1:strong proposal=scripted_turn"
     );
 }
 
@@ -158,7 +159,7 @@ fn missing_bom_labelled_record_but_archive_claims_complete() {
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),
-        "FAIL unlabelled_missing: record:waldo_model_bom (declared complete)"
+        "FAIL completeness_mismatch: record:waldo_model_bom"
     );
 }
 
@@ -169,7 +170,8 @@ fn missing_bom_labelled_with_wrong_hash() {
     let mut c = companion(&d);
     c["records"]["waldo_model_bom"]["retained"] = json!(false);
     c["records"]["waldo_model_bom"]["waldo_sha256"] = json!("0".repeat(64));
-    c["completeness"] = json!({"state": "incomplete", "missing": ["record:waldo_model_bom"]});
+    c["completeness"] =
+        json!({"state": "incomplete", "missing": ["link:model_turn", "record:waldo_model_bom"]});
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),

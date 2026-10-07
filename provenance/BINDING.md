@@ -26,7 +26,7 @@ accepted (it was in v0) and labelled; it is never upgraded.
 
 ```json
 "effect": { "binding": "aien-ledger-slice/1", "approval_binding": "aien.approval.v2",
-            "proposal_origin": "scripted_turn" }
+            "proposal_origin": "model_generation/1" }
 ```
 
 Retained records (raw files, each named in `records` with path, sha256, bytes):
@@ -44,10 +44,25 @@ Each of the first five is one `ComposeRecordView` exactly as the daemon's `Compo
 returns it (`id, cls, kind, subject, tag, links, digest, verified, note, text`); `text` is the
 record's JSON as a string. No sovereign-core change is needed to export them.
 
-`proposal_origin` must be stated. The approved path does not consult the loaded model, so
-`scripted_turn` is the only origin with a binding; `model_turn` is refused with
-`unsupported_binding`, an absent field with `malformed_companion`. The verdict repeats it:
-`effect=aien-ledger-slice/1:strong proposal=scripted_turn`.
+`proposal_origin` must be stated; silence is `malformed_companion`. It decides which link is missing:
+
+| `proposal_origin` | Meaning | Verdict |
+|---|---|---|
+| `scripted_turn` | the harness wrote the INTERPLANE model turn | `PASS_LABELLED_INCOMPLETE missing=link:model_turn` (never `PASS complete`) |
+| `model_generation/1` | the tool-call text came from the loaded model through AIEN's own generation path; `model_turn` and `generation` are retained | checked (below); `missing=link:daemon_generation_record` because the generation record is written by the run driver |
+| anything else | | `FAIL unsupported_binding` |
+
+The loose `record_effect_receipt/1` names no author, so it also leaves `link:model_turn` missing.
+The verdict repeats the origin: `effect=aien-ledger-slice/1:strong proposal=model_generation/1`.
+A companion that declares `complete` while a link is missing fails with `unlabelled_missing`.
+
+`model_generation/1` checks (`src/modelturn.rs`), after the ledger checks below: `model_turn.input` equals
+`generation.output_text` and its SHA-256 equals `generation.output_sha256`; the real `aien_legacy` dialect
+parses it into exactly one request with the trace's request id, tool, arguments and `source_digest`; the
+trace's request is sent by `model` with the id in `model_turn.model`; `generation.model_sha256_from_load_log`
+equals the exported weights digest (the load-log check binds it to the daemon); `generation.daemon_pid` and
+`daemon_start_ticks` equal `daemon_run`. `generation.written_by` must be `run-driver`: the daemon writes no
+generation record, and `daemon` is refused until a record shape exists.
 
 ### Checks (fixed order, first failure wins)
 
@@ -149,9 +164,9 @@ writes it.
 
 - The **minted** flow of sovereign-core #296 (`ComposeAuthorize`, `compose_commit`, `minted_grant`).
   The INTERPLANE adapter does not use it; a binding for it would be a new version.
-- Who authored the proposal. On the approved path the daemon "returns the approved text instead of
-  calling the model" (`approved.rs`), so the loaded model is **not consulted**. A model-authored
-  proposal needs the daemon's own proposer path and has no binding here.
+- The approved write path never calls the model ("returns the approved text instead of calling the
+  model", `approved.rs`). Authorship is therefore established upstream, in the same trace, by
+  `model_generation/1`, not by the ledger.
 - Model identity inside the daemon records. They do not carry model or tokenizer digests; the
   process identity above is the bridge. A daemon-written model digest is a sovereign-core cut (see
   the PR description).

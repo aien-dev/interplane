@@ -18,6 +18,8 @@ use std::path::{Path, PathBuf};
 const SYN: &str = "fixtures/synthetic-full-chain";
 const WEAK: &str = "fixtures/synthetic-weak-receipt";
 const STRONG: &str = "effect=aien-ledger-slice/1:strong proposal=scripted_turn";
+const WEAKL: &str = "effect=record_effect_receipt/1:weak";
+const INCOMPLETE: &str = "PASS_LABELLED_INCOMPLETE missing=link:model_turn";
 
 fn fresh(name: &str, o: &Opts) -> PathBuf {
     let d = Path::new(env!("CARGO_TARGET_TMPDIR"))
@@ -85,15 +87,12 @@ fn asset(opts: impl FnOnce(&mut Opts)) -> Opts {
 
 #[test]
 fn ledger_slice_is_labelled_strong() {
-    assert_eq!(verify(Path::new(SYN)), format!("PASS complete {STRONG}"));
+    assert_eq!(verify(Path::new(SYN)), format!("{INCOMPLETE} {STRONG}"));
 }
 
 #[test]
 fn record_effect_receipt_v1_is_still_accepted_and_labelled_weaker() {
-    assert_eq!(
-        verify(Path::new(WEAK)),
-        "PASS complete effect=record_effect_receipt/1:weak"
-    );
+    assert_eq!(verify(Path::new(WEAK)), format!("{INCOMPLETE} {WEAKL}"));
 }
 
 // ---------- identity: request, trace, model ----------
@@ -332,8 +331,8 @@ fn two_identical_calls_in_one_trace_are_told_apart() {
     assert_eq!(ta[0]["payload"]["arguments"], ta[4]["payload"]["arguments"]);
     assert_eq!(ta[0]["payload"]["tool"], ta[4]["payload"]["tool"],);
     // Each verifies against its own slice ...
-    assert_eq!(verify(&a), format!("PASS complete {STRONG}"));
-    assert_eq!(verify(&b), format!("PASS complete {STRONG}"));
+    assert_eq!(verify(&a), format!("{INCOMPLETE} {STRONG}"));
+    assert_eq!(verify(&b), format!("{INCOMPLETE} {STRONG}"));
     // ... and not against the other's.
     let swapped = with_slice_of(
         "same_trace_swapped",
@@ -353,8 +352,8 @@ fn two_identical_calls_in_two_traces_are_told_apart() {
         "two_traces_b",
         &asset(|o| o.trace_id = Some("trace-prov-02".into())),
     );
-    assert_eq!(verify(&a), format!("PASS complete {STRONG}"));
-    assert_eq!(verify(&b), format!("PASS complete {STRONG}"));
+    assert_eq!(verify(&a), format!("{INCOMPLETE} {STRONG}"));
+    assert_eq!(verify(&b), format!("{INCOMPLETE} {STRONG}"));
     let swapped = with_slice_of(
         "two_traces_swapped",
         &asset(|o| o.trace_id = Some("trace-prov-02".into())),
@@ -383,10 +382,7 @@ fn weaker_receipt_cannot_tell_two_identical_calls_apart_and_says_so() {
     );
     transplant(&b, &a, "effect_receipt");
     // Call 03's receipt is accepted for call 01. The verdict carries the weaker label.
-    assert_eq!(
-        verify(&a),
-        "PASS complete effect=record_effect_receipt/1:weak"
-    );
+    assert_eq!(verify(&a), format!("{INCOMPLETE} {WEAKL}"));
 }
 
 // ---------- canonicalization ----------
@@ -452,10 +448,7 @@ fn receipt_in_the_producer_form_is_accepted_where_jcs_would_differ() {
     let d = weak_with_args("producer_hashed", args, |v| {
         format!("sha256:{}", sha256_hex(&compact_sorted(v).unwrap()))
     });
-    assert_eq!(
-        verify(&d),
-        "PASS complete effect=record_effect_receipt/1:weak"
-    );
+    assert_eq!(verify(&d), format!("{INCOMPLETE} {WEAKL}"));
 }
 
 #[test]
@@ -473,6 +466,7 @@ fn unknown_effect_binding_is_refused() {
     let d = scratch(SYN, "binding_v2");
     let mut c = companion(&d);
     c["effect"]["binding"] = json!("aien-ledger-slice/2");
+    c["completeness"] = json!({"state": "complete", "missing": []});
     write_companion(&d, &c);
     assert_eq!(
         verify(&d),
@@ -481,6 +475,7 @@ fn unknown_effect_binding_is_refused() {
     let d = scratch(SYN, "binding_absent");
     let mut c = companion(&d);
     c["effect"].as_object_mut().unwrap().remove("binding");
+    c["completeness"] = json!({"state": "complete", "missing": []});
     write_companion(&d, &c);
     assert_eq!(verify(&d), "FAIL malformed_companion: effect.binding");
     let d = scratch(SYN, "approval_binding_v1");
@@ -555,7 +550,7 @@ fn verifying_reads_and_changes_nothing() {
     };
     let before = snapshot(&d);
     let verdict = verify(&d);
-    assert!(verdict.starts_with("PASS complete"), "{verdict}");
+    assert!(verdict.starts_with("PASS_LABELLED_INCOMPLETE"), "{verdict}");
     assert_eq!(snapshot(&d), before);
     // A PASS is a statement about records. No verdict text carries a permission.
     for word in ["allow", "grant ", "authoriz", "permit", "execute"] {

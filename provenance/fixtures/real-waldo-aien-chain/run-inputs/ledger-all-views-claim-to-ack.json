@@ -2,7 +2,7 @@
   "cited": [
     {
       "cls": 6,
-      "digest": "59ee61e31bac8e60227da276e38649398ce121f3f0bd4cabd6255c8ac33225dd",
+      "digest": "38be39ebc12c491857378a3fe5a45ebc07b9a2fef2030f9a8abfeea3f24723eb",
       "id": 6,
       "kind": 65554,
       "links": [
@@ -14,7 +14,7 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"approval_id\":\"aien-approval:w1:c32f6a1235828648\",\"approval_key\":\"a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":196539,\"start\":12819083},\"request_id\":\"w1\",\"trace_id\":\"real-run-01\"}",
+      "text": "{\"approval_id\":\"aien-approval:real-run-02:t0:c0:c32f6a1235828648\",\"approval_key\":\"f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":431861,\"start\":12978004},\"request_id\":\"real-run-02:t0:c0\",\"trace_id\":\"real-run-02\"}",
       "verified": true
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "cls": 3,
-      "digest": "de5ebda830ddedf5027ffc8b99e1d2c3990fea09c36466df1dbc5725f42d34fd",
+      "digest": "de04c070f4b37b6e62c70d4c22f4c770cc9e75693e1e66de951b6aca5a46cd27",
       "id": 8,
       "kind": 65537,
       "links": [
@@ -53,7 +53,7 @@
     },
     {
       "cls": 4,
-      "digest": "da1cb8c348f477e872167e9c61461c355c15f8ec6f4561e27775a8170a71d879",
+      "digest": "0746ae7815007a395e14306d694f075ed5a1e2be988d17bd8d2f14571502333b",
       "id": 9,
       "kind": 65540,
       "links": [
@@ -70,7 +70,7 @@
     },
     {
       "cls": 4,
-      "digest": "76490e70c716ce12a18eb16883b0ee39f981c9d5aecbb3a5189ebe6275741043",
+      "digest": "9bce6cb6f8769c6c9cc8b00d8d086964f5b905e43191aedf63c5cfab785fa396",
       "id": 10,
       "kind": 65540,
       "links": [
@@ -87,7 +87,7 @@
     },
     {
       "cls": 4,
-      "digest": "f003c4b121958c56a0f7efcd34994432d78d23841247ff5dd050de69c6ebb989",
+      "digest": "612c2ee872e283303f184065861ee7fb9dbd332a9f9c9e7a2a6362c712526dbb",
       "id": 11,
       "kind": 65540,
       "links": [
@@ -104,7 +104,7 @@
     },
     {
       "cls": 4,
-      "digest": "fb2f2c2e092b2021360bafcb48717feceadf65f3a8ffdcdf820054687db54e72",
+      "digest": "9be0dd3abf3dff39d202fc57417fde4e3bf83049f18f914999eacc1a3bcd3f4d",
       "id": 12,
       "kind": 65540,
       "links": [
@@ -121,7 +121,7 @@
     },
     {
       "cls": 2,
-      "digest": "08f61ca11931ad52560e113663a25bd6b142a3d52302057675c21e81604188ff",
+      "digest": "a4a9ad330d72466227557ed788372c0ee432c4a57a2b07abff0f0a2df6cf451c",
       "id": 13,
       "kind": 65553,
       "links": [
@@ -138,7 +138,7 @@
     },
     {
       "cls": 2,
-      "digest": "e817d96e4281992343f86a7731e1516d5a7c2ad5371203c427812a7e7ab3b812",
+      "digest": "dbac7b159dd32d425ae74ce5e6a5dca3bb9578e0999fdb3762ead887bbc0ce96",
       "id": 14,
       "kind": 65553,
       "links": [
@@ -155,7 +155,7 @@
     },
     {
       "cls": 6,
-      "digest": "de5ee508d36e97a8dda40b6716bd302564d573735f86c7894a8ceef57cc3bcf1",
+      "digest": "473cfeffa26d2da99d56bc529963f5e133722a694979116a8fcb73b369d0e145",
       "id": 15,
       "kind": 65554,
       "links": [
@@ -172,7 +172,7 @@
     },
     {
       "cls": 6,
-      "digest": "ced1f676b7b1c703027d2f87da3d9acffff2d34cdb5f2b352df4de4abc3d005b",
+      "digest": "e5e3d775cd9141396cd6c5ea31b93f2490eb9eb8e44d7a200251e88bfb9a478a",
       "id": 16,
       "kind": 65555,
       "links": [
@@ -206,7 +206,7 @@
     },
     {
       "cls": 6,
-      "digest": "ec848ad27da5d944b63713706dae9132df0ffe376c178412bfd089c4d6fe074b",
+      "digest": "3a334b3adb74e37f0931921b33e2af4ba7c03a89d10759d151a440ba222af864",
       "id": 18,
       "kind": 65554,
       "links": [
@@ -218,12 +218,12 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":10595037721773029291}}",
+      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":9124140031979291211}}",
       "verified": true
     },
     {
       "cls": 6,
-      "digest": "04cbe4465673b57d54b5802cf03e446b362320c8af8beb44620a9cda0df59a2d",
+      "digest": "0a5711db80809232edde1028af14116976f6c42de1510b1092fbaa5725e66da9",
       "id": 19,
       "kind": 65556,
       "links": [
@@ -235,12 +235,12 @@
       "note": "authorization",
       "subject": 0,
       "tag": 3,
-      "text": "{\"approval_id\":\"aien-approval:w1:c32f6a1235828648\",\"approval_key\":\"a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"78ca6bfb3c6f63b2\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"w1\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"trace_id\":\"real-run-01\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws\"}",
+      "text": "{\"approval_id\":\"aien-approval:real-run-02:t0:c0:c32f6a1235828648\",\"approval_key\":\"f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"6615bee733c95893\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"real-run-02:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"trace_id\":\"real-run-02\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws\"}",
       "verified": true
     },
     {
       "cls": 6,
-      "digest": "bb6696d89eb3350b0fbad6ff193294d40b8204492ae8321488a15aa6bee30519",
+      "digest": "ae1195e725d2130aae9ee1c5752d49dfa627797eb3267444dbf9190ee1d6c417",
       "id": 20,
       "kind": 65554,
       "links": [
@@ -252,7 +252,7 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":196516,\"start\":12819081},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+      "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":431839,\"start\":12978002},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"tool\":\"write_file\"}",
       "verified": true
     },
     {
@@ -273,11 +273,11 @@
       "verified": true
     }
   ],
-  "compose_dir": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/compose",
+  "compose_dir": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/compose",
   "host": [
     {
       "cls": 6,
-      "digest": "59ee61e31bac8e60227da276e38649398ce121f3f0bd4cabd6255c8ac33225dd",
+      "digest": "38be39ebc12c491857378a3fe5a45ebc07b9a2fef2030f9a8abfeea3f24723eb",
       "id": 6,
       "kind": 65554,
       "links": [
@@ -289,7 +289,7 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"approval_id\":\"aien-approval:w1:c32f6a1235828648\",\"approval_key\":\"a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":196539,\"start\":12819083},\"request_id\":\"w1\",\"trace_id\":\"real-run-01\"}",
+      "text": "{\"approval_id\":\"aien-approval:real-run-02:t0:c0:c32f6a1235828648\",\"approval_key\":\"f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":431861,\"start\":12978004},\"request_id\":\"real-run-02:t0:c0\",\"trace_id\":\"real-run-02\"}",
       "verified": true
     },
     {
@@ -311,7 +311,7 @@
     },
     {
       "cls": 6,
-      "digest": "ec848ad27da5d944b63713706dae9132df0ffe376c178412bfd089c4d6fe074b",
+      "digest": "3a334b3adb74e37f0931921b33e2af4ba7c03a89d10759d151a440ba222af864",
       "id": 18,
       "kind": 65554,
       "links": [
@@ -323,12 +323,12 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":10595037721773029291}}",
+      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":9124140031979291211}}",
       "verified": true
     },
     {
       "cls": 6,
-      "digest": "04cbe4465673b57d54b5802cf03e446b362320c8af8beb44620a9cda0df59a2d",
+      "digest": "0a5711db80809232edde1028af14116976f6c42de1510b1092fbaa5725e66da9",
       "id": 19,
       "kind": 65556,
       "links": [
@@ -340,12 +340,12 @@
       "note": "authorization",
       "subject": 0,
       "tag": 3,
-      "text": "{\"approval_id\":\"aien-approval:w1:c32f6a1235828648\",\"approval_key\":\"a2bc499ec38dee3a04c4afec80b046367022cfdfbf6535042e40f09064debcb9\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"78ca6bfb3c6f63b2\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"w1\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"trace_id\":\"real-run-01\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws\"}",
+      "text": "{\"approval_id\":\"aien-approval:real-run-02:t0:c0:c32f6a1235828648\",\"approval_key\":\"f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"6615bee733c95893\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"real-run-02:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"trace_id\":\"real-run-02\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws\"}",
       "verified": true
     },
     {
       "cls": 6,
-      "digest": "bb6696d89eb3350b0fbad6ff193294d40b8204492ae8321488a15aa6bee30519",
+      "digest": "ae1195e725d2130aae9ee1c5752d49dfa627797eb3267444dbf9190ee1d6c417",
       "id": 20,
       "kind": 65554,
       "links": [
@@ -357,7 +357,7 @@
       "note": "effect",
       "subject": 0,
       "tag": 4,
-      "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":196516,\"start\":12819081},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+      "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":431839,\"start\":12978002},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"tool\":\"write_file\"}",
       "verified": true
     },
     {
@@ -378,7 +378,7 @@
       "verified": true
     }
   ],
-  "machine_id": "559f4f21c1cbdffcbcdb1678b5edd8400a0584d92753810adf5791a649d99803",
+  "machine_id": "1f46d449a36bec357e3b7e13834ea84b34b4a91e69fa1c4064c644e8a935f701",
   "missing": [],
   "prefix": null,
   "prefix_digest": null,

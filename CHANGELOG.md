@@ -2,6 +2,8 @@
 
 ## Unreleased (0.3, Trust lane)
 
+- Issue #57 analysis (`docs/analysis/ISSUE-57-refusal-exposure.md`): traces how refused and held results reach the exposure ledger, enumerates the threat cases, and rules out recording refusals as `trusted_runtime` (an empty ledger would become the highest trust) and not recording them (adapter text escapes the floor). Tests only, no behaviour or fixture change: `python/tests/test_refusal_exposure.py` and `rust/crates/interplane-crossveil/tests/refusal_exposure.rs` (8 each). The policy choice is left open.
+
 - Shared adapter runner `conformance/runners/adapter_runner.py`: runs and judges a new adapter on its computed subset from two files (an authority module and a table entry kept outside the shared table, so `TRUST-DIGEST.txt` is unchanged), with `--no-exposure-check` as the negative control. The judge is the independent reproduction's, with adapter names taken from the module and entry. It reproduces both recorded runs byte for byte, normal and negative control (`python/tests/test_adapter_runner.py`; a judge that never counts violations fails it). `adapter_subset.plans` takes an optional table. Guide section 7 rewritten around it.
 
 - Maintainer check (not independent) of the adapter rules on a second host: a smart-home adapter built from "Adding an adapter" and the SDK guide, evidence `bench/runs/home-check-20261005T1320Z/`, addendum in `docs/REPORT-adapter-repro.md`. Subset 43 (30 injection, 13 approval), 43 executed, violations 0, content-derived 0, 32 injected intents; with its exposure check removed all 30 injection cases fail. The independent second run was stopped; it stays open.

@@ -108,13 +108,14 @@ proposal are never flattened into indistinguishable text. Rules:
    a model-produced or admitted envelope is discarded and recomputed, never read. Since 0.3 cut P3
    the pipeline computes it. Per trace it keeps a ledger of inputs: every result it renders back
    to the model is recorded automatically (`parent_id` is the `request_id`, `trust` and
-   `content_kind` are the result's normalized provenance, `unknown` when it has none; this includes
-   results that were not executed (denied, requires_approval, not_found, invalid, rejected), whose
-   payload labels are null: they are recorded `unknown` and count as `external_untrusted`, on purpose,
-   see CORE.md), and the
+   `content_kind` are the result's normalized provenance, `unknown` when it has none), and the
    host adds any other input before a turn through a host-only registration call that model
    output and envelopes cannot reach. All `tool_request`s of a turn, and the `CallContext` passed
-   to `decide` and `execute`, carry the ledger as it stood when the turn began. Exposure fails
+   to `decide` and `execute`, carry the ledger as it stood when the turn began.
+   A result with no classified body is recorded `unknown` and counts as `external_untrusted`, on
+   purpose; this covers results that were not executed (denied, requires_approval, not_found,
+   rejected, an unknown decision value, a decide fault) and executed `error` and `timed_out`
+   results (CORE.md, issue #57). Exposure fails
    closed: an empty ledger, an input of unknown or unrecognized trust, and an input whose
    `derived_from` names an id the ledger does not hold all count as `external_untrusted`.
 7. **Source classes.** The trust each class receives, and who records it. `Recorded by` is the

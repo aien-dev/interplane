@@ -1,7 +1,7 @@
 """Refused and held calls and the exposure floor (issue #57; docs/analysis/ISSUE-57-refusal-exposure.md).
 
 These tests state what must hold under every safe policy for non-executed results (denied,
-requires_approval, not_found, invalid, rejected): a refusal can never RAISE the floor, an empty
+requires_approval, not_found, rejected): a refusal can never RAISE the floor, an empty
 ledger stays `external_untrusted`, text echoed into a refusal never launders its taint, and a
 refusal never weakens how a later call is judged. Two tests pin the policy as it stands today
 (a refusal is recorded `unknown` and lowers the floor to `external_untrusted`).
@@ -190,30 +190,54 @@ def test_policy_pin_current_refusal_is_unknown_and_lowers_floor_to_external():
     assert floor(p) == "external_untrusted"
 
 
-class NotFound(MockRuntime):
+class Faulty(MockRuntime):
+    """Scripted outcomes per capability, so every route to a non-ok result is exercised."""
+
     def decide(self, req, ctx):
+        if req.capability == "call_provider":
+            raise RuntimeError("adapter exploded in decide")
         d = super().decide(req, ctx)
         if req.capability == "list_dir":
             d.decision = "not_found"
+        elif req.capability == "read_document":
+            d.decision = "invalid"
+        elif req.capability == "load_skill":
+            d.decision = "maybe"  # a decision value nobody defined
         return d
 
+    def execute(self, req, decision, ctx):
+        if req.capability == "read_file":
+            raise RuntimeError("adapter exploded in execute")
+        return super().execute(req, decision, ctx)
 
-def test_documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_external():
-    """CORE.md (non-executed results) and CROSSVEIL rule 6: denied, requires_approval, not_found,
-    invalid and rejected are rendered, recorded `unknown` / `unknown`, and count as external_untrusted."""
-    cases = [
-        ("write_file", {"path": "p", "content": "c"}, "denied"),
-        ("delete_file", {"path": "p"}, "requires_approval"),
-        ("list_dir", {"path": "p"}, "not_found"),
-        ("read_file", {}, "rejected"),
-        ("no_such_tool", {}, "rejected"),
-    ]
-    for i, (name, args, status) in enumerate(cases):
-        p = pipe(NotFound())
+
+# (capability, arguments, result status, recorded content_kind). Executed error results carry the
+# defaults the pipeline gives an unlabelled executed result (tool_result / unknown); every other
+# row is a result that was not executed and is recorded unknown / unknown. Same table in Rust.
+RULE_CASES = [
+    ("write_file", {"path": "p", "content": "c"}, "denied", "unknown"),
+    ("delete_file", {"path": "p"}, "requires_approval", "unknown"),
+    ("list_dir", {"path": "p"}, "not_found", "unknown"),
+    ("read_document", {"path": "p"}, "rejected", "unknown"),  # runtime said invalid
+    ("load_skill", {"name": "n"}, "denied", "unknown"),  # unknown decision value
+    ("call_provider", {"provider": "p", "query": "q"}, "denied", "unknown"),  # decide raised
+    ("read_file", {"path": "p"}, "error", "tool_result"),  # execute raised
+    ("fail_tool", {}, "error", "tool_result"),
+    ("slow_tool", {}, "timed_out", "tool_result"),
+    ("read_file", {}, "rejected", "unknown"),  # invalid arguments, rejected by the mock
+    ("no_such_tool", {}, "rejected", "unknown"),
+]
+
+
+def test_documented_rule_every_non_ok_result_is_recorded_unknown_and_counts_external():
+    """CORE.md (non-executed results in the exposure ledger) and CROSSVEIL rule 6."""
+    for i, (name, args, status, kind) in enumerate(RULE_CASES):
+        p = pipe(Faulty())
         user(p)
         out = go(p, name, args, f"c{i}", 0)
-        assert out.results[0].status == status, name
-        assert out.results[0].provenance.get("content_kind") is None
+        assert out.results[0].status == status, (name, status)
+        if kind == "unknown":  # not executed: the payload labels are null
+            assert out.results[0].provenance.get("content_kind") is None, name
         rec = p.inputs(T)[-1]
-        assert (rec["content_kind"], rec["trust"]) == ("unknown", "unknown"), name
+        assert (rec["content_kind"], rec["trust"]) == (kind, "unknown"), name
         assert floor(p) == "external_untrusted", name

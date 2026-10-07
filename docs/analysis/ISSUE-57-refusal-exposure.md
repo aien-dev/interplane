@@ -49,9 +49,9 @@ Three stated principles bear on it.
    (`spec/CROSSVEIL.md:143-146`). The floor is meant to move on real new exposure, not by
    construction.
 
-Reading 1 and 2 together with 3: the `unknown` on a refusal is an unintended side effect of two
-rules meeting (the default for unlabelled results, and the null label for non-executed ones), not a
-chosen policy. But the safe direction (fail closed) is what the authors chose for every gap, and the
+Reading 1 and 2 together with 3: the `unknown` on a refusal was an unintended side effect of two
+rules meeting (the default for unlabelled results, and the null label for non-executed ones). It
+was unintended when written and is now a decided policy (option C, section 6). But the safe direction (fail closed) is what the authors chose for every gap, and the
 fix must not open one.
 
 ## 3. Can a refusal body carry attacker-influenced text?
@@ -69,8 +69,17 @@ Yes, in four ways. The model-visible body is `{status, error.code, error.message
 | runtime catalog text | `unknown capability: <capability>` | the catalog |
 
 The Odysseus adapter passes the gate's own reason through (`authority.py:197-212`, redacted and cut
-to `_MAX_REASON`); the AIEN adapter passes sovereign-core's reason (`adapters/aien/src/lib.rs:350,
-:394, :459`). Neither checks that the reason is free of text the model could be steered by.
+to `_MAX_REASON`); the AIEN adapter passes reasons from AIEN's own primitives (`adapters/aien/src/lib.rs:394`
+staging refusals, `:450-459` approval errors formatted as `approval refused: {e:?}` or `e.to_string()`,
+`:591-607` the pending reason, `:803-809` the aegis gate reason). Neither checks that the reason is
+free of text the model could be steered by. Whether any AIEN or aegis reason quotes arguments or
+content is UNVERIFIED (those crates were not read for this note).
+
+Approval ids differ per adapter. Odysseus mints none (`authority.py:200-212`, `approval=None`), so
+its body reads `approval required: ` with an empty id; its reasons go through `_redact` and a length
+cut (`:117-118`). AIEN mints `aien-approval:<request_id>:<16 hex of the intent digest>`
+(`lib.rs:598`), which embeds the model-chosen request id, so it is not opaque: it is echoed model
+text plus a digest prefix. The mock id embeds the request id the same way.
 
 ## 4. Threat cases
 
@@ -141,7 +150,12 @@ host". The tests below pin what must hold under C, R and V alike, and pin today'
 `rust/crates/interplane-crossveil/tests/refusal_exposure.rs` (9): same scenarios and strings.
 Covered: I1, I2, echoed tool name with a later effect still held, an adapter reason carrying
 injected text, held then approved then executed, a mixed chain ending in an untrusted read, a
-todo-shaped floor sequence on the mock, and the current-policy pin.
+todo-shaped floor sequence on the mock, the current-policy pin, and a table test that pins the
+documented rule over 11 outcome rows: denied, requires_approval, not_found, a runtime `invalid`
+decision (status `rejected`), an unknown decision value, a `decide` that raised, an `execute` that
+raised, executed `error`, executed `timed_out`, and two pre-runtime rejections. Each ends at floor
+`external_untrusted`; not-executed rows are recorded `unknown` / `unknown`, executed ones
+`tool_result` / `unknown`.
 
-Red check: with refusals patched to `trusted_runtime` (policy A) 6 of 8 fail in each SDK (of the first 8); the real
+Red check: with refusals patched to `trusted_runtime` (policy A) 7 of 9 fail in each SDK; the real
 code passes all 9.

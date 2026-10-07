@@ -287,19 +287,29 @@ fn policy_pin_current_refusal_is_unknown_and_lowers_floor_to_external() {
     assert_eq!(floor(&p), "external_untrusted");
 }
 
-struct NotFound(MockRuntime);
-impl RuntimeAuthority for NotFound {
+/// Scripted outcomes per capability, so every route to a non-ok result is exercised.
+struct Faulty(MockRuntime);
+impl RuntimeAuthority for Faulty {
     fn runtime_id(&self) -> &str {
         "mock"
     }
     fn decide(&mut self, req: &CapabilityRequest, ctx: &CallContext) -> Decision {
+        if req.capability == "call_provider" {
+            panic!("adapter exploded in decide");
+        }
         let mut d = self.0.decide(req, ctx);
-        if req.capability == "list_dir" {
-            d.decision = DecisionKind::NotFound;
+        match req.capability.as_str() {
+            "list_dir" => d.decision = DecisionKind::NotFound,
+            "read_document" => d.decision = DecisionKind::Invalid,
+            "load_skill" => d.decision = DecisionKind::parse("maybe"), // nobody defined it
+            _ => {}
         }
         d
     }
     fn execute(&mut self, req: &CapabilityRequest, d: &Decision, ctx: &CallContext) -> ToolResult {
+        if req.capability == "read_file" {
+            panic!("adapter exploded in execute");
+        }
         self.0.execute(req, d, ctx)
     }
     fn catalog(&self) -> Catalog {
@@ -308,31 +318,54 @@ impl RuntimeAuthority for NotFound {
 }
 
 #[test]
-fn documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_external() {
-    // CORE.md (non-executed results) and CROSSVEIL rule 6.
+fn documented_rule_every_non_ok_result_is_recorded_unknown_and_counts_external() {
+    // CORE.md (non-executed results in the exposure ledger) and CROSSVEIL rule 6.
+    // (capability, arguments, result status, recorded content_kind). Executed error results carry
+    // the defaults the pipeline gives an unlabelled executed result (tool_result / unknown); every
+    // other row was not executed and is recorded unknown / unknown. Same table in Python.
     let cases = [
-        ("write_file", json!({"path": "p", "content": "c"}), "denied"),
-        ("delete_file", json!({"path": "p"}), "requires_approval"),
-        ("list_dir", json!({"path": "p"}), "not_found"),
-        ("read_file", json!({}), "rejected"),
-        ("no_such_tool", json!({}), "rejected"),
+        (
+            "write_file",
+            json!({"path": "p", "content": "c"}),
+            "denied",
+            "unknown",
+        ),
+        (
+            "delete_file",
+            json!({"path": "p"}),
+            "requires_approval",
+            "unknown",
+        ),
+        ("list_dir", json!({"path": "p"}), "not_found", "unknown"),
+        ("read_document", json!({"path": "p"}), "rejected", "unknown"), // runtime said invalid
+        ("load_skill", json!({"name": "n"}), "denied", "unknown"),      // unknown decision value
+        (
+            "call_provider",
+            json!({"provider": "p", "query": "q"}),
+            "denied",
+            "unknown",
+        ), // decide raised
+        ("read_file", json!({"path": "p"}), "error", "tool_result"),    // execute raised
+        ("fail_tool", json!({}), "error", "tool_result"),
+        ("slow_tool", json!({}), "timed_out", "tool_result"),
+        ("read_file", json!({}), "rejected", "unknown"), // invalid arguments, rejected by the mock
+        ("no_such_tool", json!({}), "rejected", "unknown"),
     ];
-    for (i, (name, args, status)) in cases.into_iter().enumerate() {
-        let mut rt = NotFound(MockRuntime::new());
+    for (i, (name, args, status, kind)) in cases.into_iter().enumerate() {
+        let mut rt = Faulty(MockRuntime::new());
         let mut p = pipe(&mut rt);
         user(&mut p);
         let out = go(&mut p, name, args, &format!("c{i}"), 0);
         assert_eq!(out.results[0].status.as_str(), status, "{name}");
-        assert!(out.results[0]
-            .provenance
-            .as_ref()
-            .is_none_or(|pv| pv.content_kind.is_none()));
-        let (kind, trust, _, _) = last(&p);
-        assert_eq!(
-            (kind.as_str(), trust.as_str()),
-            ("unknown", "unknown"),
-            "{name}"
-        );
+        if kind == "unknown" {
+            // not executed: the payload labels are null
+            assert!(out.results[0]
+                .provenance
+                .as_ref()
+                .is_none_or(|pv| pv.content_kind.is_none()));
+        }
+        let (k, trust, _, _) = last(&p);
+        assert_eq!((k.as_str(), trust.as_str()), (kind, "unknown"), "{name}");
         assert_eq!(floor(&p), "external_untrusted", "{name}");
     }
 }

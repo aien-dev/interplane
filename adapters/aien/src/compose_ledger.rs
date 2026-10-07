@@ -28,7 +28,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs;
 use std::io::{BufRead, BufReader, Read, Write};
-use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
+use std::os::unix::fs::{MetadataExt, OpenOptionsExt, PermissionsExt};
 use std::os::unix::net::UnixStream;
 use std::path::{Component, Path, PathBuf};
 use std::rc::Rc;
@@ -770,10 +770,34 @@ fn random_suffix() -> Result<String, String> {
     Ok(b.iter().map(|x| format!("{x:02x}")).collect())
 }
 
+/// The process umask, read from `/proc/self/status` (no new dependency, no unsafe). When the
+/// field cannot be read, the conventional 022 is assumed (the file then gets 0644).
+fn process_umask() -> u32 {
+    fs::read_to_string("/proc/self/status")
+        .ok()
+        .and_then(|s| {
+            s.lines()
+                .find_map(|l| l.strip_prefix("Umask:"))
+                .and_then(|v| u32::from_str_radix(v.trim(), 8).ok())
+        })
+        .unwrap_or(0o022)
+}
+
+/// The mode the written file ends with: an existing regular target keeps its permission bits;
+/// a new file gets what `File::create` gave before the x4 change, 0666 less the umask.
+fn final_mode(target: &Path) -> u32 {
+    match fs::symlink_metadata(target) {
+        Ok(m) if m.file_type().is_file() => m.permissions().mode() & 0o777,
+        _ => 0o666 & !process_umask(),
+    }
+}
+
 /// Write `bytes` to `target` through a temp file in the same, confined directory: the temp file
 /// gets an unpredictable name and is opened `create_new` + `O_NOFOLLOW`, mode 0600, so a symlink
 /// planted at a guessed name is never followed (476ca4 x4); the parent is re-checked inside the
-/// workspace just before the rename, which is refused otherwise.
+/// workspace just before the rename, which is refused otherwise. Before the rename the temp file
+/// is set (through its open handle) to [`final_mode`], so the rename does not leave the written
+/// file at 0600.
 fn atomic_write(workspace: &Path, target: &Path, bytes: &[u8]) -> Result<(), String> {
     let parent = parent_confined(workspace, target)?;
     let name = target
@@ -781,13 +805,18 @@ fn atomic_write(workspace: &Path, target: &Path, bytes: &[u8]) -> Result<(), Str
         .map(|n| n.to_string_lossy().into_owned())
         .unwrap_or_default();
     let tmp = parent.join(format!(".{name}.interplane-{}.tmp", random_suffix()?));
+    let mode = final_mode(target);
     let r = fs::OpenOptions::new()
         .write(true)
         .create_new(true)
         .mode(0o600)
         .custom_flags(libc_o_nofollow())
         .open(&tmp)
-        .and_then(|mut f| f.write_all(bytes).and_then(|_| f.sync_all()))
+        .and_then(|mut f| {
+            f.write_all(bytes)?;
+            f.set_permissions(fs::Permissions::from_mode(mode))?;
+            f.sync_all()
+        })
         .map_err(|e| format!("write {}: temp file: {e}", target.display()))
         .and_then(|_| parent_confined(workspace, target).map(|_| ()))
         .and_then(|_| {
@@ -901,7 +930,7 @@ mod tests {
         let outdir = root.join("outdir");
         fs::create_dir_all(&ws).unwrap();
         fs::create_dir_all(&outdir).unwrap();
-        // Honest write: lands, mode of the result is the temp file's 0600, no temp left behind.
+        // Honest write: lands, no temp left behind.
         atomic_write(&ws, &ws.join("a.txt"), b"one\n").unwrap();
         assert_eq!(fs::read(ws.join("a.txt")).unwrap(), b"one\n");
         assert_eq!(
@@ -920,5 +949,32 @@ mod tests {
         assert_eq!(fs::read_dir(&outdir).unwrap().count(), 0);
         // Two temp names never repeat.
         assert_ne!(random_suffix().unwrap(), random_suffix().unwrap());
+    }
+
+    /// The temp file is created 0600, but the written file keeps the existing target's mode, and
+    /// a new file gets 0666 less the umask, as `File::create` gave before the x4 change.
+    #[test]
+    fn atomic_write_keeps_the_target_mode_or_the_umask_default() {
+        let tmp = tempfile::tempdir().unwrap();
+        let ws = fs::canonicalize(tmp.path()).unwrap();
+        let mode = |p: &Path| fs::metadata(p).unwrap().permissions().mode() & 0o777;
+        // New file: the old default, observed the same way File::create sets it.
+        let probe = ws.join("probe.txt");
+        fs::File::create(&probe).unwrap();
+        let old_default = mode(&probe);
+        fs::remove_file(&probe).unwrap();
+        assert_eq!(old_default, 0o666 & !process_umask());
+        atomic_write(&ws, &ws.join("new.txt"), b"new\n").unwrap();
+        assert_eq!(mode(&ws.join("new.txt")), old_default);
+        assert_ne!(mode(&ws.join("new.txt")), 0o600, "temp mode leaked");
+        // Existing target: its mode survives the replace, both tighter and looser than default.
+        for m in [0o640, 0o600, 0o755] {
+            let t = ws.join(format!("existing-{m:o}.txt"));
+            fs::write(&t, b"old\n").unwrap();
+            fs::set_permissions(&t, fs::Permissions::from_mode(m)).unwrap();
+            atomic_write(&ws, &t, b"replaced\n").unwrap();
+            assert_eq!(fs::read(&t).unwrap(), b"replaced\n");
+            assert_eq!(mode(&t), m, "mode of an existing {m:o} target");
+        }
     }
 }

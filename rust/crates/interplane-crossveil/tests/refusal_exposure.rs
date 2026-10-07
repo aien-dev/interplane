@@ -326,7 +326,7 @@ fn documented_rule_every_non_executed_result_is_recorded_unknown_and_counts_exte
         assert!(out.results[0]
             .provenance
             .as_ref()
-            .map_or(true, |pv| pv.content_kind.is_none()));
+            .is_none_or(|pv| pv.content_kind.is_none()));
         let (kind, trust, _, _) = last(&p);
         assert_eq!(
             (kind.as_str(), trust.as_str()),

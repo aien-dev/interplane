@@ -30,6 +30,7 @@ use interplane_crossveil::{CallContext, ObservedRecord, Pipeline, Refusal, Runti
 use serde_json::{json, Map, Value};
 
 pub mod compose_ledger;
+pub mod provenance_export;
 pub use compose_ledger::{
     hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
     APPROVAL_BINDING_VERSION, BOUND_REQUIREMENTS, DEFAULT_APPROVER, LEDGER_BOUNDARY,

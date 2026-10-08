@@ -1,0 +1,38 @@
+{
+  "kind": "interplane-aien-live-gate-receipt",
+  "adapter_commit": "061639dc349fd8fa12d15f30000d6b22eb486c08",
+  "adapter_dirty": false,
+  "sovereign_core_bin_sha256": "9704f29f68348097516ab45382852c70c1c22aec36d868cb2be564b8cd039c2f",
+  "sovereign_core_rev": "9b5e6e82359f4ad6b6f03042e83ef6411c5f15ce",
+  "sovereign_core_rev_basis": "caller-asserted: the daemon does not print its revision",
+  "omega_lock": "6c6180cf378075b61291f4565d226eba38b4decd",
+  "backend": "CPU reference (as printed in the daemon log)",
+  "verdict": "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn",
+  "bundle_companion_sha256": "92d0b7835ff8b43ebfd7fdd80c1ee37bcc5715ddedc1606c137d54d4fa9a9954",
+  "tests": {
+    "passed": 5,
+    "names": [
+      "row1_approved_write_lands_and_is_done",
+      "x1_client_minted_grant_unused_when_the_handoff_refuses",
+      "x2_no_fallback_write_when_the_daemon_is_gone",
+      "x3_effect_uses_the_daemon_grant_not_a_client_one",
+      "x4_planted_temp_symlink_does_not_redirect_the_write"
+    ]
+  },
+  "negative_checks": [
+    "control PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn",
+    "content_bytes FAIL digest_mismatch: interplane_trace",
+    "content_restamped FAIL binding_mismatch: interplane.arguments.content request=w1",
+    "ack_bytes FAIL digest_mismatch: ledger_ack",
+    "ack_restamped FAIL binding_mismatch: ledger_ack.state",
+    "truncated FAIL size_mismatch: ledger_intent declared=746 actual=20"
+  ],
+  "started": "2026-10-08T18:16:25Z",
+  "finished": "2026-10-08T18:51:47Z",
+  "limits": [
+    "records are unsigned exports; the verifier cannot tell an export from a hand-written file",
+    "desk MAC for ComposeAuthorize stays default-off (not changed here)",
+    "native compose library linking is not reported by the daemon",
+    "the model turn is scripted: proposal authorship is not claimed"
+  ]
+}

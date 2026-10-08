@@ -54,6 +54,7 @@ struct Daemon {
     sock: PathBuf,
     desk_key_id: String,
     log: PathBuf,
+    model: PathBuf,
     started_ms: u128,
     _keep: Option<tempfile::TempDir>,
 }
@@ -147,6 +148,7 @@ fn daemon(row: &str) -> Option<Daemon> {
         sock: sock.clone(),
         desk_key_id,
         log: log.clone(),
+        model: model.clone(),
         started_ms: 0,
         _keep: keep,
     };
@@ -322,7 +324,7 @@ fn pipe<'a>(rt: &'a mut ComposeLedgerAuthority, l: &ComposeLedgerAuthority) -> P
 }
 
 /// Propose `write_file path content` as request `id`; it must stop at requires_approval.
-fn propose(p: &mut Pipeline<'_>, n: u64, id: &str, path: &str, content: &str) {
+fn propose(p: &mut Pipeline<'_>, n: u64, id: &str, path: &str, content: &str) -> (Value, Value) {
     let out = p.run_turn(
         "openai",
         "scripted",
@@ -340,6 +342,10 @@ fn propose(p: &mut Pipeline<'_>, n: u64, id: &str, path: &str, content: &str) {
         "{:?}",
         out.results[0]
     );
+    (
+        serde_json::to_value(&out.intents[0]).unwrap(),
+        serde_json::to_value(&out.results[0]).unwrap(),
+    )
 }
 
 /// Host approves request `id` (one AIEN grant) as `drake` and continues it.
@@ -359,6 +365,50 @@ fn approve(
     (r, g)
 }
 
+/// With `LEDGER_OUT` set (the live gate), write the row-1 run as a provenance bundle in
+/// `<row>/bundle` for `provenance verify`. Without it nothing is exported (a temp dir would
+/// make the model copy pointless).
+fn export_provenance(
+    d: &Daemon,
+    intent: &Value,
+    pending: &Value,
+    res: &ToolResult,
+    t_request: &str,
+    t_done: &str,
+) {
+    if std::env::var("LEDGER_OUT").is_err() {
+        return;
+    }
+    let bin = std::env::var("AIEN_BIN").expect("AIEN_BIN");
+    let model_id = std::env::var("AIEN_LEDGER_MODEL_ID")
+        .unwrap_or_else(|_| "unsloth/Llama-3.2-1B-Instruct".into());
+    let revision = std::fs::canonicalize(&d.model)
+        .ok()
+        .and_then(|p| p.file_name().map(|n| n.to_string_lossy().into_owned()))
+        .unwrap_or_default();
+    let final_result = serde_json::to_value(res).unwrap();
+    let rep = provenance_export::export_bundle(&provenance_export::LiveRun {
+        out: &d.root.join("bundle"),
+        client: &d.client(),
+        aien_bin: Path::new(&bin),
+        daemon_pid: d.child.id(),
+        daemon_log: &d.log,
+        socket: &d.sock,
+        workspace: &d.ws(),
+        model_dir: &d.model,
+        model_origin: (&model_id, &revision),
+        model_label: "scripted-test-model",
+        trace_id: TRACE,
+        intent,
+        pending,
+        final_result: &final_result,
+        t_request,
+        t_done,
+    })
+    .expect("provenance export");
+    println!("PROVENANCE_BUNDLE {}", rep.dir.display());
+}
+
 fn lock() -> std::sync::MutexGuard<'static, ()> {
     SERIAL.lock().unwrap_or_else(|e| e.into_inner())
 }
@@ -373,9 +423,11 @@ fn row1_approved_write_lands_and_is_done() {
     let l = ledger(&d);
     let mut rt = l.clone();
     let mut p = pipe(&mut rt, &l);
-    propose(&mut p, 0, "w1", "summary.txt", EXPECTED);
+    let (intent_v, pending_v) = propose(&mut p, 0, "w1", "summary.txt", EXPECTED);
+    let t_request = provenance_export::now_rfc3339();
     let (res, _) = approve(&mut p, &l, "w1");
     assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    let t_done = provenance_export::now_rfc3339();
     let rc = res.data["receipt"].clone();
     assert_eq!(rc["state"], "DONE");
     assert_eq!(rc["boundary"], LEDGER_BOUNDARY);
@@ -448,6 +500,7 @@ fn row1_approved_write_lands_and_is_done() {
         json!({"verdict": "PASS", "records_before": before, "records_after": after,
         "receipt": rc, "journal": recs, "file_sha256": hex(&written), "expected_sha256": hex(EXPECTED.as_bytes())}),
     );
+    export_provenance(&d, &intent_v, &pending_v, &res, &t_request, &t_done);
 }
 
 #[test]

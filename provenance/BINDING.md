@@ -235,6 +235,12 @@ The verdict is then `PASS_LABELLED_INCOMPLETE missing=link:model_turn,link:nativ
 `test_run` section are unchanged. `omega_sha` is the build's pinned expected sha, a build-time fact; a
 library supplied by override is linked without a sha check (sovereign-core M3a report).
 
+What this check does not do: it reads only the retained `compose_recall` report. The ledger ack records
+carry no `compose_native` field, so the ack is not consulted. The recall report is digest-bound but not
+cross-checked against the five ledger records, so a producer who writes the bundle can hand-write a
+recall report saying `compose_native: true`. That falls under the unsigned-export limit above: the
+verifier detects inconsistent or altered evidence, not a producer that fabricates a consistent set.
+
 Does not prove: that the tests are good, that the proposal came from a model (it is scripted:
 `link:model_turn` stays missing), that the harness is honest, or that nothing else touched the
 workspace between the ack and the second test run.

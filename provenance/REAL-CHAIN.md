@@ -58,6 +58,18 @@ from the same model and execution. So:
    b. feeds that exact text to the INTERPLANE `aien_legacy` dialect, which yields one `write_file` request;
    c. drives approval and the write through the INTERPLANE AIEN adapter; the daemon writes its ledger records
       (claim 7 ... ack 22).
+### The corpus generator (kept outside the repository)
+
+`conversations.jsonl` (46 conversations, bytes retained in `run-inputs/`) was written by a scratch script,
+`gen_corpus.py`. This repository takes no Python outside `python/`, so the script is not in the branch. Its exact
+bytes are kept here by name and digest, and in a durable directory outside the repo:
+
+- file: `gen_corpus.py`, 1908 bytes, sha256 `cae40fda46f5a876c0b93dee9bc0dadd5323b5f6f891f73fc3130720e7c9adcb`
+- durable path: `~/workspace/evidence/interplane-76/2026-10-07/train2/gen_corpus.py` (the whole run evidence is under
+  `~/workspace/evidence/interplane-76/2026-10-07/`: training dir, run records, driver, build log, PIDs, mutation logs)
+- it generated `conversations.jsonl`; no verifier check and no `COMPANION.json` digest reads the script, so the verdict
+  does not depend on it. The corpus bytes the training used are the retained `conversations.jsonl`.
+
 3. Retained unchanged: daemon log and stderr, the generation record, the five `ComposeRecall` views,
    `daemon-run.json`, `model-turn.json`, and the INTERPLANE trace (request, requires_approval result, ok result).
    Process ids of this run: daemon 1256385 (killed by the driver at the end). An earlier failed attempt on a build

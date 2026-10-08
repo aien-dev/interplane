@@ -102,8 +102,26 @@ pub fn check(a: &Archive, m: &Value, ledger_checked: bool) -> Result<(), Fail> {
         return fail("unsupported_test_run", "record kind/v");
     }
     let task = rec_json(a, "task", "test_run_missing")?;
-    let pin = rec_json(a, "source_pin", "source_pin_mismatch")?;
     let facts = ledger::facts(a)?;
+
+    // Task scope: the task names the one file it allows to change, and the grant must write that
+    // file. Without it a run that edited the test instead of the code would still verify.
+    match s(&task, &["target_path"]) {
+        Some(t) if t == facts.path => {}
+        Some(t) => {
+            return fail(
+                "task_scope_mismatch",
+                format!("task.target_path={t} vs ledger_grant.path={}", facts.path),
+            )
+        }
+        None => {
+            return fail(
+                "task_scope_mismatch",
+                "task.target_path absent: the task does not say which file may change",
+            )
+        }
+    }
+    let pin = rec_json(a, "source_pin", "source_pin_mismatch")?;
 
     // Source pin: the commit the task starts from, and the exact target bytes the grant replaced.
     let pin_bad = |what: &str| -> Result<(), Fail> { fail("source_pin_mismatch", what) };

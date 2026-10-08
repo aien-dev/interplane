@@ -104,6 +104,7 @@ fork stdout_digest; editrec "$neg/stdout_digest" test_run_record '.stdout_sha256
 fork blob_after;   editrec "$neg/blob_after" test_run_record '.target_blob_sha256_after = $o' --arg o "$other"; expect wrong_target_blob "$neg/blob_after" test_run_mismatch
 fork dropped;      manifest "$neg/dropped" 'del(.test_run)';                                         expect dropped_test_run "$neg/dropped" test_run_missing
 fork pin;          editrec "$neg/pin" source_pin '.target_blob_sha256 = $o' --arg o "$other";       expect tampered_source_pin "$neg/pin" source_pin_mismatch
+fork scope;        editrec "$neg/scope" task '.target_path = "test/test_clamp.c"';                     expect write_outside_task_scope "$neg/scope" task_scope_mismatch
 fork forged_native
 if [ "$native_claimed" = "true" ]; then
   # a native claim whose evidence (the retained ComposeRecall report) is removed

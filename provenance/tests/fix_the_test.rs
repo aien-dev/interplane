@@ -286,3 +286,24 @@ fn verifying_the_slice_changes_nothing() {
     let _ = verify(&d);
     assert_eq!(before, std::fs::read(d.join("COMPANION.json")).unwrap());
 }
+
+#[test]
+fn write_outside_the_task_target_is_a_task_scope_mismatch() {
+    // The task allows src/clamp.c; here it names the test file instead, so the grant's write
+    // (src/clamp.c) is not the file the task allows. The same check refuses a run whose grant
+    // writes the test file while the task names the code.
+    let d = scratch(FIX, "ftt-scope");
+    edit(&d, "task", |v| {
+        v["target_path"] = json!("test/test_clamp.c")
+    });
+    refused(&d, "task_scope_mismatch");
+}
+
+#[test]
+fn task_without_a_target_path_is_a_task_scope_mismatch() {
+    let d = scratch(FIX, "ftt-scope-absent");
+    edit(&d, "task", |v| {
+        v.as_object_mut().unwrap().remove("target_path");
+    });
+    refused(&d, "task_scope_mismatch");
+}

@@ -198,7 +198,7 @@ Retained records (named in `records`, raw files):
 
 | Record | Content |
 |---|---|
-| `task` | `{kind: "vac-task", task_id, repo_commit, test_cmd: [argv...]}` |
+| `task` | `{kind: "vac-task", task_id, repo_commit, test_cmd: [argv...], target_path}`; `target_path` is the one file the task allows to change (`target_file` in the fixture's `TASK.md`) |
 | `source_pin` | `{kind: "vac-source-pin", repo, commit, target_path, target_blob_sha256}`: the task's start commit and the SHA-256 of the target file before the fix |
 | `test_run_record` | `{kind: "vac-test-run", v: 1, task_id, argv, cwd_rel, exit_code, test_exit_before, stdout_sha256, stderr_sha256, started_unix_ms, duration_ms, tree_commit_after, target_blob_sha256_after}` |
 | `test_stdout`, `test_stderr` | the test command's output after the fix, byte for byte |
@@ -214,15 +214,20 @@ and, when the daemon reports it, `"aien": {..., "native": {"claimed": bool, "ome
    silence); or the section's record, or `task`, is absent or not retained.
 2. **`unsupported_test_run`**: `test_run.binding` is not `vac-test-run/1`, or the record's `kind`/`v`
    is not `vac-test-run`/`1`.
-3. **`source_pin_mismatch`**: `source_pin.kind` is not `vac-source-pin`; `source_pin.target_path` differs
+3. **`task_scope_mismatch`**: `task.target_path` is absent, or differs from the grant's `path`. Without
+   it, a run that rewrote the test file instead of the code would still verify. The task record is
+   written by the same harness as the bundle, so this binds the declared scope to the write; it does
+   not prove the declared scope equals the fixture's `TASK.md` (unsigned-export limit above). Bundles
+   captured before this check (no `target_path`) are refused with this code.
+4. **`source_pin_mismatch`**: `source_pin.kind` is not `vac-source-pin`; `source_pin.target_path` differs
    from the grant's `path`; `source_pin.target_blob_sha256` differs from the grant's `prior_sha256`
    (null for a new file also fails); `source_pin.commit` differs from `task.repo_commit`.
-4. **`test_run_mismatch`**: `task_id` differs between the section, the record and `task`; `argv` differs
+5. **`test_run_mismatch`**: `task_id` differs between the section, the record and `task`; `argv` differs
    from `task.test_cmd`; `exit_code` is not 0 (the slice claims the test passes after the write);
    `test_exit_before` is 0 (nothing was fixed) or missing; `target_blob_sha256_after` differs from the
    ack's `disk_sha256` (the daemon's read-back) or the grant's `content_sha256`; `stdout_sha256` or
    `stderr_sha256` is not hex or differs from the retained `test_stdout`/`test_stderr`.
-5. **`native_claim_contradicted`**: see below.
+6. **`native_claim_contradicted`**: see below.
 
 ### Native claim, and what a missing one means
 

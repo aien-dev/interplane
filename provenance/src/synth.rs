@@ -591,7 +591,7 @@ type ExtraFile = (&'static str, &'static str, Vec<u8>);
 fn fix_the_test(o: &Opts) -> (Vec<ExtraFile>, Value) {
     let task = pretty(
         &json!({"kind": "vac-task", "task_id": TASK_ID, "repo_commit": SOURCE_COMMIT,
-        "test_cmd": ["make", "test"]}),
+        "test_cmd": ["make", "test"], "target_path": "src/clamp.c"}),
     );
     let pin = pretty(
         &json!({"kind": "vac-source-pin", "repo": "fix_the_test", "commit": SOURCE_COMMIT,

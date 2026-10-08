@@ -51,7 +51,10 @@ repeated key in a candidate manifest is refused, so two readers can never see di
 the same bytes. A record path that passes through a symlink is refused. In the trace, a request
 has one `tool_request`, at most one `requires_approval` result, then at most one final result
 (spec/CORE.md lifecycle). A manifest whose `fixture.class` is anything but `real` (test material)
-is never `PASS complete`; every other check still runs on it.
+is never `PASS complete`; every other check still runs on it. The label is in-band: a manifest with
+the `fixture` object deleted cannot be recognised as test material, so `complete` still rests on
+every link being verified from retained bytes (the synthetic generator writes only `scripted_turn`
+or the weak receipt, which can never be complete).
 
 ```
 cargo run -q -- verify fixtures/synthetic-full-chain     # PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn

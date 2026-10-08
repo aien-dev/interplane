@@ -348,9 +348,9 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
 
     let companion = json!({
         "kind": "interplane-provenance-companion", "schema": 0,
-        "fixture": {"class": "real", "note": "Real daemon, real ledger records, unmodified. The model turn is SCRIPTED by the test (the tool call is a test constant), so authorship of the proposal is not claimed; the model only loaded."},
+        "fixture": {"class": "real", "note": "Real daemon; the five ledger records are the daemon's own ComposeRecall output (pretty-printed only); daemon_run.json and the 3-message trace are written by the test harness, including their timestamps. The model turn is SCRIPTED by the test (the tool call is a test constant), so authorship of the proposal is not claimed; the model only loaded."},
         "lineage": {"kind": "unknown_pretraining",
-            "origin": {"model_id": run.model_origin.0, "revision": run.model_origin.1,
+            "origin": {"model_id": run.model_origin.0, "model_id_source": "caller-asserted (AIEN_LEDGER_MODEL_ID or default; not checked against the model directory)", "revision": run.model_origin.1,
                 "note": "weights as downloaded; no training evidence is held"}},
         "export": {"format": "huggingface", "chat_template": Value::Null},
         "load_support": {"declared": "supported_structural"},

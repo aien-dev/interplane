@@ -76,7 +76,6 @@ want_incomplete="PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-le
 verdict="$(verify "$bundle")"
 case "$verdict" in
   "$want_incomplete") ;;
-  "PASS complete "*) ;;
   *) die "unexpected verdict on the live bundle: $verdict";;
 esac
 

@@ -368,6 +368,7 @@ fn approve(
 /// With `LEDGER_OUT` set (the live gate), write the row-1 run as a provenance bundle in
 /// `<row>/bundle` for `provenance verify`. Without it nothing is exported (a temp dir would
 /// make the model copy pointless).
+#[allow(clippy::too_many_arguments)]
 fn export_provenance(
     d: &Daemon,
     intent: &Value,

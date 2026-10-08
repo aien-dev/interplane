@@ -16,6 +16,9 @@ use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
+/// A named edit applied to a signed receipt.
+type Edit = (&'static str, Box<dyn Fn(&mut Value)>);
+
 const STRONG: &str = "effect=aien-ledger-slice/1:strong proposal=scripted_turn";
 const OTHER: &str = "9999999999999999999999999999999999999999999999999999999999999999";
 const HOLDOUTS: &str = "1111111111111111111111111111111111111111111111111111111111111111";
@@ -227,7 +230,7 @@ fn version_1_receipts_are_insufficient() {
 
 #[test]
 fn substituted_scores_break_the_signature() {
-    let edits: Vec<(&str, Box<dyn Fn(&mut Value)>)> = vec![
+    let edits: Vec<Edit> = vec![
         (
             "count",
             Box::new(|r| r["binding"]["holdouts_passed"] = json!(3)),

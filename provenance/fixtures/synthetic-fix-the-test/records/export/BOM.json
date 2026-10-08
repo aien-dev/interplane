@@ -1,0 +1,39 @@
+{
+  "artifacts": [
+    {
+      "bytes": 86,
+      "path": "chat_template.jinja",
+      "role": "interaction-template",
+      "sha256": "b8ea5aa4e20237c9293fc855c1e93f4bfcfbcebba497b75d56771bf978e3987f"
+    },
+    {
+      "bytes": 359,
+      "path": "config.json",
+      "role": "configuration",
+      "sha256": "09d7fb97a11a43d90794540b082f32db524e6989d8372aeb9d2f2d292124e97d"
+    },
+    {
+      "bytes": 160,
+      "path": "model.safetensors",
+      "role": "weights",
+      "sha256": "c0d9ed56f7631be1c67dad8eb6900c22019f0f74036ba256dab82e3eca601f9c"
+    },
+    {
+      "bytes": 550,
+      "path": "tokenizer.json",
+      "role": "tokenizer",
+      "sha256": "e133d05dd5781f7667288e2834e68e8b0702134d477679b3651940455ea7c17c"
+    }
+  ],
+  "format": "huggingface",
+  "generated": "2026-10-06T00:00:00Z",
+  "kind": "openwaldo-bom",
+  "model_id": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74",
+  "name": "synthetic-notes",
+  "run_id": "5e7a0c1d2b3f4a59",
+  "schema": 1,
+  "source_bom_sha256": "cb0d013088156cb472b3d9c7c65863b789efbc271baa9c8350dad1196b7c1c61",
+  "source_id": "5e7a0c1d2b3f4a59",
+  "source_type": "run",
+  "subject": "model-release"
+}

@@ -39,6 +39,18 @@ pub struct Opts {
     pub request_id: Option<String>,
     /// Write the weaker `record_effect_receipt/1` binding instead of the ledger slice.
     pub weak: bool,
+    /// Write the fix-the-test slice: a write that replaces `src/clamp.c`, the `vac-test-run/1`
+    /// records and a `compose_recall` report (see [`fix_the_test`]).
+    pub fix_the_test: bool,
+    /// With `fix_the_test`: the native-claim variant of the recall report (default: no `aien.native`).
+    pub native: Option<bool>,
+}
+
+/// Arguments and prior digest of a write that replaces an existing file.
+#[derive(Clone)]
+pub struct Over {
+    pub args: Value,
+    pub prior_sha256: String,
 }
 
 fn pretty(v: &Value) -> Vec<u8> {
@@ -112,7 +124,19 @@ fn record_view(id: u64, links: [u64; 4], note: &str, text: &Value) -> Value {
 /// The five daemon-written ledger records of one approved write, SYNTHETIC but built through the
 /// same binding functions the verifier uses. `index` spaces the record ids apart.
 pub fn ledger_slice(trace_id: &str, request_id: &str, index: u64) -> Vec<(&'static str, Value)> {
-    let a = request_args(request_id);
+    ledger_slice_over(trace_id, request_id, index, None)
+}
+
+/// [`ledger_slice`] for a write that replaces an existing file: `over` names the arguments and the
+/// digest of the bytes the file held before.
+pub fn ledger_slice_over(
+    trace_id: &str,
+    request_id: &str,
+    index: u64,
+    over: Option<&Over>,
+) -> Vec<(&'static str, Value)> {
+    let a = over.map_or_else(|| request_args(request_id), |o| o.args.clone());
+    let prior = over.map_or(Value::Null, |o| json!(o.prior_sha256));
     let (path, content) = (a["path"].as_str().unwrap(), a["content"].as_str().unwrap());
     let base = 20 + 10 * index;
     let (claim, evidence, promotion, committed, grant, intent, ack) = (
@@ -175,7 +199,7 @@ pub fn ledger_slice(trace_id: &str, request_id: &str, index: u64) -> Vec<(&'stat
                 &json!({
             "approved_grant": 1, "proposal_sha256": compose_sha, "path": path,
             "content_sha256": content_sha, "approver": "drake", "target": target,
-            "workspace": WORKSPACE, "prior_sha256": null, "approval_key": key,
+            "workspace": WORKSPACE, "prior_sha256": prior, "approval_key": key,
             "replay_claim": claim, "cx_promotion": promotion, "cx_evidence": evidence,
             "request_id": request_id, "trace_id": trace_id, "approval_id": approval_id,
             "desk_key_id": desk, "approved_proposal_sha256": approved_sha}),
@@ -190,7 +214,7 @@ pub fn ledger_slice(trace_id: &str, request_id: &str, index: u64) -> Vec<(&'stat
                 &json!({
             "phase": "intent", "tool": "write_file", "authorization": grant,
             "proposal_sha256": compose_sha, "path": path, "target": target,
-            "content_sha256": content_sha, "prior_sha256": null,
+            "content_sha256": content_sha, "prior_sha256": prior,
             "executor": {"pid": 9, "start": 9}}),
             ),
         ),
@@ -210,8 +234,8 @@ pub fn ledger_slice(trace_id: &str, request_id: &str, index: u64) -> Vec<(&'stat
 }
 
 /// The adapter's receipt as it appears in the INTERPLANE result (`data.receipt`).
-fn adapter_receipt(trace_id: &str, request_id: &str, index: u64) -> Value {
-    let s = ledger_slice(trace_id, request_id, index);
+fn adapter_receipt(trace_id: &str, request_id: &str, index: u64, over: Option<&Over>) -> Value {
+    let s = ledger_slice_over(trace_id, request_id, index, over);
     let r = |n: &str| {
         s.iter()
             .find(|(k, _)| *k == n)
@@ -240,9 +264,16 @@ fn envelope(
     })
 }
 
+fn args_of(rid: &str, over: Option<&Over>) -> Value {
+    match over.filter(|_| rid == REQUEST_ID) {
+        Some(o) => o.args.clone(),
+        None => request_args(rid),
+    }
+}
+
 /// Three requests in one trace: 01, 02 and 03, where 03 repeats 01 exactly. In ledger mode each
 /// result carries the adapter receipt of its own request.
-fn trace(trace_id: &str, weak: bool) -> Value {
+fn trace(trace_id: &str, weak: bool, over: Option<&Over>) -> Value {
     let mut envs = Vec::new();
     let mut n = 0;
     for (i, rid) in [REQUEST_ID, OTHER_REQUEST_ID, IDENTICAL_REQUEST_ID]
@@ -260,14 +291,20 @@ fn trace(trace_id: &str, weak: bool) -> Value {
             json!({
                 "kind": "tool_request", "request_id": rid,
                 "tool": {"namespace": null, "name": "write_file"},
-                "arguments": request_args(rid),
+                "arguments": args_of(rid, over),
                 "provenance": {"dialect": "openai", "parser_version": "1"}
             }),
         ));
         n += 1;
-        let mut data = result_data(rid);
+        let mut data = match over.filter(|_| rid == REQUEST_ID) {
+            Some(o) => {
+                json!({"path": o.args["path"], "bytes_written": o.args["content"].as_str().unwrap_or("").len()})
+            }
+            None => result_data(rid),
+        };
         if !weak {
-            data["receipt"] = adapter_receipt(trace_id, rid, i as u64);
+            data["receipt"] =
+                adapter_receipt(trace_id, rid, i as u64, over.filter(|_| rid == REQUEST_ID));
         }
         envs.push(envelope(trace_id, n, Some(format!("m-{req}")), ("runtime", "aien"), ("model", "synthetic-notes"), json!({
             "kind": "result", "request_id": rid, "status": "ok", "data": data,
@@ -379,7 +416,8 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
         .iter()
         .position(|r| *r == request_id)
         .expect("request id is one of the synthetic requests") as u64;
-    let trace = pretty(&trace(&trace_id, o.weak));
+    let over = fix_over(o);
+    let trace = pretty(&trace(&trace_id, o.weak, over.as_ref()));
 
     let files: Vec<(&str, &str, Vec<u8>)> = vec![
         ("waldo_plan", "records/waldo/PLAN.json", plan),
@@ -426,7 +464,7 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
             ),
         ));
     } else {
-        for (name, view) in ledger_slice(&trace_id, &request_id, index) {
+        for (name, view) in ledger_slice_over(&trace_id, &request_id, index, over.as_ref()) {
             files.push((name, ledger_path(name), pretty(&view)));
         }
         files.push((
@@ -439,12 +477,18 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
                 "note": "SYNTHETIC: written by the generator, not by a run harness"})),
         ));
     }
+    let fix = o.fix_the_test.then(|| fix_the_test(o));
+    if let Some((extra_files, _)) = &fix {
+        for (n, p, b) in extra_files {
+            files.push((n, p, b.clone()));
+        }
+    }
     let mut records = serde_json::Map::new();
     for (name, rel, bytes) in &files {
         put(dir, rel, bytes)?;
         records.insert(name.to_string(), json!({"path": rel}));
     }
-    let skeleton = json!({
+    let mut skeleton = json!({
         "kind": crate::KIND, "schema": crate::SCHEMA,
         "fixture": {"class": "synthetic", "generator": "provenance/src/synth.rs",
             "note": "Every byte is synthetic. The export carries a Hugging Face tokenizer.json, which a real WALDO Hugging Face export does not; no AIEN process loaded this model and no runtime wrote this receipt."},
@@ -466,6 +510,18 @@ pub fn write_synthetic(dir: &Path, o: &Opts) -> std::io::Result<()> {
             json!({"binding": LEDGER_BINDING, "approval_binding": APPROVAL_BINDING, "proposal_origin": "scripted_turn"})
         }
     });
+    if let Some((_, extra)) = fix {
+        skeleton["test_run"] = extra["test_run"].clone();
+        let mut missing = vec!["link:model_turn"];
+        match o.native {
+            Some(true) => {}
+            _ => missing.push("link:native"),
+        }
+        if !extra["aien_native"].is_null() {
+            skeleton["aien"]["native"] = extra["aien_native"].clone();
+        }
+        skeleton["completeness"]["missing"] = json!(missing);
+    }
     seal(dir, skeleton)
 }
 
@@ -509,4 +565,63 @@ pub fn seal(dir: &Path, mut skeleton: Value) -> std::io::Result<()> {
         }
     }
     std::fs::write(out, pretty(&skeleton))
+}
+
+/// The SYNTHETIC buggy and fixed `src/clamp.c` of the fix-the-test slice (a stand-in for the
+/// adapter fixture; the verifier never reads either, only their digests).
+pub const BUGGY_C: &str = "int clamp(int v, int lo, int hi)\n{\n    if (v < lo)\n        return lo;\n    if (v > hi)\n        return lo;\n    return v;\n}\n";
+pub const FIXED_C: &str = "int clamp(int v, int lo, int hi)\n{\n    if (v < lo)\n        return lo;\n    if (v > hi)\n        return hi;\n    return v;\n}\n";
+pub const TASK_ID: &str = "fix-the-test/clamp-1";
+pub const SOURCE_COMMIT: &str = "1111111111111111111111111111111111111111";
+pub const TREE_AFTER: &str = "2222222222222222222222222222222222222222";
+pub const OMEGA_SHA: &str = "6c6180cf378075b61291f4565d226eba38b4decd";
+pub const TEST_STDOUT: &str = "ok   inside\nok   below\nok   above\nok   at_low\nok   at_high\n";
+
+fn fix_over(o: &Opts) -> Option<Over> {
+    o.fix_the_test.then(|| Over {
+        args: json!({"path": "src/clamp.c", "content": FIXED_C}),
+        prior_sha256: sha256_hex(BUGGY_C.as_bytes()),
+    })
+}
+
+/// Extra records and companion sections of the fix-the-test slice, merged into the skeleton by
+/// `write_synthetic`: `(name, path, bytes)` files, and companion keys to set.
+type ExtraFile = (&'static str, &'static str, Vec<u8>);
+
+fn fix_the_test(o: &Opts) -> (Vec<ExtraFile>, Value) {
+    let task = pretty(
+        &json!({"kind": "vac-task", "task_id": TASK_ID, "repo_commit": SOURCE_COMMIT,
+        "test_cmd": ["make", "test"]}),
+    );
+    let pin = pretty(
+        &json!({"kind": "vac-source-pin", "repo": "fix_the_test", "commit": SOURCE_COMMIT,
+        "target_path": "src/clamp.c", "target_blob_sha256": sha256_hex(BUGGY_C.as_bytes())}),
+    );
+    let stdout = TEST_STDOUT.as_bytes().to_vec();
+    let stderr = Vec::new();
+    let run = pretty(&json!({"kind": "vac-test-run", "v": 1, "task_id": TASK_ID,
+        "argv": ["make", "test"], "cwd_rel": ".", "exit_code": 0, "test_exit_before": 2,
+        "stdout_sha256": sha256_hex(&stdout), "stderr_sha256": sha256_hex(&stderr),
+        "started_unix_ms": 1_791_000_000_000u64, "duration_ms": 120,
+        "tree_commit_after": TREE_AFTER, "target_blob_sha256_after": sha256_hex(FIXED_C.as_bytes())}));
+    let mut files = vec![
+        ("task", "records/task/task.json", task),
+        ("source_pin", "records/task/source-pin.json", pin),
+        ("test_run_record", "records/task/test-run.json", run),
+        ("test_stdout", "records/task/test-stdout.txt", stdout),
+        ("test_stderr", "records/task/test-stderr.txt", stderr),
+    ];
+    let mut extra = json!({"test_run": {"binding": "vac-test-run/1", "task_id": TASK_ID,
+        "record": "test_run_record"}});
+    if let Some(claimed) = o.native {
+        let recall = pretty(
+            &json!({"compose_dir": "/synthetic/compose", "machine_id": "synthetic",
+            "records_total": 30, "host": [], "cited": [], "missing": [],
+            "compose_native": claimed, "omega_sha": if claimed { OMEGA_SHA } else { "" }}),
+        );
+        files.push(("compose_recall", "records/aien/compose-recall.json", recall));
+        extra["aien_native"] =
+            json!({"claimed": claimed, "omega_sha": if claimed { OMEGA_SHA } else { "" }});
+    }
+    (files, extra)
 }

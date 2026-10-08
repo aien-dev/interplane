@@ -7,6 +7,9 @@
 //! INTERPLANE trace of this run, the model files the daemon loaded (hard link, or copy), and a
 //! `COMPANION.json` naming each by path, size and SHA-256.
 //!
+//! Fix-the-test slice: with [`LiveRun::slice`] the bundle also carries the harness's task, source pin
+//! and test-run records (`vac-test-run/1`, see `crate::fix_the_test`).
+//!
 //! Honest labels, nothing invented: the proposal here is a SCRIPTED turn (the test wrote the tool
 //! call), so the manifest says `proposal_origin: scripted_turn` and the verdict can never be
 //! `PASS complete`; it is `PASS_LABELLED_INCOMPLETE missing=link:model_turn`. The model's training
@@ -47,6 +50,8 @@ pub struct LiveRun<'a> {
     /// RFC 3339 times of the request and of completion (see [`rfc3339_utc`]).
     pub t_request: &'a str,
     pub t_done: &'a str,
+    /// The fix-the-test slice: task, source pin and test-run records (harness evidence).
+    pub slice: Option<&'a crate::fix_the_test::TestRunEvidence>,
 }
 
 /// What was written.
@@ -246,6 +251,58 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
         pretty(&view(cited, ack)?),
     )?;
 
+    // The daemon states whether its compose library is native (sovereign-core #346). An older
+    // daemon returns neither field: then `aien.native` is absent and the verdict says so.
+    let native = recalled["compose_native"].as_bool().map(|claimed| {
+        let sha = recalled["omega_sha"].as_str().unwrap_or("");
+        json!({"claimed": claimed, "omega_sha": sha})
+    });
+    if native.is_some() {
+        put(
+            run.out,
+            &mut records,
+            "compose_recall",
+            "records/aien/compose-recall.json",
+            pretty(&recalled),
+        )?;
+    }
+    if let Some(s) = run.slice {
+        put(
+            run.out,
+            &mut records,
+            "task",
+            "records/task/task.json",
+            pretty(&s.task),
+        )?;
+        put(
+            run.out,
+            &mut records,
+            "source_pin",
+            "records/task/source-pin.json",
+            pretty(&s.source_pin),
+        )?;
+        put(
+            run.out,
+            &mut records,
+            "test_run_record",
+            "records/task/test-run.json",
+            pretty(&s.test_run),
+        )?;
+        put(
+            run.out,
+            &mut records,
+            "test_stdout",
+            "records/task/test-stdout.txt",
+            s.stdout.clone(),
+        )?;
+        put(
+            run.out,
+            &mut records,
+            "test_stderr",
+            "records/task/test-stderr.txt",
+            s.stderr.clone(),
+        )?;
+    }
     let exe_sha = sha256_file(run.aien_bin)?;
     let boot_id = std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
         .map(|s| s.trim().to_string())
@@ -346,7 +403,11 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
         );
     }
 
-    let companion = json!({
+    let mut missing = vec!["link:model_turn"];
+    if run.slice.is_some() && native.as_ref().is_none_or(|n| n["claimed"] != true) {
+        missing.push("link:native");
+    }
+    let mut companion = json!({
         "kind": "interplane-provenance-companion", "schema": 0,
         "fixture": {"class": "real", "note": "Real daemon; the five ledger records are the daemon's own ComposeRecall output (pretty-printed only); daemon_run.json and the 3-message trace are written by the test harness, including their timestamps. The model turn is SCRIPTED by the test (the tool call is a test constant), so authorship of the proposal is not claimed; the model only loaded."},
         "lineage": {"kind": "unknown_pretraining",
@@ -355,14 +416,21 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
         "export": {"format": "huggingface", "chat_template": Value::Null},
         "load_support": {"declared": "supported_structural"},
         "aien": {"candidate_id": Value::Null, "executable": "aien-cli", "executable_sha256": exe_sha,
-            "note": "no frozen AIEN candidate: no candidate_manifest record; CPU-reference backend as printed in the daemon log; whether the compose library was native-linked is not reported by the daemon"},
+            "note": "no frozen AIEN candidate: no candidate_manifest record; CPU-reference backend as printed in the daemon log; whether the compose library was native-linked is reported only when the daemon returns compose_native (sovereign-core #346); aien.native then names it"},
         "interplane": {"trace_id": run.trace_id, "request_id": request_id},
         "effect": {"binding": "aien-ledger-slice/1", "approval_binding": "aien.approval.v2",
             "proposal_origin": "scripted_turn"},
-        "completeness": {"state": "incomplete", "missing": ["link:model_turn"],
+        "completeness": {"state": "incomplete", "missing": missing,
             "reason": "the INTERPLANE model turn is scripted by the test: nothing links this model to the effect's content"},
         "records": Value::Object(records),
     });
+    if let Some(n) = native {
+        companion["aien"]["native"] = n;
+    }
+    if let Some(s) = run.slice {
+        companion["test_run"] = json!({"binding": "vac-test-run/1", "task_id": s.task_id,
+            "record": "test_run_record"});
+    }
     write(run.out, "COMPANION.json", &pretty(&companion))?;
     Ok(ExportReport {
         dir: run.out.to_path_buf(),
@@ -413,6 +481,7 @@ mod tests {
             final_result: &v,
             t_request: "t",
             t_done: "t",
+            slice: None,
         });
         assert!(r.unwrap_err().contains("never rewritten"));
     }

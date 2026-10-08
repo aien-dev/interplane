@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "make",
+    "test"
+  ],
+  "cwd_rel": ".",
+  "duration_ms": 120,
+  "exit_code": 0,
+  "kind": "vac-test-run",
+  "started_unix_ms": 1791000000000,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "8640ef0ceb5167562cb17526e5210f63e57de169cec5aa44af62ac51515d597f",
+  "target_blob_sha256_after": "e2ceb55af549ddde3808be9f04e9e0519350ab34456b2569b9074e8bcc0f9810",
+  "task_id": "fix-the-test/clamp-1",
+  "test_exit_before": 2,
+  "tree_commit_after": "2222222222222222222222222222222222222222",
+  "v": 1
+}

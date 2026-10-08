@@ -1,0 +1,17 @@
+{
+  "cls": 0,
+  "digest": "39f4e737e6a9f1a7cfbc7bd6ae87f2e70cdc2eed7b482774f62045b3af41154a",
+  "id": 29,
+  "kind": 0,
+  "links": [
+    28,
+    27,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 0,
+  "text": "{\"authorization\":27,\"content_sha256\":\"e2ceb55af549ddde3808be9f04e9e0519350ab34456b2569b9074e8bcc0f9810\",\"disk_error\":null,\"disk_sha256\":\"e2ceb55af549ddde3808be9f04e9e0519350ab34456b2569b9074e8bcc0f9810\",\"intent\":28,\"path\":\"src/clamp.c\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
+  "verified": true
+}

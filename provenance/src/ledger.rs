@@ -428,3 +428,29 @@ fn check_call(
     }
     Ok(())
 }
+
+/// What the daemon's own records say about the written file, for the `vac-test-run/1` checks.
+pub struct Facts {
+    pub path: String,
+    /// The file's digest before the write (`null` in the grant means a new file).
+    pub prior_sha256: Option<String>,
+    pub content_sha256: String,
+    /// The ack's `disk_sha256`: the daemon read the file back after the write.
+    pub disk_sha256: String,
+}
+
+/// Read the grant and ack facts. Only meaningful after [`check`] passed.
+pub fn facts(a: &Archive) -> Result<Facts, Fail> {
+    let grant = view(a, "ledger_grant", "authorization")?;
+    let ack = view(a, "ledger_ack", "effect")?;
+    Ok(Facts {
+        path: st(&grant, "ledger_grant", "path")?.to_string(),
+        prior_sha256: grant
+            .text
+            .get("prior_sha256")
+            .and_then(Value::as_str)
+            .map(str::to_string),
+        content_sha256: st(&grant, "ledger_grant", "content_sha256")?.to_string(),
+        disk_sha256: st(&ack, "ledger_ack", "disk_sha256")?.to_string(),
+    })
+}

@@ -1,0 +1,17 @@
+{
+  "cls": 0,
+  "digest": "30363bf8ccaf941756e09b39acda0513434f06db6a1b45925614b42163316a52",
+  "id": 27,
+  "kind": 0,
+  "links": [
+    25,
+    24,
+    20,
+    0
+  ],
+  "note": "authorization",
+  "subject": 0,
+  "tag": 0,
+  "text": "{\"approval_id\":\"aien-approval:call-prov-01:synthetic\",\"approval_key\":\"b4cf33aefd83ca20fb7e3bc6fb0d525a651f983265ecee4975a7ffb72134a323\",\"approved_grant\":1,\"approved_proposal_sha256\":\"78aeeea24fed0537be88fe8ea8a6d4eccc6642357ba88eaf946fda6c1bee1133\",\"approver\":\"drake\",\"content_sha256\":\"e2ceb55af549ddde3808be9f04e9e0519350ab34456b2569b9074e8bcc0f9810\",\"cx_evidence\":24,\"cx_promotion\":25,\"desk_key_id\":\"0123456789abcdef\",\"path\":\"src/clamp.c\",\"prior_sha256\":\"72788b28b75d6b431797614b49b94aa999d18aff7cd0025f9665474e0c3b42c9\",\"proposal_sha256\":\"17dd23808c16be4a9bac27ab38779392b762033e57d0e82999ce7c6d2e296e63\",\"replay_claim\":20,\"request_id\":\"call-prov-01\",\"target\":\"/synthetic/workspace/src/clamp.c\",\"trace_id\":\"trace-prov-01\",\"workspace\":\"/synthetic/workspace\"}",
+  "verified": true
+}

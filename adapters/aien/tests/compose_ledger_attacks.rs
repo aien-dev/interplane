@@ -166,6 +166,22 @@ fn count(c: &LedgerClient) -> u64 {
 }
 
 /// Host records of kind `effect` that name authorization `grant`.
+/// Every `effect` record in the journal, whatever grant it names.
+fn all_effects(c: &LedgerClient) -> usize {
+    // Effect phase records (intent, ack) on any grant. The daemon also writes
+    // effect-class bookkeeping (replay claims, compose-commit records), which
+    // carry no `phase` and are not effects.
+    let r = c.recall(&[], None).unwrap();
+    r["host"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|h| h["note"] == "effect")
+        .filter_map(|h| serde_json::from_str::<Value>(h["text"].as_str()?).ok())
+        .filter(|t| t.get("phase").is_some())
+        .count()
+}
+
 fn effects_for(c: &LedgerClient, grant: u64) -> Vec<Value> {
     let r = c.recall(&[], None).unwrap();
     r["host"]
@@ -258,7 +274,8 @@ fn handoff(key: Option<&DeskKey>, b: &ApprovalBinding, content: &str) -> Value {
     json!({"request_id": b.request_id, "trace_id": b.trace_id, "approval_id": b.approval_id,
         "approver": b.approver, "path": b.path, "content": content,
         "approved_proposal_sha256": b.approved_proposal_sha256, "content_sha256": b.content_sha256,
-        "approval_mac": key.map(|k| k.mac(b)).unwrap_or_default()})
+        "approval_mac": key.map(|k| k.mac(b)).unwrap_or_default(), "requirements": BOUND_REQUIREMENTS,
+        "requirements_mac": key.map(|k| k.requirements_mac(b, BOUND_REQUIREMENTS)).unwrap_or_default()})
 }
 
 fn binding(
@@ -344,16 +361,18 @@ fn lock() -> std::sync::MutexGuard<'static, ()> {
 }
 
 /// The old route: a caller notes its own `authorization` grant (workspace, path, confined
-/// target, compose-form digest) for exactly the write the host will approve. Returns its id.
-fn client_minted(c: &LedgerClient, ws: &str, path: &str, content: &str) -> u64 {
+/// target, compose-form digest) for exactly the write the host will approve. Since
+/// sovereign-core #261 (#296) the daemon refuses every caller-written `authorization` note;
+/// returns the refusal text.
+fn client_minted(c: &LedgerClient, ws: &str, path: &str, content: &str) -> String {
     let target = Path::new(ws).join(path).to_str().unwrap().to_string();
     let text = json!({"proposal_sha256": compose_sha(path, content), "path": path,
         "content_sha256": hex(content.as_bytes()), "approver": "attacker", "workspace": ws,
         "target": target, "prior_sha256": null});
-    let n = c
-        .note("authorization", &text.to_string(), &[])
-        .expect("the daemon still accepts a client-minted grant note (sc#261)");
-    n["id"].as_u64().unwrap()
+    match c.note("authorization", &text.to_string(), &[]) {
+        Ok(n) => panic!("ATTACK SUCCEEDED: the daemon accepted a client-minted grant note: {n}"),
+        Err(e) => e,
+    }
 }
 
 /// Host approves `id`; the outcome as (Ok?, error text). A pipeline refusal counts as not Ok.
@@ -372,8 +391,8 @@ fn approve_outcome(p: &mut Pipeline<'_>, l: &ComposeLedgerAuthority, id: &str) -
     }
 }
 
-/// Item (1): a client-minted grant for exactly the approved write is in the journal, and the
-/// daemon refuses the handoff (the request id was already claimed). Nothing is written, no
+/// Item (1): a client-minted grant note for exactly the approved write is refused by the daemon
+/// (sovereign-core #261), and the daemon refuses the handoff (the request id was already claimed). Nothing is written, no
 /// intent opens on the client grant, the adapter does not fall back to it.
 #[test]
 #[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
@@ -383,7 +402,17 @@ fn x1_client_minted_grant_unused_when_the_handoff_refuses() {
     let c = d.client();
     let ws = d.ws().to_str().unwrap().to_string();
     let path = "minted.txt";
+    let before_note = count(&c);
     let minted = client_minted(&c, &ws, path, EXPECTED);
+    assert!(
+        minted.contains("sovereign-core #261"),
+        "client-minted note refused for another reason: {minted}"
+    );
+    assert_eq!(
+        count(&c),
+        before_note,
+        "a refused client-minted note appended records"
+    );
     // Request id m1 is claimed first by a real, desk-signed handoff for other content.
     let k = DeskKey::load(&d.desk()).unwrap();
     let b = binding(
@@ -411,9 +440,10 @@ fn x1_client_minted_grant_unused_when_the_handoff_refuses() {
         !d.ws().join(path).exists(),
         "ATTACK SUCCEEDED: file written"
     );
-    assert!(
-        effects_for(&c, minted).is_empty(),
-        "ATTACK SUCCEEDED: an effect names the client-minted grant"
+    assert_eq!(
+        all_effects(&c),
+        0,
+        "ATTACK SUCCEEDED: an effect record exists"
     );
     assert_eq!(l.grants_minted(), 0);
     assert_eq!(count(&c), before, "a refused handoff appended records");
@@ -451,8 +481,8 @@ fn x2_no_fallback_write_when_the_daemon_is_gone() {
     println!("x2: PASS refused: {err}");
 }
 
-/// The effect names the daemon's own grant and the compose-form digest, never a client-minted
-/// grant for the same write that sits in the journal first.
+/// The effect names the daemon's own grant and the compose-form digest; a client-minted grant
+/// note for the same write is refused first (sovereign-core #261), so no other grant exists.
 #[test]
 #[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
 fn x3_effect_uses_the_daemon_grant_not_a_client_one() {
@@ -461,6 +491,7 @@ fn x3_effect_uses_the_daemon_grant_not_a_client_one() {
     let c = d.client();
     let ws = d.ws().to_str().unwrap().to_string();
     let minted = client_minted(&c, &ws, "summary.txt", EXPECTED);
+    assert!(minted.contains("sovereign-core #261"), "{minted}");
     let l = ledger(&d);
     let mut rt = l.clone();
     let mut p = pipe(&mut rt, &l);
@@ -470,20 +501,23 @@ fn x3_effect_uses_the_daemon_grant_not_a_client_one() {
     let rc = l.receipts().last().cloned().unwrap();
     let grant = rc["grant_id"].as_u64().unwrap();
     assert_eq!(rc["handoff"]["approved_grant"], json!(grant));
-    assert_ne!(grant, minted, "ATTACK SUCCEEDED: the client grant was used");
     let g = &records(&c, &[grant])[0];
     assert_eq!(g["text"]["approved_grant"], 1, "the daemon wrote the grant");
     let csha = compose_sha("summary.txt", EXPECTED);
     assert_eq!(rc["proposal_sha256"], json!(csha));
     assert_eq!(rc["handoff"]["state"], "COMMITTED");
-    assert!(effects_for(&c, minted).is_empty());
     assert_eq!(
         effects_for(&c, grant).len(),
         2,
         "intent + ack on the daemon grant"
     );
+    assert_eq!(
+        all_effects(&c),
+        2,
+        "an effect names a grant other than the daemon's"
+    );
     assert_eq!(rc["state"], "DONE");
-    println!("x3: PASS grant #{grant} (client-minted #{minted} unused)");
+    println!("x3: PASS grant #{grant} (client-minted note refused: {minted})");
 }
 
 /// The write's temporary file has a predictable name in the target directory. Planted there as a

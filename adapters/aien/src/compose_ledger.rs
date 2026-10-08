@@ -47,6 +47,13 @@ use crate::{AienShared, RUNTIME_ID};
 pub const LEDGER_BOUNDARY: &str = "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance";
 /// Version tag inside every approval binding (sovereign-core `approved_auth`).
 pub const APPROVAL_BINDING_VERSION: &str = "aien.approval.v2";
+/// Domain tag of the requirements MAC (sovereign-core #295, `approved_auth::requirements_bytes`;
+/// tag v1 = no bound requirement depends on the file the bytes replace).
+pub const REQUIREMENTS_TAG_V1: &[u8] = b"aien.requirements.v1\0";
+/// The requirement goal this authority binds: empty, and signed. The host approves the exact
+/// bytes of a `write_file`, so there is no natural-language goal whose measurable requirements the
+/// daemon could check; an empty goal is the explicit "none" (a missing one is refused, #289).
+pub const BOUND_REQUIREMENTS: &str = "";
 /// Approver recorded in the grant when the host names none.
 pub const DEFAULT_APPROVER: &str = "interplane-host";
 
@@ -180,6 +187,20 @@ impl DeskKey {
     /// `approval_mac` for `b` (whose `desk_key_id` must be [`Self::id`]).
     pub fn mac(&self, b: &ApprovalBinding) -> String {
         hmac_sha256(&self.key, &b.bytes())
+            .iter()
+            .map(|x| format!("{x:02x}"))
+            .collect()
+    }
+
+    /// `requirements_mac` for `b` and the bound goal `goal` (tag v1, no base): HMAC-SHA256 over
+    /// the tag, the binding bytes, a zero byte, a one byte (goal present), the goal bytes.
+    pub fn requirements_mac(&self, b: &ApprovalBinding, goal: &str) -> String {
+        let mut m = REQUIREMENTS_TAG_V1.to_vec();
+        m.extend(b.bytes());
+        m.push(0);
+        m.push(1);
+        m.extend(goal.as_bytes());
+        hmac_sha256(&self.key, &m)
             .iter()
             .map(|x| format!("{x:02x}"))
             .collect()
@@ -559,7 +580,8 @@ impl ComposeLedgerAuthority {
         let proposal = json!({"request_id": rid, "trace_id": trace_id, "approval_id": approval_id,
             "approver": approver, "path": path, "content": content,
             "approved_proposal_sha256": approved_sha, "content_sha256": content_sha256,
-            "approval_mac": desk.mac(&binding)});
+            "approval_mac": desk.mac(&binding), "requirements": BOUND_REQUIREMENTS,
+            "requirements_mac": desk.requirements_mac(&binding, BOUND_REQUIREMENTS)});
         drop(desk);
         let client = self.client();
         let mut rc = json!({"boundary": LEDGER_BOUNDARY, "trace_id": trace_id, "request_id": rid,

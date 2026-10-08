@@ -277,7 +277,8 @@ fn handoff(key: Option<&DeskKey>, b: &ApprovalBinding, content: &str) -> Value {
     json!({"request_id": b.request_id, "trace_id": b.trace_id, "approval_id": b.approval_id,
         "approver": b.approver, "path": b.path, "content": content,
         "approved_proposal_sha256": b.approved_proposal_sha256, "content_sha256": b.content_sha256,
-        "approval_mac": key.map(|k| k.mac(b)).unwrap_or_default()})
+        "approval_mac": key.map(|k| k.mac(b)).unwrap_or_default(), "requirements": BOUND_REQUIREMENTS,
+        "requirements_mac": key.map(|k| k.requirements_mac(b, BOUND_REQUIREMENTS)).unwrap_or_default()})
 }
 
 fn binding(

@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@8bcd79b406077a5901197bff01a634aa3085cd4e` (main 2026-10-07, omega.lock c0369e67, after PR #262 merged: the authenticated `ComposeApprovedProposal` daemon command the ledger route uses; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 7d37da1, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
+`aien-dev/aien-sovereign-core@4d4dfd459ae7e7c6c175edc5017816d079c621a9` (main 2026-10-07, after PR #296 merged: the daemon honours only grants it minted itself and refuses every caller-written authorization note, sovereign-core #261; and PR #295: an approved proposal carries a signed requirements goal, a missing one is refused, #289. `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 8bcd79b, main after PR #262 merged: the authenticated `ComposeApprovedProposal` daemon command the ledger route uses; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 7d37da1, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -170,10 +170,18 @@ not WALDO provenance and not a full provenance chain: trace_id and request_id ar
 Evidence: `tests/compose_ledger.rs` rows 1-8 (approved write with both hash identities, forged
 approval id, stale target, replay including a re-presented approval id, operator stop/resume,
 adapter restart, the T4 injection subset, forged handoffs) need `AIEN_BIN` (an `aien-cli` binary
-built from sovereign-core main 8bcd79b, where #262 merged) and `cargo test -- --ignored`; rows 10 and 11 (#260 expiry and re-mint) likewise; row 9 (desk key out of the model's
+built from sovereign-core main 4d4dfd4) and `cargo test -- --ignored`; rows 10 and 11 (#260 expiry and re-mint) likewise; row 9 (desk key out of the model's
 reach, key file rules) always runs.
 
-Since sovereign-core #260 (in the pinned 8bcd79b): the effect lane is built `with_clock(host_clock())`
+Recorded run at this pin (CPU evidence only, 2026-10-08 00:52Z to 00:58Z): `aien-cli` built from
+sovereign-core 4d4dfd4 with the compose engine linked and the GPU engine not linked (build shows
+`has_omega_compose`, not `has_omega_gpu`; the daemon logs `Backend: NativeTransformerBackend/CPU-reference`),
+sha256 `279d38992b72f7c3f888d9b02c5ac7b26e57f6a47746c4e8107b2a9081ae4056`, model Llama-3.2-1B-Instruct
+on the CPU reference backend. `tests/compose_ledger.rs` rows 1-8, 10, 11: 10 passed; `tests/compose_ledger_attacks.rs`
+x1-x4: 4 passed. This is not GPU evidence and not native-OS evidence. A daemon built with the GPU engine
+linked selects the GB10 backend whenever the chip is present, so build without `AIEN_OMEGA_DIR` for CPU runs.
+
+Since sovereign-core #260 (in 8bcd79b and the pinned 4d4dfd4): the effect lane is built `with_clock(host_clock())`
 (epoch seconds; `AienAuthority::set_clock` for tests), a grant presented while reserved is
 refused as `Reserved`, and a dropped effect releases its grant. On the ledger route the adapter
 holds the minted effect (and its reservation) while the daemon runs, checks the grant's expiry
@@ -182,6 +190,15 @@ no handoff, no write), and releases the reservation afterwards: the daemon's dur
 ledger is what spends the approval. Row 11: the released grant re-minted with the same approval
 id is answered by the daemon with the original result (ALREADY_COMMITTED, no second compose) and
 refused by the adapter, with no second write.
+
+Since sovereign-core #295 (in the pinned 4d4dfd4): every approved proposal the adapter hands the
+daemon carries `requirements` and `requirements_mac`. The host approves the exact bytes of a
+`write_file`, so there is no natural-language goal whose requirements the daemon could check; the
+adapter binds the explicit "none" (`BOUND_REQUIREMENTS`, the empty goal), MACed with the desk key
+under tag `aien.requirements.v1` over the same approval binding. A proposal without it is refused
+(`RequirementsUnbound`, #289). Since #296 (#261): the daemon honours only grants it minted itself;
+`tests/compose_ledger_attacks.rs` x1 and x3 present a caller-written authorization note and assert
+the daemon refuses it (`sovereign-core #261`), the ledger gains no record and no effect is written.
 
 ## Reimplemented, and why
 

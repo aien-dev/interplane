@@ -1,7 +1,7 @@
 # The first real chain (CPU evidence)
 
 Fixture: `fixtures/real-waldo-aien-chain`.
-Verdict: `PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2`.
+Verdict: `PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none`.
 `complete` here means exactly this: every link from the training corpus to the effect is present and was
 verified from the retained bytes of ONE run (CPU evidence). It does not mean the model is capable, the
 weights are good, or anyone authorized anything. Provenance is evidence, never authority: it grants and

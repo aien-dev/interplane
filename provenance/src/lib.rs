@@ -16,6 +16,7 @@ pub mod binding;
 pub mod gojson;
 mod ledger;
 mod modelturn;
+mod strict;
 pub mod synth;
 
 use binding::{compact_sorted, LEDGER_BINDING, RECEIPT_BINDING, SERDE_DIGEST_FORM};
@@ -72,9 +73,9 @@ impl Archive {
     fn json(&self, name: &str) -> Result<Option<Value>, Fail> {
         match self.bytes(name)? {
             None => Ok(None),
-            Some(b) => match serde_json::from_slice(b) {
-                Ok(v) => Ok(Some(v)),
-                Err(_) => fail("unparseable_record", name),
+            Some(b) => match strict::parse(b) {
+                Some(v) => Ok(Some(v)),
+                None => fail("unparseable_record", name),
             },
         }
     }
@@ -111,11 +112,22 @@ fn safe_relative(p: &str) -> bool {
         && path.components().all(|c| matches!(c, Component::Normal(_)))
 }
 
+/// True when any component of `p` under `dir` (the record file included) is a symlink. A component
+/// that does not exist is left to the read (`missing_record`). A link could point anywhere.
+fn crosses_symlink(dir: &Path, p: &str) -> bool {
+    let mut cur = dir.to_path_buf();
+    Path::new(p).components().any(|c| {
+        cur.push(c);
+        std::fs::symlink_metadata(&cur).is_ok_and(|m| m.file_type().is_symlink())
+    })
+}
+
 /// Verify the archive rooted at `dir`. Never panics on hostile input; always one line.
 pub fn verify(dir: &Path) -> String {
     match verify_inner(dir) {
-        Ok((missing, effect)) => {
-            let mut line = if missing.is_empty() {
+        Ok((missing, effect, no_candidate)) => {
+            let complete = missing.is_empty();
+            let mut line = if complete {
                 "PASS complete".to_string()
             } else {
                 format!(
@@ -125,6 +137,10 @@ pub fn verify(dir: &Path) -> String {
             };
             if let Some(e) = effect {
                 line.push_str(&format!(" effect={e}"));
+            }
+            // A complete chain run without a frozen candidate manifest says so on the line itself.
+            if complete && no_candidate {
+                line.push_str(" candidate=none");
             }
             line
         }
@@ -137,14 +153,15 @@ pub fn verify(dir: &Path) -> String {
 /// daemon wrote; `record_effect_receipt/1:weak` binds tool, outcome and digests only.
 type EffectLabel = String;
 
-fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), Fail> {
+/// Missing items, the effect label, and whether the AIEN link names no frozen candidate.
+fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bool), Fail> {
     let raw = match std::fs::read(dir.join(COMPANION_FILE)) {
         Ok(b) => b,
         Err(_) => return fail("missing_companion", COMPANION_FILE),
     };
-    let m: Value = match serde_json::from_slice(&raw) {
-        Ok(v) => v,
-        Err(_) => return fail("unparseable_companion", COMPANION_FILE),
+    let m: Value = match strict::parse(&raw) {
+        Some(v) => v,
+        None => return fail("unparseable_companion", COMPANION_FILE),
     };
     if s(&m, &["kind"]) != Some(KIND) || m.get("schema").and_then(Value::as_u64) != Some(SCHEMA) {
         return fail("unsupported_companion", "kind/schema");
@@ -160,7 +177,11 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
         None => return fail("malformed_companion", "records"),
     };
     for (name, r) in records {
-        let retained = r.get("retained").and_then(Value::as_bool).unwrap_or(true);
+        let retained = match r.get("retained") {
+            None => true,
+            Some(Value::Bool(b)) => *b,
+            Some(_) => return fail("malformed_companion", format!("records.{name}.retained")),
+        };
         let sha = match s(r, &["sha256"]) {
             Some(x) if x.len() == 64 && x.bytes().all(|b| b.is_ascii_hexdigit()) => x.to_string(),
             _ => return fail("malformed_companion", format!("records.{name}.sha256")),
@@ -171,6 +192,12 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
                 Some(p) if safe_relative(p) => p,
                 _ => return fail("malformed_companion", format!("records.{name}.path")),
             };
+            if crosses_symlink(dir, path) {
+                return fail(
+                    "malformed_companion",
+                    format!("records.{name}.path (symlink)"),
+                );
+            }
             let b = match std::fs::read(dir.join(path)) {
                 Ok(b) => b,
                 Err(_) => return fail("missing_record", name),
@@ -378,7 +405,21 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
             None => return fail("malformed_companion", "effect.binding"),
         }
     }
-    Ok((actually_missing, effect_label))
+    // Test material may verify, but never as a complete chain: `fixture.class` other than `real`
+    // refuses `complete` whatever records it carries (#76 review). Checked last, so every deeper
+    // check above still runs on test material.
+    if let Some(f) = m.get("fixture") {
+        match s(f, &["class"]) {
+            Some("real") => {}
+            Some(c) if actually_missing.is_empty() => {
+                return fail("synthetic_complete", format!("fixture.class={c}"))
+            }
+            Some(_) => {}
+            None => return fail("malformed_companion", "fixture.class"),
+        }
+    }
+    let no_candidate = link("aien").is_some_and(|a| s(a, &["candidate_id"]).is_none());
+    Ok((actually_missing, effect_label, no_candidate))
 }
 
 fn check_waldo_lineage(a: &Archive, l: &Value) -> Result<(String, String), Fail> {
@@ -597,7 +638,7 @@ fn compute_load_support(a: &Archive) -> Result<Option<String>, Fail> {
     if arch != "LlamaForCausalLM" {
         return Ok(Some(format!("unsupported_architecture:{arch}")));
     }
-    let tj: Value = serde_json::from_slice(tok).unwrap_or(Value::Null);
+    let tj: Value = strict::parse(tok).unwrap_or(Value::Null);
     let vocab = tj
         .get("model")
         .and_then(|m| m.get("vocab"))
@@ -626,7 +667,8 @@ fn compute_load_support(a: &Archive) -> Result<Option<String>, Fail> {
 }
 
 /// Minimal reader for the CandidateManifestV1 subset used here: `[section]` and `key = "value"`.
-fn toml_table(text: &str) -> BTreeMap<(String, String), String> {
+/// None when a key repeats in a section (no last-wins reading).
+fn toml_table(text: &str) -> Option<BTreeMap<(String, String), String>> {
     let mut out = BTreeMap::new();
     let mut section = String::new();
     for line in text.lines() {
@@ -637,15 +679,15 @@ fn toml_table(text: &str) -> BTreeMap<(String, String), String> {
             let v = v.trim();
             if let Some(rest) = v.strip_prefix('"') {
                 if let Some(end) = rest.find('"') {
-                    out.insert(
-                        (section.clone(), k.trim().to_string()),
-                        rest[..end].to_string(),
-                    );
+                    let key = (section.clone(), k.trim().to_string());
+                    if out.insert(key, rest[..end].to_string()).is_some() {
+                        return None;
+                    }
                 }
             }
         }
     }
-    out
+    Some(out)
 }
 
 fn check_aien(a: &Archive, l: &Value) -> Result<(), Fail> {
@@ -663,7 +705,9 @@ fn check_aien(a: &Archive, l: &Value) -> Result<(), Fail> {
         );
     }
     if let Some(b) = cand {
-        let t = toml_table(&String::from_utf8_lossy(b));
+        let Some(t) = toml_table(&String::from_utf8_lossy(b)) else {
+            return fail("binding_mismatch", "candidate manifest repeats a key");
+        };
         let get = |sec: &str, k: &str| t.get(&(sec.to_string(), k.to_string())).map(String::as_str);
         if get("", "schema") != Some("CandidateManifestV1") {
             return fail("binding_mismatch", "candidate.schema");
@@ -736,7 +780,7 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
     let Some(envs) = trace.as_array() else {
         return fail("unparseable_record", "interplane_trace");
     };
-    let (mut req, mut result) = (None, None);
+    let (mut req, mut result, mut final_seen) = (None, None, false);
     for (i, e) in envs.iter().enumerate() {
         if let Err(code) = interplane_core::validate_envelope_value(e) {
             return fail(
@@ -753,6 +797,12 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
         let p = &e["payload"];
         if s(p, &["request_id"]) == Some(rid) {
             match s(p, &["kind"]) {
+                Some("tool_request") if req.is_some() => {
+                    return fail(
+                        "binding_mismatch",
+                        format!("interplane_trace[{i}] second tool_request for {rid}"),
+                    )
+                }
                 Some("tool_request") => {
                     req = Some((
                         s(p, &["tool", "name"]).unwrap_or("").to_string(),
@@ -761,7 +811,19 @@ fn check_trace(a: &Archive, t: &Value) -> Result<Option<Call>, Fail> {
                         e.get("source").cloned().unwrap_or(Value::Null),
                     ))
                 }
-                Some("result") => result = Some(p.clone()),
+                Some("result") => {
+                    // spec/CORE.md lifecycle: at most one `requires_approval`, then at most one final
+                    // result, and nothing after the final one.
+                    let pending = s(p, &["status"]) == Some("requires_approval");
+                    if final_seen || (pending && result.is_some()) {
+                        return fail(
+                            "binding_mismatch",
+                            format!("interplane_trace[{i}] result after the final one for {rid}"),
+                        );
+                    }
+                    final_seen = !pending;
+                    result = Some(p.clone());
+                }
                 _ => {}
             }
         }

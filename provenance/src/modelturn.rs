@@ -102,7 +102,7 @@ pub fn check(a: &Archive, t: &Value, call: Option<&Call>) -> Result<(), Fail> {
     let Some(g) = rec
         .get("text")
         .and_then(Value::as_str)
-        .and_then(|t| serde_json::from_str::<Value>(t).ok())
+        .and_then(|t| crate::strict::parse(t.as_bytes()))
         .filter(Value::is_object)
     else {
         return bad("text (not one JSON object)");

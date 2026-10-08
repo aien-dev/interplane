@@ -92,6 +92,7 @@ version = "0.0.1"
 dependencies = [
  "interplane-core",
  "interplane-lenshift",
+ "serde",
  "serde_json",
  "sha2",
 ]

@@ -41,11 +41,21 @@ Codes: `missing_companion`, `unparseable_companion`, `unsupported_companion`,
 truncated write), `digest_mismatch`, `unlabelled_missing`, `completeness_mismatch`,
 `unparseable_record`, `binding_mismatch`, `run_not_complete`, `lineage_conflict`,
 `conversion_mismatch`, `incompatible`, `load_support_mismatch`, `load_unsupported`,
-`invalid_envelope`, `not_in_trace`.
+`invalid_envelope`, `not_in_trace`, `synthetic_complete`, `canonicalization_mismatch`,
+`unsupported_binding`.
+
+A complete verdict whose AIEN link names no frozen candidate manifest (`candidate_id: null`) ends
+with `candidate=none`. Reading is strict: every JSON input (the manifest, each record, the JSON
+inside a ledger note) is exactly one value with no repeated object key at any depth, and a
+repeated key in a candidate manifest is refused, so two readers can never see different values in
+the same bytes. A record path that passes through a symlink is refused. In the trace, a request
+has one `tool_request`, at most one `requires_approval` result, then at most one final result
+(spec/CORE.md lifecycle). A manifest whose `fixture.class` is anything but `real` (test material)
+is never `PASS complete`; every other check still runs on it.
 
 ```
 cargo run -q -- verify fixtures/synthetic-full-chain     # PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn
-cargo run -q -- verify fixtures/real-waldo-aien-chain    # PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2
+cargo run -q -- verify fixtures/real-waldo-aien-chain    # PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none
 cargo run -q -- verify fixtures/synthetic-weak-receipt   # PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=record_effect_receipt/1:weak
 cargo run -q -- verify fixtures/real-waldo-smoke         # PASS_LABELLED_INCOMPLETE missing=link:aien,link:effect,link:interplane
 cargo run -q -- verify fixtures/real-waldo-tokenizer-json  # PASS_LABELLED_INCOMPLETE missing=link:effect,link:interplane

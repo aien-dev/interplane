@@ -11,7 +11,8 @@ use serde_json::{json, Value};
 use std::path::Path;
 
 const REAL: &str = "fixtures/real-waldo-aien-chain";
-const OK: &str = "PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2";
+const OK: &str =
+    "PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none";
 
 fn edit_json(d: &Path, rec: &str, f: impl FnOnce(&mut Value)) {
     let p = path_of(d, rec);

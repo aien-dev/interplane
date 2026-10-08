@@ -67,7 +67,7 @@ fn view(a: &Archive, name: &str, note: &str) -> Result<View, Fail> {
     let Some(text) = v
         .get("text")
         .and_then(Value::as_str)
-        .and_then(|t| serde_json::from_str::<Value>(t).ok())
+        .and_then(|t| crate::strict::parse(t.as_bytes()))
         .filter(Value::is_object)
     else {
         return bad("text");

@@ -1,6 +1,7 @@
 {
   "kind": "vac-task",
   "repo_commit": "1111111111111111111111111111111111111111",
+  "target_path": "src/clamp.c",
   "task_id": "fix-the-test/clamp-1",
   "test_cmd": [
     "make",

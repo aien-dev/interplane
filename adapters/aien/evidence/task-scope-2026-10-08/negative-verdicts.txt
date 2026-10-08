@@ -1,0 +1,8 @@
+control PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn
+changed_exit_code FAIL test_run_mismatch: exit_code=1 (a fix must pass: exit 0)
+swapped_stdout_digest FAIL test_run_mismatch: stdout_sha256 vs retained test_stdout
+wrong_target_blob FAIL test_run_mismatch: target_blob_sha256_after vs ledger_ack.disk_sha256
+dropped_test_run FAIL test_run_missing: task/source_pin/test_run_record present but no test_run section
+tampered_source_pin FAIL source_pin_mismatch: source_pin.target_blob_sha256 vs ledger_grant.prior_sha256
+write_outside_task_scope FAIL task_scope_mismatch: task.target_path=test/test_clamp.c vs ledger_grant.path=src/clamp.c
+forged_native FAIL native_claim_contradicted: claimed native but no compose_recall report with compose_native

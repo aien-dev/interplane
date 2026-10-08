@@ -122,7 +122,7 @@ trace_content_sha="$(jq -j ".[0].payload.arguments.content" "$r/interplane/trace
 t_before_exit="$(jq -r .task.test_exit_before "$rec")"; t_after_exit="$(jq -r .task.test_exit_after "$rec")"
 out_before_sha="$(jq -r .before.stdout_sha256 "$r/task/test-run.json")"; out_after_sha="$(jq -r .stdout_sha256 "$r/task/test-run.json")"
 [ "$out_after_sha" = "$(sha256sum "$r/task/test-stdout.txt" | cut -d' ' -f1)" ] || die "retained stdout digest != test-run record"
-neg_n="$(jq '.negative_checks | length' "$rec")"; [ "$neg_n" -eq 7 ] || die "expected 7 negative checks (control + 6), got $neg_n"
+neg_n="$(jq '.negative_checks | length' "$rec")"; [ "$neg_n" -eq 8 ] || die "expected 8 negative checks (control + 7), got $neg_n"
 rustc_v="$(rustc --version)"
 finished="$(date -u +%FT%TZ)"
 mf() { jq -r "$1" "$rec"; }
@@ -215,7 +215,7 @@ This run: daemon $build_note; AIEN_OMEGA_COMPOSE_DIR/AIEN_PHYSICS_DIR/AIEN_AIENO
 - The approved write is bound to exact bytes: grant, intent and ack share one content digest, and the ack's on-disk digest equals it [O].
 - The write went through the daemon's approved ledger (claim, grant, intent, ack, committed records retained) [O].
 - Tests failed before and passed after; their stdout digests are retained and checked by the verifier [O].
-- The source pin matches the grant's prior_sha256; the native claim agrees with the daemon's own report; six tampers are each refused with their specific code [O].
+- The source pin matches the grant's prior_sha256; the native claim agrees with the daemon's own report; seven tampers are each refused with their specific code [O].
 - The daemon was native (not a stub) by its own report, and its model/tokenizer hashes equal the files on disk [O].
 
 ## 10. What is not proven

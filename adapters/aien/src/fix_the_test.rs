@@ -78,8 +78,9 @@ fn copy_tree(from: &Path, to: &Path, skip: &[&str]) -> Result<(), String> {
     Ok(())
 }
 
-/// `task_id: x` and `test_command: a b c` lines of `TASK.md`.
-fn parse_task(md: &str) -> Result<(String, Vec<String>), String> {
+/// `task_id: x`, `test_command: a b c` and `target_file: p` lines of `TASK.md`. `target_file` is the
+/// one file the task allows the agent to change; it goes into the task record as `target_path`.
+fn parse_task(md: &str) -> Result<(String, Vec<String>, String), String> {
     let field = |k: &str| {
         md.lines()
             .find_map(|l| l.strip_prefix(k).map(|v| v.trim().to_string()))
@@ -90,14 +91,21 @@ fn parse_task(md: &str) -> Result<(String, Vec<String>), String> {
         .split_whitespace()
         .map(str::to_string)
         .collect();
-    Ok((field("task_id:")?, argv))
+    Ok((field("task_id:")?, argv, field("target_file:")?))
 }
 
 /// Copy `fixture` (without `solution/` and `build/`) into `ws`, `git init` and commit it.
 pub fn prepare(fixture: &Path, ws: &Path) -> Result<Prepared, String> {
-    let (task_id, argv) = parse_task(
+    let (task_id, argv, target) = parse_task(
         &std::fs::read_to_string(fixture.join("TASK.md")).map_err(|e| format!("TASK.md: {e}"))?,
     )?;
+    // The scripted proposal writes TARGET. A task that allows a different file is refused here,
+    // before any proposal reaches the daemon.
+    if target != TARGET {
+        return Err(format!(
+            "TASK.md target_file {target} is not the scripted proposal target {TARGET}: refused"
+        ));
+    }
     let solution = std::fs::read_to_string(fixture.join("solution/clamp.c"))
         .map_err(|e| format!("solution/clamp.c: {e}"))?;
     copy_tree(fixture, ws, &["solution", "build"])?;
@@ -172,7 +180,7 @@ pub fn evidence(
     let tree_commit_after = git(&p.ws, &["rev-parse", "HEAD"])?;
     let blob_after = sha256_hex(&std::fs::read(p.ws.join(TARGET)).map_err(|e| e.to_string())?);
     let task = json!({"kind": "vac-task", "task_id": p.task_id, "repo_commit": p.commit,
-        "test_cmd": p.argv});
+        "test_cmd": p.argv, "target_path": TARGET});
     let source_pin = json!({"kind": "vac-source-pin", "repo": "fix_the_test", "commit": p.commit,
         "target_path": TARGET, "target_blob_sha256": p.target_blob_sha256});
     let test_run = json!({"kind": "vac-test-run", "v": 1, "task_id": p.task_id, "argv": p.argv,
@@ -204,12 +212,16 @@ mod tests {
 
     #[test]
     fn task_fields_parse() {
-        let (id, argv) = parse_task("# T\n\ntask_id: a/b-1\ntest_command: make test\n").unwrap();
+        let (id, argv, target) =
+            parse_task("# T\n\ntask_id: a/b-1\ntest_command: make test\ntarget_file: src/x.c\n")
+                .unwrap();
         assert_eq!(
-            (id.as_str(), argv),
-            ("a/b-1", vec!["make".into(), "test".into()])
+            (id.as_str(), argv, target.as_str()),
+            ("a/b-1", vec!["make".into(), "test".into()], "src/x.c")
         );
         assert!(parse_task("task_id: x\n").is_err());
+        // No target_file: the task does not say which file may change, so it is refused.
+        assert!(parse_task("task_id: x\ntest_command: make test\n").is_err());
     }
 
     #[test]

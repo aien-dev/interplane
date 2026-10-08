@@ -32,17 +32,25 @@ command -v jq >/dev/null || die "jq is required"
 if [ "${M5_GATE_NEGATIVE:-0}" != 1 ]; then
   unset M5_SUBJECT_OVERRIDE M5_JUDGE_KEY_OVERRIDE M5_RECEIPT_V1
 fi
-# The judged parent is the workspace's commit, so the workspace must be exactly that commit, and
-# a symlink could redirect a write or a read outside it.
-[ "$(git -C "$ws" rev-parse --show-toplevel 2>/dev/null)" = "$(cd "$ws" && pwd -P)" ] \
+# The judged parent is the workspace's commit, exported by git itself (so ignored, untracked or
+# flagged files in the folder never reach the judge). Git runs with no hook or fsmonitor program
+# from the workspace's own config.
+g() { git -c core.fsmonitor= -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -C "$ws" "$@"; }
+[ "$(g rev-parse --show-toplevel 2>/dev/null)" = "$(cd "$ws" && pwd -P)" ] \
   || die "workspace is not the top of its own git repository: refused"
-ws_status="$(git -C "$ws" status --porcelain --untracked-files=all)" || die "cannot read the workspace status"
+ws_status="$(g status --porcelain --untracked-files=all)" || die "cannot read the workspace status"
 [ -z "$ws_status" ] || die "workspace has uncommitted changes: the judged parent would not be its commit"
-[ -z "$(find "$ws" -path "$ws/.git" -prune -o -path "$ws/target" -prune -o -type l -print -quit)" ] \
-  || die "workspace contains a symlink: refused"
+parent_commit="$(g rev-parse --verify 'HEAD^{commit}')" || die "workspace has no commit"
+# Attributes could make the export differ from the commit (export-ignore, export-subst).
+tree_files="$(g ls-tree -r --name-only "$parent_commit")" || die "cannot list the task commit"
+! grep -Eq '(^|/)\.gitattributes$' <<<"$tree_files" || die "the task commit carries .gitattributes: refused"
+[ ! -s "$(g rev-parse --path-format=absolute --git-path info/attributes)" ] || die "the workspace has info/attributes: refused"
 
-copy_tree() { # src dst: the tree without .git and target
-  mkdir -p "$2"; tar -C "$1" --exclude=./.git --exclude=./target -cf - . | tar -C "$2" -xf -
+export_commit() { # dst: the parent commit's tree, exactly
+  mkdir -p "$1"; g archive --format=tar "$parent_commit" | tar -C "$1" -xf -
+}
+copy_tree() { # src dst: a staged tree
+  mkdir -p "$2"; tar -C "$1" -cf - . | tar -C "$2" -xf -
 }
 
 stage="$(mktemp -d /tmp/aien-m5.XXXXXX)"
@@ -50,7 +58,8 @@ trap 'chmod -R u+w "$stage" 2>/dev/null; rm -rf "$stage"' EXIT
 chmod 755 "$stage"
 mkdir "$stage/bin"
 cp "$SPARK_RSI_DIR/spark-rsi" "$stage/bin/spark-rsi"
-copy_tree "$ws" "$stage/view"
+export_commit "$stage/view"
+[ -z "$(find "$stage/view" -type l -print -quit)" ] || die "the task commit contains a symlink: refused"
 chmod -R a+rX,a-w "$stage/view" "$stage/bin"
 
 # 1. Propose, as the RSI account, from a read-only view.
@@ -80,7 +89,6 @@ send "$stage/candidate" "$jdir/candidate"
 send "$M5_HOLDOUTS" "$jdir/holdouts"
 as_judge sh -c 'cat > "$1"' _ "$jdir/policy.json" <"$M5_POLICY"
 as_judge sh -c 'cat > "$1" && chmod 700 "$1"' _ "$jdir/spark-rsi-judge" <"$SPARK_RSI_DIR/spark-rsi-judge"
-parent_commit="$(git -C "$ws" rev-parse HEAD)"
 candidate_id="$(jq -r .id "$out/proposal.json")"
 keyfile="$judge_home/judge.key"
 if [ -n "${M5_JUDGE_KEY_OVERRIDE:-}" ]; then

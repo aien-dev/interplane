@@ -362,7 +362,7 @@ native (its own `Compose:` line and `ComposeRecall`), the starting task, the app
 digest, approval binding id), the ledger ack, the test results before and after, the verifier verdict and the
 tamper summary, plus "What is proven" and "What is not". It runs `scripts/test-fix-the-test.sh` once.
 
-Prerequisites: `git jq make cc cargo`, the Llama-3.2-1B-Instruct snapshot (`AIEN_LEDGER_MODEL_DIR`, default the
+Prerequisites: `git jq make cc cargo rustc sha256sum`, the Llama-3.2-1B-Instruct snapshot (`AIEN_LEDGER_MODEL_DIR`, default the
 unsloth snapshot in the Hugging Face cache), a clean interplane checkout, and a native sovereign-core daemon.
 
 ```

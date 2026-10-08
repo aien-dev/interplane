@@ -109,7 +109,12 @@ appr_id="$(jq -r .approval_id <<<"$grant")"; appr_key="$(jq -r .approval_key <<<
 w_path="$(jq -r .path <<<"$intent")"; w_sha="$(jq -r .content_sha256 <<<"$intent")"; w_prior="$(jq -r .prior_sha256 <<<"$intent")"
 ack_phase="$(jq -r .phase <<<"$ack")"; ack_disk="$(jq -r .disk_sha256 <<<"$ack")"; ack_err="$(jq -r '.disk_error // "null"' <<<"$ack")"
 [ "$ack_phase" = "ack" ] && [ "$ack_disk" = "$w_sha" ] && [ "$ack_err" = "null" ] || die "ack does not confirm the approved bytes on disk"
-[ "$(jq -r .approval_id <<<"$intent")" = "$appr_id" ] || [ "$(jq -r .authorization <<<"$intent")" = "$(jq -r .id "$r/aien/ledger-grant.json")" ] || die "intent not bound to the grant"
+# The intent carries no approval id; it binds to the grant by `authorization` (= the grant record id), and the
+# grant carries the approval. So all three must hold: intent -> this grant, grant -> an approval, same proposal.
+grant_id="$(jq -r .id "$r/aien/ledger-grant.json")"
+[ "$(jq -r .authorization <<<"$intent")" = "$grant_id" ] || die "intent.authorization is not this grant ($grant_id)"
+case "$appr_id" in ""|null) die "grant carries no approval_id";; esac
+[ "$(jq -r .proposal_sha256 <<<"$intent")" = "$(jq -r .proposal_sha256 <<<"$grant")" ] || die "intent and grant name different proposals"
 approved_content_sha="$(jq -r .content_sha256 <<<"$grant")"
 [ "$approved_content_sha" = "$w_sha" ] || die "grant content sha != written content sha"
 trace_content_sha="$(jq -j ".[0].payload.arguments.content" "$r/interplane/trace.json" | sha256sum | cut -d" " -f1)"

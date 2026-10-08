@@ -1,0 +1,17 @@
+{
+  "cls": 0,
+  "digest": "af087bfa0cc7fc16c14dbc5caf37feb507edd8857f415a6be18148cb25ad2ef4",
+  "id": 27,
+  "kind": 0,
+  "links": [
+    25,
+    24,
+    20,
+    0
+  ],
+  "note": "authorization",
+  "subject": 0,
+  "tag": 0,
+  "text": "{\"approval_id\":\"aien-approval:call-prov-01:synthetic\",\"approval_key\":\"05787991e9e9f648849359b8a66916dd44fbf5de1846c5877777bfa3a31a461e\",\"approved_grant\":1,\"approved_proposal_sha256\":\"75071890c196c690ecda863e1525d30182217d308d98dcc710ee8a720931f79d\",\"approver\":\"drake\",\"content_sha256\":\"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\",\"cx_evidence\":24,\"cx_promotion\":25,\"desk_key_id\":\"0123456789abcdef\",\"path\":\"notes/today.md\",\"prior_sha256\":null,\"proposal_sha256\":\"bb4a3ff677a0722f1ecf6e778acdb7b46703a9b47be3ff46e64549472b4680fb\",\"replay_claim\":20,\"request_id\":\"call-prov-01\",\"target\":\"/synthetic/workspace/notes/today.md\",\"trace_id\":\"trace-prov-01\",\"workspace\":\"/synthetic/workspace\"}",
+  "verified": true
+}

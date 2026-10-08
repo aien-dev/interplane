@@ -1,0 +1,75 @@
+{
+  "kind": "openwaldo-bom",
+  "schema": 1,
+  "subject": "model-release",
+  "format": "huggingface",
+  "model_id": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+  "name": "pytorch-smoke",
+  "source_type": "run",
+  "source_id": "a8787ab0a4548d98",
+  "run_id": "a8787ab0a4548d98",
+  "source_bom_sha256": "32d3b9fc849bb2ef3af00bccee9a9eed2054ebe7fd8b2ab6c6497e5142c6c35a",
+  "artifacts": [
+    {
+      "role": "regulatory-disclosure",
+      "path": "EU-BOM.json",
+      "sha256": "d0c25cb0588ecc2d3b0e996a5643f92089a15cddeeda0710f2f74e78bd63e1ec",
+      "bytes": 6523
+    },
+    {
+      "role": "documentation",
+      "path": "README.md",
+      "sha256": "9ce1f43a61722ccba461005110767b998ece499212f17c874cf0a00774fb702f",
+      "bytes": 387
+    },
+    {
+      "role": "architecture-code",
+      "path": "architecture.py",
+      "sha256": "4ab702067e866ca668560bf94aeab2e5d19c9079eb1fde14456c6551b6a6c469",
+      "bytes": 203
+    },
+    {
+      "role": "configuration",
+      "path": "config.json",
+      "sha256": "0c766e310dbf9d1cfcaaef010d7c21832c5350589f49fa3abb66b9e4ad0f80e6",
+      "bytes": 455
+    },
+    {
+      "role": "generation-configuration",
+      "path": "generation_config.json",
+      "sha256": "7d0cb9f30bf9cc9b1721c17a0f83782cb3e0abf4321bd3723e27341364e738c1",
+      "bytes": 79
+    },
+    {
+      "role": "weights",
+      "path": "model.safetensors",
+      "sha256": "07795e7d4cf50d6e86e27a6e0041699f12091a3137d88882bcc1c9462d0f1be5",
+      "bytes": 36632
+    },
+    {
+      "role": "tokenizer",
+      "path": "special_tokens_map.json",
+      "sha256": "3f330b24e998993152a876811568d84ae615ebd9500d61dc8020a47af2b357c6",
+      "bytes": 62
+    },
+    {
+      "role": "tokenizer-code",
+      "path": "tokenization_openwaldo.py",
+      "sha256": "44145b9a453878ffd5f4db501e67e7fe7a996ba4e0fb479ac1a5b91ae6acf6c0",
+      "bytes": 1887
+    },
+    {
+      "role": "tokenizer",
+      "path": "tokenizer.json",
+      "sha256": "c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd",
+      "bytes": 9061
+    },
+    {
+      "role": "tokenizer",
+      "path": "tokenizer_config.json",
+      "sha256": "30de54691b6efe51abfdce648693b272c4cf9634640ec0bec8702914ce7c051e",
+      "bytes": 294
+    }
+  ],
+  "generated": "2026-10-06T22:45:29.324541383Z"
+}

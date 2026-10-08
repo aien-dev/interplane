@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+
+[package]
+name = "interplane-provenance"
+version = "0.0.1"
+edition = "2021"
+license = "Apache-2.0"
+description = "Companion provenance manifest v0: offline verifier binding corpus, training, export, AIEN load, INTERPLANE trace and effect receipt by digest and retained bytes. Evidence, never authority."
+publish = false
+
+[dependencies]
+interplane-core = { path = "../rust/crates/interplane-core" }
+interplane-lenshift = { path = "../rust/crates/interplane-lenshift" }
+serde = "1"
+serde_json = "1"
+sha2 = "0.10"

@@ -1,0 +1,112 @@
+{
+  "kind": "waldo-training-run",
+  "schema": 1,
+  "id": "19dfc4470530354c",
+  "state": "complete",
+  "bom_sha256": "7f0e1393cf2195592296c3944647231e9d6f6febba6365a8acf2501c8702a6ad",
+  "planned": "2026-10-07T23:31:16.497614435Z",
+  "started": "2026-10-07T23:31:16.511298775Z",
+  "finished": "2026-10-07T23:33:33.339001225Z",
+  "observation": {
+    "simulated": false,
+    "steps": 921,
+    "consumed_tokens": 605250,
+    "final_loss": 0.056180987507104874,
+    "checkpoints": [
+      {
+        "step": 500,
+        "tokens": 328712,
+        "artifacts": [
+          {
+            "path": "artifacts/checkpoints/step-00000500/model.safetensors",
+            "sha256": "f88be5364a9992025b5d6ed0e4a09795e00e77204eece42e8583d0c7a448070e",
+            "bytes": 659640
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000500/runtime.pt",
+            "sha256": "fe7684b0eefc8ccd4bef88c78e1f50029fa269ea9681d3938fa5d1ead3e96699",
+            "bytes": 2651564
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000500/state.json",
+            "sha256": "1c119b5eebbcbfa6009b5305b8006c958625077a97f84920ca14fbf04b80fdf1",
+            "bytes": 457
+          }
+        ]
+      },
+      {
+        "step": 921,
+        "tokens": 605250,
+        "artifacts": [
+          {
+            "path": "artifacts/checkpoints/step-00000921/model.safetensors",
+            "sha256": "11de89395b8eb29b5ea06d3aba2c78ec720974ae9d501399668cc3b2f987bb95",
+            "bytes": 659640
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000921/runtime.pt",
+            "sha256": "302f6d8858eaae953346857d2badbeff7649e0517b4d7d2e9520011fac19885c",
+            "bytes": 2651564
+          },
+          {
+            "path": "artifacts/checkpoints/step-00000921/state.json",
+            "sha256": "689c4eeadafe66d75fa4c1f719c4a381f7284765946ac9322972a87741747be8",
+            "bytes": 457
+          }
+        ]
+      }
+    ],
+    "evaluations": [
+      {
+        "step": 500,
+        "tokens": 328712,
+        "metrics": {
+          "heldout_loss": 0.02673229513497188,
+          "heldout_perplexity": 1.0270928082148478
+        }
+      },
+      {
+        "step": 921,
+        "tokens": 605250,
+        "metrics": {
+          "artifact_heldout_loss": 0.00066661202702029,
+          "artifact_heldout_perplexity": 1.0006668342621963,
+          "artifact_loss_delta": -0.000010005256225322856,
+          "heldout_loss": 0.0006766172832456129,
+          "heldout_perplexity": 1.0006768462403555
+        }
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "artifacts/model.safetensors",
+        "sha256": "bd841997042ae5da411e1d8c3bb2040c650d4b4b6cdb36057a176335474c8ce3",
+        "bytes": 659640
+      },
+      {
+        "path": "artifacts/config.json",
+        "sha256": "04616cc0a644a533e6b4b920b7998cb678b7c7cf05aa98bced24b10b39ad248e",
+        "bytes": 1616
+      },
+      {
+        "path": "artifacts/tokenizer.json",
+        "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
+        "bytes": 175
+      }
+    ],
+    "consumption": [
+      {
+        "corpus": "post-train/sft/aien-toolcall-own",
+        "token_targets": 605250
+      }
+    ]
+  },
+  "attempts": [
+    {
+      "ordinal": 1,
+      "started": "2026-10-07T23:31:16.511298775Z",
+      "finished": "2026-10-07T23:33:33.339001225Z",
+      "state": "complete"
+    }
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "kind": "openwaldo-bom",
+  "schema": 1,
+  "subject": "training-run",
+  "id": "19dfc4470530354c",
+  "model_id": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+  "stage": "toolcall-sft",
+  "stage_type": "fine-tuning",
+  "ordinal": 1,
+  "objective": "assistant-response-modeling",
+  "conversation": {
+    "template": "chatml-v1",
+    "supervised_roles": [
+      "assistant"
+    ]
+  },
+  "execution": {
+    "backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "framework": "pytorch",
+    "runtime": "/home/drakestapleton/.claude/jobs/bb9e2577/tmp/waldo29/venvB/bin/python3; Python 3.12.3; PyTorch 2.14.1+cpu; device cpu",
+    "host": {
+      "os": "linux",
+      "architecture": "arm64"
+    },
+    "nodes": 1,
+    "world_size": 1
+  },
+  "architecture_sha256": "f2896605c42b00448354c181f31166adce5146898d58c6fec96f942d81fe1e6c",
+  "corpus_bom_sha256": "b2459684270f11d9a2b3d987ba81da8c77f119a43f399e836ef3b39848abc46c",
+  "corpus_bom": {
+    "kind": "openwaldo-bom",
+    "schema": 1,
+    "subject": "corpus",
+    "index": {},
+    "paths": [
+      "post-train/sft/aien-toolcall-own"
+    ],
+    "license_policy": {},
+    "manifests": [
+      {
+        "path": "post-train/sft/aien-toolcall-own/aien-toolcall-own.yaml",
+        "sha256": "aec4cc8ab61668a73a9284be002e289d99530ffa5855aba687a78d5c8559cc78",
+        "name": "aien-toolcall-own",
+        "title": "AIEN tool-call conversations",
+        "description": "Own tiny corpus: write_file tool calls, written for the provenance fixture",
+        "license": "CC0-1.0",
+        "format": "parquet",
+        "record_schema": 1,
+        "record_kind": "conversation",
+        "converted_by": {
+          "tool": "waldo index ingest",
+          "version": "0.1.0-dev",
+          "profile": "canonical-text-schema-2@sha256:ccc58c86c1b971b569a9494d41b56ec072aa06a92933b5eda6d752213b496627",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+          "tokenizer": "tiktoken/cl100k_base"
+        },
+        "sources": [
+          {
+            "name": "aien-toolcall-own",
+            "source": "aien-toolcall-own",
+            "version": "1",
+            "input_formats": [
+              "jsonl"
+            ],
+            "license": "CC0-1.0",
+            "license_evidence": {
+              "declaration": "CC0-1.0"
+            },
+            "url": "https://example.invalid/aien-toolcall-own",
+            "category": "public-dataset",
+            "sha256": "8c2e43abf0f65cb01abee1c2430a1d674ae9da372fd3a3104b763b5d734c7162"
+          }
+        ],
+        "assessment": {
+          "email_addresses": {
+            "detector": "waldo/email-address-v1",
+            "records": 0
+          },
+          "repetitive_content": {
+            "detector": "waldo/gopher-ngram-repetition-v1",
+            "records": 0
+          },
+          "boilerplate_content": {
+            "detector": "waldo/gopher-structural-duplication-v1",
+            "records": 0
+          }
+        },
+        "redaction": {
+          "policy": "waldo/privacy-redaction-v1",
+          "names_retained": true,
+          "email_addresses": 0,
+          "ip_addresses": 0,
+          "phone_numbers": 0,
+          "mail_routing_headers": 0,
+          "credentials": 0
+        },
+        "totals": {
+          "shards": 1,
+          "docs": 46,
+          "tokens": 3816,
+          "bytes": 8627
+        },
+        "licenses": {
+          "CC0-1.0": {
+            "shards": 1,
+            "docs": 46,
+            "tokens": 3816,
+            "bytes": 8627
+          }
+        }
+      }
+    ],
+    "shards": [
+      {
+        "manifest": "post-train/sft/aien-toolcall-own/aien-toolcall-own.yaml",
+        "url": "file:///home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/look/41/8a/418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b",
+        "sha256": "418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b",
+        "format": "parquet",
+        "record_schema": 1,
+        "record_kind": "conversation",
+        "license": "CC0-1.0",
+        "sources": [
+          "aien-toolcall-own"
+        ],
+        "converted_by": {
+          "tool": "waldo index ingest",
+          "version": "0.1.0-dev",
+          "profile": "canonical-text-schema-2@sha256:ccc58c86c1b971b569a9494d41b56ec072aa06a92933b5eda6d752213b496627",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+          "tokenizer": "tiktoken/cl100k_base"
+        },
+        "docs": 46,
+        "tokens": 3816,
+        "bytes": 8627,
+        "attestation": {
+          "status": "embedded",
+          "writer_recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+          "bom_sha256": "bed2d11d7e4fa2e267c4705a015ffe5d74980cdada2208106f972682b386b715",
+          "bom": {
+            "kind": "openwaldo-bom",
+            "schema": 1,
+            "subject": "shard",
+            "plan_sha256": "434a1aa04b5ea08c44f2e2a71f5586a78c0dd6ef96efa33ea5f5de1f2c3ada35",
+            "record_kind": "conversation",
+            "record_schema": 1,
+            "writer_recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/conversation-v1",
+            "tokenizer": "tiktoken/cl100k_base",
+            "records": 46,
+            "tokens": 3816,
+            "content_bytes": 13114,
+            "redaction": {
+              "policy": "waldo/privacy-redaction-v1",
+              "names_retained": true,
+              "email_addresses": 0,
+              "ip_addresses": 0,
+              "phone_numbers": 0,
+              "mail_routing_headers": 0,
+              "credentials": 0
+            },
+            "licenses": [
+              "CC0-1.0"
+            ],
+            "validation": {
+              "canonical_records": true,
+              "content_hashes": true,
+              "token_counts": true,
+              "exact_license_partition_dedup": true
+            }
+          }
+        },
+        "assessment": {
+          "email_addresses": {
+            "detector": "waldo/email-address-v1",
+            "records": 0
+          },
+          "repetitive_content": {
+            "detector": "waldo/gopher-ngram-repetition-v1",
+            "records": 0
+          },
+          "boilerplate_content": {
+            "detector": "waldo/gopher-structural-duplication-v1",
+            "records": 0
+          }
+        },
+        "redaction": {
+          "policy": "waldo/privacy-redaction-v1",
+          "names_retained": true,
+          "email_addresses": 0,
+          "ip_addresses": 0,
+          "phone_numbers": 0,
+          "mail_routing_headers": 0,
+          "credentials": 0
+        }
+      }
+    ],
+    "totals": {
+      "shards": 1,
+      "docs": 46,
+      "tokens": 3816,
+      "bytes": 8627
+    },
+    "licenses": {
+      "CC0-1.0": {
+        "shards": 1,
+        "docs": 46,
+        "tokens": 3816,
+        "bytes": 8627
+      }
+    }
+  },
+  "parameters": {
+    "profile": "causal-pretrain-shuffled",
+    "profile_schema": 1,
+    "epochs": 90,
+    "steps": 921,
+    "batch_size": 4,
+    "sequence_length": 256,
+    "learning_rate": 0.003,
+    "seed": 7,
+    "optimizer": {
+      "name": "adamw",
+      "weight_decay": 0.1,
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "epsilon": 1e-8
+    },
+    "schedule": {
+      "name": "cosine",
+      "warmup_steps": 92,
+      "minimum_rate_ratio": 0.1
+    },
+    "data": {
+      "order": "bounded-shuffle-v1",
+      "shuffle_buffer_records": 1024,
+      "shuffle_buffer_bytes": 67108864,
+      "packing": "continuous-eos-v1"
+    },
+    "evaluation": {
+      "selection": "lowest-sha256-v1",
+      "fraction": 0.01,
+      "max_records": 1,
+      "max_bytes": 1048576
+    },
+    "checkpoint_every": 500,
+    "evaluate_every": 500,
+    "planned_token_capacity": 943104
+  },
+  "evaluation_set": {
+    "selection": "lowest-sha256-v1",
+    "seed": 7,
+    "records": 1,
+    "token_targets": 145,
+    "text_bytes": 286,
+    "sha256": "cf7c657e1abb07ef70bbb71f32063e4ca8128e9a92b77ba6ef3d220cbf07f900"
+  },
+  "preflight": {
+    "path": "PREFLIGHT.json",
+    "sha256": "18fb4d320e98c22743deeedc96d8b27972ddcfd9f64ac48e49424119dedf21bf",
+    "bytes": 1416
+  }
+}

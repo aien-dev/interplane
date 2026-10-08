@@ -1,0 +1,82 @@
+{
+  "kind": "openwaldo-bom",
+  "schema": 1,
+  "subject": "model",
+  "model_id": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+  "name": "pytorch-smoke",
+  "plan_sha256": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+  "architecture_sha256": "e74f66bdf07cd83be55c122a3783b8f5a1a00a01ad851696d7aec936a90225a6",
+  "path_base": "model-root",
+  "current_run_id": "a8787ab0a4548d98",
+  "runs": [
+    {
+      "id": "2741da97f0bffad1",
+      "stage": "pretrain",
+      "ordinal": 1,
+      "run_bom": "runs/0001-pretrain-2741da97f0bffad1/RUN-BOM.json",
+      "bom_sha256": "4440f926db62ce5cb7127866ec5e6a7e0f3e375ab356cffdadf6d1a53d6f85e3",
+      "state": "complete",
+      "backend": {
+        "name": "pytorch",
+        "revision": "builtin-pytorch-worker-schema-1-r7"
+      },
+      "simulated": false,
+      "observation_sha256": "17b1b7f8ded20e6664778fc8093d1b709e86bd3511fcf2457082a3cf0b923b57",
+      "artifacts": [
+        {
+          "role": "weights",
+          "path": "runs/0001-pretrain-2741da97f0bffad1/artifacts/model.safetensors",
+          "sha256": "defdf3c881581b69f839cabb7c7075100bc9a2aedd87d8964f0d3e4cb877f84e",
+          "bytes": 36504
+        },
+        {
+          "role": "configuration",
+          "path": "runs/0001-pretrain-2741da97f0bffad1/artifacts/config.json",
+          "sha256": "b2725db131fbe4d61948ea6cb0cc776b85619a5c508c6c4748782eb6f8f9107c",
+          "bytes": 1601
+        },
+        {
+          "role": "tokenizer",
+          "path": "runs/0001-pretrain-2741da97f0bffad1/artifacts/tokenizer.json",
+          "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
+          "bytes": 175
+        }
+      ]
+    },
+    {
+      "id": "a8787ab0a4548d98",
+      "stage": "train-0002",
+      "ordinal": 2,
+      "run_bom": "runs/0002-train-0002-a8787ab0a4548d98/RUN-BOM.json",
+      "bom_sha256": "59b0b40ff565dda01a0b94ed1b9f9389a0304a3f0595a1b7c9ddce2c0af23bb1",
+      "state": "complete",
+      "backend": {
+        "name": "pytorch",
+        "revision": "builtin-pytorch-worker-schema-1-r7"
+      },
+      "simulated": false,
+      "observation_sha256": "fb00ff92182bc09063f506d5f966812a5630fda745fa3d145e27f278a57b3119",
+      "artifacts": [
+        {
+          "role": "weights",
+          "path": "runs/0002-train-0002-a8787ab0a4548d98/artifacts/model.safetensors",
+          "sha256": "0aa5dddaf8ba1c6d036381bd7e42d413a5268f536e63d042adb72f5657957a0c",
+          "bytes": 36504
+        },
+        {
+          "role": "configuration",
+          "path": "runs/0002-train-0002-a8787ab0a4548d98/artifacts/config.json",
+          "sha256": "ddb5345fc89265555c77c1f445777df008bf2887ce64785294461d80b48fda35",
+          "bytes": 1883
+        },
+        {
+          "role": "tokenizer",
+          "path": "runs/0002-train-0002-a8787ab0a4548d98/artifacts/tokenizer.json",
+          "sha256": "af7b95a392ce6a695ea8c40e52b1924a76c6e0a8ac02512023388115a51a7efd",
+          "bytes": 175
+        }
+      ]
+    }
+  ],
+  "generated": "2026-10-06T22:45:29.324541383Z"
+}

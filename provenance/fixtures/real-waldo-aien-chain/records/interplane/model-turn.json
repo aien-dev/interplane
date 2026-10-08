@@ -1,0 +1,11 @@
+{
+  "dialect": "aien_legacy",
+  "generation_record_id": 6,
+  "generation_record_source": "TurnFinished.generation_record",
+  "input": "<tool_call>\n{\"name\": \"write_file\", \"arguments\": {\"path\": \"summary.txt\", \"content\": \"Decisions: ship v0.3 on Friday.\\nOwners: Ada (release), Lin (docs).\\n\"}}\n</tool_call><|im_end|>\n",
+  "model": "toolcall-tiny",
+  "stream_finished": "2026-10-08T01:16:00Z",
+  "stream_started": "2026-10-08T01:16:00Z",
+  "trace_id": "real-run-04",
+  "turn": 0
+}

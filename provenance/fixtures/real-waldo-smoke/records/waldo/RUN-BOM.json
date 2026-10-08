@@ -1,0 +1,230 @@
+{
+  "kind": "openwaldo-bom",
+  "schema": 1,
+  "subject": "training-run",
+  "id": "80b1d6cbe8ca88a1",
+  "model_id": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+  "stage": "train-0002",
+  "stage_type": "pre-training",
+  "ordinal": 2,
+  "objective": "causal-language-modeling",
+  "execution": {
+    "backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "framework": "pytorch",
+    "runtime": "/home/drakestapleton/.claude/jobs/bb9e2577/tmp/waldo29/venvB/bin/python3; Python 3.12.3; PyTorch 2.14.1+cpu; device cpu",
+    "host": {
+      "os": "linux",
+      "architecture": "arm64"
+    },
+    "nodes": 1,
+    "world_size": 1
+  },
+  "architecture_sha256": "e74f66bdf07cd83be55c122a3783b8f5a1a00a01ad851696d7aec936a90225a6",
+  "corpus_bom_sha256": "4317dcce52042068548c64f909bf959c6e917d7b974e3a5096366840eeb692bb",
+  "corpus_bom": {
+    "kind": "openwaldo-bom",
+    "schema": 1,
+    "subject": "corpus",
+    "index": {},
+    "paths": [
+      "core/e2e/pytorch"
+    ],
+    "license_policy": {},
+    "manifests": [
+      {
+        "path": "core/e2e/pytorch/pytorch.yaml",
+        "sha256": "5d302511a192a59256bd2b44ddec0de9e55f7280fe906de8beb47a19ad11b21d",
+        "name": "pytorch",
+        "title": "PyTorch-E2E-Corpus",
+        "description": "Disposable-real-PyTorch-training-input",
+        "license": "CC0-1.0",
+        "format": "parquet",
+        "record_schema": 2,
+        "record_kind": "pretrain",
+        "converted_by": {
+          "tool": "waldo index ingest",
+          "version": "0.1.0-dev",
+          "profile": "canonical-text-schema-2",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/v9-privacy-redaction",
+          "tokenizer": "tiktoken/cl100k_base"
+        },
+        "sources": [
+          {
+            "name": "pytorch",
+            "source": "pytorch",
+            "license": "CC0-1.0",
+            "url": "https://example.invalid/pytorch-e2e",
+            "category": "public-dataset",
+            "sha256": "60a649037ead2a696b45b063ff7d93c20b6aa89a771ef33581d566d6813beabe",
+            "content": {
+              "languages": [
+                "en"
+              ]
+            }
+          }
+        ],
+        "assessment": {
+          "email_addresses": {
+            "detector": "waldo/email-address-v1",
+            "records": 0
+          },
+          "repetitive_content": {
+            "detector": "waldo/gopher-ngram-repetition-v1",
+            "records": 0
+          },
+          "boilerplate_content": {
+            "detector": "waldo/gopher-structural-duplication-v1",
+            "records": 0
+          }
+        },
+        "redaction": {
+          "policy": "waldo/privacy-redaction-v1",
+          "names_retained": true,
+          "email_addresses": 0,
+          "ip_addresses": 0,
+          "phone_numbers": 0,
+          "mail_routing_headers": 0,
+          "credentials": 0
+        },
+        "totals": {
+          "shards": 1,
+          "docs": 1,
+          "tokens": 20,
+          "bytes": 6033
+        },
+        "licenses": {
+          "CC0-1.0": {
+            "shards": 1,
+            "docs": 1,
+            "tokens": 20,
+            "bytes": 6033
+          }
+        }
+      }
+    ],
+    "shards": [
+      {
+        "manifest": "core/e2e/pytorch/pytorch.yaml",
+        "url": "file:///home/drakestapleton/.claude/jobs/bb9e2577/tmp/waldo29/runs/waldo-pytorch-e2e.UMCTse/lookaside/2e/d0/2ed0517ec8d56db38d2dd1bca592ea5bfdb5021627a7791d4b0a9f4e859b8e6d",
+        "sha256": "2ed0517ec8d56db38d2dd1bca592ea5bfdb5021627a7791d4b0a9f4e859b8e6d",
+        "format": "parquet",
+        "record_schema": 2,
+        "record_kind": "pretrain",
+        "license": "CC0-1.0",
+        "sources": [
+          "pytorch"
+        ],
+        "converted_by": {
+          "tool": "waldo index ingest",
+          "version": "0.1.0-dev",
+          "profile": "canonical-text-schema-2",
+          "recipe": "parquet-go/0.30.1/zstd-6/page-1m/rg-64m/v9-privacy-redaction",
+          "tokenizer": "tiktoken/cl100k_base"
+        },
+        "docs": 1,
+        "tokens": 20,
+        "bytes": 6033,
+        "assessment": {
+          "email_addresses": {
+            "detector": "waldo/email-address-v1",
+            "records": 0
+          },
+          "repetitive_content": {
+            "detector": "waldo/gopher-ngram-repetition-v1",
+            "records": 0
+          },
+          "boilerplate_content": {
+            "detector": "waldo/gopher-structural-duplication-v1",
+            "records": 0
+          }
+        },
+        "redaction": {
+          "policy": "waldo/privacy-redaction-v1",
+          "names_retained": true,
+          "email_addresses": 0,
+          "ip_addresses": 0,
+          "phone_numbers": 0,
+          "mail_routing_headers": 0,
+          "credentials": 0
+        }
+      }
+    ],
+    "totals": {
+      "shards": 1,
+      "docs": 1,
+      "tokens": 20,
+      "bytes": 6033
+    },
+    "licenses": {
+      "CC0-1.0": {
+        "shards": 1,
+        "docs": 1,
+        "tokens": 20,
+        "bytes": 6033
+      }
+    }
+  },
+  "parameters": {
+    "profile": "causal-pretrain-shuffled",
+    "profile_schema": 1,
+    "epochs": 2,
+    "steps": 2,
+    "batch_size": 8,
+    "sequence_length": 16,
+    "learning_rate": 0.0003,
+    "seed": 42,
+    "optimizer": {
+      "name": "adamw",
+      "weight_decay": 0.1,
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "epsilon": 1e-8
+    },
+    "schedule": {
+      "name": "cosine",
+      "warmup_steps": 1,
+      "minimum_rate_ratio": 0.1
+    },
+    "data": {
+      "order": "bounded-shuffle-v1",
+      "shuffle_buffer_records": 1024,
+      "shuffle_buffer_bytes": 67108864,
+      "packing": "continuous-eos-v1"
+    },
+    "evaluation": {
+      "selection": "lowest-sha256-v1",
+      "fraction": 0.01,
+      "max_records": 256,
+      "max_bytes": 1048576
+    },
+    "checkpoint_every": 2,
+    "evaluate_every": 2,
+    "planned_token_capacity": 256
+  },
+  "evaluation_set": {
+    "selection": "lowest-sha256-v1",
+    "seed": 42,
+    "records": 0,
+    "token_targets": 0,
+    "text_bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "preflight": {
+    "path": "PREFLIGHT.json",
+    "sha256": "0cebca4d5c1bf00778938a35dead3310b7ea68e631f19fcd5a945af7cc36de2e",
+    "bytes": 1340
+  },
+  "initialization": {
+    "source_type": "run",
+    "source_id": "f81e33c118e1f087",
+    "source_run_id": "f81e33c118e1f087",
+    "artifact": {
+      "path": "artifacts/model.safetensors",
+      "sha256": "974c6bb80b9ec5b7d7a798bedb43d422a7440c036cb6e362986677b2ba2c45cf",
+      "bytes": 36504
+    }
+  }
+}

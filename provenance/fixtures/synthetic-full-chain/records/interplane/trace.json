@@ -1,0 +1,230 @@
+[
+  {
+    "destination": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-1",
+    "parent_id": null,
+    "payload": {
+      "arguments": {
+        "content": "hello world",
+        "path": "notes/today.md"
+      },
+      "kind": "tool_request",
+      "provenance": {
+        "dialect": "openai",
+        "parser_version": "1"
+      },
+      "request_id": "call-prov-01",
+      "tool": {
+        "name": "write_file",
+        "namespace": null
+      }
+    },
+    "source": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "timestamp": "2026-10-06T00:00:01Z",
+    "trace_id": "trace-prov-01"
+  },
+  {
+    "destination": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-2",
+    "parent_id": "m-1",
+    "payload": {
+      "data": {
+        "bytes_written": 11,
+        "path": "notes/today.md",
+        "receipt": {
+          "ack_digest": "4f148cdcec7472d553ddee6525faf6bdf6f7e098ce64782942529c5dca9176b1",
+          "ack_record_id": 29,
+          "grant_digest": "af087bfa0cc7fc16c14dbc5caf37feb507edd8857f415a6be18148cb25ad2ef4",
+          "grant_id": 27,
+          "intent_digest": "6933a54ce566da29444377fda9d275f0a7160aef81012c0534c7a824481adc6c",
+          "intent_id": 28,
+          "request_id": "call-prov-01",
+          "state": "DONE",
+          "trace_id": "trace-prov-01"
+        }
+      },
+      "decision": null,
+      "error": null,
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": "tool_result",
+        "duration_ms": null,
+        "runtime": "aien",
+        "trust": "trusted_runtime",
+        "trusted": true
+      },
+      "request_id": "call-prov-01",
+      "status": "ok"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-06T00:00:02Z",
+    "trace_id": "trace-prov-01"
+  },
+  {
+    "destination": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-3",
+    "parent_id": null,
+    "payload": {
+      "arguments": {
+        "content": "note append",
+        "path": "notes/other.md"
+      },
+      "kind": "tool_request",
+      "provenance": {
+        "dialect": "openai",
+        "parser_version": "1"
+      },
+      "request_id": "call-prov-02",
+      "tool": {
+        "name": "write_file",
+        "namespace": null
+      }
+    },
+    "source": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "timestamp": "2026-10-06T00:00:03Z",
+    "trace_id": "trace-prov-01"
+  },
+  {
+    "destination": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-4",
+    "parent_id": "m-3",
+    "payload": {
+      "data": {
+        "bytes_written": 11,
+        "path": "notes/other.md",
+        "receipt": {
+          "ack_digest": "7454fe8237c3608d93828aad0dab2c2ce3140a94cc396645df2df97f628dd520",
+          "ack_record_id": 39,
+          "grant_digest": "049d77c78cfdc1c44517b51035cb6fa33a29eb1bf1de1e365d07588fff7f680c",
+          "grant_id": 37,
+          "intent_digest": "d827990166faff06e9dc15edb9698ce0298431dcba17adcc01c7d6e1e5d2a897",
+          "intent_id": 38,
+          "request_id": "call-prov-02",
+          "state": "DONE",
+          "trace_id": "trace-prov-01"
+        }
+      },
+      "decision": null,
+      "error": null,
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": "tool_result",
+        "duration_ms": null,
+        "runtime": "aien",
+        "trust": "trusted_runtime",
+        "trusted": true
+      },
+      "request_id": "call-prov-02",
+      "status": "ok"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-06T00:00:04Z",
+    "trace_id": "trace-prov-01"
+  },
+  {
+    "destination": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-5",
+    "parent_id": null,
+    "payload": {
+      "arguments": {
+        "content": "hello world",
+        "path": "notes/today.md"
+      },
+      "kind": "tool_request",
+      "provenance": {
+        "dialect": "openai",
+        "parser_version": "1"
+      },
+      "request_id": "call-prov-03",
+      "tool": {
+        "name": "write_file",
+        "namespace": null
+      }
+    },
+    "source": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "timestamp": "2026-10-06T00:00:05Z",
+    "trace_id": "trace-prov-01"
+  },
+  {
+    "destination": {
+      "id": "synthetic-notes",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-6",
+    "parent_id": "m-5",
+    "payload": {
+      "data": {
+        "bytes_written": 11,
+        "path": "notes/today.md",
+        "receipt": {
+          "ack_digest": "4091cf86d95eb01eefd5bcfe653b6d6150ea804b4f865c81e3aed67e82d145fa",
+          "ack_record_id": 49,
+          "grant_digest": "291f21f5d8379331a5f3c213f17670e51d95f718a174d56d821f41d431cdd382",
+          "grant_id": 47,
+          "intent_digest": "1a0cbb0010907ea8787f8741ded1c51aed855c9e5b005cf21789497560b5308b",
+          "intent_id": 48,
+          "request_id": "call-prov-03",
+          "state": "DONE",
+          "trace_id": "trace-prov-01"
+        }
+      },
+      "decision": null,
+      "error": null,
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": "tool_result",
+        "duration_ms": null,
+        "runtime": "aien",
+        "trust": "trusted_runtime",
+        "trusted": true
+      },
+      "request_id": "call-prov-03",
+      "status": "ok"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-06T00:00:06Z",
+    "trace_id": "trace-prov-01"
+  }
+]

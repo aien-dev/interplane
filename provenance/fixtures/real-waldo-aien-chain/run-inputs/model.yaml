@@ -1,0 +1,35 @@
+kind: waldo-model-compose
+schema: 1
+interaction:
+  template: chatml-v1
+architecture:
+  family: decoder-transformer
+  context_tokens: 2048
+  vocabulary_size: 259
+  hidden_size: 128
+  intermediate_size: 256
+  layers: 2
+  attention_heads: 4
+  key_value_heads: 2
+  tie_embeddings: true
+  parameter_dtype: bfloat16
+  tokenizer:
+    name: byte
+    revision: builtin-byte-schema-1
+stages:
+  - name: toolcall-sft
+    type: fine-tuning
+    objective: assistant-response-modeling
+    conversation:
+      template: chatml-v1
+      supervised_roles: [assistant]
+    corpora:
+      - post-train/sft/aien-toolcall-own
+    parameters:
+      epochs: 90
+      batch_size: 4
+      sequence_length: 256
+      learning_rate: 0.003
+      seed: 7
+      evaluation_max_records: 1
+      evaluation_max_bytes: 1048576

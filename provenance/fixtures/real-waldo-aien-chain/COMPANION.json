@@ -1,0 +1,167 @@
+{
+  "aien": {
+    "candidate_id": null,
+    "executable": "aien-cli",
+    "executable_sha256": "50b2378cb6338687a4166313759b4472fa5a2ba293aad9f2dc7b1e2f40be4b72",
+    "note": "no frozen AIEN candidate: no candidate_manifest record; executable is aien-dev/aien-sovereign-core main 12c1a5ff18b70e748b678280c4210788f820c712 (sc#301 merged), release build, CPU-reference backend (Omega GPU engine not linked: AIEN_OMEGA_DIR unset so aien-omega-gpu is the CPU stub, no CUDA libraries linked, daemon log says CPU-reference). The compose library librx_compose.a (CPU C code) is linked from omega 01f6a746 with AIEN_OMEGA_COMPOSE_DIR, because the daemon needs it to write any ledger record"
+  },
+  "completeness": {
+    "missing": [],
+    "state": "complete"
+  },
+  "effect": {
+    "approval_binding": "aien.approval.v2",
+    "binding": "aien-ledger-slice/1",
+    "proposal_origin": "model_generation/2"
+  },
+  "export": {
+    "chat_template": "export_chat_template",
+    "conversion_tool": {
+      "checked": false,
+      "commit": "4c407d7f5ed33feaf234dd8ebed34ac197cfc0ef",
+      "name": "waldo model export --format huggingface",
+      "source": "github.com/aien-dev/waldo branch export-tokenizer-json (writes tokenizer.json and the standard plain ChatML template text)"
+    },
+    "format": "huggingface",
+    "model_revision": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39/19dfc4470530354c"
+  },
+  "fixture": {
+    "class": "real",
+    "note": "Real bytes from ONE run on this machine (CPU, release build, GPU engine not linked). A tiny WALDO chatml-v1 model was trained (SFT on our own tool-call conversations, run-inputs/conversations.jsonl) and exported with tokenizer.json and the standard ChatML template. The AIEN daemon loaded it. AIEN own generation path (StreamTurn) on that loaded model produced the tool-call text, and the DAEMON wrote its own generation record (ledger-generation.json, id returned in TurnFinished.generation_record) carrying the model and tokenizer digests, the output text digest and its own pid and start time. The INTERPLANE aien_legacy dialect parsed that text into the request; the adapter then drove one approved write_file and the daemon wrote its ledger records. Limits (docs/DAEMON_GENERATION_RECORD.md in sovereign-core 12c1a5f): the digests are of the files read at load time (a swap between hash and load is not detected), the record is not signed (a same-user process that can append to the compose ledger could forge one), request_id/operation_id are the client claims, and no capability or authority follows. The model is a tiny memoriser with a fixed prompt: no capability claim. The adapter is the merged INTERPLANE adapter at interplane main c982fd3 (interplane#81, re-pinned to sovereign-core 4d4dfd4, signs the requirements goal). Scope: CPU only, no GPU and no native OS; the tiny model is a memoriser; none of this is authority.",
+    "source": "driver/main.rs (run driver), run-inputs/ (corpus, compose, script, train log)"
+  },
+  "interplane": {
+    "request_id": "real-run-04:t0:c0",
+    "trace_id": "real-run-04"
+  },
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "corpus_license_assertions": [
+      "CC0-1.0"
+    ],
+    "kind": "waldo_run",
+    "model_id": "1d9e5e60a0e8bda91da78ef169c7dcd92ebda667f70aa77f72d78ecea3018b39",
+    "run_id": "19dfc4470530354c",
+    "training_backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "training_code": {
+      "checked": false,
+      "commit": "4c407d7f5ed33feaf234dd8ebed34ac197cfc0ef",
+      "repository": "github.com/aien-dev/waldo",
+      "source": "fork branch export-tokenizer-json, tree that trained and exported this model"
+    }
+  },
+  "load_support": {
+    "declared": "supported_structural"
+  },
+  "records": {
+    "aien_load_log": {
+      "bytes": 1276,
+      "path": "records/aien/daemon-load.log",
+      "sha256": "375f802620ee2b97367b4307f304e5422cc6b0d73c1f2473ad4bf5bab7403994"
+    },
+    "daemon_run": {
+      "bytes": 508,
+      "path": "records/aien/daemon-run.json",
+      "sha256": "190d9fac6760ab0c60e9421d04afd08f71d668d8a87d1a23e3c8669323d285b8"
+    },
+    "export_chat_template": {
+      "bytes": 197,
+      "path": "records/export/chat_template.jinja",
+      "sha256": "4d773c6800c326634a217c28d11c096dced7551c3af32ef35f59f0cb20881a72"
+    },
+    "export_config": {
+      "bytes": 459,
+      "path": "records/export/config.json",
+      "sha256": "d0b5e56149d14e8f481a901fdbfe4f7fb23a1e5a1d774adcfcb874f31f15cbb7"
+    },
+    "export_tokenizer": {
+      "bytes": 9061,
+      "path": "records/export/tokenizer.json",
+      "sha256": "c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd"
+    },
+    "export_weights": {
+      "bytes": 659824,
+      "path": "records/export/model.safetensors",
+      "sha256": "552fb3a85f5871a45a5243f3ae066b7b51711caf0ae8dc7412bbd5c9e505f8ad"
+    },
+    "interplane_trace": {
+      "bytes": 6177,
+      "path": "records/interplane/trace.json",
+      "sha256": "565f3b9b0bd054d76fe94c5b3d96e484c0082988f4f8021f51c49c52dd000b32"
+    },
+    "ledger_ack": {
+      "bytes": 707,
+      "path": "records/aien/ledger-ack.json",
+      "sha256": "45e8a2eb7b281b09315a4d1daa8683334677c6538abc1ee6df4e67e4775aa359"
+    },
+    "ledger_claim": {
+      "bytes": 558,
+      "path": "records/aien/ledger-claim.json",
+      "sha256": "f797256c5147fb6b8bd1cd92c2a4e79581bbdd9928d01b1184d6e5ece9fcd688"
+    },
+    "ledger_committed": {
+      "bytes": 482,
+      "path": "records/aien/ledger-committed.json",
+      "sha256": "8dd6fc1ac24a2ca930935e9d5b9a901b059ec221e67fc4b72926ac412c631938"
+    },
+    "ledger_generation": {
+      "bytes": 1173,
+      "path": "records/aien/ledger-generation.json",
+      "sha256": "fd8e7544f4449efa38c219d9e17a77ee153747941044f639b942944f2621994f"
+    },
+    "ledger_grant": {
+      "bytes": 1129,
+      "path": "records/aien/ledger-grant.json",
+      "sha256": "8d61ce8ab9172bfec44fbb548d54bb3053d145f2deac8781c93d0478d7694607"
+    },
+    "ledger_intent": {
+      "bytes": 690,
+      "path": "records/aien/ledger-intent.json",
+      "sha256": "29d5904d28fda472f057c2c6620abda9b35ce211c20520d17446d34c7247929e"
+    },
+    "model_turn": {
+      "bytes": 496,
+      "path": "records/interplane/model-turn.json",
+      "sha256": "b27b1fa0db8809e1d4e39fda50742cd54afff689c257daced678f0effdffec49"
+    },
+    "release_bom": {
+      "bytes": 2534,
+      "path": "records/export/BOM.json",
+      "sha256": "98dcf6178ecef79ee7536b0db5ee7e34457f397d6f368a2e0d4a6a8bb880b47e"
+    },
+    "run_weights": {
+      "bytes": 659640,
+      "path": "records/waldo/model.safetensors",
+      "sha256": "bd841997042ae5da411e1d8c3bb2040c650d4b4b6cdb36057a176335474c8ce3"
+    },
+    "waldo_model_bom": {
+      "bytes": 1839,
+      "path": "records/waldo/MODEL-BOM.json",
+      "sha256": "232ece145fc999ffb307652052be1324a37f8ed5fbcc7127cedc920665552b09"
+    },
+    "waldo_plan": {
+      "bytes": 789,
+      "path": "records/waldo/PLAN.json",
+      "sha256": "d32f85551d56ae247f41b62b0d2fc80f5d019f891b8c64793528eb8a938d6b57"
+    },
+    "waldo_preflight": {
+      "bytes": 1416,
+      "path": "records/waldo/PREFLIGHT.json",
+      "sha256": "18fb4d320e98c22743deeedc96d8b27972ddcfd9f64ac48e49424119dedf21bf"
+    },
+    "waldo_run": {
+      "bytes": 3406,
+      "path": "records/waldo/RUN.json",
+      "sha256": "6d96033c40ca262e1daf4343426245d88599eb5773c72202e1c4241b0bd0b656"
+    },
+    "waldo_run_bom": {
+      "bytes": 8130,
+      "path": "records/waldo/RUN-BOM.json",
+      "sha256": "e67e0188be26537d7578d8784e61c3a37dd642309d52faaed1770e8e06c9e2d5"
+    }
+  },
+  "schema": 0
+}

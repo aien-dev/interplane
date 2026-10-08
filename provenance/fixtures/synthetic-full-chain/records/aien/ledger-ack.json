@@ -1,0 +1,17 @@
+{
+  "cls": 0,
+  "digest": "4f148cdcec7472d553ddee6525faf6bdf6f7e098ce64782942529c5dca9176b1",
+  "id": 29,
+  "kind": 0,
+  "links": [
+    28,
+    27,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 0,
+  "text": "{\"authorization\":27,\"content_sha256\":\"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\",\"disk_error\":null,\"disk_sha256\":\"b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9\",\"intent\":28,\"path\":\"notes/today.md\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
+  "verified": true
+}

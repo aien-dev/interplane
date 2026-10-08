@@ -1,0 +1,162 @@
+probing  /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/source/raw/conversations.jsonl
+detected /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/source/raw/conversations.jsonl as jsonl (12.8 KiB)
+ingest started   0/1 files  0 B/12.8 KiB  0 docs  0 tokens  0 output shards
+convert  /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/source/raw/conversations.jsonl using jsonl
+creating OpenWALDO Parquet file 1
+ingest    0/1 files  12.8 KiB/12.8 KiB  46 docs  3,816 tokens  0 output shards
+converted /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/source/raw/conversations.jsonl (12.8 KiB)
+ingest    1/1 files  12.8 KiB/12.8 KiB  46 docs  3,816 tokens  0 output shards
+audit 1  418a5a41335e started on worker 4
+audit 1  418a5a41335e completed
+created  OpenWALDO Parquet file 1  418a5a41335e  8.4 KiB  46 docs  3,816 tokens
+ingest complete  1/1 files  12.8 KiB/12.8 KiB  46 docs  3,816 tokens  1 output shards
+upload 1  418a5a41335e started on worker 1
+upload 1  418a5a41335e 8.4 KiB/8.4 KiB
+upload 1  418a5a41335e verified at file:///home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/look/41/8a/418a5a41335edc000314a9448dcc46e2b8127192e729b360d93741fbb8f48c2b
+purged 1  418a5a41335e reclaimed 8.4 KiB
+preflight               checking 1 corpus paths against index /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/idx
+preflight               passed; all 1 corpus paths are available
+model                  persisted immutable model architecture and OpenWALDO BOM
+preflight/toolcall-sft          resolving 1 shards, 46 records, 3.8K reference tokens
+  materialized 1/1  8.4 KiB/8.4 KiB  418a5a41335e
+preflight/toolcall-sft          auditing 1 materialized shards
+  validated 1/1 shards  46 records  3,816 tokens
+preflight/toolcall-sft selecting deterministic held-out records across 1 shards
+preflight/toolcall-sft evaluation selection 1/1 shards, 46 records indexed
+preflight/toolcall-sft selected 1 held-out records (286 B text)
+preflight/toolcall-sft deriving optimizer steps from 90 epochs
+preflight/toolcall-sft planned 921 optimizer steps from 90 epochs
+backend/toolcall-sft   verifying the selected training backend
+backend/toolcall-sft   selected pytorch@builtin-pytorch-worker-schema-1-r7
+run/toolcall-sft       planned     persisted run OpenWALDO BOM
+run/toolcall-sft       running     training backend started
+training/toolcall-sft  running     step 1/921, loss 5.5664, 1094 tokens/s
+training/toolcall-sft  running     step 9/921, loss 5.0671, 3509 tokens/s, ETA 2m 50s
+training/toolcall-sft  running     step 18/921, loss 4.4651, 3946 tokens/s, ETA 2m 29s
+training/toolcall-sft  running     step 27/921, loss 3.6468, 4161 tokens/s, ETA 2m 20s
+training/toolcall-sft  running     step 36/921, loss 2.8425, 4286 tokens/s, ETA 2m 15s
+training/toolcall-sft  running     step 45/921, loss 2.3330, 4350 tokens/s, ETA 2m 12s
+training/toolcall-sft  running     step 54/921, loss 1.9259, 4384 tokens/s, ETA 2m 9s
+training/toolcall-sft  running     step 63/921, loss 1.2584, 4392 tokens/s, ETA 2m 8s
+training/toolcall-sft  running     step 72/921, loss 0.9260, 4366 tokens/s, ETA 2m 7s
+training/toolcall-sft  running     step 81/921, loss 0.6500, 4390 tokens/s, ETA 2m 5s
+training/toolcall-sft  running     step 90/921, loss 0.5293, 4404 tokens/s, ETA 2m 4s
+training/toolcall-sft  running     step 99/921, loss 0.3052, 4428 tokens/s, ETA 2m 1s
+training/toolcall-sft  running     step 108/921, loss 0.2180, 4462 tokens/s, ETA 1m 59s
+training/toolcall-sft  running     step 117/921, loss 0.1595, 4478 tokens/s, ETA 1m 58s
+training/toolcall-sft  running     step 126/921, loss 0.1337, 4476 tokens/s, ETA 1m 56s
+training/toolcall-sft  running     step 135/921, loss 0.1283, 4481 tokens/s, ETA 1m 55s
+training/toolcall-sft  running     step 144/921, loss 0.0739, 4488 tokens/s, ETA 1m 53s
+training/toolcall-sft  running     step 153/921, loss 0.1414, 4487 tokens/s, ETA 1m 52s
+training/toolcall-sft  running     step 162/921, loss 0.2019, 4470 tokens/s, ETA 1m 51s
+training/toolcall-sft  running     step 171/921, loss 0.1781, 4478 tokens/s, ETA 1m 50s
+training/toolcall-sft  running     step 180/921, loss 0.0714, 4476 tokens/s, ETA 1m 48s
+training/toolcall-sft  running     step 189/921, loss 0.1180, 4484 tokens/s, ETA 1m 47s
+training/toolcall-sft  running     step 198/921, loss 0.1032, 4465 tokens/s, ETA 1m 46s
+training/toolcall-sft  running     step 207/921, loss 0.0529, 4473 tokens/s, ETA 1m 44s
+training/toolcall-sft  running     step 216/921, loss 0.0607, 4481 tokens/s, ETA 1m 43s
+training/toolcall-sft  running     step 225/921, loss 0.1143, 4490 tokens/s, ETA 1m 41s
+training/toolcall-sft  running     step 234/921, loss 0.1731, 4492 tokens/s, ETA 1m 40s
+training/toolcall-sft  running     step 243/921, loss 0.1097, 4485 tokens/s, ETA 1m 39s
+training/toolcall-sft  running     step 252/921, loss 0.0579, 4475 tokens/s, ETA 1m 38s
+training/toolcall-sft  running     step 261/921, loss 0.0901, 4487 tokens/s, ETA 1m 36s
+training/toolcall-sft  running     step 270/921, loss 0.0292, 4487 tokens/s, ETA 1m 35s
+training/toolcall-sft  running     step 279/921, loss 0.0390, 4477 tokens/s, ETA 1m 34s
+training/toolcall-sft  running     step 288/921, loss 0.1292, 4464 tokens/s, ETA 1m 33s
+training/toolcall-sft  running     step 297/921, loss 0.0470, 4453 tokens/s, ETA 1m 32s
+training/toolcall-sft  running     step 306/921, loss 0.0403, 4447 tokens/s, ETA 1m 30s
+training/toolcall-sft  running     step 315/921, loss 0.0845, 4443 tokens/s, ETA 1m 29s
+training/toolcall-sft  running     step 324/921, loss 0.1259, 4434 tokens/s, ETA 1m 28s
+training/toolcall-sft  running     step 333/921, loss 0.0891, 4418 tokens/s, ETA 1m 27s
+training/toolcall-sft  running     step 342/921, loss 0.0413, 4404 tokens/s, ETA 1m 26s
+training/toolcall-sft  running     step 351/921, loss 0.0310, 4400 tokens/s, ETA 1m 25s
+training/toolcall-sft  running     step 360/921, loss 0.1025, 4395 tokens/s, ETA 1m 23s
+training/toolcall-sft  running     step 369/921, loss 0.0465, 4392 tokens/s, ETA 1m 22s
+training/toolcall-sft  running     step 378/921, loss 0.0923, 4388 tokens/s, ETA 1m 21s
+training/toolcall-sft  running     step 387/921, loss 0.0450, 4384 tokens/s, ETA 1m 20s
+training/toolcall-sft  running     step 396/921, loss 0.0639, 4382 tokens/s, ETA 1m 18s
+training/toolcall-sft  running     step 405/921, loss 0.0604, 4379 tokens/s, ETA 1m 17s
+training/toolcall-sft  running     step 414/921, loss 0.0223, 4374 tokens/s, ETA 1m 16s
+training/toolcall-sft  running     step 423/921, loss 0.0260, 4368 tokens/s, ETA 1m 14s
+training/toolcall-sft  running     step 432/921, loss 0.0505, 4365 tokens/s, ETA 1m 13s
+training/toolcall-sft  running     step 441/921, loss 0.0992, 4360 tokens/s, ETA 1m 12s
+training/toolcall-sft  running     step 450/921, loss 0.0317, 4357 tokens/s, ETA 1m 11s
+training/toolcall-sft  running     step 459/921, loss 0.0424, 4352 tokens/s, ETA 1m 9s
+training/toolcall-sft  running     step 468/921, loss 0.0666, 4349 tokens/s, ETA 1m 8s
+training/toolcall-sft  running     step 477/921, loss 0.0629, 4347 tokens/s, ETA 1m 7s
+training/toolcall-sft  running     step 486/921, loss 0.0254, 4353 tokens/s, ETA 1m 5s
+training/toolcall-sft  running     step 495/921, loss 0.0416, 4356 tokens/s, ETA 1m 4s
+training/toolcall-sft  running     checkpoint step 500 persisted
+training/toolcall-sft  running     step 500 held-out loss 0.0267
+training/toolcall-sft  running     step 504/921, loss 0.0279, 4349 tokens/s, ETA 1m 3s
+training/toolcall-sft  running     step 513/921, loss 0.0557, 4353 tokens/s, ETA 1m 1s
+training/toolcall-sft  running     step 522/921, loss 0.0263, 4360 tokens/s, ETA 1m 0s
+training/toolcall-sft  running     step 531/921, loss 0.0316, 4364 tokens/s, ETA 58s
+training/toolcall-sft  running     step 540/921, loss 0.0548, 4365 tokens/s, ETA 57s
+training/toolcall-sft  running     step 549/921, loss 0.0144, 4362 tokens/s, ETA 56s
+training/toolcall-sft  running     step 558/921, loss 0.0141, 4363 tokens/s, ETA 54s
+training/toolcall-sft  running     step 567/921, loss 0.0129, 4365 tokens/s, ETA 53s
+training/toolcall-sft  running     step 576/921, loss 0.0287, 4370 tokens/s, ETA 51s
+training/toolcall-sft  running     step 585/921, loss 0.0162, 4371 tokens/s, ETA 50s
+training/toolcall-sft  running     step 594/921, loss 0.0293, 4367 tokens/s, ETA 49s
+training/toolcall-sft  running     step 603/921, loss 0.0128, 4372 tokens/s, ETA 47s
+training/toolcall-sft  running     step 612/921, loss 0.0527, 4377 tokens/s, ETA 46s
+training/toolcall-sft  running     step 621/921, loss 0.0366, 4384 tokens/s, ETA 44s
+training/toolcall-sft  running     step 630/921, loss 0.0208, 4389 tokens/s, ETA 43s
+training/toolcall-sft  running     step 639/921, loss 0.0262, 4393 tokens/s, ETA 42s
+training/toolcall-sft  running     step 648/921, loss 0.0294, 4398 tokens/s, ETA 40s
+training/toolcall-sft  running     step 657/921, loss 0.0141, 4400 tokens/s, ETA 39s
+training/toolcall-sft  running     step 666/921, loss 0.0494, 4401 tokens/s, ETA 38s
+training/toolcall-sft  running     step 675/921, loss 0.0565, 4404 tokens/s, ETA 36s
+training/toolcall-sft  running     step 684/921, loss 0.0258, 4401 tokens/s, ETA 35s
+training/toolcall-sft  running     step 693/921, loss 0.0088, 4404 tokens/s, ETA 34s
+training/toolcall-sft  running     step 702/921, loss 0.0186, 4406 tokens/s, ETA 32s
+training/toolcall-sft  running     step 711/921, loss 0.0291, 4406 tokens/s, ETA 31s
+training/toolcall-sft  running     step 720/921, loss 0.0230, 4409 tokens/s, ETA 29s
+training/toolcall-sft  running     step 729/921, loss 0.0147, 4415 tokens/s, ETA 28s
+training/toolcall-sft  running     step 738/921, loss 0.0358, 4416 tokens/s, ETA 27s
+training/toolcall-sft  running     step 747/921, loss 0.0095, 4418 tokens/s, ETA 25s
+training/toolcall-sft  running     step 756/921, loss 0.0323, 4421 tokens/s, ETA 24s
+training/toolcall-sft  running     step 765/921, loss 0.0259, 4422 tokens/s, ETA 23s
+training/toolcall-sft  running     step 774/921, loss 0.0387, 4419 tokens/s, ETA 21s
+training/toolcall-sft  running     step 783/921, loss 0.0530, 4419 tokens/s, ETA 20s
+training/toolcall-sft  running     step 792/921, loss 0.0153, 4421 tokens/s, ETA 19s
+training/toolcall-sft  running     step 801/921, loss 0.0372, 4425 tokens/s, ETA 17s
+training/toolcall-sft  running     step 810/921, loss 0.0356, 4428 tokens/s, ETA 16s
+training/toolcall-sft  running     step 819/921, loss 0.0104, 4431 tokens/s, ETA 15s
+training/toolcall-sft  running     step 828/921, loss 0.0383, 4434 tokens/s, ETA 13s
+training/toolcall-sft  running     step 837/921, loss 0.0204, 4437 tokens/s, ETA 12s
+training/toolcall-sft  running     step 846/921, loss 0.0487, 4441 tokens/s, ETA 11s
+training/toolcall-sft  running     step 855/921, loss 0.0100, 4444 tokens/s, ETA 9s
+training/toolcall-sft  running     step 864/921, loss 0.0207, 4442 tokens/s, ETA 8s
+training/toolcall-sft  running     step 873/921, loss 0.0108, 4440 tokens/s, ETA 7s
+training/toolcall-sft  running     step 882/921, loss 0.0355, 4441 tokens/s, ETA 5s
+training/toolcall-sft  running     step 891/921, loss 0.0291, 4444 tokens/s, ETA 4s
+training/toolcall-sft  running     step 900/921, loss 0.0192, 4449 tokens/s, ETA 3s
+training/toolcall-sft  running     step 909/921, loss 0.0202, 4451 tokens/s, ETA 1s
+training/toolcall-sft  running     step 918/921, loss 0.0258, 4453 tokens/s
+training/toolcall-sft  running     step 921/921, loss 0.0562, 4452 tokens/s
+training/toolcall-sft  running     checkpoint step 921 persisted
+training/toolcall-sft  running     step 921 held-out loss 0.0007
+training/toolcall-sft  running     reloaded model artifact verified at held-out loss 0.0007
+run/toolcall-sft       complete    persisted training observations and artifact hashes
+compose                completed durable transaction d66dfec023b7
+trained model toolcall-tiny
+  location      /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/models/toolcall-tiny
+  model id      1d9e5e60a0e8
+  runs          1
+  backend       pytorch@builtin-pytorch-worker-schema-1-r7
+warning: model export is unsigned; configure signing.* to sign exports automatically
+exported huggingface model toolcall-tiny to /home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/hf
+architecture.py
+BOM.json
+chat_template.jinja
+config.json
+EU-BOM.json
+generation_config.json
+model.safetensors
+README.md
+special_tokens_map.json
+tokenization_openwaldo.py
+tokenizer_config.json
+tokenizer.json

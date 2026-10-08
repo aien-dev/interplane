@@ -1,0 +1,63 @@
+{
+  "data": {
+    "receipt": {
+      "ack_digest": "efffbc3f7e12913469861f8aa3b143d68f84efe6152ad51b7881f0ea9282d468",
+      "ack_record_id": 22,
+      "approval_id": "aien-approval:real-run-04:t0:c0:c32f6a1235828648",
+      "approved_proposal_sha256": "f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb",
+      "approver": "drake",
+      "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+      "compose_proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+      "content_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+      "disk_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+      "grant_digest": "24bb98b5bfdb81726b9307faf8f2651b7483350c89d2177e49acf1ff4be407ce",
+      "grant_id": 20,
+      "handoff": {
+        "aegis_pass_mask": 1,
+        "approval_key": "d32a1bfabcb28efd288858c5a2a628077a87eecbcac0aacc19e50281dac40b81",
+        "approved_grant": 20,
+        "branch_count": 1,
+        "committed": true,
+        "cx_evidence": 16,
+        "cx_goal": 9,
+        "cx_promotion": 17,
+        "desk_key_id": "dc5a4b8af4bbf0ff",
+        "grant_links": [
+          17,
+          16
+        ],
+        "outcome": 1,
+        "proposer": "hook:approved-proposal",
+        "record_digest": "0a19be959a970176a42e90300b555d0301e4c0e3f304d425d957707c2ca0e2e7",
+        "replay_claim": 7,
+        "state": "COMMITTED",
+        "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt",
+        "task": 15330623940039986179,
+        "winner": 0,
+        "winner_digest": "d37f452f4b83abcc6530f737c08e7f35cd68609d99ee2118fee5a15901d8f36e"
+      },
+      "intent_digest": "bcaad664f72514fe19f65e6d14cfe34ac407634f129bc2c71c86a367e32aff3e",
+      "intent_id": 21,
+      "path": "summary.txt",
+      "prior_sha256": null,
+      "proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+      "request_id": "real-run-04:t0:c0",
+      "state": "DONE",
+      "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt",
+      "trace_id": "real-run-04"
+    }
+  },
+  "decision": null,
+  "error": null,
+  "kind": "result",
+  "provenance": {
+    "capability": "write_file",
+    "content_kind": "tool_result",
+    "duration_ms": 0,
+    "runtime": "aien",
+    "trust": "trusted_runtime",
+    "trusted": true
+  },
+  "request_id": "real-run-04:t0:c0",
+  "status": "ok"
+}

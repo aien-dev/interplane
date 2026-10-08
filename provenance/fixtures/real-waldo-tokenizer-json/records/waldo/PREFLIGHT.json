@@ -1,0 +1,55 @@
+{
+  "kind": "openwaldo-stage-preflight",
+  "schema": 1,
+  "identity_sha256": "7e30a61d4b85ea5b537113c9c4473b0c2dd977056509435378a7e2006017e178",
+  "evaluation": {
+    "selection": "lowest-sha256-v1",
+    "seed": 42,
+    "records": 0,
+    "token_targets": 0,
+    "text_bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "selected_records": [],
+  "eligible_records": {
+    "core/e2e/pytorch": 1
+  },
+  "parameters": {
+    "profile": "causal-pretrain-shuffled",
+    "profile_schema": 1,
+    "epochs": 2,
+    "steps": 2,
+    "batch_size": 8,
+    "sequence_length": 16,
+    "learning_rate": 0.0003,
+    "seed": 42,
+    "optimizer": {
+      "name": "adamw",
+      "weight_decay": 0.1,
+      "beta1": 0.9,
+      "beta2": 0.95,
+      "epsilon": 1e-8
+    },
+    "schedule": {
+      "name": "cosine",
+      "warmup_steps": 1,
+      "minimum_rate_ratio": 0.1
+    },
+    "data": {
+      "order": "bounded-shuffle-v1",
+      "shuffle_buffer_records": 1024,
+      "shuffle_buffer_bytes": 67108864,
+      "packing": "continuous-eos-v1"
+    },
+    "evaluation": {
+      "selection": "lowest-sha256-v1",
+      "fraction": 0.01,
+      "max_records": 256,
+      "max_bytes": 1048576
+    },
+    "checkpoint_every": 2,
+    "evaluate_every": 2,
+    "planned_token_capacity": 256
+  },
+  "capacity_verified": true
+}

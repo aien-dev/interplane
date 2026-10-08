@@ -158,6 +158,23 @@ jobs:
           bad=[c for c in sorted(set(r)|set(p)) if json.dumps(r.get(c),sort_keys=True)!=json.dumps(p.get(c),sort_keys=True)]
           print('cases:',len(r),'mismatches:',bad); sys.exit(1 if bad or len(r)!=106 else 0)
           PY
+  provenance:
+    runs-on: ubuntu-latest
+    defaults: {run: {working-directory: provenance}}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
+      - run: cargo fmt --all --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked
+      - name: fixture verdicts from the CLI
+        run: |
+          test "$(cargo run -q --locked -- verify fixtures/synthetic-full-chain)" = "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn"
+          test "$(cargo run -q --locked -- verify fixtures/synthetic-weak-receipt)" = "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=record_effect_receipt/1:weak"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-aien-chain)" = "PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-tokenizer-json)" = "PASS_LABELLED_INCOMPLETE missing=link:effect,link:interplane"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-smoke)" = "PASS_LABELLED_INCOMPLETE missing=link:aien,link:effect,link:interplane"
   adapter-aien:
     runs-on: ubuntu-latest
     steps:

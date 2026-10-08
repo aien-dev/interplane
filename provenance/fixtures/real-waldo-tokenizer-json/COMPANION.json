@@ -1,0 +1,119 @@
+{
+  "aien": {
+    "candidate_id": null,
+    "executable": "aien-cli",
+    "executable_sha256": "4743fcdae289ef8b50e2a82b6ea2a23831043a2cb09ca06a91269c9f24fd8a0c",
+    "note": "no frozen AIEN candidate: no candidate_manifest record; executable is sovereign-core PR #248 head 8e7b14d debug build"
+  },
+  "completeness": {
+    "missing": [
+      "link:effect",
+      "link:interplane"
+    ],
+    "reason": "AIEN really loaded this export (aien-cli daemon, CPU); no INTERPLANE trace or effect receipt exists for this model yet",
+    "state": "incomplete"
+  },
+  "effect": null,
+  "export": {
+    "chat_template": null,
+    "conversion_tool": {
+      "checked": false,
+      "commit": "09f262c2b0e1fab71bbb73d96a483988ff969771",
+      "name": "waldo model export --format huggingface",
+      "source": "github.com/aien-dev/waldo branch export-tokenizer-json (patched exporter that writes a Hugging Face tokenizer.json)"
+    },
+    "format": "huggingface",
+    "model_revision": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691/a8787ab0a4548d98"
+  },
+  "fixture": {
+    "class": "real",
+    "note": "Real bytes from a WALDO CPU smoke run with the patched exporter (tokenizer.json). aien-cli loaded it; the daemon warm-up then refused chat rendering because this is a plain base model with no chat template (log retained verbatim). No frozen candidate manifest exists, so aien.candidate_id is null.",
+    "source": "waldo fork aien-dev/waldo export-tokenizer-json 09f262c, model pytorch-smoke run a8787ab0a4548d98 (train, 2026-10-06T22:45Z), PyTorch backend; aien-cli from sovereign-core PR #248 8e7b14d; load log is the full daemon output (25 s timeout, rc 124 expected)"
+  },
+  "interplane": null,
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "corpus_license_assertions": [
+      "CC0-1.0"
+    ],
+    "kind": "waldo_run",
+    "model_id": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691",
+    "run_id": "a8787ab0a4548d98",
+    "training_backend": {
+      "name": "pytorch",
+      "revision": "builtin-pytorch-worker-schema-1-r7"
+    },
+    "training_code": {
+      "checked": false,
+      "commit": "09f262c2b0e1fab71bbb73d96a483988ff969771",
+      "repository": "github.com/aien-dev/waldo",
+      "source": "fork branch export-tokenizer-json, same tree that ran the smoke"
+    }
+  },
+  "load_support": {
+    "declared": "supported_structural"
+  },
+  "records": {
+    "aien_load_log": {
+      "bytes": 838,
+      "path": "records/aien_load.log",
+      "sha256": "61cc6cac4f25d62c65fb6fdadfb25706a4dc49cdc07937c28f9fa2d6d05a2445"
+    },
+    "export_config": {
+      "bytes": 455,
+      "path": "records/export/config.json",
+      "sha256": "0c766e310dbf9d1cfcaaef010d7c21832c5350589f49fa3abb66b9e4ad0f80e6"
+    },
+    "export_tokenizer": {
+      "bytes": 9061,
+      "path": "records/export/tokenizer.json",
+      "sha256": "c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd"
+    },
+    "export_weights": {
+      "bytes": 36632,
+      "path": "records/export/model.safetensors",
+      "sha256": "07795e7d4cf50d6e86e27a6e0041699f12091a3137d88882bcc1c9462d0f1be5"
+    },
+    "release_bom": {
+      "bytes": 2290,
+      "path": "records/export/BOM.json",
+      "sha256": "eb49a3a599463c41bb12a4a356ced380a1adac1b1d9436c8d53a7a2efe00a1a8",
+      "waldo_sha256": "54331b2251887e319411a4fc5048295207f19eed68b09f16d8c2db435cf65938"
+    },
+    "run_weights": {
+      "bytes": 36504,
+      "path": "records/waldo/model.safetensors",
+      "sha256": "0aa5dddaf8ba1c6d036381bd7e42d413a5268f536e63d042adb72f5657957a0c"
+    },
+    "waldo_model_bom": {
+      "bytes": 3054,
+      "path": "records/waldo/MODEL-BOM.json",
+      "sha256": "8c2a7d47f0a550c3bb0944a372f7079f0f94c906e7926ccafa696a83bbf47f4b",
+      "waldo_sha256": "32d3b9fc849bb2ef3af00bccee9a9eed2054ebe7fd8b2ab6c6497e5142c6c35a"
+    },
+    "waldo_plan": {
+      "bytes": 731,
+      "path": "records/waldo/PLAN.json",
+      "sha256": "f5e28f826596874689db252d6f5eccd65c93b8b8c83a8a522a2bff35445e13b3",
+      "waldo_sha256": "35acdfa7635cfcf26852f7644efdb707fdae6e240fd43341684a8020f478a691"
+    },
+    "waldo_preflight": {
+      "bytes": 1340,
+      "path": "records/waldo/PREFLIGHT.json",
+      "sha256": "950ce682817a4b689a95ea26f656fbd2551cca0624fbc8d15e514ef49d50bd28"
+    },
+    "waldo_run": {
+      "bytes": 2040,
+      "path": "records/waldo/RUN.json",
+      "sha256": "7cd8623191d560d76f0d2d19e8c3f0c3a10d5e998fe380cff513652d5efeb58a",
+      "waldo_sha256": "0bc7d5a47cc66310efcd40045377656d3266ba015df1b0c69080c1d34b593ff3"
+    },
+    "waldo_run_bom": {
+      "bytes": 6734,
+      "path": "records/waldo/RUN-BOM.json",
+      "sha256": "b756d528c1c3758ecfd1e431870a0aa53ab07b84f077ee99cbdce22f3101d880",
+      "waldo_sha256": "59b0b40ff565dda01a0b94ed1b9f9389a0304a3f0595a1b7c9ddce2c0af23bb1"
+    }
+  },
+  "schema": 0
+}

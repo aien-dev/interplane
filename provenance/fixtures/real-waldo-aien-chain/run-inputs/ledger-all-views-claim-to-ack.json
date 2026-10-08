@@ -1,0 +1,403 @@
+{
+  "cited": [
+    {
+      "cls": 6,
+      "digest": "1682d2c6af43a1308becd93bf81252f127a6fd8e9e4629a0e955afc7042a4c3b",
+      "id": 7,
+      "kind": 65554,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approval_id\":\"aien-approval:real-run-04:t0:c0:c32f6a1235828648\",\"approval_key\":\"d32a1bfabcb28efd288858c5a2a628077a87eecbcac0aacc19e50281dac40b81\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":1641935,\"start\":13587022},\"request_id\":\"real-run-04:t0:c0\",\"trace_id\":\"real-run-04\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "d306f069eeaf45b1c26072cdde7f7d9ff1ff844316a41a41b879493feda3f4b0",
+      "id": 8,
+      "kind": 65554,
+      "links": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"in_flight\",\"claim\":7}",
+      "verified": true
+    },
+    {
+      "cls": 3,
+      "digest": "ac713c8c341eede8f98addf141866349fe5960ff6d1a13cb7646deec078f65b7",
+      "id": 9,
+      "kind": 65537,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 1,
+      "tag": 2,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "8fb1132e71a100dcd001609b33244f2247494cc708413ece4ce155dbdcc0721f",
+      "id": 10,
+      "kind": 65540,
+      "links": [
+        9,
+        1,
+        5,
+        0
+      ],
+      "note": null,
+      "subject": 3,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "9cf58b9cacdf66524e75686dabbc7bdd717431022dc49d21a1c2dfee963abaab",
+      "id": 11,
+      "kind": 65540,
+      "links": [
+        9,
+        1,
+        5,
+        0
+      ],
+      "note": null,
+      "subject": 2,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "b2db5e7f5d16a706086c6667f165a627e489d1ac8af9eed449b812ec16f1399e",
+      "id": 12,
+      "kind": 65540,
+      "links": [
+        11,
+        1,
+        2,
+        3
+      ],
+      "note": null,
+      "subject": 4,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "aac249273fd17a981e79074539ae486cb941e40beb1b5cb742733563ecdb5804",
+      "id": 13,
+      "kind": 65540,
+      "links": [
+        12,
+        4,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 2,
+      "digest": "b75af61818d14801dad533a1e3ec038bc0c0c026e323177eba9476e2330ed091",
+      "id": 14,
+      "kind": 65553,
+      "links": [
+        11,
+        9,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 9,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 2,
+      "digest": "3bee68df07ae23867639f547fece3b384cb80d74c224a0f7fc2f5b6dcb04a1cd",
+      "id": 15,
+      "kind": 65553,
+      "links": [
+        10,
+        9,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 9,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "d09ffe8bb67edff82060cb61bfdb6edd697e7a81b6f7e234db2cfa88f1df4e5c",
+      "id": 16,
+      "kind": 65554,
+      "links": [
+        12,
+        14,
+        15,
+        13
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 9,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "d0b08804c56efb5cc59592399cec1ff1e0aefe015b88a1df202bbd9d922f958d",
+      "id": 17,
+      "kind": 65555,
+      "links": [
+        14,
+        16,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 0,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "da9404db58b796a6407fd0c62963d525bd454e7d9ee6b665e02b7f3c207534d7",
+      "id": 18,
+      "kind": 65556,
+      "links": [
+        15,
+        16,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 1,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "1e3f5ff28c728bf1ae0c0bac8febf4c7c4a72901a36bfdbf75c557fb17be050a",
+      "id": 19,
+      "kind": 65554,
+      "links": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"committed\",\"claim\":7,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":16,\"cx_promotion\":17,\"task\":15330623940039986179}}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "24bb98b5bfdb81726b9307faf8f2651b7483350c89d2177e49acf1ff4be407ce",
+      "id": 20,
+      "kind": 65556,
+      "links": [
+        17,
+        16,
+        7,
+        0
+      ],
+      "note": "authorization",
+      "subject": 0,
+      "tag": 3,
+      "text": "{\"approval_id\":\"aien-approval:real-run-04:t0:c0:c32f6a1235828648\",\"approval_key\":\"d32a1bfabcb28efd288858c5a2a628077a87eecbcac0aacc19e50281dac40b81\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":16,\"cx_promotion\":17,\"desk_key_id\":\"dc5a4b8af4bbf0ff\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":7,\"request_id\":\"real-run-04:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt\",\"trace_id\":\"real-run-04\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "bcaad664f72514fe19f65e6d14cfe34ac407634f129bc2c71c86a367e32aff3e",
+      "id": 21,
+      "kind": 65554,
+      "links": [
+        20,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":1641899,\"start\":13587021},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "efffbc3f7e12913469861f8aa3b143d68f84efe6152ad51b7881f0ea9282d468",
+      "id": 22,
+      "kind": 65554,
+      "links": [
+        21,
+        20,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"disk_error\":null,\"disk_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor_reported\":{\"bytes\":67,\"error\":null,\"written_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\"},\"intent\":21,\"path\":\"summary.txt\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
+      "verified": true
+    }
+  ],
+  "compose_dir": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/compose",
+  "host": [
+    {
+      "cls": 6,
+      "digest": "6d25da29469da3e08b0599ab8b18552dde728abf415b448874725bb52d250d23",
+      "id": 6,
+      "kind": 65554,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"daemon\":{\"pid\":1641935,\"start_ticks\":13587022,\"started_unix_ms\":\"1791422159827\"},\"finish_reason\":\"eos\",\"generation\":1,\"model_path\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/hf/model.safetensors\",\"model_sha256\":\"552fb3a85f5871a45a5243f3ae066b7b51711caf0ae8dc7412bbd5c9e505f8ad\",\"operation_id\":\"1791422160865329715\",\"output_text_sha256\":\"63e25ca957d611e7d9b516505107369e2fece1351e72a4a2ee694629f17d4291\",\"output_token_ids_sha256\":\"400992a4c84bdb327e3c86c349c60f4f57094eed925119638952998764a34cee\",\"output_tokens\":180,\"prompt_ids_sha256\":\"52b2f9907f859e421988c939153040edc6a131eb2b37d9f672cd1255f0334acd\",\"request_id\":1791422160865,\"tokenizer_path\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/hf/tokenizer.json\",\"tokenizer_sha256\":\"c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd\",\"total_tokens\":271,\"v\":1}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "1682d2c6af43a1308becd93bf81252f127a6fd8e9e4629a0e955afc7042a4c3b",
+      "id": 7,
+      "kind": 65554,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approval_id\":\"aien-approval:real-run-04:t0:c0:c32f6a1235828648\",\"approval_key\":\"d32a1bfabcb28efd288858c5a2a628077a87eecbcac0aacc19e50281dac40b81\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":1641935,\"start\":13587022},\"request_id\":\"real-run-04:t0:c0\",\"trace_id\":\"real-run-04\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "d306f069eeaf45b1c26072cdde7f7d9ff1ff844316a41a41b879493feda3f4b0",
+      "id": 8,
+      "kind": 65554,
+      "links": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"in_flight\",\"claim\":7}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "1e3f5ff28c728bf1ae0c0bac8febf4c7c4a72901a36bfdbf75c557fb17be050a",
+      "id": 19,
+      "kind": 65554,
+      "links": [
+        7,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"committed\",\"claim\":7,\"evidence\":{\"compose_proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"cx_evidence\":16,\"cx_promotion\":17,\"task\":15330623940039986179}}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "24bb98b5bfdb81726b9307faf8f2651b7483350c89d2177e49acf1ff4be407ce",
+      "id": 20,
+      "kind": 65556,
+      "links": [
+        17,
+        16,
+        7,
+        0
+      ],
+      "note": "authorization",
+      "subject": 0,
+      "tag": 3,
+      "text": "{\"approval_id\":\"aien-approval:real-run-04:t0:c0:c32f6a1235828648\",\"approval_key\":\"d32a1bfabcb28efd288858c5a2a628077a87eecbcac0aacc19e50281dac40b81\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":16,\"cx_promotion\":17,\"desk_key_id\":\"dc5a4b8af4bbf0ff\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":7,\"request_id\":\"real-run-04:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt\",\"trace_id\":\"real-run-04\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "bcaad664f72514fe19f65e6d14cfe34ac407634f129bc2c71c86a367e32aff3e",
+      "id": 21,
+      "kind": 65554,
+      "links": [
+        20,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":1641899,\"start\":13587021},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run4/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "efffbc3f7e12913469861f8aa3b143d68f84efe6152ad51b7881f0ea9282d468",
+      "id": 22,
+      "kind": 65554,
+      "links": [
+        21,
+        20,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"disk_error\":null,\"disk_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor_reported\":{\"bytes\":67,\"error\":null,\"written_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\"},\"intent\":21,\"path\":\"summary.txt\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
+      "verified": true
+    }
+  ],
+  "machine_id": "81a06102eccdcca9e32aa787ad585c36744d3ec3e22725ed523caa5f1b6c3483",
+  "missing": [],
+  "prefix": null,
+  "prefix_digest": null,
+  "records_total": 22
+}

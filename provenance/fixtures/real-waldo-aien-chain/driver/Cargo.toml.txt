@@ -1,0 +1,13 @@
+[workspace]
+[package]
+name = "ipx76-real-run"
+version = "0.0.0"
+edition = "2021"
+publish = false
+[dependencies]
+interplane-adapter-aien = { path = "/home/drakestapleton/workspace/hive/IPX/p76/adapters/aien" }
+interplane-core = { path = "/home/drakestapleton/workspace/hive/IPX/p76/rust/crates/interplane-core" }
+interplane-crossveil = { path = "/home/drakestapleton/workspace/hive/IPX/p76/rust/crates/interplane-crossveil" }
+interplane-lenshift = { path = "/home/drakestapleton/workspace/hive/IPX/p76/rust/crates/interplane-lenshift" }
+serde_json = "1"
+sha2 = "0.10"

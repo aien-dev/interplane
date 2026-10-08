@@ -32,7 +32,8 @@ use serde_json::{json, Map, Value};
 pub mod compose_ledger;
 pub use compose_ledger::{
     hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
-    APPROVAL_BINDING_VERSION, DEFAULT_APPROVER, LEDGER_BOUNDARY,
+    APPROVAL_BINDING_VERSION, BOUND_REQUIREMENTS, DEFAULT_APPROVER, LEDGER_BOUNDARY,
+    REQUIREMENTS_TAG_V1,
 };
 
 /// Runtime id carried in every decision, result and catalog.

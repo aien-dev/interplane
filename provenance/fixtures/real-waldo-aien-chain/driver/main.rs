@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-const TRACE: &str = "real-run-03";
+const TRACE: &str = "real-run-04";
 const PROMPT: &str = "Save the meeting summary to summary.txt.";
 const MODEL_LABEL: &str = "toolcall-tiny";
 const NOW: &str = "2026-10-06T00:00:00Z";

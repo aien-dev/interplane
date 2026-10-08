@@ -82,10 +82,10 @@ writes no generation record). A private `CARGO_TARGET_DIR`; `ldd` shows no CUDA 
 log says `NativeTransformerBackend/CPU-reference (Omega GPU engine not linked, explicit fallback)`; the driver
 removes `AIEN_GPU_BACKEND`, `AIEN_REQUIRE_BLACKWELL` and `AIEN_OMEGA_DIR` from the daemon environment.
 
-Adapter used: interplane main 0ff60f2 plus the UNCOMMITTED worktree diff of the coordinator's branch
-`ipx/issue-78-repin` (read-only snapshot, `run-inputs/adapter-pr78-worktree-diff.patch`, sha256
-a11d8ac03f3683baedb187d4d504203419f9a736512597fccab8ed0ba3e47e86), because main is refused by the daemon
-(`RequirementsUnbound`). Replace this with the merged interplane#78 commit when it lands.
+Adapter used: the MERGED INTERPLANE adapter at interplane main c982fd3 (interplane#81, re-pinned to sovereign-core
+4d4dfd4, signs the requirements goal). No snapshot or uncommitted diff is involved. Run id `real-run-04` (trace
+`real-run-04`, daemon pid 1641935, killed by the driver). The earlier run `real-run-03` (adapter snapshot of the
+uncommitted #78 worktree) is replaced: it only differed in the adapter, and its records stay in the evidence dir.
 
 ## What the verifier checks for `model_generation/2`
 
@@ -108,6 +108,14 @@ Everything the ledger binding already checks still runs (`BINDING.md`): request,
 path and bytes, claim, commit, grant, intent, ack. `request_id` and `operation_id` in the record are the client's
 claims and are recorded, never trusted (a test pins that changing them changes nothing).
 
+## In plain words
+
+Proves: for this one run, the bytes of the training corpus, the exported model, the daemon's load, the text the
+daemon generated, the tool call the adapter parsed from it and the write the daemon ledgered all agree, by digest
+and process identity. Does not prove: anything about GPU or the native OS (CPU only), model quality (tiny
+memoriser), authority (provenance grants none), signing (the generation record is unsigned), or the caller-asserted
+`request_id`/`operation_id`. Residual gaps are listed next.
+
 ## What this does NOT prove (residual limits)
 
 From the AIEN document, repeated here so the verdict is not read as more than it is:
@@ -122,5 +130,5 @@ From the AIEN document, repeated here so the verdict is not read as more than it
   digest (`BINDING.md`, Trust).
 - Not that the text is correct, safe, or what an operator approved. No capability, permission or authority.
 - The model is a tiny memoriser with a fixed prompt at temperature 0. This shows the plumbing, NOT capability.
-- CPU evidence only; not a frozen candidate (`candidate_id` is null); not the minted flow; the adapter is not yet at a
-  merged commit; the trace timestamps are the driver's wall clock and the adapter's approval clock is the harness epoch.
+- CPU evidence only; not a frozen candidate (`candidate_id` is null); not the minted flow; the trace timestamps are the driver's wall clock and the adapter's approval clock is the harness epoch.
+- run-04 evidence (this fixture): ~/workspace/evidence/interplane-76/2026-10-08/ (SHA256SUMS sha256 474176b5f6b66a3672e30211f67d1b5cb0754d460c1bdf4102387f5e4a181600)

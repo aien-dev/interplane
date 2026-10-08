@@ -53,6 +53,8 @@ pub const REQUIREMENTS_TAG_V1: &[u8] = b"aien.requirements.v1\0";
 /// The requirement goal this authority binds: empty, and signed. The host approves the exact
 /// bytes of a `write_file`, so there is no natural-language goal whose measurable requirements the
 /// daemon could check; an empty goal is the explicit "none" (a missing one is refused, #289).
+/// Tag v2 (a goal whose requirement depends on the replaced file, signed with a base) is
+/// deliberately not implemented: an empty goal never needs a base.
 pub const BOUND_REQUIREMENTS: &str = "";
 /// Approver recorded in the grant when the host names none.
 pub const DEFAULT_APPROVER: &str = "interplane-host";
@@ -998,5 +1000,44 @@ mod tests {
             assert_eq!(fs::read(&t).unwrap(), b"replaced\n");
             assert_eq!(mode(&t), m, "mode of an existing {m:o} target");
         }
+    }
+
+    /// Golden vectors, computed outside this crate (`openssl dgst -sha256 -mac HMAC`) over the
+    /// bytes sovereign-core `approved_auth` signs, so a change to a tag, a separator or the
+    /// binding's field order fails here and not only in the `--ignored` real-daemon run.
+    #[test]
+    fn desk_macs_match_fixed_vectors() {
+        let key: [u8; 32] = std::array::from_fn(|i| i as u8);
+        let desk = DeskKey {
+            key,
+            id: "0123456789abcdef".into(),
+        };
+        let b = ApprovalBinding {
+            trace_id: "t-1".into(),
+            request_id: "r-1".into(),
+            approval_id: "A-1".into(),
+            approver: "host".into(),
+            path: "/ws/a.txt".into(),
+            content_sha256: "cc".into(),
+            approved_proposal_sha256: "bb".into(),
+            desk_key_id: "0123456789abcdef".into(),
+            workspace: "/ws".into(),
+        };
+        assert_eq!(
+            String::from_utf8(b.bytes()).unwrap(),
+            r#"{"approval_id":"A-1","approved_proposal_sha256":"bb","approver":"host","content_sha256":"cc","desk_key_id":"0123456789abcdef","path":"/ws/a.txt","request_id":"r-1","trace_id":"t-1","v":"aien.approval.v2","workspace":"/ws"}"#
+        );
+        assert_eq!(
+            desk.mac(&b),
+            "314669cd8b3848f7c92f8354cda5265b14051902e944e5ef464ed5bb216604d9"
+        );
+        assert_eq!(
+            desk.requirements_mac(&b, BOUND_REQUIREMENTS),
+            "467f2dfe43034b856ec7e9ecb80643410eac39d4520f6c62bda55a17a12d248a"
+        );
+        assert_eq!(
+            desk.requirements_mac(&b, "two lines"),
+            "d29340b1c0661149dcc337aebad1866fe71cdb33bd1718e9cfcdda55d1347bf1"
+        );
     }
 }

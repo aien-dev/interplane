@@ -165,7 +165,6 @@ fn count(c: &LedgerClient) -> u64 {
     a
 }
 
-/// Host records of kind `effect` that name authorization `grant`.
 /// Every `effect` record in the journal, whatever grant it names.
 fn all_effects(c: &LedgerClient) -> usize {
     // Effect phase records (intent, ack) on any grant. The daemon also writes
@@ -182,6 +181,7 @@ fn all_effects(c: &LedgerClient) -> usize {
         .count()
 }
 
+/// Host records of kind `effect` that name authorization `grant`.
 fn effects_for(c: &LedgerClient, grant: u64) -> Vec<Value> {
     let r = c.recall(&[], None).unwrap();
     r["host"]
@@ -392,8 +392,9 @@ fn approve_outcome(p: &mut Pipeline<'_>, l: &ComposeLedgerAuthority, id: &str) -
 }
 
 /// Item (1): a client-minted grant note for exactly the approved write is refused by the daemon
-/// (sovereign-core #261), and the daemon refuses the handoff (the request id was already claimed). Nothing is written, no
-/// intent opens on the client grant, the adapter does not fall back to it.
+/// (sovereign-core #261), and the daemon refuses the handoff (the request id was already
+/// claimed). Nothing is written, no intent opens on the client grant, the adapter does not
+/// fall back to it.
 #[test]
 #[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
 fn x1_client_minted_grant_unused_when_the_handoff_refuses() {

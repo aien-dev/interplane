@@ -23,11 +23,20 @@ if ! as_judge test -f "$key"; then
   as_judge sh -c 'umask 077; head -c 32 /dev/urandom | od -An -tx1 | tr -d " \n" > "$1"' _ "$key"
 fi
 [ "$(as_judge stat -c %a "$key")" = 600 ] || die "$key must be mode 600"
-# The proposer must not be able to read the key.
-if sudo -n -u "$rsi_user" cat "$key" >/dev/null 2>&1; then die "$rsi_user can read $key"; fi
+# The proposer must not be able to read the key: prove the account runs at all, then require a
+# permission refusal (a missing account or sudo rule must not pass for "cannot read").
+sudo -n -u "$rsi_user" true || die "cannot run commands as $rsi_user, so the key check would prove nothing"
+if err="$(sudo -n -u "$rsi_user" cat "$key" 2>&1 >/dev/null)"; then die "$rsi_user can read $key"; fi
+case "$err" in *"Permission denied"*) ;; *) die "unexpected result reading $key as $rsi_user: $err";; esac
 bin_copy="$(as_judge mktemp "$judge_home/judge-bin.XXXXXX")"
 as_judge sh -c 'cat > "$1" && chmod 700 "$1"' _ "$bin_copy" <"$JUDGE_BIN"
 mkdir -p "$(dirname "$pin")"
+# Neither service account may replace the pinned key.
+for u in "$rsi_user" "$judge_user"; do
+  if sudo -n -u "$u" test -w "$(dirname "$pin")" || { [ -e "$pin" ] && sudo -n -u "$u" test -w "$pin"; }; then
+    die "$u can write the pinned key location $(dirname "$pin")"
+  fi
+done
 as_judge "$bin_copy" --signing-key-file "$key" --public-key >"$pin.new"
 as_judge rm -f "$bin_copy"
 grep -Eq '^04[0-9a-f]{128}$' "$pin.new" || die "unexpected public key output"

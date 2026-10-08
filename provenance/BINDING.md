@@ -296,8 +296,8 @@ Status: implemented in `src/evaluation.rs`; tested in `tests/evaluation.rs` on t
 The invariant: **no change may be promoted unless its exact identity matches the identity covered by a
 valid, independently signed evaluation.** The proposer (the RSI engine) and the judge run as different
 operating-system accounts; the judge signs with a key only its account can read. The judge's public
-key is a trust input the operator supplies to the verifier (`verify <dir> --judge-key <file>`); it is
-never read from the bundle, because a bundle that carried its own key could carry the proposer's.
+key is a trust input the operator supplies to the verifier (`verify <dir> --judge-key <file>
+[--policy-sha256 <hex>]`); it is never read from the bundle, because a bundle that carried its own key could carry the proposer's.
 
 Retained records (raw files, never re-serialized):
 
@@ -328,13 +328,22 @@ and is checked after the test-run section and before the `fixture.class` check.
 7. **`evaluation_subject_mismatch`**: `binding.subject_path` differs from the grant's `path`, or
    `binding.subject_sha256` differs from the grant's `content_sha256` or the ack's `disk_sha256`. A
    genuine receipt for different bytes (a substituted change) fails here.
-8. **`evaluation_policy_mismatch`**: `binding.policy_sha256` differs from the SHA-256 of the retained
-   policy bytes; the written path is not in `allowed_targets`; `require_admitted` is not `true`; or
-   `min_holdout_pass_ratio` is not in (0, 1].
-9. **`evaluation_holdout_mismatch`**: `binding.holdout_set_sha256` differs from the policy's pinned
-   digest.
-10. **`evaluation_below_threshold`**: the judge did not admit the change, or
+8. **`evaluation_parent_mismatch`**: the receipt's `parent_id` differs from the archive's
+   `source_pin.commit`, or the archive has no source pin. A genuine receipt for the same bytes judged
+   against another tree fails here.
+9. **`evaluation_policy_mismatch`**: `binding.policy_sha256` differs from the SHA-256 of the retained
+   policy bytes; the operator pinned a policy (`--policy-sha256`) and the retained policy is not it;
+   the written path is under one of the policy's `protected_paths` or not in `allowed_targets`;
+   `require_admitted` is not `true`; or `min_holdout_pass_ratio` is not in (0, 1].
+10. **`evaluation_holdout_mismatch`**: `binding.holdout_set_sha256` differs from the policy's pinned
+    digest.
+11. **`evaluation_below_threshold`**: the judge did not admit the change, or
     `holdouts_passed < min_holdout_pass_ratio * holdouts_total`, or the total is 0.
+
+A plain `verify <dir>` without `--judge-key` does not look for an evaluation: a bundle with no
+evaluation section passes as an ordinary ledger bundle. An M5 audit must therefore always pass
+`--judge-key` (and should pass `--policy-sha256`, the SHA-256 of the operator's own policy file);
+with a key supplied, a bundle that carries no evaluation fails `evaluation_missing`.
 
 The same checks run in the harness **before** the write (`evaluation::precheck`, against the exact
 bytes about to be proposed), so a change whose receipt does not bind it never reaches the daemon. The

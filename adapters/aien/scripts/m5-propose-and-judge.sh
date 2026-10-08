@@ -16,7 +16,8 @@
 # Negative tests only (the gate script uses these to make counterfeit evidence, never the row):
 # M5_SUBJECT_OVERRIDE=<file> judges that file as the README instead of the proposal;
 # M5_JUDGE_KEY_OVERRIDE=<file> signs with that key instead of the judge's own;
-# M5_RECEIPT_V1=1 asks for a version 1 receipt (no binding).
+# M5_RECEIPT_V1=1 asks for a version 1 receipt (no binding). All three are ignored unless
+# M5_GATE_NEGATIVE=1 (the gate sets it for its negatives; the live row strips all four).
 # Exit 0 when a receipt was written (admitted or not: the harness reads it), non-zero otherwise.
 set -euo pipefail
 die() { echo "M5 HOOK FAIL: $*" >&2; exit 1; }
@@ -28,6 +29,15 @@ judge_home="${JUDGE_HOME:-/var/lib/aien-judge}"
 target="README.md"
 as_judge() { sudo -n -u "$judge_user" "$@"; }
 command -v jq >/dev/null || die "jq is required"
+if [ "${M5_GATE_NEGATIVE:-0}" != 1 ]; then
+  unset M5_SUBJECT_OVERRIDE M5_JUDGE_KEY_OVERRIDE M5_RECEIPT_V1
+fi
+# The judged parent is the workspace's commit, so the workspace must be exactly that commit, and
+# a symlink could redirect a write or a read outside it.
+[ -z "$(git -C "$ws" status --porcelain --untracked-files=all)" ] \
+  || die "workspace has uncommitted changes: the judged parent would not be its commit"
+[ -z "$(find "$ws" -path "$ws/.git" -prune -o -path "$ws/target" -prune -o -type l -print -quit)" ] \
+  || die "workspace contains a symlink: refused"
 
 copy_tree() { # src dst: the tree without .git and target
   mkdir -p "$2"; tar -C "$1" --exclude=./.git --exclude=./target -cf - . | tar -C "$2" -xf -
@@ -52,6 +62,8 @@ got="$(jq -r '.target_file // "none"' "$out/proposal.json")"
 # 3. Candidate = parent + the proposed file, byte for byte.
 copy_tree "$stage/view" "$stage/candidate"
 chmod -R u+w "$stage/candidate"
+jq -e '.proposed_patch | type == "string"' "$out/proposal.json" >/dev/null \
+  || die "the proposal carries no whole-file content"
 jq -j '.proposed_patch' "$out/proposal.json" >"$stage/candidate/$target"
 if [ -n "${M5_SUBJECT_OVERRIDE:-}" ]; then cp "$M5_SUBJECT_OVERRIDE" "$stage/candidate/$target"; fi
 chmod -R a+rX "$stage/candidate"

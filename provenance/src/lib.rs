@@ -124,15 +124,18 @@ fn crosses_symlink(dir: &Path, p: &str) -> bool {
     })
 }
 
-/// Verify the archive rooted at `dir`. Never panics on hostile input; always one line.
 /// What the operator supplies out of band. Nothing in here is ever read from the bundle.
 #[derive(Debug, Clone, Default)]
 pub struct Options {
     /// The independent judge's P-256 public key. With it, a bundle must carry a valid
     /// `rsi-eval/2` evaluation; without it, an evaluation in the bundle fails `evaluation_untrusted`.
     pub judge_key: Option<p256::ecdsa::VerifyingKey>,
+    /// SHA-256 (hex) of the operator's own copy of the evaluation policy. With it, the retained
+    /// policy must be exactly that file (`evaluation_policy_mismatch` otherwise).
+    pub policy_sha256: Option<String>,
 }
 
+/// Verify the archive rooted at `dir`. Never panics on hostile input; always one line.
 pub fn verify(dir: &Path) -> String {
     verify_with(dir, &Options::default())
 }
@@ -433,7 +436,7 @@ fn verify_inner(
         }
     }
     testrun::check(&archive, &m, ledger_checked)?;
-    evaluation::check(&archive, &m, ledger_checked, opts.judge_key.as_ref())?;
+    evaluation::check(&archive, &m, ledger_checked, opts)?;
     // Test material may verify, but never as a complete chain: `fixture.class` other than `real`
     // refuses `complete` whatever records it carries (#76 review). Checked last, so every deeper
     // check above still runs on test material.

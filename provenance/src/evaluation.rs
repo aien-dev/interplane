@@ -202,8 +202,9 @@ pub(crate) fn check(
     a: &Archive,
     m: &Value,
     ledger_checked: bool,
-    judge_key: Option<&VerifyingKey>,
+    opts: &crate::Options,
 ) -> Result<(), Fail> {
+    let judge_key = opts.judge_key.as_ref();
     let Some(sec) = m.get("evaluation").filter(|v| !v.is_null()) else {
         if claims_evaluation(a, m) {
             return fail(
@@ -253,57 +254,93 @@ pub(crate) fn check(
     }
     let policy_sha = a.sha(POLICY_RECORD)?.to_string();
     let policy = load(POLICY_RECORD)?;
-    // The evaluated subject is the change the daemon granted and read back.
+    // The evaluated subject is the change the daemon granted and read back, judged from the
+    // commit the task's source pin names.
     let facts = ledger::facts(a)?;
+    let pin = if a.has("source_pin") {
+        a.json("source_pin")?
+    } else {
+        None
+    };
+    let Some(parent) = pin.as_ref().and_then(|p| s(p, &["commit"])) else {
+        return fail(
+            "evaluation_parent_mismatch",
+            "no retained source_pin commit to bind the judged parent to",
+        );
+    };
     core(
         &r,
         &policy_sha,
         &policy,
         judge_key,
-        &facts.path,
-        &facts.content_sha256,
-        &facts.disk_sha256,
+        &Want {
+            path: &facts.path,
+            content_sha256: &facts.content_sha256,
+            disk_sha256: &facts.disk_sha256,
+            parent_commit: parent,
+            pinned_policy_sha256: opts.policy_sha256.as_deref(),
+        },
     )
 }
 
+/// What the harness is about to propose: the file, its whole new bytes, the commit the workspace
+/// is at (the judged parent), and the operator's pinned policy digest when it has one.
+pub struct Expect<'a> {
+    pub path: &'a str,
+    pub content: &'a [u8],
+    pub parent_commit: &'a str,
+    pub policy_sha256: Option<&'a str>,
+}
+
+/// What a receipt must match, from the audit (ledger facts) or from the harness (before a write).
+struct Want<'a> {
+    path: &'a str,
+    content_sha256: &'a str,
+    disk_sha256: &'a str,
+    parent_commit: &'a str,
+    pinned_policy_sha256: Option<&'a str>,
+}
+
 /// The harness gate before the write: the same checks as the audit, run on the judge's receipt
-/// and policy bytes against the exact bytes about to be proposed for `target_path`. Returns the
-/// refusal line on failure. Nothing reaches the daemon unless this passes.
+/// and policy bytes against exactly what is about to be proposed. Returns the refusal line on
+/// failure. Nothing reaches the daemon unless this passes.
 pub fn precheck(
     receipt: &[u8],
     policy: &[u8],
     judge_key: &VerifyingKey,
-    target_path: &str,
-    proposed: &[u8],
+    want: &Expect,
 ) -> Result<(), String> {
     let r = crate::strict::parse(receipt)
         .ok_or("FAIL evaluation_malformed: receipt is not strict JSON")?;
     let p = crate::strict::parse(policy)
         .ok_or("FAIL evaluation_malformed: policy is not strict JSON")?;
-    let content = hex::encode(Sha256::digest(proposed));
+    let content = hex::encode(Sha256::digest(want.content));
     core(
         &r,
         &hex::encode(Sha256::digest(policy)),
         &p,
         Some(judge_key),
-        target_path,
-        &content,
-        &content,
+        &Want {
+            path: want.path,
+            content_sha256: &content,
+            disk_sha256: &content,
+            parent_commit: want.parent_commit,
+            pinned_policy_sha256: want.policy_sha256,
+        },
     )
     .map_err(|Fail(line)| line)
 }
 
-/// Every check on a parsed receipt and policy. `content_sha256` is what the change carries and
-/// `disk_sha256` what was read back after the write (the same value before the write).
+/// Every check on a parsed receipt and policy. `w.content_sha256` is what the change carries and
+/// `w.disk_sha256` what was read back after the write (the same value before the write).
 fn core(
     r: &Value,
     policy_sha256: &str,
     policy: &Value,
     judge_key: Option<&VerifyingKey>,
-    path: &str,
-    content_sha256: &str,
-    disk_sha256: &str,
+    w: &Want,
 ) -> Result<(), Fail> {
+    let (path, content_sha256, disk_sha256) = (w.path, w.content_sha256, w.disk_sha256);
     match r.get("format_version").and_then(Value::as_u64) {
         None | Some(1) => {
             return fail(
@@ -344,12 +381,48 @@ fn core(
             "binding.subject_sha256 vs ledger_grant.content_sha256 and ledger_ack.disk_sha256",
         );
     }
+    // The tree the judge compared against is the commit the change was made from.
+    let parent = g.str(&["parent_id"])?;
+    if parent != w.parent_commit {
+        return fail(
+            "evaluation_parent_mismatch",
+            format!(
+                "parent_id={parent} vs source_pin.commit={}",
+                w.parent_commit
+            ),
+        );
+    }
 
     // The policy the judge ran under is the retained policy, and it pins the holdout set.
     if policy_sha256 != g.str(&["binding", "policy_sha256"])? {
         return fail(
             "evaluation_policy_mismatch",
             "binding.policy_sha256 vs retained evaluation_policy",
+        );
+    }
+    // When the operator pins a policy, the judge must have run under exactly that one.
+    if let Some(pinned) = w.pinned_policy_sha256 {
+        if policy_sha256 != pinned {
+            return fail(
+                "evaluation_policy_mismatch",
+                "retained evaluation_policy is not the operator's pinned policy",
+            );
+        }
+    }
+    let protected = policy
+        .get("protected_paths")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .find(|p| {
+            let p = p.trim_end_matches('/');
+            path == p || path.starts_with(&format!("{p}/"))
+        });
+    if let Some(p) = protected {
+        return fail(
+            "evaluation_policy_mismatch",
+            format!("{path} is under protected path {p} in evaluation_policy"),
         );
     }
     let allowed = policy

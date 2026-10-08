@@ -1412,9 +1412,10 @@ fn slice1_fix_the_test_lands_and_tests_pass() {
     );
 }
 
-/// VAC M5: the RSI engine proposes, the separate judge evaluates the exact bytes on holdouts the
-/// proposer cannot read and signs a version 2 receipt, the harness refuses to propose unless that
-/// receipt binds those bytes, the change lands through the approved ledger, the tests pass, and a
+/// VAC M5: the RSI engine proposes, the separate judge (its own account and key) evaluates the
+/// exact bytes on the policy's pinned holdout set and signs a version 2 receipt, the harness
+/// refuses to propose unless that receipt binds those bytes, this workspace's commit and the
+/// operator's own policy, the change lands through the approved ledger, the tests pass, and a
 /// second approved write rolls it back to the pinned source bytes.
 #[test]
 #[ignore = "NOT_RUN unless AIEN_BIN, M5_HOOK and M5_JUDGE_KEY are set: run with --ignored"]
@@ -1440,16 +1441,28 @@ fn m5_rsi_judged_change_lands_and_rolls_back() {
         "the task must start red: {}",
         String::from_utf8_lossy(&before_run.stderr)
     );
-    let judged = rsi_m5::propose_and_judge(Path::new(&hook), &task.ws, &d.root.join("judged"))
-        .expect("propose and judge");
+    // The operator's policy is the committed one, read here, never the hook's copy.
+    let pinned_policy =
+        std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("m5/policy.json")).unwrap();
+    let judged = rsi_m5::propose_and_judge(
+        Path::new(&hook),
+        &task.ws,
+        &d.root.join("judged"),
+        &pinned_policy,
+    )
+    .expect("propose and judge");
     // The gate before the write: no proposal reaches the daemon unless a valid judge receipt
-    // binds exactly these bytes for exactly this file.
+    // binds exactly these bytes for exactly this file, judged from this workspace's commit.
     interplane_provenance::evaluation::precheck(
         &judged.evaluation.receipt,
         &judged.evaluation.policy,
         &key,
-        &task.target,
-        judged.content.as_bytes(),
+        &interplane_provenance::evaluation::Expect {
+            path: &task.target,
+            content: judged.content.as_bytes(),
+            parent_commit: &task.commit,
+            policy_sha256: Some(&hex(&pinned_policy)),
+        },
     )
     .expect("the judge's receipt must bind the proposed bytes");
     let before = count(&c);

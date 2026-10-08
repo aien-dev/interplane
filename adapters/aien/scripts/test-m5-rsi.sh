@@ -65,7 +65,9 @@ bundle="$row/bundle"
 # 2. The verifier, with the operator's pinned key and without it.
 (cd "$repo/provenance" && cargo build -q --locked --release) || die "verifier build failed"
 vbin="${CARGO_TARGET_DIR:-$repo/provenance/target}/release/interplane-provenance"
-verify() { "$vbin" verify "$1" --judge-key "${2:-$M5_JUDGE_KEY}" 2>&1 | tail -1 || true; }
+# The operator pins the judge key and the policy; neither is ever read from the bundle.
+policy_pin="$(sha256sum "$M5_POLICY" | cut -d' ' -f1)"
+verify() { "$vbin" verify "$1" --judge-key "${2:-$M5_JUDGE_KEY}" --policy-sha256 "$policy_pin" 2>&1 | tail -1 || true; }
 strong="effect=aien-ledger-slice/1:strong proposal=scripted_turn"
 case "$(jq -r '.aien.native.claimed // "absent"' "$bundle/COMPANION.json")" in
   true) want="PASS_LABELLED_INCOMPLETE missing=link:model_turn $strong";;
@@ -101,7 +103,7 @@ refused() { # name log pattern: the hook (and so the judge) refused before any r
   echo "negative $1: refused ($3)"; echo "$1 REFUSED $3" >>"$neg/verdicts.txt"; }
 hook() { # name [VAR=value ...]: run the hook on the row's workspace into a fresh dir
   local name="$1"; shift; local o="$neg/$name.judged"; rm -rf "$o"; mkdir -p "$o"
-  env "$@" "$M5_HOOK" "$row/ws" "$o" >"$o.log" 2>&1; }
+  env M5_GATE_NEGATIVE=1 "$@" "$M5_HOOK" "$row/ws" "$o" >"$o.log" 2>&1; }
 
 fork control; [ "$(verify "$neg/control")" = "$verdict" ] || die "negative control: an untouched copy no longer verifies"
 echo "control $verdict" >>"$neg/verdicts.txt"
@@ -134,6 +136,9 @@ fork v1; swaprec "$neg/v1" evaluation_receipt "$neg/v1.judged/receipt.json"; exp
 jq '.min_holdout_pass_ratio = 0.5' "$M5_POLICY" >"$neg/lower-bar-policy.json"
 hook lowbar M5_POLICY="$neg/lower-bar-policy.json" || die "judge run under the lower-bar policy failed ($neg/lowbar.judged.log)"
 fork lowbar; swaprec "$neg/lowbar" evaluation_receipt "$neg/lowbar.judged/receipt.json"; expect judged_under_other_policy "$neg/lowbar" evaluation_policy_mismatch
+# The same receipt with its own policy alongside: self-consistent, but not the operator's policy.
+fork lowpair; swaprec "$neg/lowpair" evaluation_receipt "$neg/lowbar.judged/receipt.json"
+swaprec "$neg/lowpair" evaluation_policy "$neg/lowbar.judged/policy.json"; expect unpinned_policy_pair "$neg/lowpair" evaluation_policy_mismatch
 
 # Incomplete or corrupted holdouts: the judge refuses to evaluate at all.
 mkh() { rm -rf "$neg/$1"; cp -r "$M5_HOLDOUTS" "$neg/$1"; }
@@ -159,6 +164,11 @@ git -C "$odd" init -q && git -C "$odd" add -A && git -C "$odd" -c user.name=m5 -
 o="$neg/other_target.judged"; rm -rf "$o"; mkdir -p "$o"
 ! "$M5_HOOK" "$odd" "$o" >"$o.log" 2>&1 || die "a proposal for CONTRIBUTING.md reached the judge"
 refused rsi_targets_other_file "$o.log" "only README.md is allowed: refused"
+# A workspace that is not its own commit: the judged parent would be mislabelled.
+dirty="$neg/ws-dirty"; rm -rf "$dirty"; cp -a "$row/ws" "$dirty"; echo "extra" >>"$dirty/TASK.md"
+o="$neg/dirty_workspace.judged"; rm -rf "$o"; mkdir -p "$o"
+! "$M5_HOOK" "$dirty" "$o" >"$o.log" 2>&1 || die "a workspace with uncommitted changes reached the judge"
+refused dirty_workspace "$o.log" "uncommitted changes"
 
 # 4. Receipt.
 finished="$(date -u +%FT%TZ)"
@@ -169,7 +179,7 @@ jq -n \
   --arg verifier_sha "$(sha256sum "$vbin" | cut -d' ' -f1)" \
   --arg judge_sha "$(sha256sum "$SPARK_RSI_DIR/spark-rsi-judge" | cut -d' ' -f1)" \
   --arg rsi_sha "$(sha256sum "$SPARK_RSI_DIR/spark-rsi" | cut -d' ' -f1)" \
-  --arg judge_pub "$(cat "$M5_JUDGE_KEY")" \
+  --arg judge_pub "$(cat "$M5_JUDGE_KEY")" --arg policy_pin "$policy_pin" \
   --arg sc_rev "${SOVEREIGN_CORE_REV:-UNVERIFIED}" --arg rsi_rev "${SPARK_RSI_REV:-UNVERIFIED}" \
   --arg verdict "$verdict" --arg nokey "$nokey" \
   --argjson run "$(jq '{task_id, proposal_id, source_commit, tree_commit_after, test_exit_before, test_exit_after, target_blob_sha256_before, target_blob_sha256_after, evaluation_receipt_sha256, evaluation_policy_sha256, rollback: {disk_sha256: .rollback.disk_sha256, test_exit_after_rollback: .rollback.test_exit_after_rollback}}' "$row/receipt.json")" \
@@ -178,7 +188,7 @@ jq -n \
   --arg negatives "$(cat "$neg/verdicts.txt")" --arg started "$started" --arg finished "$finished" \
   '{kind: "interplane-aien-m5-rsi-receipt", adapter_commit: $adapter_commit, adapter_dirty: $adapter_dirty,
     aien_cli_sha256: $bin_sha, verifier_sha256: $verifier_sha, spark_rsi_rev: $rsi_rev,
-    spark_rsi_sha256: $rsi_sha, spark_rsi_judge_sha256: $judge_sha, judge_public_key: $judge_pub,
+    spark_rsi_sha256: $rsi_sha, spark_rsi_judge_sha256: $judge_sha, judge_public_key: $judge_pub, operator_policy_sha256: $policy_pin,
     sovereign_core_rev: $sc_rev, backend: "CPU reference (as printed in the daemon log)",
     task: $run, evaluation: $binding, verdict: $verdict, verdict_without_judge_key: $nokey,
     bundle_companion_sha256: $companion_sha,

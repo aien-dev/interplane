@@ -44,9 +44,25 @@ pub fn check_proposal(bytes: &[u8], allowed: &str) -> Result<(String, String), S
     ))
 }
 
+/// The hook's switches for making counterfeit evidence in the gate's negative checks. A real run
+/// never passes them on (the hook also ignores them unless `M5_GATE_NEGATIVE=1`).
+pub const NEGATIVE_ONLY_ENV: [&str; 4] = [
+    "M5_GATE_NEGATIVE",
+    "M5_SUBJECT_OVERRIDE",
+    "M5_JUDGE_KEY_OVERRIDE",
+    "M5_RECEIPT_V1",
+];
+
 /// Runs `hook <ws> <out>` and reads `proposal.json`, `receipt.json` and `policy.json` from `out`,
-/// which must not exist yet. The receipt and policy are kept as the exact bytes written.
-pub fn propose_and_judge(hook: &Path, ws: &Path, out: &Path) -> Result<Judged, String> {
+/// which must not exist yet. The receipt and policy are kept as the exact bytes written, and the
+/// policy must be byte for byte `pinned_policy`, the operator's own copy: the hook's copy is never
+/// trusted on its own. The hook's output goes to `out/hook.log`.
+pub fn propose_and_judge(
+    hook: &Path,
+    ws: &Path,
+    out: &Path,
+    pinned_policy: &[u8],
+) -> Result<Judged, String> {
     if out.exists() {
         return Err(format!(
             "{} exists: a judged run is never reused",
@@ -54,22 +70,36 @@ pub fn propose_and_judge(hook: &Path, ws: &Path, out: &Path) -> Result<Judged, S
         ));
     }
     std::fs::create_dir_all(out).map_err(|e| e.to_string())?;
-    let st = Command::new(hook)
-        .arg(ws)
-        .arg(out)
-        .status()
+    let mut cmd = Command::new(hook);
+    cmd.arg(ws).arg(out);
+    for v in NEGATIVE_ONLY_ENV {
+        cmd.env_remove(v);
+    }
+    let run = cmd
+        .output()
         .map_err(|e| format!("{}: {e}", hook.display()))?;
-    if !st.success() {
-        return Err(format!("hook {} exited {st}", hook.display()));
+    let log = [run.stdout.as_slice(), run.stderr.as_slice()].concat();
+    std::fs::write(out.join("hook.log"), &log).map_err(|e| e.to_string())?;
+    if !run.status.success() {
+        return Err(format!(
+            "hook {} exited {}: {}",
+            hook.display(),
+            run.status,
+            String::from_utf8_lossy(&log).lines().last().unwrap_or("")
+        ));
     }
     let read = |n: &str| std::fs::read(out.join(n)).map_err(|e| format!("{n}: {e}"));
     let (proposal_id, content) = check_proposal(&read("proposal.json")?, TARGET)?;
+    let policy = read("policy.json")?;
+    if policy != pinned_policy {
+        return Err("the judged policy is not the operator's pinned policy: refused".into());
+    }
     Ok(Judged {
         proposal_id,
         content,
         evaluation: Evaluation {
             receipt: read("receipt.json")?,
-            policy: read("policy.json")?,
+            policy,
         },
     })
 }
@@ -110,7 +140,7 @@ mod tests {
     #[test]
     fn a_used_output_directory_is_refused() {
         let d = tempfile::tempdir().unwrap();
-        let e = propose_and_judge(Path::new("/bin/true"), d.path(), d.path()).unwrap_err();
+        let e = propose_and_judge(Path::new("/bin/true"), d.path(), d.path(), b"{}").unwrap_err();
         assert!(e.contains("never reused"), "{e}");
     }
 }

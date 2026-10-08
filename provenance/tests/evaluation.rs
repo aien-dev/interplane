@@ -6,7 +6,7 @@
 mod common;
 
 use common::*;
-use interplane_provenance::evaluation::{parse_judge_key, precheck, receipt_digest_v2};
+use interplane_provenance::evaluation::{parse_judge_key, precheck, receipt_digest_v2, Expect};
 use interplane_provenance::gojson::sha256_hex;
 use interplane_provenance::synth::{self, Opts};
 use interplane_provenance::{verify, verify_with, Options};
@@ -31,6 +31,7 @@ fn judge() -> SigningKey {
 fn opts(k: &SigningKey) -> Options {
     Options {
         judge_key: Some(*k.verifying_key()),
+        ..Default::default()
     }
 }
 
@@ -93,9 +94,9 @@ fn sign(r: &mut Value, k: &SigningKey) {
     r["signature"] = json!(format!("tpm2-p256:{}", hex::encode(sig.to_bytes())));
 }
 
-fn receipt(path: &str, sha: &str, policy_bytes: &[u8]) -> Value {
+fn receipt(path: &str, sha: &str, policy_bytes: &[u8], parent: &str) -> Value {
     json!({
-        "cycle_id": "cyc", "candidate_id": "cand", "parent_id": "par",
+        "cycle_id": "cyc", "candidate_id": "cand", "parent_id": parent,
         "evaluated_at": "2026-10-08T22:00:00Z", "evaluator_version": "1.0.0",
         "passed_all_hard_invariants": true, "passed_statistical_gates": true, "admitted": true,
         "layer_results": [
@@ -119,7 +120,11 @@ fn receipt(path: &str, sha: &str, policy_bytes: &[u8]) -> Value {
 fn add_evaluation(d: &Path, k: &SigningKey, tweak: impl FnOnce(&mut Value), pol: Option<Value>) {
     let (path, sha) = subject(d);
     let policy_bytes = serde_json::to_vec_pretty(&pol.unwrap_or_else(|| policy(&path))).unwrap();
-    let mut r = receipt(&path, &sha, &policy_bytes);
+    let parent = record_json(d, "source_pin")["commit"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let mut r = receipt(&path, &sha, &policy_bytes, &parent);
     tweak(&mut r);
     sign(&mut r, k);
     let dir = d.join("records/evaluation");
@@ -426,6 +431,46 @@ fn malformed_and_unsupported_receipts_are_refused() {
     );
 }
 
+#[test]
+fn a_receipt_judged_from_another_commit_is_refused() {
+    let d = fresh("parent");
+    add_evaluation(&d, &judge(), |r| r["parent_id"] = json!("0000000"), None);
+    assert_eq!(
+        code(&verify_with(&d, &opts(&judge()))),
+        "evaluation_parent_mismatch"
+    );
+}
+
+#[test]
+fn the_operator_can_pin_the_policy() {
+    let d = fresh("pinned");
+    add_evaluation(&d, &judge(), |_| {}, None);
+    let retained = std::fs::read(path_of(&d, "evaluation_policy")).unwrap();
+    let pinned = |sha: String| Options {
+        judge_key: Some(*judge().verifying_key()),
+        policy_sha256: Some(sha),
+    };
+    assert_eq!(verify_with(&d, &pinned(sha256_hex(&retained))), baseline());
+    // A self-consistent receipt and policy pair, but not the operator's policy.
+    assert_eq!(
+        code(&verify_with(&d, &pinned(OTHER.to_string()))),
+        "evaluation_policy_mismatch"
+    );
+}
+
+#[test]
+fn a_subject_under_a_protected_path_is_refused() {
+    let (path, _) = subject(&base());
+    let mut p = policy(&path);
+    p["protected_paths"] = json!([path.split('/').next().unwrap()]);
+    let d = fresh("protected");
+    add_evaluation(&d, &judge(), |_| {}, Some(p));
+    assert_eq!(
+        code(&verify_with(&d, &opts(&judge()))),
+        "evaluation_policy_mismatch"
+    );
+}
+
 // ---------------------------------------------------------------- cross-language fixture
 
 fn cross() -> PathBuf {
@@ -436,53 +481,108 @@ fn cross_key() -> VerifyingKey {
     parse_judge_key(&std::fs::read_to_string(cross().join("judge.pub")).unwrap()).unwrap()
 }
 
+struct Cross {
+    receipt: Vec<u8>,
+    policy: Vec<u8>,
+    subject: Vec<u8>,
+    parent: String,
+}
+
+fn cross_files() -> Cross {
+    let f = cross();
+    let receipt = std::fs::read(f.join("receipt.json")).unwrap();
+    let parent = serde_json::from_slice::<Value>(&receipt).unwrap()["parent_id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    Cross {
+        receipt,
+        policy: std::fs::read(f.join("policy.json")).unwrap(),
+        subject: std::fs::read(f.join("subject.md")).unwrap(),
+        parent,
+    }
+}
+
+fn cross_check(
+    c: &Cross,
+    receipt: &[u8],
+    policy: &[u8],
+    key: &VerifyingKey,
+    path: &str,
+    content: &[u8],
+) -> Result<(), String> {
+    precheck(
+        receipt,
+        policy,
+        key,
+        &Expect {
+            path,
+            content,
+            parent_commit: &c.parent,
+            policy_sha256: Some(&sha256_hex(&c.policy)),
+        },
+    )
+}
+
 /// A receipt written and signed by spark-rsi's own judge binary (fixtures/rsi-eval-v2/README.md
 /// says how it was made) verifies here: the two implementations agree on every digest byte.
 #[test]
 fn spark_rsi_receipt_verifies_byte_for_byte() {
-    let f = cross();
-    let receipt = std::fs::read(f.join("receipt.json")).unwrap();
-    let policy = std::fs::read(f.join("policy.json")).unwrap();
-    let subject = std::fs::read(f.join("subject.md")).unwrap();
-    precheck(&receipt, &policy, &cross_key(), "README.md", &subject).unwrap();
+    let c = cross_files();
+    let k = cross_key();
+    cross_check(&c, &c.receipt, &c.policy, &k, "README.md", &c.subject).unwrap();
 
-    let mut other = subject.clone();
+    let refused = |r: Result<(), String>, code: &str| {
+        let e = r.unwrap_err();
+        assert!(e.starts_with(&format!("FAIL {code}:")), "{e}");
+    };
+    let mut other = c.subject.clone();
     other.push(b'\n');
-    assert!(
-        precheck(&receipt, &policy, &cross_key(), "README.md", &other)
-            .unwrap_err()
-            .starts_with("FAIL evaluation_subject_mismatch")
+    refused(
+        cross_check(&c, &c.receipt, &c.policy, &k, "README.md", &other),
+        "evaluation_subject_mismatch",
     );
-    assert!(
-        precheck(&receipt, &policy, &cross_key(), "src/main.rs", &subject)
-            .unwrap_err()
-            .starts_with("FAIL evaluation_subject_mismatch")
+    refused(
+        cross_check(&c, &c.receipt, &c.policy, &k, "src/main.rs", &c.subject),
+        "evaluation_subject_mismatch",
     );
-    assert!(precheck(
-        &receipt,
-        &policy,
-        judge().verifying_key(),
-        "README.md",
-        &subject
-    )
-    .unwrap_err()
-    .starts_with("FAIL evaluation_signature_bad"));
-    let mut policy2 = policy.clone();
+    refused(
+        cross_check(
+            &c,
+            &c.receipt,
+            &c.policy,
+            judge().verifying_key(),
+            "README.md",
+            &c.subject,
+        ),
+        "evaluation_signature_bad",
+    );
+    let mut policy2 = c.policy.clone();
     policy2.push(b'\n');
-    assert!(
-        precheck(&receipt, &policy2, &cross_key(), "README.md", &subject)
-            .unwrap_err()
-            .starts_with("FAIL evaluation_policy_mismatch")
+    refused(
+        cross_check(&c, &c.receipt, &policy2, &k, "README.md", &c.subject),
+        "evaluation_policy_mismatch",
+    );
+    refused(
+        precheck(
+            &c.receipt,
+            &c.policy,
+            &k,
+            &Expect {
+                path: "README.md",
+                content: &c.subject,
+                parent_commit: "0000000",
+                policy_sha256: None,
+            },
+        ),
+        "evaluation_parent_mismatch",
     );
 }
 
 #[test]
 fn spark_rsi_receipt_with_any_field_changed_fails() {
-    let f = cross();
-    let receipt: Value =
-        serde_json::from_slice(&std::fs::read(f.join("receipt.json")).unwrap()).unwrap();
-    let policy = std::fs::read(f.join("policy.json")).unwrap();
-    let subject = std::fs::read(f.join("subject.md")).unwrap();
+    let c = cross_files();
+    let receipt: Value = serde_json::from_slice(&c.receipt).unwrap();
     let paths: [&[&str]; 6] = [
         &["cycle_id"],
         &["evaluated_at"],
@@ -504,12 +604,13 @@ fn spark_rsi_receipt_with_any_field_changed_fails() {
             Value::Array(a) => json!(a[..a.len().saturating_sub(1)]),
             _ => Value::Null,
         };
-        let e = precheck(
+        let e = cross_check(
+            &c,
             &serde_json::to_vec(&r).unwrap(),
-            &policy,
+            &c.policy,
             &cross_key(),
             "README.md",
-            &subject,
+            &c.subject,
         )
         .unwrap_err();
         assert!(

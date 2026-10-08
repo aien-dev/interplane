@@ -34,8 +34,10 @@ if [ "${M5_GATE_NEGATIVE:-0}" != 1 ]; then
 fi
 # The judged parent is the workspace's commit, so the workspace must be exactly that commit, and
 # a symlink could redirect a write or a read outside it.
-[ -z "$(git -C "$ws" status --porcelain --untracked-files=all)" ] \
-  || die "workspace has uncommitted changes: the judged parent would not be its commit"
+[ "$(git -C "$ws" rev-parse --show-toplevel 2>/dev/null)" = "$(cd "$ws" && pwd -P)" ] \
+  || die "workspace is not the top of its own git repository: refused"
+ws_status="$(git -C "$ws" status --porcelain --untracked-files=all)" || die "cannot read the workspace status"
+[ -z "$ws_status" ] || die "workspace has uncommitted changes: the judged parent would not be its commit"
 [ -z "$(find "$ws" -path "$ws/.git" -prune -o -path "$ws/target" -prune -o -type l -print -quit)" ] \
   || die "workspace contains a symlink: refused"
 

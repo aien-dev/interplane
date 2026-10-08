@@ -83,6 +83,11 @@ jq -e '.verdict == "PASS" and .test_exit_after == 0 and .test_exit_before != 0
 
 # 3. Counterfeits. Bundle edits go to hard-linked copies (a changed file is written fresh).
 neg="$OUT/negative"; mkdir -p "$neg"; : >"$neg/verdicts.txt"
+# The negatives judge from a clean clone of the task workspace at the commit the row was judged
+# from (the row leaves its workspace rolled back, which is an uncommitted change).
+task_commit="$(jq -r .parent_id "$row/judged/receipt.json")"
+git clone -q "$row/ws" "$neg/ws" && git -C "$neg/ws" checkout -q --detach "$task_commit" \
+  || die "cannot check out the task commit $task_commit for the negatives"
 fork() { rm -rf "$neg/$1"; cp -al "$bundle" "$neg/$1"; }
 manifest() { local d="$1" f="$2"; shift 2
   jq "$@" "$f" "$d/COMPANION.json" >"$d/COMPANION.tmp" && mv "$d/COMPANION.tmp" "$d/COMPANION.json"; }
@@ -103,7 +108,7 @@ refused() { # name log pattern: the hook (and so the judge) refused before any r
   echo "negative $1: refused ($3)"; echo "$1 REFUSED $3" >>"$neg/verdicts.txt"; }
 hook() { # name [VAR=value ...]: run the hook on the row's workspace into a fresh dir
   local name="$1"; shift; local o="$neg/$name.judged"; rm -rf "$o"; mkdir -p "$o"
-  env M5_GATE_NEGATIVE=1 "$@" "$M5_HOOK" "$row/ws" "$o" >"$o.log" 2>&1; }
+  env M5_GATE_NEGATIVE=1 "$@" "$M5_HOOK" "$neg/ws" "$o" >"$o.log" 2>&1; }
 
 fork control; [ "$(verify "$neg/control")" = "$verdict" ] || die "negative control: an untouched copy no longer verifies"
 echo "control $verdict" >>"$neg/verdicts.txt"
@@ -165,10 +170,16 @@ o="$neg/other_target.judged"; rm -rf "$o"; mkdir -p "$o"
 ! "$M5_HOOK" "$odd" "$o" >"$o.log" 2>&1 || die "a proposal for CONTRIBUTING.md reached the judge"
 refused rsi_targets_other_file "$o.log" "only README.md is allowed: refused"
 # A workspace that is not its own commit: the judged parent would be mislabelled.
-dirty="$neg/ws-dirty"; rm -rf "$dirty"; cp -a "$row/ws" "$dirty"; echo "extra" >>"$dirty/TASK.md"
+dirty="$neg/ws-dirty"; rm -rf "$dirty"; cp -a "$neg/ws" "$dirty"; echo "extra" >>"$dirty/TASK.md"
 o="$neg/dirty_workspace.judged"; rm -rf "$o"; mkdir -p "$o"
 ! "$M5_HOOK" "$dirty" "$o" >"$o.log" 2>&1 || die "a workspace with uncommitted changes reached the judge"
 refused dirty_workspace "$o.log" "uncommitted changes"
+# A workspace with no git history of its own: its parent commit cannot be named.
+bare="$neg/ws-nogit"; rm -rf "$bare"; mkdir -p "$bare"
+tar -C "$neg/ws" --exclude=./.git -cf - . | tar -C "$bare" -xf -
+o="$neg/no_git_workspace.judged"; rm -rf "$o"; mkdir -p "$o"
+! "$M5_HOOK" "$bare" "$o" >"$o.log" 2>&1 || die "a workspace without its own git repository reached the judge"
+refused no_git_workspace "$o.log" "not the top of its own git repository"
 
 # 4. Receipt.
 finished="$(date -u +%FT%TZ)"

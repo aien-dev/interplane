@@ -394,7 +394,7 @@ M5_JUDGE_KEY=<pinned public key file> scripts/test-m5-rsi.sh
 
 `m5-setup-judge.sh` refuses to finish unless it can run a command as the proposing account and that
 account gets "Permission denied" reading the judge key, and unless neither service account can write the
-pinned public key or its directory.
+pinned public key, its directory or any directory above it, or use sudo.
 
 Three separate parties, three separate operating-system accounts:
 
@@ -406,9 +406,9 @@ Three separate parties, three separate operating-system accounts:
   its own copies of the parent tree, the candidate tree, the holdout suite (`m5/holdouts/`) and the
   operator policy (`m5/policy.json`). Before running anything it refuses a holdout set that does not hash
   to the policy's pinned digest, a subject outside `allowed_targets` or under `protected_paths`, and a
-  candidate that differs from the parent in any file but the subject. It builds both trees itself inside
-  a bubblewrap sandbox (no network, no environment, only the tree and the toolchain visible, so a build
-  script in the candidate cannot read the key), runs the holdouts, re-hashes the subject and signs a
+  candidate that differs from the parent in any file but the subject. It builds both trees and runs their
+  own `cargo check` and `cargo test` inside a bubblewrap sandbox (no network, no environment, only the
+  tree and the toolchain visible, so a build script or test in the candidate cannot read the key), runs the holdouts, re-hashes the subject and signs a
   version 2 receipt (`spark-rsi` `docs/RECEIPT-V2.md`) naming the parent commit it compared against.
 - **Operator path** (the harness and the daemon): the harness refuses a judged policy that is not byte for
   byte its own `m5/policy.json`, then `evaluation::precheck` checks the receipt against the pinned public

@@ -31,11 +31,18 @@ case "$err" in *"Permission denied"*) ;; *) die "unexpected result reading $key 
 bin_copy="$(as_judge mktemp "$judge_home/judge-bin.XXXXXX")"
 as_judge sh -c 'cat > "$1" && chmod 700 "$1"' _ "$bin_copy" <"$JUDGE_BIN"
 mkdir -p "$(dirname "$pin")"
-# Neither service account may replace the pinned key.
+# Neither service account may replace the pinned key: not the file, its directory, or any directory
+# above it (which would let it rename the whole path), and neither may become root through sudo.
+pin_dir="$(cd "$(dirname "$pin")" && pwd -P)"
 for u in "$rsi_user" "$judge_user"; do
-  if sudo -n -u "$u" test -w "$(dirname "$pin")" || { [ -e "$pin" ] && sudo -n -u "$u" test -w "$pin"; }; then
-    die "$u can write the pinned key location $(dirname "$pin")"
-  fi
+  if [ -e "$pin" ] && sudo -n -u "$u" test -w "$pin"; then die "$u can write $pin"; fi
+  d="$pin_dir"
+  while :; do
+    if sudo -n -u "$u" test -w "$d"; then die "$u can write $d, above the pinned key"; fi
+    [ "$d" = / ] && break
+    d="$(dirname "$d")"
+  done
+  if sudo -n -u "$u" sudo -n true 2>/dev/null; then die "$u can use sudo"; fi
 done
 as_judge "$bin_copy" --signing-key-file "$key" --public-key >"$pin.new"
 as_judge rm -f "$bin_copy"

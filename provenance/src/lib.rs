@@ -382,7 +382,14 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bo
                     }
                     None => return fail("malformed_companion", "effect.proposal_origin"),
                 };
-                ledger::check(&archive, e, t, aien, call.as_ref())?;
+                ledger::check(
+                    &archive,
+                    e,
+                    t,
+                    aien,
+                    call.as_ref(),
+                    testrun::claims_test_run(&archive, &m),
+                )?;
                 if origin == modelturn::GENERATED {
                     modelturn::check(&archive, t, call.as_ref())?;
                 }

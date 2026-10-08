@@ -109,6 +109,7 @@ pub fn check(
     t: &Value,
     aien: &Value,
     call: Option<&Call>,
+    claims_test_run: bool,
 ) -> Result<(), Fail> {
     if s(e, &["approval_binding"]) != Some(APPROVAL_BINDING) {
         return fail(
@@ -119,8 +120,9 @@ pub fn check(
             ),
         );
     }
+    // An intent without an ack is an interrupted effect (checked below), not a missing record.
     for n in SLICE.iter().chain([&DAEMON_RUN]) {
-        if !a.has(n) {
+        if *n != "ledger_ack" && !a.has(n) {
             return fail("missing_record_entry", *n);
         }
     }
@@ -128,8 +130,6 @@ pub fn check(
     let committed = view(a, "ledger_committed", "effect")?;
     let grant = view(a, "ledger_grant", "authorization")?;
     let intent = view(a, "ledger_intent", "effect")?;
-    let ack = view(a, "ledger_ack", "effect")?;
-
     // Record kinds.
     eq(
         st(&claim, "ledger_claim", "approved_submission")?,
@@ -151,6 +151,14 @@ pub fn check(
         "intent",
         "ledger_intent.phase",
     )?;
+    if !a.has("ledger_ack") {
+        return unlanded(
+            "effect_interrupted",
+            "ledger_intent is the last record: no ack, the write may or may not have landed",
+            claims_test_run,
+        );
+    }
+    let ack = view(a, "ledger_ack", "effect")?;
     eq(st(&ack, "ledger_ack", "phase")?, "ack", "ledger_ack.phase")?;
 
     // Ledger order: claim < committed < grant < intent < ack.
@@ -298,7 +306,22 @@ pub fn check(
         true,
         "ledger_ack.links",
     )?;
-    eq(st(&ack, "ledger_ack", "state")?, "DONE", "ledger_ack.state")?;
+    match st(&ack, "ledger_ack", "state")? {
+        "DONE" => {}
+        "NOT_DONE" => return unlanded(
+            "effect_not_done",
+            "ledger_ack.state=NOT_DONE: the daemon read the world back and the write did not land",
+            claims_test_run,
+        ),
+        "UNRESOLVED" => {
+            return unlanded(
+                "effect_unresolved",
+                "ledger_ack.state=UNRESOLVED: the daemon could not tell whether the write landed",
+                claims_test_run,
+            )
+        }
+        other => return fail("binding_mismatch", format!("ledger_ack.state={other}")),
+    }
     eq(
         st(&ack, "ledger_ack", "content_sha256")?,
         g("content_sha256")?,
@@ -453,4 +476,14 @@ pub fn facts(a: &Archive) -> Result<Facts, Fail> {
         content_sha256: st(&grant, "ledger_grant", "content_sha256")?.to_string(),
         disk_sha256: st(&ack, "ledger_ack", "disk_sha256")?.to_string(),
     })
+}
+
+/// An effect the daemon's own ledger does not show as landed. The code names which of the three
+/// cases it is. A bundle that also carries a test run is refused as `test_run_on_unlanded_effect`
+/// instead: a test cannot certify a write that did not land, and the state is in the detail.
+fn unlanded<T>(code: &str, detail: &str, claims_test_run: bool) -> Result<T, Fail> {
+    if claims_test_run {
+        return fail("test_run_on_unlanded_effect", format!("{code}: {detail}"));
+    }
+    fail(code, detail)
 }

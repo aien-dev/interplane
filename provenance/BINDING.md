@@ -94,7 +94,9 @@ about correctness of the text.
    own request id, and the ids are inside the MAC-bound approval key.
 9. Intent and ack: intent names the grant and repeats its `proposal_sha256`, `path`, `target`,
    `content_sha256`, `prior_sha256`; `tool` is `write_file`; the grant's `target` is `workspace + "/"
-   + path`; ack names the intent and the grant, `state` is `DONE`, and its `content_sha256` and
+   + path`; no ack after the intent is `FAIL effect_interrupted`; ack names the intent and the grant,
+   `state` is `DONE` (`NOT_DONE` is `FAIL effect_not_done`, `UNRESOLVED` is `FAIL effect_unresolved`, see
+   "Recovery outcomes"), and its `content_sha256` and
    `disk_sha256` equal the grant's `content_sha256`.
 10. **Same process.** `claim.executor.{pid,start}` equals `daemon_run.{pid,start_ticks}`;
     `daemon_run.workspace` equals the grant's workspace; `daemon_run.executable_sha256` equals
@@ -244,3 +246,38 @@ verifier detects inconsistent or altered evidence, not a producer that fabricate
 Does not prove: that the tests are good, that the proposal came from a model (it is scripted:
 `link:model_turn` stays missing), that the harness is honest, or that nothing else touched the
 workspace between the ack and the second test run.
+
+## Recovery outcomes: effects the ledger does not show as landed (VAC M4d)
+
+Status: implemented in `src/ledger.rs` (`unlanded`); tested in `tests/recovery_verdicts.rs` on the
+committed real slice (`real-waldo-aien-chain`) and the synthetic fixtures, mutated and restamped.
+
+**Behaviour before M4d [O, from `tests/effect_binding.rs`]:** an ack with `state: NOT_DONE` was
+`FAIL binding_mismatch: ledger_ack.state`; an intent with no ack in the manifest was
+`FAIL missing_record_entry: ledger_ack`; `UNRESOLVED` took the same path as `NOT_DONE` [I, same code
+line]. None could pass, but all three were indistinguishable from a tampered bundle.
+
+**Now**, in the checks' fixed order (step 9, after the intent and ack are tied to the grant):
+
+| Ledger shows | Verdict | Meaning |
+|---|---|---|
+| ack `DONE` | as before | the daemon read the file back and it matched |
+| ack `NOT_DONE` | `FAIL effect_not_done` | the daemon read the world back and the write did not land |
+| ack `UNRESOLVED` | `FAIL effect_unresolved` | the daemon could not tell whether the write landed |
+| intent, no `ledger_ack` in the bundle | `FAIL effect_interrupted` | the executor was interrupted after the intent; the write may or may not have landed |
+| any other ack state | `FAIL binding_mismatch: ledger_ack.state=<x>` | not a daemon state |
+
+Why FAIL and not `PASS_LABELLED_INCOMPLETE`: a labelled-missing link says "an otherwise valid chain
+lacks a link". Here the claimed effect is the link, and the ledger says it is absent or unknown. A PASS
+of any kind would let a reader take the effect as having happened. The three codes are checked after the
+records before them agree (a forged claim next to a missing ack is reported as the forgery) and before the
+INTERPLANE call checks.
+
+**A test run cannot certify a write that did not land.** When the bundle carries a `test_run` section or
+any of `task`, `source_pin`, `test_run_record`, each of the three cases above is instead
+`FAIL test_run_on_unlanded_effect: <effect code>: <detail>`.
+
+Limits: the verifier does not re-derive that a recovery was correct, only that the exported ack says
+what it says. An interrupted run's ack may never be written, and then the bundle is unrecoverable as
+evidence of the effect, by design. The NOT_DONE and UNRESOLVED fixtures are synthetic (the real DONE ack
+with `state` changed); a bundle exported from a real daemon after an interruption was not produced.

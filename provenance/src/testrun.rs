@@ -44,6 +44,14 @@ pub fn implied_missing(m: &Value) -> BTreeSet<String> {
     out
 }
 
+/// True when the bundle carries a test run or the records of one (a task, a source pin).
+pub fn claims_test_run(a: &Archive, m: &Value) -> bool {
+    m.get("test_run").is_some_and(|v| !v.is_null())
+        || ["task", "source_pin", "test_run_record"]
+            .iter()
+            .any(|n| a.has(n))
+}
+
 fn rec_json(a: &Archive, name: &str, code: &str) -> Result<Value, Fail> {
     if !a.has(name) {
         return fail(code, format!("record {name} absent"));

@@ -1,4 +1,5 @@
-//! `interplane-provenance verify <dir>` prints one verdict line (exit 0 on PASS*, 1 on FAIL).
+//! `interplane-provenance verify <dir> [--judge-key <file>]` prints one verdict line (exit 0 on
+//! PASS*, 1 on FAIL). The judge key file holds the independent judge's SEC1 hex public key.
 //! `interplane-provenance gen-synthetic <dir> [weak|fix-the-test|fix-the-test-native|fix-the-test-stub]` writes the synthetic full-chain fixture
 //! (ledger-slice binding; `weak` writes the record_effect_receipt/1 variant).
 //! `interplane-provenance seal <dir> <skeleton.json>` seals a new COMPANION.json (never overwrites).
@@ -6,16 +7,34 @@
 use std::path::Path;
 use std::process::ExitCode;
 
+fn report(v: String) -> ExitCode {
+    println!("{v}");
+    if v.starts_with("PASS") {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(1)
+    }
+}
+
 fn main() -> ExitCode {
     let a: Vec<String> = std::env::args().collect();
     match (a.get(1).map(String::as_str), a.get(2), a.get(3)) {
-        (Some("verify"), Some(dir), None) => {
-            let v = interplane_provenance::verify(Path::new(dir));
-            println!("{v}");
-            if v.starts_with("PASS") {
-                ExitCode::SUCCESS
-            } else {
-                ExitCode::from(1)
+        (Some("verify"), Some(dir), None) => report(interplane_provenance::verify(Path::new(dir))),
+        (Some("verify"), Some(dir), Some(flag)) if flag == "--judge-key" => {
+            // The judge key comes from the operator, never from the bundle.
+            let key = a
+                .get(4)
+                .and_then(|p| std::fs::read_to_string(p).ok())
+                .and_then(|t| interplane_provenance::evaluation::parse_judge_key(&t).ok());
+            match (key, a.get(5)) {
+                (Some(k), None) => report(interplane_provenance::verify_with(
+                    Path::new(dir),
+                    &interplane_provenance::Options { judge_key: Some(k) },
+                )),
+                _ => {
+                    eprintln!("--judge-key needs a file holding the judge's SEC1 hex public key");
+                    ExitCode::from(2)
+                }
             }
         }
         (Some("gen-synthetic"), Some(dir), mode @ (None | Some(_))) => {
@@ -57,7 +76,7 @@ fn main() -> ExitCode {
             }
         }
         _ => {
-            eprintln!("usage: interplane-provenance verify <dir> | gen-synthetic <dir> [weak|fix-the-test|fix-the-test-native|fix-the-test-stub] | seal <dir> <skeleton.json>");
+            eprintln!("usage: interplane-provenance verify <dir> [--judge-key <pubkey-hex-file>] | gen-synthetic <dir> [weak|fix-the-test|fix-the-test-native|fix-the-test-stub] | seal <dir> <skeleton.json>");
             ExitCode::from(2)
         }
     }

@@ -32,6 +32,7 @@ use serde_json::{json, Map, Value};
 pub mod compose_ledger;
 pub mod fix_the_test;
 pub mod provenance_export;
+pub mod rsi_m5;
 pub use compose_ledger::{
     hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
     APPROVAL_BINDING_VERSION, BOUND_REQUIREMENTS, DEFAULT_APPROVER, LEDGER_BOUNDARY,

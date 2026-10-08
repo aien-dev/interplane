@@ -18,12 +18,17 @@ pub const TARGET: &str = "src/clamp.c";
 pub struct Prepared {
     pub ws: PathBuf,
     pub task_id: String,
+    /// The one file the task allows to change.
+    pub target: String,
+    /// Fixture name recorded in the source pin.
+    pub repo: String,
     pub argv: Vec<String>,
     /// Commit of the buggy tree.
     pub commit: String,
-    /// SHA-256 of the buggy `src/clamp.c` (what the grant's `prior_sha256` must equal).
+    /// SHA-256 of the target before the change (what the grant's `prior_sha256` must equal).
     pub target_blob_sha256: String,
-    /// The corrected whole file the scripted proposal writes.
+    /// The corrected whole file the scripted proposal writes (empty when the change comes from
+    /// elsewhere, as in the M5 slice).
     pub solution: String,
 }
 
@@ -96,31 +101,45 @@ fn parse_task(md: &str) -> Result<(String, Vec<String>, String), String> {
 
 /// Copy `fixture` (without `solution/` and `build/`) into `ws`, `git init` and commit it.
 pub fn prepare(fixture: &Path, ws: &Path) -> Result<Prepared, String> {
+    let solution = std::fs::read_to_string(fixture.join("solution/clamp.c"))
+        .map_err(|e| format!("solution/clamp.c: {e}"))?;
+    let mut p = prepare_task(fixture, ws, TARGET, "fix_the_test")?;
+    p.solution = solution;
+    Ok(p)
+}
+
+/// Copy `fixture` (without `solution/`, `build/` and `target/`) into `ws`, `git init` and commit
+/// it. The proposal will write `allowed`: a task that allows a different file is refused here,
+/// before any proposal reaches the daemon.
+pub fn prepare_task(
+    fixture: &Path,
+    ws: &Path,
+    allowed: &str,
+    repo: &str,
+) -> Result<Prepared, String> {
     let (task_id, argv, target) = parse_task(
         &std::fs::read_to_string(fixture.join("TASK.md")).map_err(|e| format!("TASK.md: {e}"))?,
     )?;
-    // The scripted proposal writes TARGET. A task that allows a different file is refused here,
-    // before any proposal reaches the daemon.
-    if target != TARGET {
+    if target != allowed {
         return Err(format!(
-            "TASK.md target_file {target} is not the scripted proposal target {TARGET}: refused"
+            "TASK.md target_file {target} is not the proposal target {allowed}: refused"
         ));
     }
-    let solution = std::fs::read_to_string(fixture.join("solution/clamp.c"))
-        .map_err(|e| format!("solution/clamp.c: {e}"))?;
-    copy_tree(fixture, ws, &["solution", "build"])?;
+    copy_tree(fixture, ws, &["solution", "build", "target"])?;
     git(ws, &["init", "-q"])?;
     git(ws, &["add", "-A"])?;
     git(ws, &["commit", "-q", "-m", "task start: failing test"])?;
     let commit = git(ws, &["rev-parse", "HEAD"])?;
-    let buggy = std::fs::read(ws.join(TARGET)).map_err(|e| e.to_string())?;
+    let before = std::fs::read(ws.join(&target)).map_err(|e| e.to_string())?;
     Ok(Prepared {
         ws: ws.to_path_buf(),
         task_id,
+        target,
+        repo: repo.to_string(),
         argv,
         commit,
-        target_blob_sha256: sha256_hex(&buggy),
-        solution,
+        target_blob_sha256: sha256_hex(&before),
+        solution: String::new(),
     })
 }
 
@@ -178,11 +197,11 @@ pub fn evidence(
         ],
     )?;
     let tree_commit_after = git(&p.ws, &["rev-parse", "HEAD"])?;
-    let blob_after = sha256_hex(&std::fs::read(p.ws.join(TARGET)).map_err(|e| e.to_string())?);
+    let blob_after = sha256_hex(&std::fs::read(p.ws.join(&p.target)).map_err(|e| e.to_string())?);
     let task = json!({"kind": "vac-task", "task_id": p.task_id, "repo_commit": p.commit,
-        "test_cmd": p.argv, "target_path": TARGET});
-    let source_pin = json!({"kind": "vac-source-pin", "repo": "fix_the_test", "commit": p.commit,
-        "target_path": TARGET, "target_blob_sha256": p.target_blob_sha256});
+        "test_cmd": p.argv, "target_path": p.target});
+    let source_pin = json!({"kind": "vac-source-pin", "repo": p.repo, "commit": p.commit,
+        "target_path": p.target, "target_blob_sha256": p.target_blob_sha256});
     let test_run = json!({"kind": "vac-test-run", "v": 1, "task_id": p.task_id, "argv": p.argv,
         "cwd_rel": ".", "exit_code": after.exit_code, "test_exit_before": before.exit_code,
         "stdout_sha256": sha256_hex(&after.stdout), "stderr_sha256": sha256_hex(&after.stderr),

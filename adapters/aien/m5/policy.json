@@ -1,0 +1,18 @@
+{
+  "policy_id": "vac-m5-readme-dashes",
+  "holdout_set_sha256": "662163365703186910d3b9364e2761c82ca55200487d534ec04287d03554be36",
+  "min_holdout_pass_ratio": 1.0,
+  "require_admitted": true,
+  "allowed_targets": [
+    "README.md"
+  ],
+  "protected_paths": [
+    "src",
+    "Cargo.toml",
+    "Cargo.lock",
+    "TASK.md",
+    ".cargo",
+    ".gitignore"
+  ],
+  "non_inferiority_margin_pct": 200.0
+}

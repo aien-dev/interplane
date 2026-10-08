@@ -1262,6 +1262,7 @@ dependencies = [
  "interplane-crossaxis",
  "interplane-crossveil",
  "interplane-lenshift",
+ "interplane-provenance",
  "serde_json",
  "sha2 0.10.9",
  "tempfile",
@@ -1308,6 +1309,19 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "interplane-provenance"
+version = "0.0.1"
+dependencies = [
+ "hex",
+ "interplane-core",
+ "interplane-lenshift",
+ "p256",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
 ]
 
 [[package]]

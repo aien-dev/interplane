@@ -31,5 +31,6 @@ aien-mcp = { git = "https://github.com/aien-dev/aien-sovereign-core.git", rev = 
 aegis = { path = "../../../interplane-audit/aegis-runtime", optional = true }
 
 [dev-dependencies]
+interplane-provenance = { path = "../../provenance" }
 interplane-lenshift = { path = "../../rust/crates/interplane-lenshift" }
 tempfile = "3"

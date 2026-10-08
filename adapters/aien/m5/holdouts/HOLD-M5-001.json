@@ -1,0 +1,10 @@
+{
+  "suite_id": "HOLD-M5-001",
+  "name": "VAC M5 README holdouts",
+  "cases": [
+    {"id": "M5-01", "name": "README has no em or en dashes", "input": "check_readme_dashes", "expected_output": "DASHES_ABSENT", "category": "style"},
+    {"id": "M5-02", "name": "README keeps its title", "input": "readme_has_title", "expected_output": "TITLE_OK", "category": "invariant"},
+    {"id": "M5-03", "name": "Empty input handling", "input": "", "expected_output": "EMPTY_OK", "category": "boundary"},
+    {"id": "M5-04", "name": "Zero input guarded", "input": "0", "expected_output": "DIV0_GUARDED", "category": "boundary"}
+  ]
+}

@@ -1,0 +1,10 @@
+[package]
+name = "rsi-dashes"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+description = "VAC M5 fixture: one user-facing file the RSI engine improves and a holdout command the judge runs."
+
+# Standalone: never part of the adapter's build.
+[workspace]

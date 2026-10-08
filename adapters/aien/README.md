@@ -286,7 +286,7 @@ each row starts a daemon that loads the model, about 6.5 min on the CPU referenc
 build) and fails if zero tests ran or row 1 or an attack test `x1_`..`x4_` did not; (2) row 1 exports its
 run with `provenance_export::export_bundle` (the daemon's own `ComposeRecall` views of the claim,
 settlement, grant, intent and ack, the load log, the trace, the loaded model files, `COMPANION.json`)
-and the gate runs `provenance verify` on it; the accepted verdicts are `PASS complete ...` or exactly
+and the gate runs `provenance verify` on it; the only accepted verdict is exactly
 `PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn`;
 (3) it tampers with hard-linked copies of the bundle and requires named refusals: an untouched copy
 still passes (negative control), a changed proposal content or a changed ack fails `digest_mismatch`,

@@ -306,6 +306,8 @@ changed here; this path authenticates by the desk-key MAC regardless); CPU refer
 daemon does not report whether the native compose library is linked or which revision it was built
 from, so the receipt records those as caller-asserted or `UNVERIFIED`.
 
+Recorded run: `evidence/live-gate-2026-10-08/receipt.json` (CPU, debug `aien-cli` sha256 9704f29f..., sovereign-core 9b5e6e8 caller-asserted, omega 6c6180c). It ran `LIVE_ROWS="row1_ x1_ x2_ x3_ x4_"` (5 tests); rows 2-8, 10 and 11 passed against the same binary in an earlier unrecorded-by-this-gate run (14 of 14), not by this receipt.
+
 ## Build and test
 
 ```

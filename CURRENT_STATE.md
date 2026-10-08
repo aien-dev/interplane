@@ -10,7 +10,7 @@ Pinned sources:
 | Project | Repo | Commit | Default branch | License |
 |---|---|---|---|---|
 | Odysseus | odysseus-dev/odysseus | 2992bf6 (2026-10-01) | dev | AGPL-3.0 |
-| AIEN sovereign core | aien-dev/aien-sovereign-core | 7580039 (2026-10-04 re-audit: origin/main 0bcd558, 3 attention/ABI commits, no authority change) | main | AGPL-3.0-or-later |
+| AIEN sovereign core | aien-dev/aien-sovereign-core | 9b5e6e8 (2026-10-08 adapter pin; was 7580039 at the 2026-10-04 re-audit) | main | AGPL-3.0-or-later |
 | AIEN aegis-runtime | aien-dev/aegis-runtime | f4e8709 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
 | AIEN protocols | aien-dev/aien-protocols | 3a4cdbe (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
 | AIEN architecture | aien-dev/aien-architecture | 6c95697 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |

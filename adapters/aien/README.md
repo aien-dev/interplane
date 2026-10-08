@@ -14,7 +14,7 @@ spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
 ## Pinned AIEN sources
 
 `aien-capability` and `aien-mcp` are git dependencies pinned to
-`aien-dev/aien-sovereign-core@4d4dfd459ae7e7c6c175edc5017816d079c621a9` (main 2026-10-07, after PR #296 merged: the daemon honours only grants it minted itself and refuses every caller-written authorization note, sovereign-core #261; and PR #295: an approved proposal carries a signed requirements goal, a missing one is refused, #289. `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 8bcd79b, main after PR #262 merged: the authenticated `ComposeApprovedProposal` daemon command the ledger route uses; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 7d37da1, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
+`aien-dev/aien-sovereign-core@9b5e6e82359f4ad6b6f03042e83ef6411c5f15ce` (main 2026-10-08; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 4d4dfd4, `git diff --stat 4d4dfd4 9b5e6e8 -- crates/aien-capability crates/aien-mcp` is empty, and the live gate below passed against a daemon built from 9b5e6e8. 4d4dfd4 was main 2026-10-07, after PR #296 merged: the daemon honours only grants it minted itself and refuses every caller-written authorization note, sovereign-core #261; and PR #295: an approved proposal carries a signed requirements goal, a missing one is refused, #289. `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 8bcd79b, main after PR #262 merged: the authenticated `ComposeApprovedProposal` daemon command the ledger route uses; `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 7d37da1, after PR #260 merged: two-phase approval spend, a grant is reserved at mint, committed when the effect runs, released if the effect is dropped, and `EffectLane::with_clock` re-checks expiry at commit; before #260 `crates/aien-capability` and `crates/aien-mcp` are byte-identical to 0bdc97a, main after PR #208 merged, which binds the idempotency ledger to effect identity and lets an approver revoke an unspent grant; before it, PR #207 merged,
 which makes the authority exposure-aware, on top of PR #204 single-use approvals and the PR #203
 authority seam). `aegis` (feature `aegis-gate`, on by default) cannot be a git dependency because
 `aegis-runtime`'s own `Cargo.toml` reaches a sibling checkout by relative path
@@ -170,7 +170,7 @@ not WALDO provenance and not a full provenance chain: trace_id and request_id ar
 Evidence: `tests/compose_ledger.rs` rows 1-8 (approved write with both hash identities, forged
 approval id, stale target, replay including a re-presented approval id, operator stop/resume,
 adapter restart, the T4 injection subset, forged handoffs) need `AIEN_BIN` (an `aien-cli` binary
-built from sovereign-core main 4d4dfd4) and `cargo test -- --ignored`; rows 10 and 11 (#260 expiry and re-mint) likewise; row 9 (desk key out of the model's
+built from sovereign-core main 9b5e6e8) and `cargo test -- --ignored`; rows 10 and 11 (#260 expiry and re-mint) likewise; row 9 (desk key out of the model's
 reach, key file rules) always runs.
 
 Recorded run at this pin (CPU evidence only, 2026-10-08 00:52Z to 00:58Z): `aien-cli` built from
@@ -270,6 +270,41 @@ registers the user's request first; with an empty ledger the floor is `external_
 Evidence: `tests/exposure.rs` (5 host-registered untrusted sources and a workspace read, against
 `write_file` and `bash_eval`: all held, 0 executed, nothing written). A `bash_eval` outside the
 catalogued forms is refused earlier by the AEGIS gate.
+
+## Live verified run gate
+
+`scripts/test-live-daemon.sh` is the one command that ties the live daemon rows to the offline
+provenance verifier:
+
+```
+AIEN_BIN=<native aien-cli> AIEN_LEDGER_MODEL_DIR=<dir with model.safetensors, tokenizer.json, config.json> \
+  OUT=<fresh dir> scripts/test-live-daemon.sh        # LIVE_ROWS="row1_ x1_ x2_ x3_ x4_" limits the rows
+```
+
+It (1) runs the `#[ignore]`d live tests against a real `aien-cli daemon` (`--ignored --test-threads=1`;
+each row starts a daemon that loads the model, about 6.5 min on the CPU reference backend with a debug
+build) and fails if zero tests ran or row 1 or an attack test `x1_`..`x4_` did not; (2) row 1 exports its
+run with `provenance_export::export_bundle` (the daemon's own `ComposeRecall` views of the claim,
+settlement, grant, intent and ack, the load log, the trace, the loaded model files, `COMPANION.json`)
+and the gate runs `provenance verify` on it; the accepted verdicts are `PASS complete ...` or exactly
+`PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn`;
+(3) it tampers with hard-linked copies of the bundle and requires named refusals: an untouched copy
+still passes (negative control), a changed proposal content or a changed ack fails `digest_mismatch`,
+the same change with the manifest restamped fails `binding_mismatch`, and a truncated record fails
+`size_mismatch`; (4) it writes `OUT/receipt.json` (adapter commit, binary sha256, sovereign-core
+revision, omega lock, verdict, test names, negative-check verdicts, timestamps).
+
+What a pass proves: for one real daemon run, the claim, settlement, grant, intent and ack the daemon
+wrote agree with each other and with the INTERPLANE call (path, bytes, request, trace, the approval key
+recomputed from the grant's own fields, the daemon process identity), and the verifier refuses the
+tampered copies above.
+
+What it does not prove: the exported records carry no signatures, so the verifier cannot tell an export
+from a hand-written file (`provenance/BINDING.md`, Trust); the model turn is scripted, so the verdict is
+labelled incomplete (no authorship claim); the desk MAC for `ComposeAuthorize` stays default-off (not
+changed here; this path authenticates by the desk-key MAC regardless); CPU reference backend only; the
+daemon does not report whether the native compose library is linked or which revision it was built
+from, so the receipt records those as caller-asserted or `UNVERIFIED`.
 
 ## Build and test
 

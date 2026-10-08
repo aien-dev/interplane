@@ -43,7 +43,7 @@ truncated write), `digest_mismatch`, `unlabelled_missing`, `completeness_mismatc
 `conversion_mismatch`, `incompatible`, `load_support_mismatch`, `load_unsupported`,
 `invalid_envelope`, `not_in_trace`, `synthetic_complete`, `canonicalization_mismatch`,
 `unsupported_binding`, and for the fix-the-test slice (BINDING.md): `test_run_missing`,
-`test_run_mismatch`, `unsupported_test_run`, `source_pin_mismatch`, `native_claim_contradicted`.
+`test_run_mismatch`, `unsupported_test_run`, `source_pin_mismatch`, `native_claim_contradicted`; and for effects the ledger does not show as landed (BINDING.md "Recovery outcomes"): `effect_not_done`, `effect_unresolved`, `effect_interrupted`, `test_run_on_unlanded_effect`.
 
 A complete verdict whose AIEN link names no frozen candidate manifest (`candidate_id: null`) ends
 with `candidate=none`. Reading is strict: every JSON input (the manifest, each record, the JSON

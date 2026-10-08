@@ -244,7 +244,7 @@ fn altered_intent() {
 fn altered_ack() {
     let d = scratch(SYN, "alter_ack");
     edit_text(&d, "ledger_ack", |t| t["state"] = json!("NOT_DONE"));
-    assert_eq!(verify(&d), "FAIL binding_mismatch: ledger_ack.state");
+    assert_eq!(verify(&d), "FAIL effect_not_done: ledger_ack.state=NOT_DONE: the daemon read the world back and the write did not land");
     let d = scratch(SYN, "alter_ack_disk");
     edit_text(&d, "ledger_ack", |t| {
         t["disk_sha256"] = json!("c".repeat(64))
@@ -287,7 +287,7 @@ fn ledger_record_removed_from_the_manifest() {
     let mut c = companion(&d);
     c["records"].as_object_mut().unwrap().remove("ledger_ack");
     write_companion(&d, &c);
-    assert_eq!(verify(&d), "FAIL missing_record_entry: ledger_ack");
+    assert_eq!(verify(&d), "FAIL effect_interrupted: ledger_intent is the last record: no ack, the write may or may not have landed");
 }
 
 // ---------- INTERPLANE call against the ledger ----------

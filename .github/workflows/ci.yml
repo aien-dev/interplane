@@ -172,7 +172,7 @@ jobs:
         run: |
           test "$(cargo run -q --locked -- verify fixtures/synthetic-full-chain)" = "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn"
           test "$(cargo run -q --locked -- verify fixtures/synthetic-weak-receipt)" = "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=record_effect_receipt/1:weak"
-          test "$(cargo run -q --locked -- verify fixtures/real-waldo-aien-chain)" = "PASS_LABELLED_INCOMPLETE missing=link:daemon_generation_record effect=aien-ledger-slice/1:strong proposal=model_generation/1"
+          test "$(cargo run -q --locked -- verify fixtures/real-waldo-aien-chain)" = "PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2"
           test "$(cargo run -q --locked -- verify fixtures/real-waldo-tokenizer-json)" = "PASS_LABELLED_INCOMPLETE missing=link:effect,link:interplane"
           test "$(cargo run -q --locked -- verify fixtures/real-waldo-smoke)" = "PASS_LABELLED_INCOMPLETE missing=link:aien,link:effect,link:interplane"
   adapter-aien:

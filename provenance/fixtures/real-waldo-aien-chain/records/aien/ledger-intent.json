@@ -1,10 +1,10 @@
 {
   "cls": 6,
-  "digest": "ae1195e725d2130aae9ee1c5752d49dfa627797eb3267444dbf9190ee1d6c417",
-  "id": 20,
+  "digest": "26f03c9642061c24725cfd69e1519590a171826fbf003eb77c4d8c9cdb3f71cf",
+  "id": 21,
   "kind": 65554,
   "links": [
-    19,
+    20,
     0,
     0,
     0
@@ -12,6 +12,6 @@
   "note": "effect",
   "subject": 0,
   "tag": 4,
-  "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":431839,\"start\":12978002},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"tool\":\"write_file\"}",
+  "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor\":{\"pid\":1256340,\"start\":13432990},\"path\":\"summary.txt\",\"phase\":\"intent\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run3/home/ws/summary.txt\",\"tool\":\"write_file\"}",
   "verified": true
 }

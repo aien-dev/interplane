@@ -1,9 +1,11 @@
 # The first real chain (CPU evidence)
 
 Fixture: `fixtures/real-waldo-aien-chain`.
-Verdict: `PASS_LABELLED_INCOMPLETE missing=link:daemon_generation_record effect=aien-ledger-slice/1:strong proposal=model_generation/1`.
-It is labelled incomplete on purpose and cannot say `PASS complete` (see "What is missing"). Provenance is
-evidence, never authority: it grants and authorizes nothing, and no AIEN or INTERPLANE code reads it.
+Verdict: `PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2`.
+`complete` here means exactly this: every link from the training corpus to the effect is present and was
+verified from the retained bytes of ONE run (CPU evidence). It does not mean the model is capable, the
+weights are good, or anyone authorized anything. Provenance is evidence, never authority: it grants and
+authorizes nothing, and no AIEN or INTERPLANE code reads it.
 
 ## The rule the verdict follows
 
@@ -14,9 +16,12 @@ from the same model and execution. So:
   `PASS_LABELLED_INCOMPLETE missing=link:model_turn`, never `PASS complete`. The weaker
   `record_effect_receipt/1` names no author, so it also leaves `link:model_turn` missing. Declaring either
   complete is refused (`unlabelled_missing`).
-- `proposal_origin: model_generation/1` is checked as far as the bytes allow and still leaves
-  `link:daemon_generation_record` missing, because the daemon writes no record of a generation.
-- Today no effect-bearing chain can reach `PASS complete`. That needs the daemon cut below.
+- `proposal_origin: model_generation/2` needs the DAEMON'S OWN generation record (sovereign-core #301,
+  `docs/DAEMON_GENERATION_RECORD.md`) and checks it as below. With it, nothing is missing.
+- `model_generation/1` (a record written by the run driver, the first version of this fixture) is superseded and
+  refused (`unsupported_binding`).
+- A missing, malformed, altered or mismatched generation record is a refusal (`FAIL`), never a pass. The daemon
+  itself says that an absent record is an absent claim.
 
 ## Prerequisite analysis
 
@@ -44,55 +49,66 @@ from the same model and execution. So:
 1. `run-inputs/train-and-export.sh`: WALDO (fork 4c407d7) trains `toolcall-tiny` on `run-inputs/conversations.jsonl`
    (PyTorch CPU, 90 epochs, 921 steps; log in `run-inputs/train.log`) and exports Hugging Face with `tokenizer.json`.
 2. `driver/main.rs` (a scratch crate, kept as evidence) starts `aien-cli daemon` (sovereign-core main
-   4d4dfd459ae7e7c6c175edc5017816d079c621a9, #295 and #296 merged, RELEASE build) on that export, writes
+   12c1a5ff18b70e748b678280c4210788f820c712, sc#301 merged, RELEASE build) on that export, writes
    `daemon-run.json` (pid, start ticks, socket, executable digest), then:
    a. sends one `StreamTurn` (the path `aien-cli chat` uses) with the prompt "Save the meeting summary to
-      summary.txt." at temperature 0, and keeps the reply as `generation.json`;
-   b. feeds that exact text to the INTERPLANE `aien_legacy` dialect (`model-turn.json`), which yields one
-      `write_file` request;
-   c. drives approval and the write through the INTERPLANE AIEN adapter; the daemon writes its ledger records.
-3. Retained unchanged: daemon log, the five `ComposeRecall` views, `daemon-run.json`, `generation.json`,
-   `model-turn.json`, and the INTERPLANE trace (request, requires_approval result, ok result).
+      summary.txt." at temperature 0 and reads `TurnFinished.generation_record` (id 6). It exports that record
+      with the daemon's own `ComposeRecall` (`ledger-generation.json`) and keeps the reply text in `model-turn.json`
+      together with the id;
+   b. feeds that exact text to the INTERPLANE `aien_legacy` dialect, which yields one `write_file` request;
+   c. drives approval and the write through the INTERPLANE AIEN adapter; the daemon writes its ledger records
+      (claim 7 ... ack 22).
+3. Retained unchanged: daemon log and stderr, the generation record, the five `ComposeRecall` views,
+   `daemon-run.json`, `model-turn.json`, and the INTERPLANE trace (request, requires_approval result, ok result).
+   Process ids of this run: daemon 1256385 (killed by the driver at the end). An earlier failed attempt on a build
+   that lacked the compose library left daemon 1214846, killed by that PID alone.
 
-How the GPU engine stayed OFF: the release binary was built with `AIEN_OMEGA_DIR` unset (CPU stub of
-`aien-omega-gpu`) and `AIEN_GB10_QWEN3_DECLARED_ATTEMPT` unset; `ldd` shows no CUDA or NVIDIA library; the daemon
+Build and how the GPU engine stayed OFF: `cargo build --release --locked -p aien-cli` at 12c1a5f with
+`AIEN_OMEGA_DIR` unset (so `aien-omega-gpu` is the CPU stub) and `AIEN_OMEGA_COMPOSE_DIR` pointing at the pinned
+checkout 01f6a746 (the compose library, CPU C code, which the daemon needs to open the ledger at all; a stub build
+writes no generation record). A private `CARGO_TARGET_DIR`; `ldd` shows no CUDA or NVIDIA library; the daemon
 log says `NativeTransformerBackend/CPU-reference (Omega GPU engine not linked, explicit fallback)`; the driver
 removes `AIEN_GPU_BACKEND`, `AIEN_REQUIRE_BLACKWELL` and `AIEN_OMEGA_DIR` from the daemon environment.
 
 Adapter used: interplane main 0ff60f2 plus the UNCOMMITTED worktree diff of the coordinator's branch
 `ipx/issue-78-repin` (read-only snapshot, `run-inputs/adapter-pr78-worktree-diff.patch`, sha256
-a11d8ac03f3683baedb187d4d504203419f9a736512597fccab8ed0ba3e47e86), because main is refused by a 4d4dfd4 daemon
+a11d8ac03f3683baedb187d4d504203419f9a736512597fccab8ed0ba3e47e86), because main is refused by the daemon
 (`RequirementsUnbound`). Replace this with the merged interplane#78 commit when it lands.
 
-## What the verifier checks for `model_generation/1`
+## What the verifier checks for `model_generation/2`
 
-- The text in `model_turn` is byte for byte the generation's `output_text`, whose digest is `output_sha256`.
-- The real `aien_legacy` dialect (the verifier links `interplane-lenshift`) parses that text into exactly one
-  request with the trace's request id, tool, arguments and `source_digest`, and the trace names the same model as
-  the sender.
-- The generation names the model digest the daemon load log carries; that digest is already bound to the exported
-  weights, and the export descends from the retained WALDO run.
-- The generation and the ledger name the same daemon process (pid and start ticks), the process that wrote the
-  claim, grant, intent and ack.
-- Everything the ledger binding already checks (`BINDING.md`): request, trace, approval key recomputed, path and
-  bytes, claim, commit, grant, intent, ack.
+The generation record (`records/aien/ledger-generation.json`) is located by the id the daemon returned in
+`TurnFinished` (kept in `model-turn.json`), and parsed strictly:
 
-## What is missing (labelled, not filled)
+- it is a `ComposeRecall` view with `verified: true`, note `effect`, all four link slots zero, and a text that is
+  exactly one JSON object with top-level `generation == 1` and `v == 1`;
+- `output_text_sha256` equals the SHA-256 of the exact text in `model_turn`, which the real `aien_legacy` dialect
+  (the verifier links `interplane-lenshift`) parses into exactly one request with the trace's request id, tool,
+  arguments and `source_digest`; the trace names the same model as the sender;
+- `model_sha256` equals the exported weights and `tokenizer_sha256` the exported `tokenizer.json`; the load log
+  line carries the same digests, and the export descends from the retained WALDO run;
+- `daemon.pid` and `daemon.start_ticks` equal the daemon that wrote the ledger (`daemon-run.json`), the process
+  that wrote the claim, grant, intent and ack;
+- `finish_reason` is `eos` or `max_tokens`, `output_tokens` is positive, the two token-id digests are SHA-256 hex;
+- the record's id is smaller than the replay claim's id: the generation precedes the effect.
 
-- `link:daemon_generation_record`. AIEN's generation path (`StreamTurn`) wrote no record: the journal held 5
-  records before and after (`generation.json`). So "this text came from the model with this digest" is asserted
-  by the run driver (`written_by: run-driver`), tied to the daemon only by process identity. A record written
-  by the daemon would close it; `written_by: daemon` is refused (`unsupported_binding`) until such a record has
-  a defined shape.
-- Ledger files are exports, not the live journal; no journal prefix digest (`BINDING.md`, Trust).
-- The model is a memoriser; the prompt is fixed; temperature 0. This shows the plumbing, not capability.
-- Not the minted flow, not GPU, not a frozen candidate (`candidate_id` is null), adapter not yet at a merged commit.
-- The INTERPLANE trace timestamps are the driver's wall clock; the adapter's approval clock is the harness epoch.
+Everything the ledger binding already checks still runs (`BINDING.md`): request, trace, approval key recomputed,
+path and bytes, claim, commit, grant, intent, ack. `request_id` and `operation_id` in the record are the client's
+claims and are recorded, never trusted (a test pins that changing them changes nothing).
 
-## The minimal sovereign-core cut (not made here)
+## What this does NOT prove (residual limits)
 
-When the daemon serves `StreamTurn` (and when `RunComposeTask` generates a proposal), append one record through
-the same journal writer, class `effect`, kind `generation`, with fields: `model_sha256`, `tokenizer_sha256`
-(the digests it logged at load), `prompt_sha256` (of the rendered prompt), `output_sha256` (of the returned text),
-`total_tokens`, `executor {pid, start}`, and the request or trace id when the caller supplies one. Return the
-record id in `TurnFinished`. Then the verifier can require that record and the chain can reach `PASS complete`.
+From the AIEN document, repeated here so the verdict is not read as more than it is:
+
+- The digests are of the files the daemon read at load time. The loaders then open the same paths again, so a swap
+  between the hash and the load is not detected. Nor that the file on disk still has that digest later.
+- The record is not signed. A process of the same user that can append to the compose ledger could append a record
+  that passes the per-record digest. The daemon refuses to write one through the socket (`ComposeNote`), but the file
+  itself is not protected against that user.
+- The `verified` flag and `digest` in the exported view are the daemon's statement at export time; this verifier does
+  not recompute the engine's record digest. Ledger files are exports, not the live journal; there is no journal prefix
+  digest (`BINDING.md`, Trust).
+- Not that the text is correct, safe, or what an operator approved. No capability, permission or authority.
+- The model is a tiny memoriser with a fixed prompt at temperature 0. This shows the plumbing, NOT capability.
+- CPU evidence only; not a frozen candidate (`candidate_id` is null); not the minted flow; the adapter is not yet at a
+  merged commit; the trace timestamps are the driver's wall clock and the adapter's approval clock is the harness epoch.

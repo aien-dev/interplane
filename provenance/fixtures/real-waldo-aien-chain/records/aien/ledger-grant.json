@@ -1,17 +1,17 @@
 {
   "cls": 6,
-  "digest": "0a5711db80809232edde1028af14116976f6c42de1510b1092fbaa5725e66da9",
-  "id": 19,
+  "digest": "7c8abd92196c752a09b2227448a558d0872abba6745111f0501850aa277e6bb7",
+  "id": 20,
   "kind": 65556,
   "links": [
+    17,
     16,
-    15,
-    6,
+    7,
     0
   ],
   "note": "authorization",
   "subject": 0,
   "tag": 3,
-  "text": "{\"approval_id\":\"aien-approval:real-run-02:t0:c0:c32f6a1235828648\",\"approval_key\":\"f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"6615bee733c95893\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":6,\"request_id\":\"real-run-02:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt\",\"trace_id\":\"real-run-02\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws\"}",
+  "text": "{\"approval_id\":\"aien-approval:real-run-03:t0:c0:c32f6a1235828648\",\"approval_key\":\"155ed4453b7d7063a7011a1035e6e99bb4925ca915b5c61d8a3d6ad6b6b01d4f\",\"approved_grant\":1,\"approved_proposal_sha256\":\"f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb\",\"approver\":\"drake\",\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"cx_evidence\":16,\"cx_promotion\":17,\"desk_key_id\":\"3f531d257ce333dd\",\"path\":\"summary.txt\",\"prior_sha256\":null,\"proposal_sha256\":\"356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0\",\"replay_claim\":7,\"request_id\":\"real-run-03:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run3/home/ws/summary.txt\",\"trace_id\":\"real-run-03\",\"workspace\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run3/home/ws\"}",
   "verified": true
 }

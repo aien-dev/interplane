@@ -1,17 +1,17 @@
 {
   "cls": 6,
-  "digest": "3824f1decb48065854f8a8b8f70656d567f71b3575fb744d14c741f3da24129c",
-  "id": 21,
+  "digest": "efffbc3f7e12913469861f8aa3b143d68f84efe6152ad51b7881f0ea9282d468",
+  "id": 22,
   "kind": 65554,
   "links": [
+    21,
     20,
-    19,
     0,
     0
   ],
   "note": "effect",
   "subject": 0,
   "tag": 4,
-  "text": "{\"authorization\":19,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"disk_error\":null,\"disk_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor_reported\":{\"bytes\":67,\"error\":null,\"written_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\"},\"intent\":20,\"path\":\"summary.txt\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
+  "text": "{\"authorization\":20,\"content_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"disk_error\":null,\"disk_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\",\"executor_reported\":{\"bytes\":67,\"error\":null,\"written_sha256\":\"7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4\"},\"intent\":21,\"path\":\"summary.txt\",\"phase\":\"ack\",\"state\":\"DONE\",\"tool\":\"write_file\"}",
   "verified": true
 }

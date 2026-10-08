@@ -2,20 +2,17 @@
   "aien": {
     "candidate_id": null,
     "executable": "aien-cli",
-    "executable_sha256": "279d38992b72f7c3f888d9b02c5ac7b26e57f6a47746c4e8107b2a9081ae4056",
-    "note": "no frozen AIEN candidate: no candidate_manifest record; executable is aien-dev/aien-sovereign-core main 4d4dfd4 (sc#295 and #296 merged), release build, CPU-reference backend (Omega GPU engine not linked: AIEN_OMEGA_DIR unset at build, no CUDA libraries linked, daemon log says CPU-reference)"
+    "executable_sha256": "50b2378cb6338687a4166313759b4472fa5a2ba293aad9f2dc7b1e2f40be4b72",
+    "note": "no frozen AIEN candidate: no candidate_manifest record; executable is aien-dev/aien-sovereign-core main 12c1a5ff18b70e748b678280c4210788f820c712 (sc#301 merged), release build, CPU-reference backend (Omega GPU engine not linked: AIEN_OMEGA_DIR unset so aien-omega-gpu is the CPU stub, no CUDA libraries linked, daemon log says CPU-reference). The compose library librx_compose.a (CPU C code) is linked from omega 01f6a746 with AIEN_OMEGA_COMPOSE_DIR, because the daemon needs it to write any ledger record"
   },
   "completeness": {
-    "missing": [
-      "link:daemon_generation_record"
-    ],
-    "reason": "AIEN own generation path wrote no record carrying the model digest next to the generated text; the generation observation is written by the run driver",
-    "state": "incomplete"
+    "missing": [],
+    "state": "complete"
   },
   "effect": {
     "approval_binding": "aien.approval.v2",
     "binding": "aien-ledger-slice/1",
-    "proposal_origin": "model_generation/1"
+    "proposal_origin": "model_generation/2"
   },
   "export": {
     "chat_template": "export_chat_template",
@@ -30,12 +27,12 @@
   },
   "fixture": {
     "class": "real",
-    "note": "Real bytes from one run on this machine (CPU, release build, GPU engine not linked). A tiny WALDO chatml-v1 model was trained (SFT on our own tool-call conversations, run-inputs/conversations.jsonl) and exported with tokenizer.json and the standard ChatML template. The AIEN daemon loaded it. AIEN own generation path (StreamTurn) on that loaded model produced the tool-call text; the INTERPLANE aien_legacy dialect parsed that text into the request; the adapter then drove one approved write_file and the daemon wrote its ledger records. NOT proven: the daemon wrote no record of the generation (journal 5 records before and after), so generated text to model digest is asserted by the run driver (link:daemon_generation_record is missing); the approved path itself does not call the model, the content comes from the model upstream; the adapter is interplane main 0ff60f2 plus the uncommitted worktree diff of issue-78-repin (adapter-pr78-worktree-diff.patch) because main is refused by the 4d4dfd4 daemon.",
+    "note": "Real bytes from ONE run on this machine (CPU, release build, GPU engine not linked). A tiny WALDO chatml-v1 model was trained (SFT on our own tool-call conversations, run-inputs/conversations.jsonl) and exported with tokenizer.json and the standard ChatML template. The AIEN daemon loaded it. AIEN own generation path (StreamTurn) on that loaded model produced the tool-call text, and the DAEMON wrote its own generation record (ledger-generation.json, id returned in TurnFinished.generation_record) carrying the model and tokenizer digests, the output text digest and its own pid and start time. The INTERPLANE aien_legacy dialect parsed that text into the request; the adapter then drove one approved write_file and the daemon wrote its ledger records. Limits (docs/DAEMON_GENERATION_RECORD.md in sovereign-core 12c1a5f): the digests are of the files read at load time (a swap between hash and load is not detected), the record is not signed (a same-user process that can append to the compose ledger could forge one), request_id/operation_id are the client claims, and no capability or authority follows. The model is a tiny memoriser with a fixed prompt: no capability claim. The adapter is interplane main 0ff60f2 plus the uncommitted worktree diff of issue-78-repin (adapter-pr78-worktree-diff.patch) because main is refused by the daemon (sc#295 requirements).",
     "source": "driver/main.rs (run driver), run-inputs/ (corpus, compose, script, train log)"
   },
   "interplane": {
-    "request_id": "real-run-02:t0:c0",
-    "trace_id": "real-run-02"
+    "request_id": "real-run-03:t0:c0",
+    "trace_id": "real-run-03"
   },
   "kind": "interplane-provenance-companion",
   "lineage": {
@@ -63,12 +60,12 @@
     "aien_load_log": {
       "bytes": 1275,
       "path": "records/aien/daemon-load.log",
-      "sha256": "614b145e66c9212285200d7a6dbdda938d023d65455d69156e82dff4b19c5ae5"
+      "sha256": "12f05d0ea4c806d415495aa31ce40026e25dd8e1cb33d915131fcc1d0dc6d4cb"
     },
     "daemon_run": {
-      "bytes": 507,
+      "bytes": 508,
       "path": "records/aien/daemon-run.json",
-      "sha256": "762f3d674b7d1fad34ec7bcdebf9048733f383fd77e7edea1fe563dff9bc4fee"
+      "sha256": "8bfb6a48ff6f6b8e6d5790da65fbabcfa945d014d27c26b4f88aefe453d9c582"
     },
     "export_chat_template": {
       "bytes": 197,
@@ -90,45 +87,45 @@
       "path": "records/export/model.safetensors",
       "sha256": "552fb3a85f5871a45a5243f3ae066b7b51711caf0ae8dc7412bbd5c9e505f8ad"
     },
-    "generation": {
-      "bytes": 1003,
-      "path": "records/aien/generation.json",
-      "sha256": "76d71a45e83ca8dae73f2e918cf32fb08d878048cebebc7840b1ce61220f676a"
-    },
     "interplane_trace": {
-      "bytes": 6176,
+      "bytes": 6177,
       "path": "records/interplane/trace.json",
-      "sha256": "a7c06bd029a5455fcd5dc442b864799a3a5fac46bfcc0103cd766b845b792bb8"
+      "sha256": "41494b2fd16c78e8b836a6552b7e53546d36066e3c1a6e8ed6e783e106f6fa2c"
     },
     "ledger_ack": {
       "bytes": 707,
       "path": "records/aien/ledger-ack.json",
-      "sha256": "a7c73bfaee108f43d10d71286894829f302eee9ae8c69812c2b5d77bfd9c367d"
+      "sha256": "45e8a2eb7b281b09315a4d1daa8683334677c6538abc1ee6df4e67e4775aa359"
     },
     "ledger_claim": {
-      "bytes": 557,
+      "bytes": 558,
       "path": "records/aien/ledger-claim.json",
-      "sha256": "a78df9abca55f432e829e29eebc7374f901e17ebba0d9deb08c82fc56f3f5ed2"
+      "sha256": "5335cfc805e8ee1eb73faf40a263b7e6c5623ed04b52a3404063c81ff49317af"
     },
     "ledger_committed": {
-      "bytes": 481,
+      "bytes": 482,
       "path": "records/aien/ledger-committed.json",
-      "sha256": "83aaebf8dc47663b532f9dbffdf2873fee8a922587ef52411c4c085881113666"
+      "sha256": "312176d1b682ed5f62f83de22072dbe5c476ba657597aa7883e7808a216e8873"
+    },
+    "ledger_generation": {
+      "bytes": 1173,
+      "path": "records/aien/ledger-generation.json",
+      "sha256": "734326b454fdf5741084834905363130b5538e1e232ee8d7f11fa3a04a22ccd1"
     },
     "ledger_grant": {
       "bytes": 1129,
       "path": "records/aien/ledger-grant.json",
-      "sha256": "606fad9e9e2940b176073a314cc8ad5c65bc138454f86d0621bae55f1fc420dd"
+      "sha256": "ad1adf5ed847608041ff7f99c102c617ae3256234873633002b309b863f97535"
     },
     "ledger_intent": {
-      "bytes": 689,
+      "bytes": 690,
       "path": "records/aien/ledger-intent.json",
-      "sha256": "e154040d770fabbb3322ee782a6456c571bb2368c2a7cedd8d3f6990956fc89b"
+      "sha256": "86287da175741627300fe963167d53da7c71ba7647b624c6e4fbc5333b9059fb"
     },
     "model_turn": {
-      "bytes": 314,
+      "bytes": 496,
       "path": "records/interplane/model-turn.json",
-      "sha256": "3ef7ed76240577af0d8e07c0ea1a1d56f7b420f227c34f201a14ac1c6aaf7530"
+      "sha256": "412a3ce447368a6b63146506cec0956b2961ce46987468306d3d402eeb9aedb9"
     },
     "release_bom": {
       "bytes": 2534,

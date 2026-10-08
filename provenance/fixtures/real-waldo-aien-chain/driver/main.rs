@@ -13,7 +13,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{Duration, Instant};
 
-const TRACE: &str = "real-run-02";
+const TRACE: &str = "real-run-03";
 const PROMPT: &str = "Save the meeting summary to summary.txt.";
 const MODEL_LABEL: &str = "toolcall-tiny";
 const NOW: &str = "2026-10-06T00:00:00Z";
@@ -104,22 +104,19 @@ fn main() {
         "content_digest": format!("sha256:{}", hex(body.as_bytes())),"trace_id":TRACE,
         "parent_id":null,"derived_from":[]})).unwrap()).unwrap();
     // The model turn: AIEN's own generation path (StreamTurn) on the model this daemon loaded.
-    let count0 = client.records_total().unwrap();
     let t_gen0 = ts();
     let messages = json!([{"role":"user","content":PROMPT}]);
-    let (gen_text, gen_tokens) = stream_turn(&sock, &messages, 400);
+    let (gen_text, _gen_tokens, gen_record) = stream_turn(&sock, &messages, 400);
     let t_gen1 = ts();
-    let count1 = client.records_total().unwrap();
-    wr_top(&out, "generation.json", &json!({
-        "kind":"aien-generation-observation","written_by":"run-driver",
-        "note":"written by the run driver from the daemon's StreamTurn reply; the daemon wrote no record of this generation",
-        "command":"StreamTurn","messages":messages,"max_tokens":400,"temperature":0.0,
-        "output_text":gen_text,"output_sha256":hex(gen_text.as_bytes()),"total_tokens":gen_tokens,
-        "model_sha256_from_load_log": load_log_digest(&log,"model_sha256="),
-        "daemon_pid":pid,"daemon_start_ticks":start_ticks,
-        "journal_records_before":count0,"journal_records_after":count1,
-        "started":t_gen0,"finished":t_gen1}));
-    wr_top(&out, "model-turn.json", &json!({"dialect":"aien_legacy","model":MODEL_LABEL,"trace_id":TRACE,"turn":0,"input":gen_text}));
+    let gen_id = gen_record.expect("daemon returned no generation_record (no record means no claim)");
+    // The daemon's own record of the generation, exported with its own read command.
+    let gview = client.recall(&[gen_id], None).unwrap();
+    assert!(gview["missing"].as_array().unwrap().is_empty(), "{gview}");
+    let gcited = gview["cited"].as_array().unwrap()[0].clone();
+    wr_top(&out, "ledger-generation.json", &gcited);
+    wr_top(&out, "model-turn.json", &json!({"dialect":"aien_legacy","model":MODEL_LABEL,"trace_id":TRACE,"turn":0,
+        "input":gen_text,"generation_record_id":gen_id,"generation_record_source":"TurnFinished.generation_record",
+        "stream_started":t_gen0,"stream_finished":t_gen1}));
     let t_req = ts();
     let o = p.run_turn("aien_legacy", MODEL_LABEL, &json!(gen_text), TRACE, 0);
     assert_eq!(o.results.len(), 1, "{o:?}");
@@ -192,7 +189,7 @@ fn load_log_digest(log: &Path, key: &str) -> String {
 }
 
 /// One `StreamTurn` on the daemon socket (the path `aien-cli chat` uses): returns the finished text.
-fn stream_turn(sock: &Path, messages: &Value, max_tokens: u64) -> (String, u64) {
+fn stream_turn(sock: &Path, messages: &Value, max_tokens: u64) -> (String, u64, Option<u64>) {
     let mut s = UnixStream::connect(sock).unwrap();
     s.set_read_timeout(Some(Duration::from_secs(300))).unwrap();
     let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap();
@@ -202,7 +199,7 @@ fn stream_turn(sock: &Path, messages: &Value, max_tokens: u64) -> (String, u64) 
     for line in BufReader::new(&s).lines() {
         let v: Value = serde_json::from_str(&line.unwrap()).unwrap();
         if let Some(f) = v.get("TurnFinished") {
-            return (f["text"].as_str().unwrap().to_string(), f["total_tokens"].as_u64().unwrap());
+            return (f["text"].as_str().unwrap().to_string(), f["total_tokens"].as_u64().unwrap(), f["generation_record"].as_u64());
         }
         assert!(v.get("Error").is_none(), "{v}");
     }

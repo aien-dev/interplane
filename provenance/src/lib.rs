@@ -334,10 +334,16 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>), F
             Some(LEDGER_BINDING) => {
                 // Who authored the proposal must be stated, never implied by silence. A scripted
                 // turn leaves `link:model_turn` missing; a model generation is checked in
-                // `modelturn` and still leaves `link:daemon_generation_record` missing.
+                // `modelturn` against the daemon's own generation record.
                 let origin = match s(e, &["proposal_origin"]) {
                     Some(modelturn::SCRIPTED) => modelturn::SCRIPTED,
                     Some(modelturn::GENERATED) => modelturn::GENERATED,
+                    Some(modelturn::SUPERSEDED) => {
+                        return fail(
+                            "unsupported_binding",
+                            "effect.proposal_origin=model_generation/1 (superseded by model_generation/2: needs the daemon's own record)",
+                        )
+                    }
                     Some(other) => {
                         return fail(
                             "unsupported_binding",

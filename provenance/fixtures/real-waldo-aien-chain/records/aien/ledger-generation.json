@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "acf2eb941faeffa1ad3aed61a8f8a7cf48be06d7038604c9a9de6817b34a2108",
+  "id": 6,
+  "kind": 65554,
+  "links": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"daemon\":{\"pid\":1256385,\"start_ticks\":13432994,\"started_unix_ms\":\"1791420619553\"},\"finish_reason\":\"eos\",\"generation\":1,\"model_path\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/hf/model.safetensors\",\"model_sha256\":\"552fb3a85f5871a45a5243f3ae066b7b51711caf0ae8dc7412bbd5c9e505f8ad\",\"operation_id\":\"1791420620585656251\",\"output_text_sha256\":\"63e25ca957d611e7d9b516505107369e2fece1351e72a4a2ee694629f17d4291\",\"output_token_ids_sha256\":\"400992a4c84bdb327e3c86c349c60f4f57094eed925119638952998764a34cee\",\"output_tokens\":180,\"prompt_ids_sha256\":\"52b2f9907f859e421988c939153040edc6a131eb2b37d9f672cd1255f0334acd\",\"request_id\":1791420620585,\"tokenizer_path\":\"/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/train2/work/hf/tokenizer.json\",\"tokenizer_sha256\":\"c9cd47d3e172a575fbd2b5e1a0c977c47160f48a9f322c55d337ab08662443dd\",\"total_tokens\":271,\"v\":1}",
+  "verified": true
+}

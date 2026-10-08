@@ -28,7 +28,7 @@
         "source_digest": "sha256:3b584bb7d02e212c5bb66460fdf2abeea5aed6c01f48f8ee271c152d2bc09a9d",
         "source_turn": 0
       },
-      "request_id": "real-run-02:t0:c0",
+      "request_id": "real-run-03:t0:c0",
       "tool": {
         "name": "write_file",
         "namespace": null
@@ -38,8 +38,8 @@
       "id": "toolcall-tiny",
       "kind": "model"
     },
-    "timestamp": "2026-10-07T23:34:31Z",
-    "trace_id": "real-run-02"
+    "timestamp": "2026-10-08T00:50:20Z",
+    "trace_id": "real-run-03"
   },
   {
     "destination": {
@@ -53,7 +53,7 @@
       "data": null,
       "decision": {
         "approval": {
-          "approval_id": "aien-approval:real-run-02:t0:c0:c32f6a1235828648",
+          "approval_id": "aien-approval:real-run-03:t0:c0:c32f6a1235828648",
           "expires_at": null,
           "scope": "c32f6a123582864804b99027881aa0354aa1c2f40407da930394d120ee87bcc9"
         },
@@ -67,7 +67,7 @@
         "decision": "requires_approval",
         "kind": "decision",
         "reason": "tool `write_file` needs approval (effect bits 0x8)",
-        "request_id": "real-run-02:t0:c0",
+        "request_id": "real-run-03:t0:c0",
         "runtime_state": {
           "values": [
             "effect_class=WorldMutation",
@@ -79,7 +79,7 @@
       },
       "error": {
         "code": "approval_required",
-        "message": "approval required: aien-approval:real-run-02:t0:c0:c32f6a1235828648",
+        "message": "approval required: aien-approval:real-run-03:t0:c0:c32f6a1235828648",
         "retryable": false
       },
       "kind": "result",
@@ -91,15 +91,15 @@
         "trust": null,
         "trusted": null
       },
-      "request_id": "real-run-02:t0:c0",
+      "request_id": "real-run-03:t0:c0",
       "status": "requires_approval"
     },
     "source": {
       "id": "aien",
       "kind": "runtime"
     },
-    "timestamp": "2026-10-07T23:34:31Z",
-    "trace_id": "real-run-02"
+    "timestamp": "2026-10-08T00:50:20Z",
+    "trace_id": "real-run-03"
   },
   {
     "destination": {
@@ -112,50 +112,50 @@
     "payload": {
       "data": {
         "receipt": {
-          "ack_digest": "3824f1decb48065854f8a8b8f70656d567f71b3575fb744d14c741f3da24129c",
-          "ack_record_id": 21,
-          "approval_id": "aien-approval:real-run-02:t0:c0:c32f6a1235828648",
+          "ack_digest": "efffbc3f7e12913469861f8aa3b143d68f84efe6152ad51b7881f0ea9282d468",
+          "ack_record_id": 22,
+          "approval_id": "aien-approval:real-run-03:t0:c0:c32f6a1235828648",
           "approved_proposal_sha256": "f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb",
           "approver": "drake",
           "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
           "compose_proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
           "content_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
           "disk_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
-          "grant_digest": "0a5711db80809232edde1028af14116976f6c42de1510b1092fbaa5725e66da9",
-          "grant_id": 19,
+          "grant_digest": "7c8abd92196c752a09b2227448a558d0872abba6745111f0501850aa277e6bb7",
+          "grant_id": 20,
           "handoff": {
             "aegis_pass_mask": 1,
-            "approval_key": "f2731d5b1feb3ed1aec01985edbcafd86203c2ec1485d1ea35334e1495b09a48",
-            "approved_grant": 19,
+            "approval_key": "155ed4453b7d7063a7011a1035e6e99bb4925ca915b5c61d8a3d6ad6b6b01d4f",
+            "approved_grant": 20,
             "branch_count": 1,
             "committed": true,
-            "cx_evidence": 15,
-            "cx_goal": 8,
-            "cx_promotion": 16,
-            "desk_key_id": "6615bee733c95893",
+            "cx_evidence": 16,
+            "cx_goal": 9,
+            "cx_promotion": 17,
+            "desk_key_id": "3f531d257ce333dd",
             "grant_links": [
-              16,
-              15
+              17,
+              16
             ],
             "outcome": 1,
             "proposer": "hook:approved-proposal",
-            "record_digest": "7031fc6cac2c5bb16541ab0dff1144b5f2735da1b6847ea9453ee21f86a58959",
-            "replay_claim": 6,
+            "record_digest": "504cf42f0a892c5ccca8b3c37b4881ae2b433da8fb0314c2fb57c856a1ccc3da",
+            "replay_claim": 7,
             "state": "COMMITTED",
-            "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt",
-            "task": 9124140031979291211,
+            "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run3/home/ws/summary.txt",
+            "task": 10686189728208829113,
             "winner": 0,
-            "winner_digest": "2b78664aa2e5b37a0bd7bee711bf2420e580e4c753d695b4febab3a15bd59955"
+            "winner_digest": "3e81d23884116000cecfc1aa7525d6b9dc71e2710cc78a2d09085c340c3d3c77"
           },
-          "intent_digest": "ae1195e725d2130aae9ee1c5752d49dfa627797eb3267444dbf9190ee1d6c417",
-          "intent_id": 20,
+          "intent_digest": "26f03c9642061c24725cfd69e1519590a171826fbf003eb77c4d8c9cdb3f71cf",
+          "intent_id": 21,
           "path": "summary.txt",
           "prior_sha256": null,
           "proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
-          "request_id": "real-run-02:t0:c0",
+          "request_id": "real-run-03:t0:c0",
           "state": "DONE",
-          "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run2/home/ws/summary.txt",
-          "trace_id": "real-run-02"
+          "target": "/home/drakestapleton/.claude/jobs/6c731f18/tmp/ipx76/real-run3/home/ws/summary.txt",
+          "trace_id": "real-run-03"
         }
       },
       "decision": null,
@@ -169,14 +169,14 @@
         "trust": "trusted_runtime",
         "trusted": true
       },
-      "request_id": "real-run-02:t0:c0",
+      "request_id": "real-run-03:t0:c0",
       "status": "ok"
     },
     "source": {
       "id": "aien",
       "kind": "runtime"
     },
-    "timestamp": "2026-10-07T23:34:31Z",
-    "trace_id": "real-run-02"
+    "timestamp": "2026-10-08T00:50:20Z",
+    "trace_id": "real-run-03"
   }
 ]

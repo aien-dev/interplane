@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "05b14a8884539827a708c31fc6fcdedcfc1205d75c06df515763a168950e5f71",
+  "id": 20,
+  "kind": 65554,
+  "links": [
+    19,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor\":{\"pid\":827256,\"start\":20040993},\"path\":\"src/clamp.c\",\"phase\":\"intent\",\"prior_sha256\":\"a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7\",\"proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"target\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws/src/clamp.c\",\"tool\":\"write_file\"}",
+  "verified": true
+}

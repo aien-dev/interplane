@@ -1,0 +1,10 @@
+{
+  "boot_id": "8ff5f413-7f55-4bfa-999b-a80f3145d5de",
+  "executable_sha256": "a62a88b4a33b3805c3a95e6b56755a53aeb5cee22c60731a0bd8aef2632ee476",
+  "kind": "aien-daemon-run",
+  "note": "written by the run harness from /proc/<pid>/stat and the spawned child pid, not by the daemon",
+  "pid": 827279,
+  "socket": "/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/aien.sock",
+  "start_ticks": 20040999,
+  "workspace": "/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws"
+}

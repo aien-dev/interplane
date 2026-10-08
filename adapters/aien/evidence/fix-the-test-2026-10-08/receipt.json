@@ -1,0 +1,44 @@
+{
+  "kind": "interplane-aien-fix-the-test-receipt",
+  "adapter_commit": "dbe608e135130aaa91b687fdc0ce99ea69b055b1",
+  "adapter_dirty": false,
+  "aien_cli_sha256": "a62a88b4a33b3805c3a95e6b56755a53aeb5cee22c60731a0bd8aef2632ee476",
+  "verifier_sha256": "f4a0385dd9ba739f03affe2ff1dceeda06bd87a064a41aaaf09310049fb315aa",
+  "sovereign_core_rev": "47f1014a1aa0cf54b732132c6958bc142e91c20b",
+  "omega_lock": "6c6180cf378075b61291f4565d226eba38b4decd",
+  "backend": "CPU reference (as printed in the daemon log)",
+  "task": {
+    "task_id": "fix-the-test/clamp-1",
+    "source_commit": "369834ec1b5921ca72fce87ba8382bbec1cd257d",
+    "tree_commit_after": "c11f474412427fe80db94a9b331876dc8ef67ba8",
+    "test_exit_before": 2,
+    "test_exit_after": 0,
+    "target_blob_sha256_before": "a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7",
+    "target_blob_sha256_after": "95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2"
+  },
+  "native": {
+    "claimed": true,
+    "omega_sha": "6c6180cf378075b61291f4565d226eba38b4decd"
+  },
+  "native_label": "proven: daemon reports compose_native=true and the verifier checked the retained report",
+  "verdict": "PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn",
+  "bundle_companion_sha256": "f5b553b5b8026527f7bdc768f1d39cbe778ae751f314fa49e191f2c221ba11aa",
+  "negative_checks": [
+    "control PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn",
+    "changed_exit_code FAIL test_run_mismatch: exit_code=1 (a fix must pass: exit 0)",
+    "swapped_stdout_digest FAIL test_run_mismatch: stdout_sha256 vs retained test_stdout",
+    "wrong_target_blob FAIL test_run_mismatch: target_blob_sha256_after vs ledger_ack.disk_sha256",
+    "dropped_test_run FAIL test_run_missing: task/source_pin/test_run_record present but no test_run section",
+    "tampered_source_pin FAIL source_pin_mismatch: source_pin.target_blob_sha256 vs ledger_grant.prior_sha256",
+    "forged_native FAIL native_claim_contradicted: claimed native but no compose_recall report with compose_native"
+  ],
+  "started": "2026-10-08T19:11:39Z",
+  "finished": "2026-10-08T19:20:49Z",
+  "limits": [
+    "the model turn is scripted: proposal authorship is not claimed",
+    "the test run is harness evidence, not a daemon effect; the daemon only wrote the file",
+    "records are unsigned exports; the verifier cannot tell an export from a hand-written file",
+    "desk MAC for ComposeAuthorize stays default-off (not changed here)",
+    "make exits 2 (not 1) on a failing recipe: the gate requires non-zero before and 0 after"
+  ]
+}

@@ -1,0 +1,8 @@
+mkdir -p build
+cc -Wall -Wextra -O0 -o build/test_clamp src/clamp.c test/test_clamp.c
+./build/test_clamp
+ok   inside
+ok   below
+ok   above
+ok   at_low
+ok   at_high

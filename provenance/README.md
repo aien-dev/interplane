@@ -42,7 +42,8 @@ truncated write), `digest_mismatch`, `unlabelled_missing`, `completeness_mismatc
 `unparseable_record`, `binding_mismatch`, `run_not_complete`, `lineage_conflict`,
 `conversion_mismatch`, `incompatible`, `load_support_mismatch`, `load_unsupported`,
 `invalid_envelope`, `not_in_trace`, `synthetic_complete`, `canonicalization_mismatch`,
-`unsupported_binding`.
+`unsupported_binding`, and for the fix-the-test slice (BINDING.md): `test_run_missing`,
+`test_run_mismatch`, `unsupported_test_run`, `source_pin_mismatch`, `native_claim_contradicted`.
 
 A complete verdict whose AIEN link names no frozen candidate manifest (`candidate_id: null`) ends
 with `candidate=none`. Reading is strict: every JSON input (the manifest, each record, the JSON

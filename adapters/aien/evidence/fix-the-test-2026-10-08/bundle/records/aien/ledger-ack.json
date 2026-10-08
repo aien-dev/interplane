@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "bb08f949b357f04ec5efa74d9dad283e081bb6a97a05ba0f020fd5245e394602",
+  "id": 21,
+  "kind": 65554,
+  "links": [
+    20,
+    19,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"disk_error\":null,\"disk_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor_reported\":{\"bytes\":176,\"error\":null,\"written_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\"},\"intent\":20,\"path\":\"src/clamp.c\",\"phase\":\"ack\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"state\":\"DONE\",\"tool\":\"write_file\"}",
+  "verified": true
+}

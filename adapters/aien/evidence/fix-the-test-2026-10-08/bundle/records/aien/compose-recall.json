@@ -1,0 +1,388 @@
+{
+  "cited": [
+    {
+      "cls": 6,
+      "digest": "23d4b0bd3a6272b27d53ee6c56ff191daeba910d2555fb9ea8f67751de1c4a26",
+      "id": 6,
+      "kind": 65554,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approval_id\":\"aien-approval:w1:8751637374eb2313\",\"approval_key\":\"52c3fbd9b07eb9a8df015eff2cb1712c791a7098302e1dfcd1c2c19b79fd6469\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":827279,\"start\":20040999},\"request_id\":\"w1\",\"trace_id\":\"ledger\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "5f2f6a7c66cb7d8da77d20805079d92fd71c2e1c79578eeadef9c1065836cd2a",
+      "id": 7,
+      "kind": 65554,
+      "links": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"in_flight\",\"claim\":6}",
+      "verified": true
+    },
+    {
+      "cls": 3,
+      "digest": "719cb8d50e277e27df6a19b2f5ad4ab762ce3f532117060a8707eec01eaf6b8a",
+      "id": 8,
+      "kind": 65537,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 1,
+      "tag": 2,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "74e25f31f4456c8d3ebb7c8da9dbe768ba728c2e410f7357064eea2e1211752e",
+      "id": 9,
+      "kind": 65540,
+      "links": [
+        8,
+        1,
+        5,
+        0
+      ],
+      "note": null,
+      "subject": 3,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "97ef43281c511802e1e7121370f8d047488f1d9bca364e9f91e1761acf1ce501",
+      "id": 10,
+      "kind": 65540,
+      "links": [
+        8,
+        1,
+        5,
+        0
+      ],
+      "note": null,
+      "subject": 2,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "58ea105df196e010c51316914978f3f7e5b07f49799acc9d3a53a89652b47d0e",
+      "id": 11,
+      "kind": 65540,
+      "links": [
+        10,
+        1,
+        2,
+        3
+      ],
+      "note": null,
+      "subject": 4,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 4,
+      "digest": "9207185c6cfcd819417744ba72a39da7bf242b9a313842f76b579bc4a2346867",
+      "id": 12,
+      "kind": 65540,
+      "links": [
+        11,
+        4,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 3,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 2,
+      "digest": "043fbac2837dd1e0f0e47f1355a5a575dde52ea509e7ee1224edb3eab407a588",
+      "id": 13,
+      "kind": 65553,
+      "links": [
+        10,
+        8,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 8,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 2,
+      "digest": "222968a7aa806dfe4d65c25f738ea06e4c392708acdbc08b8ceb0143a1277fd9",
+      "id": 14,
+      "kind": 65553,
+      "links": [
+        9,
+        8,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 8,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "9bb1125a05a32bdc6e8d61cbd358aa7c69bb0bcea1f55ca384d276fe49416a14",
+      "id": 15,
+      "kind": 65554,
+      "links": [
+        11,
+        13,
+        14,
+        12
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 8,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "10f7374cbcb473352a3ec54bdaecb5ebd6e14dd329f2999f490374882d6bcd03",
+      "id": 16,
+      "kind": 65555,
+      "links": [
+        13,
+        15,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 0,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "47a05a2a1b909b68d03f8329a9cdb9be2ab9838b5c3072d7c2d06e73ecb3baee",
+      "id": 17,
+      "kind": 65556,
+      "links": [
+        14,
+        15,
+        0,
+        0
+      ],
+      "note": null,
+      "subject": 5,
+      "tag": 1,
+      "text": null,
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "339ad321e5d73adb91269412a52c4ae2e4919b0ad2aebb4211471e8e05532163",
+      "id": 18,
+      "kind": 65554,
+      "links": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":16572432152021077981}}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "a82c2d448a007544aef7eaf355a35ebdad9380bdbd7e52ab84cb40d17bcfb218",
+      "id": 19,
+      "kind": 65556,
+      "links": [
+        16,
+        15,
+        6,
+        0
+      ],
+      "note": "authorization",
+      "subject": 0,
+      "tag": 3,
+      "text": "{\"approval_id\":\"aien-approval:w1:8751637374eb2313\",\"approval_key\":\"52c3fbd9b07eb9a8df015eff2cb1712c791a7098302e1dfcd1c2c19b79fd6469\",\"approved_grant\":1,\"approved_proposal_sha256\":\"98bb5ec47ff537fa6cc27dccad702b86c4c3bbd409fedd65ad48099035ff963e\",\"approver\":\"drake\",\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"97c3b30524d50c9f\",\"path\":\"src/clamp.c\",\"prior_sha256\":\"a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7\",\"proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"replay_claim\":6,\"request_id\":\"w1\",\"target\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws/src/clamp.c\",\"trace_id\":\"ledger\",\"workspace\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "05b14a8884539827a708c31fc6fcdedcfc1205d75c06df515763a168950e5f71",
+      "id": 20,
+      "kind": 65554,
+      "links": [
+        19,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor\":{\"pid\":827256,\"start\":20040993},\"path\":\"src/clamp.c\",\"phase\":\"intent\",\"prior_sha256\":\"a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7\",\"proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"target\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws/src/clamp.c\",\"tool\":\"write_file\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "bb08f949b357f04ec5efa74d9dad283e081bb6a97a05ba0f020fd5245e394602",
+      "id": 21,
+      "kind": 65554,
+      "links": [
+        20,
+        19,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"disk_error\":null,\"disk_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor_reported\":{\"bytes\":176,\"error\":null,\"written_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\"},\"intent\":20,\"path\":\"src/clamp.c\",\"phase\":\"ack\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"state\":\"DONE\",\"tool\":\"write_file\"}",
+      "verified": true
+    }
+  ],
+  "compose_dir": "/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/compose",
+  "compose_native": true,
+  "host": [
+    {
+      "cls": 6,
+      "digest": "23d4b0bd3a6272b27d53ee6c56ff191daeba910d2555fb9ea8f67751de1c4a26",
+      "id": 6,
+      "kind": 65554,
+      "links": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approval_id\":\"aien-approval:w1:8751637374eb2313\",\"approval_key\":\"52c3fbd9b07eb9a8df015eff2cb1712c791a7098302e1dfcd1c2c19b79fd6469\",\"approved_submission\":\"accepted\",\"executor\":{\"pid\":827279,\"start\":20040999},\"request_id\":\"w1\",\"trace_id\":\"ledger\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "5f2f6a7c66cb7d8da77d20805079d92fd71c2e1c79578eeadef9c1065836cd2a",
+      "id": 7,
+      "kind": 65554,
+      "links": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"in_flight\",\"claim\":6}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "339ad321e5d73adb91269412a52c4ae2e4919b0ad2aebb4211471e8e05532163",
+      "id": 18,
+      "kind": 65554,
+      "links": [
+        6,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"approved_submission\":\"committed\",\"claim\":6,\"evidence\":{\"compose_proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"cx_evidence\":15,\"cx_promotion\":16,\"task\":16572432152021077981}}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "a82c2d448a007544aef7eaf355a35ebdad9380bdbd7e52ab84cb40d17bcfb218",
+      "id": 19,
+      "kind": 65556,
+      "links": [
+        16,
+        15,
+        6,
+        0
+      ],
+      "note": "authorization",
+      "subject": 0,
+      "tag": 3,
+      "text": "{\"approval_id\":\"aien-approval:w1:8751637374eb2313\",\"approval_key\":\"52c3fbd9b07eb9a8df015eff2cb1712c791a7098302e1dfcd1c2c19b79fd6469\",\"approved_grant\":1,\"approved_proposal_sha256\":\"98bb5ec47ff537fa6cc27dccad702b86c4c3bbd409fedd65ad48099035ff963e\",\"approver\":\"drake\",\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"cx_evidence\":15,\"cx_promotion\":16,\"desk_key_id\":\"97c3b30524d50c9f\",\"path\":\"src/clamp.c\",\"prior_sha256\":\"a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7\",\"proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"replay_claim\":6,\"request_id\":\"w1\",\"target\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws/src/clamp.c\",\"trace_id\":\"ledger\",\"workspace\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "05b14a8884539827a708c31fc6fcdedcfc1205d75c06df515763a168950e5f71",
+      "id": 20,
+      "kind": 65554,
+      "links": [
+        19,
+        0,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor\":{\"pid\":827256,\"start\":20040993},\"path\":\"src/clamp.c\",\"phase\":\"intent\",\"prior_sha256\":\"a13f814d50eb8ab97531f19a22726034ef3347ef233f8385863b397bf236a8f7\",\"proposal_sha256\":\"e3f48e7e932952d3c7016a3751837d37a81f84f39dced24d6bd89ddd6afc3be6\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"target\":\"/home/drakestapleton/handoffs/vac/M3b-slice-out/rows/slice1/ws/src/clamp.c\",\"tool\":\"write_file\"}",
+      "verified": true
+    },
+    {
+      "cls": 6,
+      "digest": "bb08f949b357f04ec5efa74d9dad283e081bb6a97a05ba0f020fd5245e394602",
+      "id": 21,
+      "kind": 65554,
+      "links": [
+        20,
+        19,
+        0,
+        0
+      ],
+      "note": "effect",
+      "subject": 0,
+      "tag": 4,
+      "text": "{\"authorization\":19,\"content_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"disk_error\":null,\"disk_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\",\"executor_reported\":{\"bytes\":176,\"error\":null,\"written_sha256\":\"95bdc0c9571d94ecf70cfbef4ab2e34a499876f1839f0ca084be9941ae6536a2\"},\"intent\":20,\"path\":\"src/clamp.c\",\"phase\":\"ack\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"state\":\"DONE\",\"tool\":\"write_file\"}",
+      "verified": true
+    }
+  ],
+  "machine_id": "ef3da1bb2ea3017674b603ee223617f7636e2b7cb6f9650092848f189532d5bc",
+  "missing": [],
+  "omega_sha": "6c6180cf378075b61291f4565d226eba38b4decd",
+  "prefix": null,
+  "prefix_digest": null,
+  "records_total": 21
+}

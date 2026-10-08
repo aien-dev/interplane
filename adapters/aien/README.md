@@ -353,6 +353,34 @@ to the workspace state beyond the digest of the target file and the harness's ow
 Recorded run: `evidence/fix-the-test-2026-10-08/` (receipt and the small bundle files; the 2.4 GB weights are
 hard links in the original and are not copied).
 
+## Reproducible demo
+
+`scripts/demo-verified-fix.sh` is the one command that runs the verified fix-the-test workflow end to end and
+writes a machine-made record, `$OUT/DEMO-RESULT.md`: exact revisions (interplane, sovereign-core, omega,
+physics and aienos locks, daemon hash, model and tokenizer hashes, host, rustc), whether the daemon says it is
+native (its own `Compose:` line and `ComposeRecall`), the starting task, the approved write (path, content
+digest, approval binding id), the ledger ack, the test results before and after, the verifier verdict and the
+tamper summary, plus "What is proven" and "What is not". It runs `scripts/test-fix-the-test.sh` once.
+
+Prerequisites: `git jq make cc cargo rustc sha256sum`, the Llama-3.2-1B-Instruct snapshot (`AIEN_LEDGER_MODEL_DIR`, default the
+unsloth snapshot in the Hugging Face cache), a clean interplane checkout, and a native sovereign-core daemon.
+
+```
+# with a native aien-cli you already have
+AIEN_BIN=<native aien-cli> SOVEREIGN_CORE_REV=<its sovereign-core rev> OUT=<fresh dir> adapters/aien/scripts/demo-verified-fix.sh
+
+# or build it from the four checkouts (each HEAD must equal its lock; CPU, debug build)
+SC_DIR=<aien-sovereign-core> OMEGA_DIR=<omega @ SC_DIR/omega.lock> PHYSICS_DIR=<physics @ OMEGA_DIR/physics.lock> \
+AIENOS_REPO=<aienos @ OMEGA_DIR/aienos.lock> OUT=<fresh dir> adapters/aien/scripts/demo-verified-fix.sh
+```
+
+The demo exits non-zero if the daemon reports a stub compose library, if `compose_native` and the `Compose:`
+line disagree, if the model or tokenizer hash in the daemon log differs from the file on disk, if the verdict
+is anything but the labelled-incomplete one (`missing=link:model_turn`; a scripted run is never `PASS
+complete`), or if any tamper is not refused. The stub check reads the daemon's report after the gate's run
+(about 9 to 15 minutes), not before it. Recorded run: `evidence/demo-2026-10-08/DEMO-RESULT.md`. Nothing here
+changes a security default.
+
 ## Build and test
 
 ```

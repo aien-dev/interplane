@@ -1,0 +1,19 @@
+control PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn
+substituted_score_count FAIL evaluation_signature_bad: receipt_digest does not match the receipt's fields
+substituted_score_layer FAIL evaluation_signature_bad: receipt_digest does not match the receipt's fields
+edited_subject FAIL evaluation_signature_bad: receipt_digest does not match the receipt's fields
+altered_policy_record FAIL evaluation_policy_mismatch: binding.policy_sha256 vs retained evaluation_policy
+wrong_pinned_key FAIL evaluation_signature_bad: signature does not verify under the operator-supplied judge key
+dropped_evaluation FAIL evaluation_missing: evaluation records present but no evaluation section
+substituted_change FAIL evaluation_subject_mismatch: binding.subject_sha256 vs ledger_grant.content_sha256 and ledger_ack.disk_sha256
+receipt_signed_by_other_key FAIL evaluation_signature_bad: signature does not verify under the operator-supplied judge key
+version_1_receipt FAIL evaluation_v1_insufficient: a version 1 receipt does not bind the evaluated change
+judged_under_other_policy FAIL evaluation_policy_mismatch: binding.policy_sha256 vs retained evaluation_policy
+unpinned_policy_pair FAIL evaluation_policy_mismatch: retained evaluation_policy is not the operator's pinned policy
+missing_holdouts REFUSED No valid holdout suites
+corrupted_holdouts REFUSED is corrupt
+shrunken_holdouts REFUSED does not match the policy
+stray_holdout_file REFUSED unexpected holdout entry
+rsi_targets_other_file REFUSED only README.md is allowed: refused
+dirty_workspace REFUSED uncommitted changes
+no_git_workspace REFUSED not the top of its own git repository

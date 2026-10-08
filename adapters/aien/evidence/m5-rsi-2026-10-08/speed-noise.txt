@@ -1,0 +1,11 @@
+# Speed-check noise: spark-rsi-judge --build-release on fixtures/rsi_dashes, measured 2026-10-08 before the M5 gate run
+# A/A = parent against an identical copy (no change); A/B = parent against the proposed README. Margin under test: 1% (default).
+A/A 1: Performance: delta=-5.43%, p_val=0.2064, p95_ci_upper=1.02%, p99_ci_upper=-0.46%, sig=NO
+A/A 2: Performance: delta=37.70%, p_val=0.0224, p95_ci_upper=78.57%, p99_ci_upper=42.95%, sig=NO
+A/A 3: Performance: delta=2.31%, p_val=0.7772, p95_ci_upper=9.32%, p99_ci_upper=0.45%, sig=NO
+A/A 4: Performance: delta=-2.11%, p_val=0.7524, p95_ci_upper=14.32%, p99_ci_upper=11.66%, sig=NO
+A/A 5: Performance: delta=-0.03%, p_val=0.9956, p95_ci_upper=4.42%, p99_ci_upper=2.32%, sig=NO
+A/B 1: Performance: delta=-1.27%, p_val=0.8676, p95_ci_upper=13.63%, p99_ci_upper=9.36%, sig=NO
+A/B 2: Performance: delta=-10.71%, p_val=0.1200, p95_ci_upper=-0.45%, p99_ci_upper=-2.28%, sig=NO
+A/B 3: Performance: delta=15.20%, p_val=0.0356, p95_ci_upper=8.10%, p99_ci_upper=5.07%, sig=NO
+A/B 0 (dry run with v2 binding): Performance: delta=1.06%, p_val=0.9240, p95_ci_upper=28.15%, p99_ci_upper=28.10%, sig=NO

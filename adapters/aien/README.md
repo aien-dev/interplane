@@ -442,6 +442,12 @@ model turn, so the verdict stays labelled incomplete (`missing=link:model_turn`)
 200% slowdown because timing a microsecond program here varied by up to 79% between identical builds; the
 desk MAC for `ComposeAuthorize` stays default-off (not changed here).
 
+Recorded run: `evidence/m5-rsi-2026-10-08/` (`receipt.json`: gate PASS on adapter 0c8a92d and spark-rsi 4becebb, tests
+failing before, passing after and failing again after the rollback; `judge-receipt.json`: the judge's signed
+version 2 receipt, 4 of 4 holdout suites; `negative-verdicts.txt`: the control and 18 named refusals;
+`speed-noise.txt`: the timing noise behind the 200% allowance). The same receipt is the cross-language
+fixture in `provenance/fixtures/rsi-eval-v2/`.
+
 ## Build and test
 
 ```

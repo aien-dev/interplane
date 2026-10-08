@@ -368,6 +368,7 @@ fn approve(
 /// With `LEDGER_OUT` set (the live gate), write the row-1 run as a provenance bundle in
 /// `<row>/bundle` for `provenance verify`. Without it nothing is exported (a temp dir would
 /// make the model copy pointless).
+#[allow(clippy::too_many_arguments)]
 fn export_provenance(
     d: &Daemon,
     intent: &Value,
@@ -376,6 +377,7 @@ fn export_provenance(
     t_request: &str,
     t_done: &str,
     slice: Option<&fix_the_test::TestRunEvidence>,
+    evaluation: Option<&provenance_export::Evaluation>,
 ) {
     if std::env::var("LEDGER_OUT").is_err() {
         return;
@@ -406,6 +408,7 @@ fn export_provenance(
         t_request,
         t_done,
         slice,
+        evaluation,
     })
     .expect("provenance export");
     println!("PROVENANCE_BUNDLE {}", rep.dir.display());
@@ -502,7 +505,9 @@ fn row1_approved_write_lands_and_is_done() {
         json!({"verdict": "PASS", "records_before": before, "records_after": after,
         "receipt": rc, "journal": recs, "file_sha256": hex(&written), "expected_sha256": hex(EXPECTED.as_bytes())}),
     );
-    export_provenance(&d, &intent_v, &pending_v, &res, &t_request, &t_done, None);
+    export_provenance(
+        &d, &intent_v, &pending_v, &res, &t_request, &t_done, None, None,
+    );
 }
 
 #[test]
@@ -1404,5 +1409,161 @@ fn slice1_fix_the_test_lands_and_tests_pass() {
         &t_request,
         &t_done,
         Some(&evidence),
+        None,
+    );
+}
+
+/// VAC M5: the RSI engine proposes, the separate judge (its own account and key) evaluates the
+/// exact bytes on the policy's pinned holdout set and signs a version 2 receipt, the harness
+/// refuses to propose unless that receipt binds those bytes, this workspace's commit and the
+/// operator's own policy, the change lands through the approved ledger, the tests pass, and a
+/// second approved write rolls it back to the pinned source bytes.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN, M5_HOOK and M5_JUDGE_KEY are set: run with --ignored"]
+fn m5_rsi_judged_change_lands_and_rolls_back() {
+    let _g = lock();
+    let (Ok(hook), Ok(key_file)) = (std::env::var("M5_HOOK"), std::env::var("M5_JUDGE_KEY")) else {
+        panic!("NOT_RUN m5: M5_HOOK and M5_JUDGE_KEY must be set");
+    };
+    // The judge key is the operator's pinned copy, never something the hook returns.
+    let key = interplane_provenance::evaluation::parse_judge_key(
+        &std::fs::read_to_string(&key_file).expect("M5_JUDGE_KEY file"),
+    )
+    .expect("judge key");
+    let Some(d) = daemon("m5") else { return };
+    let c = d.client();
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/rsi_dashes");
+    let task = fix_the_test::prepare_task(&fixture, &d.ws(), rsi_m5::TARGET, "rsi_dashes")
+        .expect("prepare the task workspace");
+    let before_run = fix_the_test::run_tests(&task).expect("tests before");
+    assert_ne!(
+        before_run.exit_code,
+        0,
+        "the task must start red: {}",
+        String::from_utf8_lossy(&before_run.stderr)
+    );
+    // The operator's policy is the committed one, read here, never the hook's copy.
+    let pinned_policy =
+        std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("m5/policy.json")).unwrap();
+    let judged = rsi_m5::propose_and_judge(
+        Path::new(&hook),
+        &task.ws,
+        &d.root.join("judged"),
+        &pinned_policy,
+    )
+    .expect("propose and judge");
+    // The gate before the write: no proposal reaches the daemon unless a valid judge receipt
+    // binds exactly these bytes for exactly this file, judged from this workspace's commit.
+    interplane_provenance::evaluation::precheck(
+        &judged.evaluation.receipt,
+        &judged.evaluation.policy,
+        &key,
+        &interplane_provenance::evaluation::Expect {
+            path: &task.target,
+            content: judged.content.as_bytes(),
+            parent_commit: &task.commit,
+            policy_sha256: Some(&hex(&pinned_policy)),
+        },
+    )
+    .expect("the judge's receipt must bind the proposed bytes");
+    let before = count(&c);
+    let l = ledger(&d);
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    let (intent_v, pending_v) = propose(&mut p, 0, "w1", &task.target, &judged.content);
+    let t_request = provenance_export::now_rfc3339();
+    let (res, _) = approve(&mut p, &l, "w1");
+    assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    let t_done = provenance_export::now_rfc3339();
+    let rc = res.data["receipt"].clone();
+    assert_eq!(rc["state"], "DONE");
+    let written = std::fs::read(d.ws().join(&task.target)).unwrap();
+    assert_eq!(
+        written,
+        judged.content.as_bytes(),
+        "the daemon wrote the judged bytes"
+    );
+    assert_eq!(rc["disk_sha256"], json!(hex(judged.content.as_bytes())));
+    let ids: Vec<u64> = ["grant_id", "intent_id", "ack_record_id"]
+        .iter()
+        .map(|k| rc[*k].as_u64().unwrap())
+        .collect();
+    let recs = records(&c, &ids);
+    assert!(recs.iter().all(|r| r["verified"] == true));
+    assert_eq!(
+        recs[0]["text"]["prior_sha256"],
+        json!(task.target_blob_sha256),
+        "the grant pins the bytes the change replaced"
+    );
+    let after_run = fix_the_test::run_tests(&task).expect("tests after");
+    assert_eq!(
+        after_run.exit_code,
+        0,
+        "the task must end green: {}",
+        String::from_utf8_lossy(&after_run.stderr)
+    );
+    let evidence = fix_the_test::evidence(&task, &before_run, &after_run).unwrap();
+    let after = count(&c);
+    export_provenance(
+        &d,
+        &intent_v,
+        &pending_v,
+        &res,
+        &t_request,
+        &t_done,
+        Some(&evidence),
+        Some(&judged.evaluation),
+    );
+
+    // Rollback: a second approved write restores the pinned source bytes, with its own records.
+    let prior = std::fs::read(fixture.join(&task.target)).unwrap();
+    assert_eq!(
+        hex(&prior),
+        task.target_blob_sha256,
+        "fixture bytes are the source pin"
+    );
+    propose(
+        &mut p,
+        1,
+        "w2",
+        &task.target,
+        std::str::from_utf8(&prior).unwrap(),
+    );
+    let (res2, _) = approve(&mut p, &l, "w2");
+    assert_eq!(res2.status, ResultStatus::Ok, "{res2:?}");
+    let rc2 = res2.data["receipt"].clone();
+    assert_eq!(rc2["state"], "DONE");
+    let restored = std::fs::read(d.ws().join(&task.target)).unwrap();
+    assert_eq!(restored, prior, "rollback restored the pinned bytes");
+    assert_eq!(rc2["disk_sha256"], json!(task.target_blob_sha256));
+    let ids2: Vec<u64> = ["grant_id", "intent_id", "ack_record_id"]
+        .iter()
+        .map(|k| rc2[*k].as_u64().unwrap())
+        .collect();
+    let recs2 = records(&c, &ids2);
+    assert!(recs2.iter().all(|r| r["verified"] == true));
+    assert_eq!(
+        recs2[0]["text"]["prior_sha256"],
+        json!(hex(judged.content.as_bytes())),
+        "the rollback grant pins the judged bytes it replaces"
+    );
+    let rollback_run = fix_the_test::run_tests(&task).expect("tests after rollback");
+    assert_ne!(
+        rollback_run.exit_code, 0,
+        "the restored README fails its test again"
+    );
+    save(
+        &d,
+        "m5",
+        json!({"verdict": "PASS", "records_before": before, "records_after": after,
+        "receipt": rc, "journal": recs, "task_id": evidence.task_id,
+        "proposal_id": judged.proposal_id,
+        "evaluation_receipt_sha256": hex(&judged.evaluation.receipt),
+        "evaluation_policy_sha256": hex(&judged.evaluation.policy),
+        "test_exit_before": evidence.exit_before, "test_exit_after": evidence.exit_after,
+        "source_commit": task.commit, "tree_commit_after": evidence.tree_commit_after,
+        "target_blob_sha256_before": task.target_blob_sha256, "target_blob_sha256_after": hex(&written),
+        "rollback": {"receipt": rc2, "journal": recs2, "disk_sha256": hex(&restored),
+            "test_exit_after_rollback": rollback_run.exit_code}}),
     );
 }

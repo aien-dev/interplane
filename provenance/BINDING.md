@@ -286,3 +286,76 @@ Limits: the verifier does not re-derive that a recovery was correct, only that t
 what it says. An interrupted run's ack may never be written, and then the bundle is unrecoverable as
 evidence of the effect, by design. The NOT_DONE and UNRESOLVED fixtures are synthetic (the real DONE ack
 with `state` changed); a bundle exported from a real daemon after an interruption was not produced.
+
+## Independent evaluation: `rsi-eval/2` (VAC M5)
+
+Status: implemented in `src/evaluation.rs`; tested in `tests/evaluation.rs` on the committed
+`fixtures/rsi-eval-v2` (a receipt signed by spark-rsi's own code) and on the live M5 bundle by
+`adapters/aien/scripts/test-m5-rsi.sh`. Receipt format: spark-rsi `docs/RECEIPT-V2.md`.
+
+The invariant: **no change may be promoted unless its exact identity matches the identity covered by a
+valid, independently signed evaluation.** The proposer (the RSI engine) and the judge run as different
+operating-system accounts; the judge signs with a key only its account can read. The judge's public
+key is a trust input the operator supplies to the verifier (`verify <dir> --judge-key <file>
+[--policy-sha256 <hex>]`); it is never read from the bundle, because a bundle that carried its own key could carry the proposer's.
+
+Retained records (raw files, never re-serialized):
+
+| Record | Content |
+|---|---|
+| `evaluation_receipt` | the judge's version 2 receipt, exactly as the judge printed it |
+| `evaluation_policy` | the operator's policy file the judge ran under (`holdout_set_sha256`, `min_holdout_pass_ratio`, `require_admitted`, `allowed_targets`, `protected_paths`) |
+
+`COMPANION.json` gains `"evaluation": {"binding": "rsi-eval/2", "receipt": "evaluation_receipt", "policy": "evaluation_policy"}`.
+The section rides on `aien-ledger-slice/1` (with any other effect binding it is `malformed_companion`)
+and is checked after the test-run section and before the `fixture.class` check.
+
+### Checks (fixed order, first failure wins)
+
+1. **`evaluation_missing`**: the archive names an evaluation record but has no `evaluation` section; a
+   judge key was supplied but the bundle carries no evaluation; or a named record is absent or not
+   retained.
+2. **`unsupported_evaluation`**: `evaluation.binding` is not `rsi-eval/2`, or `format_version` is
+   neither 1 nor 2.
+3. **`evaluation_v1_insufficient`**: the receipt is version 1 (or has no `format_version`). Version 1
+   does not bind the evaluated change; it stays verifiable as history in spark-rsi but never
+   satisfies this check.
+4. **`evaluation_malformed`**: a field the digest needs is missing or has the wrong type.
+5. **`evaluation_signature_bad`**: the recomputed version 2 digest differs from `receipt_digest` (any
+   field edited after signing), or the P-256 signature does not verify under the supplied key (wrong
+   or substituted key, a receipt signed by anyone but the pinned judge).
+6. **`evaluation_untrusted`**: no judge key was supplied. A receipt is never trusted on its own word.
+7. **`evaluation_subject_mismatch`**: `binding.subject_path` differs from the grant's `path`, or
+   `binding.subject_sha256` differs from the grant's `content_sha256` or the ack's `disk_sha256`. A
+   genuine receipt for different bytes (a substituted change) fails here.
+8. **`evaluation_parent_mismatch`**: the receipt's `parent_id` differs from the archive's
+   `source_pin.commit`, or the archive has no source pin. A genuine receipt for the same bytes judged
+   against another tree fails here.
+9. **`evaluation_policy_mismatch`**: `binding.policy_sha256` differs from the SHA-256 of the retained
+   policy bytes; the operator pinned a policy (`--policy-sha256`) and the retained policy is not it;
+   the written path is under one of the policy's `protected_paths` or not in `allowed_targets`;
+   `require_admitted` is not `true`; or `min_holdout_pass_ratio` is not in (0, 1].
+10. **`evaluation_holdout_mismatch`**: `binding.holdout_set_sha256` differs from the policy's pinned
+    digest.
+11. **`evaluation_below_threshold`**: the judge did not admit the change, or
+    `holdouts_passed < min_holdout_pass_ratio * holdouts_total`, or the total is 0.
+
+A plain `verify <dir>` without `--judge-key` does not look for an evaluation: a bundle with no
+evaluation section passes as an ordinary ledger bundle. An M5 audit must therefore always pass
+`--judge-key` (and should pass `--policy-sha256`, the SHA-256 of the operator's own policy file);
+with a key supplied, a bundle that carries no evaluation fails `evaluation_missing`.
+
+The same checks run in the harness **before** the write (`evaluation::precheck`, against the exact
+bytes about to be proposed), so a change whose receipt does not bind it never reaches the daemon. The
+verifier then repeats them against the daemon's own grant and read-back.
+
+### Trust, stated plainly
+
+- The verifier checks that the pinned judge signed this evaluation of these bytes under this policy and
+  holdout set. It does not re-run the judge; that the judge's holdouts and layers are good tests is the
+  judge's claim.
+- The judge refuses to evaluate when the holdout directory is missing, empty, holds anything but
+  regular `.json` files, a file does not parse, a suite or case is incomplete, or the set's digest
+  differs from the policy's pin. The verifier sees only the digest the judge signed.
+- Key separation holds against the proposing account. The operator account can read the judge key
+  through sudo; that is the operator's authority, and the M5 receipt lists it as a limit.

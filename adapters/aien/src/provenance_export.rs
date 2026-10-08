@@ -52,6 +52,16 @@ pub struct LiveRun<'a> {
     pub t_done: &'a str,
     /// The fix-the-test slice: task, source pin and test-run records (harness evidence).
     pub slice: Option<&'a crate::fix_the_test::TestRunEvidence>,
+    /// The M5 slice: the independent judge's signed receipt and the policy it ran under, as the
+    /// exact bytes the judge wrote and the operator pinned (never re-serialized).
+    pub evaluation: Option<&'a Evaluation>,
+}
+
+/// The judge's evidence for one change (`rsi-eval/2`, spark-rsi docs/RECEIPT-V2.md).
+#[derive(Debug, Clone)]
+pub struct Evaluation {
+    pub receipt: Vec<u8>,
+    pub policy: Vec<u8>,
 }
 
 /// What was written.
@@ -303,6 +313,22 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
             s.stderr.clone(),
         )?;
     }
+    if let Some(ev) = run.evaluation {
+        put(
+            run.out,
+            &mut records,
+            "evaluation_receipt",
+            "records/evaluation/receipt.json",
+            ev.receipt.clone(),
+        )?;
+        put(
+            run.out,
+            &mut records,
+            "evaluation_policy",
+            "records/evaluation/policy.json",
+            ev.policy.clone(),
+        )?;
+    }
     let exe_sha = sha256_file(run.aien_bin)?;
     let boot_id = std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
         .map(|s| s.trim().to_string())
@@ -431,6 +457,11 @@ pub fn export_bundle(run: &LiveRun<'_>) -> Result<ExportReport, String> {
         companion["test_run"] = json!({"binding": "vac-test-run/1", "task_id": s.task_id,
             "record": "test_run_record"});
     }
+    if run.evaluation.is_some() {
+        companion["evaluation"] = json!({"binding": "rsi-eval/2",
+            "receipt": "evaluation_receipt", "policy": "evaluation_policy",
+            "note": "the change was proposed by spark-rsi and evaluated by the separate judge process; the judge's public key is supplied to the verifier out of band"});
+    }
     write(run.out, "COMPANION.json", &pretty(&companion))?;
     Ok(ExportReport {
         dir: run.out.to_path_buf(),
@@ -482,6 +513,7 @@ mod tests {
             t_request: "t",
             t_done: "t",
             slice: None,
+            evaluation: None,
         });
         assert!(r.unwrap_err().contains("never rewritten"));
     }

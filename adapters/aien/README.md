@@ -381,6 +381,73 @@ complete`), or if any tamper is not refused. The stub check reads the daemon's r
 (about 9 to 15 minutes), not before it. Recorded run: `evidence/demo-2026-10-08/DEMO-RESULT.md`. Nothing here
 changes a security default.
 
+## Bounded self-improvement, independently judged (VAC M5)
+
+`scripts/test-m5-rsi.sh` runs one bounded self-improvement cycle where the proposing agent cannot forge
+the evidence that approves its own change:
+
+```
+scripts/m5-setup-judge.sh <pinned public key file>        # once: the judge account makes its own key
+AIEN_BIN=<aien-cli> OUT=<fresh dir> SPARK_RSI_DIR=<spark-rsi target/release> \
+M5_JUDGE_KEY=<pinned public key file> scripts/test-m5-rsi.sh
+```
+
+`m5-setup-judge.sh` refuses to finish unless it can run a command as the proposing account and that
+account gets "Permission denied" reading the judge key, and unless neither service account can write the
+pinned public key, its directory or any directory above it, or use sudo.
+
+Three separate parties, three separate operating-system accounts:
+
+- **Proposer** (`aien-rsi`, no sudo): `spark-rsi propose` reads a read-only copy of the task workspace
+  (`fixtures/rsi_dashes/`, whose tests fail while its README contains dashes) and prints one proposal. The
+  hook (`scripts/m5-propose-and-judge.sh`) refuses a workspace with uncommitted changes or symbolic
+  links, and a proposal for any file other than `README.md`.
+- **Judge** (`aien-judge`, home mode 700, holds the only copy of `judge.key`): `spark-rsi-judge` receives
+  its own copies of the parent tree, the candidate tree, the holdout suite (`m5/holdouts/`) and the
+  operator policy (`m5/policy.json`). Before running anything it refuses a holdout set that does not hash
+  to the policy's pinned digest, a subject outside `allowed_targets` or under `protected_paths`, and a
+  candidate that differs from the parent in any file but the subject. It builds both trees and runs their
+  own `cargo check` and `cargo test` inside a bubblewrap sandbox (no network, no environment, only the
+  tree and the toolchain visible, so a build script or test in the candidate cannot read the key), runs the holdouts, re-hashes the subject and signs a
+  version 2 receipt (`spark-rsi` `docs/RECEIPT-V2.md`) naming the parent commit it compared against.
+- **Operator path** (the harness and the daemon): the harness refuses a judged policy that is not byte for
+  byte its own `m5/policy.json`, then `evaluation::precheck` checks the receipt against the pinned public
+  key, the exact bytes about to be proposed, the task's commit and the policy pin; only then does the
+  scripted proposal go through `ComposeApprovedProposal` with the normal approval, exactly like the
+  fix-the-test slice. After the tests pass, a second approved write restores the original README
+  (rollback) and the tests fail again.
+
+The bundle carries the receipt and the policy as records with an `evaluation` section, and
+`provenance verify <bundle> --judge-key <file> --policy-sha256 <sha of m5/policy.json>` checks it offline
+(`provenance/BINDING.md`, "Independent evaluation"). Without the key the verdict is
+`FAIL evaluation_untrusted`: a bundle never carries the key that verifies it. The gate then requires a
+named refusal for each counterfeit: an edited score, layer or subject digest (`evaluation_signature_bad`),
+an edited policy (`evaluation_policy_mismatch`), the wrong pinned key (`evaluation_signature_bad`), a
+dropped section (`evaluation_missing`), a genuine receipt for a different README
+(`evaluation_subject_mismatch`), a receipt signed with a throwaway key, a version 1 receipt
+(`evaluation_v1_insufficient`), a policy with a lower bar re-signed into a consistent pair
+(`evaluation_policy_mismatch` against the operator's pin), a workspace with uncommitted changes (the hook
+refuses), and holdout suites that are missing, corrupt, shrunk or carry a stray file (the judge refuses to
+sign).
+
+What it proves: the change that landed is byte for byte the change the judge evaluated, judged against the
+task's own commit; the judge ran under the operator's pinned policy and holdout set and signed with a key
+the proposer cannot read; a version 1 receipt, a substituted score or a substituted change is refused
+before the write and again offline; the change can be undone through the same approved path.
+
+What it does not prove: the operator account can still read the judge key through sudo (that is the
+operator's authority, not the agent's); the holdouts are not secret from the proposer (its account can
+read the operator's files), only fixed by digest; the proposal is a deterministic rule-based edit, not a
+model turn, so the verdict stays labelled incomplete (`missing=link:model_turn`); the speed check allows
+200% slowdown because timing a microsecond program here varied by up to 79% between identical builds; the
+desk MAC for `ComposeAuthorize` stays default-off (not changed here).
+
+Recorded run: `evidence/m5-rsi-2026-10-08/` (`receipt.json`: gate PASS on adapter 0c8a92d and spark-rsi 4becebb, tests
+failing before, passing after and failing again after the rollback; `judge-receipt.json`: the judge's signed
+version 2 receipt, 4 of 4 holdout suites; `negative-verdicts.txt`: the control and 18 named refusals;
+`speed-noise.txt`: the timing noise behind the 200% allowance). The same receipt is the cross-language
+fixture in `provenance/fixtures/rsi-eval-v2/`.
+
 ## Build and test
 
 ```

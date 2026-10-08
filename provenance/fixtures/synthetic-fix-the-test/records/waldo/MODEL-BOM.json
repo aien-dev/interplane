@@ -1,0 +1,32 @@
+{
+  "current_run_id": "5e7a0c1d2b3f4a59",
+  "kind": "openwaldo-bom",
+  "model_id": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74",
+  "name": "synthetic-notes",
+  "path_base": "model-root",
+  "plan_sha256": "c894c3d7cface2bbb09acec55075aac6cd875ff2251fada62862ed85863cfd74",
+  "runs": [
+    {
+      "artifacts": [
+        {
+          "bytes": 152,
+          "path": "runs/0001-pretrain-5e7a0c1d2b3f4a59/artifacts/model.safetensors",
+          "role": "weights",
+          "sha256": "c577e4eca87be69ec21ae758c3f81edb91d9fed486ba517d25da321da3e51a6f"
+        }
+      ],
+      "backend": {
+        "name": "pytorch",
+        "revision": "synthetic-worker-r0"
+      },
+      "bom_sha256": "2afc802676a08df19a94facc7b287f99236b18aad1b88c9df14d0bd3019b10d2",
+      "id": "5e7a0c1d2b3f4a59",
+      "ordinal": 1,
+      "simulated": false,
+      "stage": "pretrain",
+      "state": "complete"
+    }
+  ],
+  "schema": 1,
+  "subject": "model"
+}

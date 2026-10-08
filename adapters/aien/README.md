@@ -303,10 +303,55 @@ What it does not prove: the exported records carry no signatures, so the verifie
 from a hand-written file (`provenance/BINDING.md`, Trust); the model turn is scripted, so the verdict is
 labelled incomplete (no authorship claim); the desk MAC for `ComposeAuthorize` stays default-off (not
 changed here; this path authenticates by the desk-key MAC regardless); CPU reference backend only; the
-daemon does not report whether the native compose library is linked or which revision it was built
-from, so the receipt records those as caller-asserted or `UNVERIFIED`.
+daemon (before sovereign-core #346) does not report whether the native compose library is linked or which revision it was
+built from, so the receipt records those as caller-asserted or `UNVERIFIED`; a daemon with #346 reports
+`compose_native` and `omega_sha`, which the fix-the-test slice below carries and checks.
 
 Recorded run: `evidence/live-gate-2026-10-08/receipt.json` (CPU, debug `aien-cli` sha256 9704f29f..., sovereign-core 9b5e6e8 caller-asserted, omega 6c6180c). It ran `LIVE_ROWS="row1_ x1_ x2_ x3_ x4_"` (5 tests); rows 2-8, 10 and 11 passed against the same binary in an earlier unrecorded-by-this-gate run (14 of 14), not by this receipt.
+
+## Fix-the-test slice
+
+`scripts/test-fix-the-test.sh` (also run at the end of `test-live-daemon.sh` unless `SKIP_SLICE=1`) is the
+first product-shaped run on top of the live gate: an agent step fixes a deliberately failing test, and the
+whole run is verified offline.
+
+```
+AIEN_BIN=<aien-cli> OUT=<fresh dir> scripts/test-fix-the-test.sh      # one live row, about 8.5 min on CPU
+```
+
+The fixture `fixtures/fix_the_test/` is a tiny C project: `clamp()` returns `lo` where it must return `hi`,
+so `make test` fails before the fix (GNU make exits 2 on a failing recipe; the gate requires non-zero) and
+exits 0 after. `TASK.md` carries the task id and the exact test command; `solution/clamp.c` is harness
+material (not copied into the task workspace). No binaries are committed.
+
+The live row `slice1_fix_the_test_lands_and_tests_pass` (`tests/compose_ledger.rs`, `#[ignore]`d) copies the
+fixture to a workspace, `git init`s and commits it, runs `make test` (expected red), then drives a
+SCRIPTED `write_file` proposal whose content is the corrected `src/clamp.c` through the existing adapter and
+the daemon's `ComposeApprovedProposal` path (desk-key MAC, durable claim, grant, intent, ack), waits for
+`DONE`, and runs `make test` again (expected green). `src/fix_the_test.rs` builds the task, source-pin and
+`vac-test-run/1` records; the exporter retains them next to the daemon's ledger records, and the daemon's
+raw `ComposeRecall` report, which since sovereign-core #346 says whether the compose library is native.
+The gate then runs `provenance verify` and, on hard-linked copies, requires a named refusal for a changed
+exit code, a swapped stdout digest, a wrong target blob, a dropped test run, a tampered source pin and a
+forged native claim (`provenance/BINDING.md`, "Fix-the-test slice").
+
+Expected verdict: `PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong
+proposal=scripted_turn`; with a daemon that does not report `compose_native` it is `missing=link:model_turn,link:native`
+(labelled, never complete). Never `PASS complete`: the model turn is scripted.
+
+What it proves: the approval is bound to the exact bytes written; the write went through the daemon's
+ledger; the tests were run after the write and their output is retained and digest-checked; the source
+pin matches the grant's `prior_sha256` (the bytes the daemon replaced are the bytes of the pinned commit's
+file); the bundle's native claim agrees with the daemon's own report.
+
+What it does not prove: the model turn is scripted (no authorship claim); the records are unsigned exports,
+so the verifier cannot tell an export from a hand-written file; the test run is harness evidence, not a
+daemon effect (the daemon only writes, `bash_eval` stays `NOT_EXECUTED`); nothing ties the second test run
+to the workspace state beyond the digest of the target file and the harness's own commit; the desk MAC for
+`ComposeAuthorize` stays default-off (not changed here); CPU reference backend only.
+
+Recorded run: `evidence/fix-the-test-2026-10-08/` (receipt and the small bundle files; the 2.4 GB weights are
+hard links in the original and are not copied).
 
 ## Build and test
 

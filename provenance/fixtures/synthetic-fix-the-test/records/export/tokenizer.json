@@ -1,0 +1,37 @@
+{
+  "added_tokens": [
+    {
+      "content": "<unk>",
+      "id": 0,
+      "special": true
+    },
+    {
+      "content": "<s>",
+      "id": 1,
+      "special": true
+    },
+    {
+      "content": "</s>",
+      "id": 2,
+      "special": true
+    }
+  ],
+  "model": {
+    "type": "WordLevel",
+    "unk_token": "<unk>",
+    "vocab": {
+      "</s>": 2,
+      "<s>": 1,
+      "<unk>": 0,
+      "append": 6,
+      "hello": 3,
+      "note": 5,
+      "ok": 7,
+      "world": 4
+    }
+  },
+  "pre_tokenizer": {
+    "type": "Whitespace"
+  },
+  "version": "1.0"
+}

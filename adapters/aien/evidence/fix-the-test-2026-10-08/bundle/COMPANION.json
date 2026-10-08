@@ -1,0 +1,142 @@
+{
+  "aien": {
+    "candidate_id": null,
+    "executable": "aien-cli",
+    "executable_sha256": "a62a88b4a33b3805c3a95e6b56755a53aeb5cee22c60731a0bd8aef2632ee476",
+    "native": {
+      "claimed": true,
+      "omega_sha": "6c6180cf378075b61291f4565d226eba38b4decd"
+    },
+    "note": "no frozen AIEN candidate: no candidate_manifest record; CPU-reference backend as printed in the daemon log; whether the compose library was native-linked is reported only when the daemon returns compose_native (sovereign-core #346); aien.native then names it"
+  },
+  "completeness": {
+    "missing": [
+      "link:model_turn"
+    ],
+    "reason": "the INTERPLANE model turn is scripted by the test: nothing links this model to the effect's content",
+    "state": "incomplete"
+  },
+  "effect": {
+    "approval_binding": "aien.approval.v2",
+    "binding": "aien-ledger-slice/1",
+    "proposal_origin": "scripted_turn"
+  },
+  "export": {
+    "chat_template": null,
+    "format": "huggingface"
+  },
+  "fixture": {
+    "class": "real",
+    "note": "Real daemon; the five ledger records are the daemon's own ComposeRecall output (pretty-printed only); daemon_run.json and the 3-message trace are written by the test harness, including their timestamps. The model turn is SCRIPTED by the test (the tool call is a test constant), so authorship of the proposal is not claimed; the model only loaded."
+  },
+  "interplane": {
+    "request_id": "w1",
+    "trace_id": "ledger"
+  },
+  "kind": "interplane-provenance-companion",
+  "lineage": {
+    "kind": "unknown_pretraining",
+    "origin": {
+      "model_id": "unsloth/Llama-3.2-1B-Instruct",
+      "model_id_source": "caller-asserted (AIEN_LEDGER_MODEL_ID or default; not checked against the model directory)",
+      "note": "weights as downloaded; no training evidence is held",
+      "revision": "5a8abab4a5d6f164389b1079fb721cfab8d7126c"
+    }
+  },
+  "load_support": {
+    "declared": "supported_structural"
+  },
+  "records": {
+    "aien_load_log": {
+      "bytes": 1554,
+      "path": "records/aien/daemon-load.log",
+      "sha256": "d1b50249ae6e5da030486e4cbd2fc87ff59d7f241a64d092829d25f1e2eeddfb"
+    },
+    "compose_recall": {
+      "bytes": 12616,
+      "path": "records/aien/compose-recall.json",
+      "sha256": "c1b26938bd239fc38631c8ff39c2840393b329992ca70d4645dd3adc6f266b5e"
+    },
+    "daemon_run": {
+      "bytes": 492,
+      "path": "records/aien/daemon-run.json",
+      "sha256": "af38f3db124ca5365679ec4209a87f95df654a4d055181a2227162005862682c"
+    },
+    "export_config": {
+      "bytes": 894,
+      "path": "records/export/config.json",
+      "sha256": "dfb67fd8afe73a1c75245824ef9d64a6ba8983025447e3bf76aa1ea57ee46152"
+    },
+    "export_tokenizer": {
+      "bytes": 17209920,
+      "path": "records/export/tokenizer.json",
+      "sha256": "6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b"
+    },
+    "export_weights": {
+      "bytes": 2471645608,
+      "path": "records/export/model.safetensors",
+      "sha256": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f"
+    },
+    "interplane_trace": {
+      "bytes": 6243,
+      "path": "records/interplane/trace.json",
+      "sha256": "53855bf5835fd87ccf9abdfbb1c2eadbbcc9738461db2ca70794dcc0e78ab32b"
+    },
+    "ledger_ack": {
+      "bytes": 777,
+      "path": "records/aien/ledger-ack.json",
+      "sha256": "36e0fba19387b981e5f9a979a88e65842cb14c15207ada984ef00bd912f5c5e5"
+    },
+    "ledger_claim": {
+      "bytes": 522,
+      "path": "records/aien/ledger-claim.json",
+      "sha256": "828e8b1645a29f6b134eeef792c23969515785df48739d6ac36baa2d87331fd3"
+    },
+    "ledger_committed": {
+      "bytes": 482,
+      "path": "records/aien/ledger-committed.json",
+      "sha256": "0733d0b8a6ace38fb739faaee00b102347281873a1ebc580d877a09b9dca58cd"
+    },
+    "ledger_grant": {
+      "bytes": 1211,
+      "path": "records/aien/ledger-grant.json",
+      "sha256": "c34f3eee1bc8614cff0942cae241f2de9c062c496a7967e75dd17c9f084bc35d"
+    },
+    "ledger_intent": {
+      "bytes": 814,
+      "path": "records/aien/ledger-intent.json",
+      "sha256": "825170ebbc191d9e01210ae04d1b8f43e606e121efd72dcce09c4d3104097293"
+    },
+    "source_pin": {
+      "bytes": 236,
+      "path": "records/task/source-pin.json",
+      "sha256": "257ca3d6e0066b87127c4d7621b987ef34a55017234db5387b54716270250917"
+    },
+    "task": {
+      "bytes": 166,
+      "path": "records/task/task.json",
+      "sha256": "5b7c7e56ee4a9c27e43c4b1eaaa927b4dcb090640ba82ed3c1e53fbbc1f29737"
+    },
+    "test_run_record": {
+      "bytes": 768,
+      "path": "records/task/test-run.json",
+      "sha256": "aed0dd53fae0fa7621d1c5580816e54fe2d6a8c222d06532c1a338bc895e95db"
+    },
+    "test_stderr": {
+      "bytes": 0,
+      "path": "records/task/test-stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "test_stdout": {
+      "bytes": 164,
+      "path": "records/task/test-stdout.txt",
+      "sha256": "8138649dee23d7f8a22dfeae6a63398a1479cab6fbbd967f76ef87eaeda45ae1"
+    }
+  },
+  "schema": 0,
+  "test_run": {
+    "binding": "vac-test-run/1",
+    "record": "test_run_record",
+    "task_id": "fix-the-test/clamp-1"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "kind": "vac-task",
+  "repo_commit": "369834ec1b5921ca72fce87ba8382bbec1cd257d",
+  "task_id": "fix-the-test/clamp-1",
+  "test_cmd": [
+    "make",
+    "test"
+  ]
+}

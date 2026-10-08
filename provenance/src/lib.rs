@@ -18,6 +18,7 @@ mod ledger;
 mod modelturn;
 mod strict;
 pub mod synth;
+mod testrun;
 
 use binding::{compact_sorted, LEDGER_BINDING, RECEIPT_BINDING, SERDE_DIGEST_FORM};
 use gojson::{compact, sha256_hex, top_level_member, waldo_sha256};
@@ -251,6 +252,7 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bo
     for item in modelturn::implied_missing(&archive, &m) {
         actually_missing.insert(item);
     }
+    actually_missing.extend(testrun::implied_missing(&m));
     let state = s(&m, &["completeness", "state"]);
     let declared: BTreeSet<String> = m
         .get("completeness")
@@ -353,6 +355,7 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bo
         call = check_trace(&archive, t)?;
     }
     let mut effect_label = None;
+    let mut ledger_checked = false;
     if let Some(e) = link("effect") {
         let (Some(t), Some(aien)) = (link("interplane"), link("aien")) else {
             return fail("malformed_companion", "effect without interplane");
@@ -384,6 +387,7 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bo
                     modelturn::check(&archive, t, call.as_ref())?;
                 }
                 effect_label = Some(format!("{LEDGER_BINDING}:strong proposal={origin}"));
+                ledger_checked = true;
             }
             Some(RECEIPT_BINDING) => {
                 // Weaker: tool + digests only. The label stays on the verdict.
@@ -405,6 +409,7 @@ fn verify_inner(dir: &Path) -> Result<(BTreeSet<String>, Option<EffectLabel>, bo
             None => return fail("malformed_companion", "effect.binding"),
         }
     }
+    testrun::check(&archive, &m, ledger_checked)?;
     // Test material may verify, but never as a complete chain: `fixture.class` other than `real`
     // refuses `complete` whatever records it carries (#76 review). Checked last, so every deeper
     // check above still runs on test material.

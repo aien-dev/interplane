@@ -19,6 +19,7 @@
 #                          recorded as caller-asserted (default UNVERIFIED)
 #   OMEGA_LOCK_REV         omega revision of the linked compose library; default: git rev-parse of
 #                          $AIEN_OMEGA_COMPOSE_DIR when set, else UNVERIFIED
+#   SKIP_SLICE             1: do not run the fix-the-test slice gate (scripts/test-fix-the-test.sh) at the end
 #   CARGO_TARGET_DIR       build dir
 # Exit 0 only when every check passed. No process is killed here; the daemons are the tests' own.
 set -euo pipefail
@@ -52,10 +53,12 @@ if [ -n "$rows" ]; then
 fi
 
 # 1. The live tests.
+# The fix-the-test slice row has its own gate (step 5); with no LIVE_ROWS filter it is skipped here.
+skip_slice=""; [ -n "$rows" ] || skip_slice="--skip slice1_"
 log="$OUT/live.log"
 set +e
 (cd "$adapter" && AIEN_BIN="$AIEN_BIN" AIEN_LEDGER_MODEL_DIR="$model_dir" LEDGER_OUT="$OUT/rows" \
-  cargo test --locked --test compose_ledger --test compose_ledger_attacks -- --ignored --test-threads=1 $rows) >"$log" 2>&1
+  cargo test --locked --test compose_ledger --test compose_ledger_attacks -- --ignored --test-threads=1 $skip_slice $rows) >"$log" 2>&1
 test_rc=$?
 set -e
 [ "$test_rc" -eq 0 ] || { tail -5 "$log" >&2; die "live tests exited $test_rc (log $log)"; }
@@ -156,4 +159,8 @@ jq -n \
              "desk MAC for ComposeAuthorize stays default-off (not changed here)",
              "native compose library linking is not reported by the daemon",
              "the model turn is scripted: proposal authorship is not claimed"]}' >"$OUT/receipt.json"
+# 5. The fix-the-test slice (scripts/test-fix-the-test.sh): its own live row, bundle verdict, tamper checks and receipt.
+if [ "${SKIP_SLICE:-0}" != "1" ]; then
+  OUT="$OUT/slice" "$here/test-fix-the-test.sh" || die "fix-the-test slice gate failed (set SKIP_SLICE=1 to run without it)"
+fi
 echo "GATE PASS: $passed live tests, verdict: $verdict; receipt $OUT/receipt.json"

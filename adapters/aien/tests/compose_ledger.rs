@@ -375,6 +375,7 @@ fn export_provenance(
     res: &ToolResult,
     t_request: &str,
     t_done: &str,
+    slice: Option<&fix_the_test::TestRunEvidence>,
 ) {
     if std::env::var("LEDGER_OUT").is_err() {
         return;
@@ -404,6 +405,7 @@ fn export_provenance(
         final_result: &final_result,
         t_request,
         t_done,
+        slice,
     })
     .expect("provenance export");
     println!("PROVENANCE_BUNDLE {}", rep.dir.display());
@@ -500,7 +502,7 @@ fn row1_approved_write_lands_and_is_done() {
         json!({"verdict": "PASS", "records_before": before, "records_after": after,
         "receipt": rc, "journal": recs, "file_sha256": hex(&written), "expected_sha256": hex(EXPECTED.as_bytes())}),
     );
-    export_provenance(&d, &intent_v, &pending_v, &res, &t_request, &t_done);
+    export_provenance(&d, &intent_v, &pending_v, &res, &t_request, &t_done, None);
 }
 
 #[test]
@@ -1318,5 +1320,89 @@ fn row11_released_grant_reminted_is_refused_by_the_daemon() {
         "row11",
         json!({"verdict": "PASS", "records_before": before, "records_after": count(&c),
         "remint_refusal": msg}),
+    );
+}
+
+/// The fix-the-test slice (VAC M3b): a task workspace with a deliberately failing test, a SCRIPTED
+/// proposal whose content is the corrected file, written through the daemon's approved ledger; the
+/// harness runs the task's test command before the proposal and after the daemon's ack. The test
+/// run is harness evidence, not a daemon effect. With `LEDGER_OUT` set the run is exported as a
+/// bundle (`slice1/bundle`) for `provenance verify`.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn slice1_fix_the_test_lands_and_tests_pass() {
+    let _g = lock();
+    let Some(d) = daemon("slice1") else { return };
+    let c = d.client();
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/fix_the_test");
+    let task = fix_the_test::prepare(&fixture, &d.ws()).expect("prepare the task workspace");
+    let before_run = fix_the_test::run_tests(&task).expect("make test before");
+    assert_ne!(
+        before_run.exit_code,
+        0,
+        "the task must start red: {}",
+        String::from_utf8_lossy(&before_run.stdout)
+    );
+    let before = count(&c);
+    let l = ledger(&d);
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    let (intent_v, pending_v) = propose(&mut p, 0, "w1", fix_the_test::TARGET, &task.solution);
+    let t_request = provenance_export::now_rfc3339();
+    let (res, _) = approve(&mut p, &l, "w1");
+    assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    let t_done = provenance_export::now_rfc3339();
+    let rc = res.data["receipt"].clone();
+    assert_eq!(rc["state"], "DONE");
+    let written = std::fs::read(d.ws().join(fix_the_test::TARGET)).unwrap();
+    assert_eq!(
+        written,
+        task.solution.as_bytes(),
+        "the daemon wrote the approved bytes"
+    );
+    assert_eq!(rc["disk_sha256"], json!(hex(task.solution.as_bytes())));
+    let ids: Vec<u64> = ["grant_id", "intent_id", "ack_record_id"]
+        .iter()
+        .map(|k| rc[*k].as_u64().unwrap())
+        .collect();
+    let recs = records(&c, &ids);
+    assert!(recs.iter().all(|r| r["verified"] == true));
+    assert_eq!(
+        recs[0]["text"]["prior_sha256"],
+        json!(task.target_blob_sha256),
+        "the grant pins the bytes the fix replaced"
+    );
+    let after_run = fix_the_test::run_tests(&task).expect("make test after");
+    assert_eq!(
+        after_run.exit_code,
+        0,
+        "the task must end green: {}",
+        String::from_utf8_lossy(&after_run.stdout)
+    );
+    let evidence = fix_the_test::evidence(&task, &before_run, &after_run).unwrap();
+    let after = count(&c);
+    let (claim, _) = claim_grant(&rc);
+    assert_eq!(
+        after - before,
+        ids[2] - claim + 1,
+        "handoff + grant + intent + ack"
+    );
+    save(
+        &d,
+        "slice1",
+        json!({"verdict": "PASS", "records_before": before, "records_after": after,
+        "receipt": rc, "journal": recs, "task_id": evidence.task_id,
+        "test_exit_before": evidence.exit_before, "test_exit_after": evidence.exit_after,
+        "source_commit": task.commit, "tree_commit_after": evidence.tree_commit_after,
+        "target_blob_sha256_before": task.target_blob_sha256, "target_blob_sha256_after": hex(&written)}),
+    );
+    export_provenance(
+        &d,
+        &intent_v,
+        &pending_v,
+        &res,
+        &t_request,
+        &t_done,
+        Some(&evidence),
     );
 }

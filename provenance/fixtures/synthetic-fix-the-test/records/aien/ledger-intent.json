@@ -1,0 +1,17 @@
+{
+  "cls": 0,
+  "digest": "6d6960003ec46ee172dccfd37d083f824cb571a0decd920f7ea6f3b77e0ab25e",
+  "id": 28,
+  "kind": 0,
+  "links": [
+    27,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 0,
+  "text": "{\"authorization\":27,\"content_sha256\":\"e2ceb55af549ddde3808be9f04e9e0519350ab34456b2569b9074e8bcc0f9810\",\"executor\":{\"pid\":9,\"start\":9},\"path\":\"src/clamp.c\",\"phase\":\"intent\",\"prior_sha256\":\"72788b28b75d6b431797614b49b94aa999d18aff7cd0025f9665474e0c3b42c9\",\"proposal_sha256\":\"17dd23808c16be4a9bac27ab38779392b762033e57d0e82999ce7c6d2e296e63\",\"target\":\"/synthetic/workspace/src/clamp.c\",\"tool\":\"write_file\"}",
+  "verified": true
+}

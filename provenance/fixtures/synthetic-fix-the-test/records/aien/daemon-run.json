@@ -1,0 +1,10 @@
+{
+  "boot_id": "synthetic-boot",
+  "executable_sha256": "be0196b6bf36be4eb97aaa63b23421b964ed5c62905c5dfa144b0618f3f216ec",
+  "kind": "aien-daemon-run",
+  "note": "SYNTHETIC: written by the generator, not by a run harness",
+  "pid": 4242,
+  "socket": "/synthetic/run/aien.sock",
+  "start_ticks": 777000,
+  "workspace": "/synthetic/workspace"
+}

@@ -17,6 +17,7 @@ and needs no change (the `odysseus_text` dialect is registered adapter-locally).
 | `.../domains.py` | Hand-curated `TOOL_DOMAINS` (one reviewable line per tool, fixed 19-domain set), 16 `CANONICAL` aliases, `catalog_with_domains()`. |
 | `.../mapping.py` | `mapping_table()`: 16 alias rules + 71 passthrough rules, `catalog_digest` from the record. |
 | `.../authority.py` | `OdysseusAuthority(RuntimeAuthority)`: `decide`, `execute`, `catalog`. |
+| `.../launch.py` | `launch_preflight()`: structural process-launch check (#93). Never authorizes, never executes. |
 | `.../dialect.py` | `odysseus_text` Lenshift dialect and `make_registry()`. |
 | `.../demo.py` | Runs turns through the real `Pipeline`. |
 | `.../_odysseus.py` | Optional loader for a checkout named by `ODYSSEUS_SRC`. |
@@ -103,6 +104,49 @@ A test pins this.
 The recorded `catalog_digest` (`sha256:4ec0d10e...`) is `Catalog.computed_digest()` over the 71
 recorded capabilities, so anyone can recompute it from the record with Core alone. (The first
 extraction used an ad-hoc formula; it was recomputed on 2026-10-04 with the tools unchanged.)
+
+## Workspace and process-launch boundaries (#93)
+
+Four separate questions, answered by four separate things:
+
+1. **Selection** is `vet_workspace` (`src/tool_execution.py:1179`, what `/api/workspace/vet` returns): is this a real, non-sensitive directory? It accepts an ancestor of `ODYSSEUS_DATA_DIR` on purpose and refuses `DATA_DIR` itself and anything nested in it.
+2. **Confinement** is Odysseus's per-path deny: inside an accepted workspace, files of server state are hidden one path at a time.
+3. **Launch preflight** is `launch_preflight()` here: would the launch boundary (`guard_launch_workspace`, `src/agent_runtime/process_resources.py:379`) structurally accept this workspace for bash, python, host_shell or manage_bg_jobs? Read-only; asks the real upstream code.
+4. **Authorization** stays with Odysseus at launch: tool permission, admin, delegated credentials, untrusted context, approvals. A positive preflight is none of these and not a claim that anything ran.
+
+**Verified disagreement** (a8c147b, real run): a workspace that is an ancestor of `DATA_DIR` is accepted by selection but refused by the launch guard ("contains server control state"), so the workspace can be chosen and then every launch fails. A workspace nested inside `DATA_DIR` is the reverse: refused by selection, passed by the guard alone. The preflight runs both: Odysseus's own `vet_workspace` and launch guard, preceded by the adapter's equal/nested check against `DATA_DIR` (the same rule `vet_workspace` applies, repeated so the reason code can name the case). Upstream: odysseus-dev/odysseus#6651 (open, unfixed at a8c147b). INTERPLANE does not bypass or weaken either gate.
+
+**Safe layout.** Keep `ODYSSEUS_DATA_DIR` disjoint from every agent workspace (siblings, not parent or child). The loader defaults it to a fresh temp directory only when unset; an operator value is always honoured. The adapter never moves, copies or rewrites existing state; the fix for a refused layout is the operator's.
+
+| Code | Stage | Meaning | Remediation |
+|---|---|---|---|
+| `structurally_eligible` | preflight | Passed every structural check; not an authorization | Odysseus still decides at launch |
+| `runtime_unavailable` | runtime | Odysseus not importable | Set `ODYSSEUS_SRC` |
+| `not_a_process_tool` | request | Tool is not bash, python, host_shell or manage_bg_jobs | Read-only tools need no launch preflight |
+| `process_tool_unavailable` | runtime | Tool missing from `TOOL_TAGS` or `TOOL_HANDLERS` | Use a revision that registers it |
+| `host_api_unsupported` | runtime | No launch guard API (e.g. 2992bf6) | Treat launch as not ready |
+| `workspace_missing` | selection | No workspace given | Name one |
+| `workspace_invalid` | selection | Not an existing directory | Check the path |
+| `workspace_inaccessible` | selection | No read/search access | Fix permissions or choose another |
+| `workspace_is_server_state` | selection | Workspace is `DATA_DIR` | Choose another; keep `DATA_DIR` outside workspaces |
+| `workspace_within_server_state` | selection | Nested inside `DATA_DIR` | Choose another |
+| `workspace_rejected_by_host` | selection | `vet_workspace` refuses it | Choose another |
+| `indeterminate` | launch_boundary | Boundary could not be sealed or inspected | Fix permissions or shrink the workspace, retry |
+| `workspace_contains_server_state` | launch_boundary | Contains control state (the #6651 case) | Disjoint workspace or `ODYSSEUS_DATA_DIR` outside it |
+| `workspace_aliases_server_state` | launch_boundary | Symlink or hardlink to server state inside | Remove the link or choose another |
+
+Results carry fixed text only: no paths, no upstream exception text.
+
+**Qualification matrix** (`tests/test_launch_preflight.py`: 24 tests, no skips, real upstream calls):
+
+| Odysseus | Full suite | Preflight |
+|---|---|---|
+| 2992bf6 (catalog pin) | 115 passed (91 existing + 24) | every workspace case reports `host_api_unsupported` (no `process_resources.py`) |
+| a8c147b (2026-10-07) | 112 passed, 3 failed (known drift detectors) | full table: sibling and lookalike eligible; equals, nested, ancestor, other-control-path, symlink, hardlink, invalid, inaccessible denied |
+
+The 3 failures at a8c147b are the existing drift detectors in `test_odysseus_pipeline.py`: `tail_serve_output` is now in `TOOL_TAGS`, and the untrusted-context message was reworded. Execution stays fail-closed (only `read_file`, `ls`, `glob`, `grep` run). Re-pinning the catalog to a8c147b is a separate follow-up. CI runs the preflight tests against a8c147b in addition to the full suite at 2992bf6.
+
+**Limitations.** The guard is pathname and inode based and not atomic (its own docstring): links can change after the check. The nested case relies on selection, not the guard. The guard walks the whole workspace tree, so very large workspaces cost time. A positive result is not an authorization. No shell, python or job execution was added to the adapter.
 
 ## Run
 

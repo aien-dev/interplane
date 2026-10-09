@@ -14,6 +14,10 @@ Reused from Odysseus (commit 2992bf6), by call:
   * ``src.tool_execution._resolve_tool_path_in_workspace`` / ``vet_workspace`` /
     ``_active_workspace`` + ``src.agent_tools.TOOL_HANDLERS`` (ReadFileTool, LsTool, GlobTool,
     GrepTool)                                           confinement and execution
+Added for the launch preflight (commit a8c147b, see launch.py):
+  * ``src.agent_runtime.process_resources.guard_launch_workspace`` (:379) with
+    ``src.agent_runtime.resources.FilesystemRoot.seal`` / ``ResourceIdentityError``,
+    ``src.constants.DATA_DIR`` and ``src.tool_execution.vet_workspace`` (read-only, structural).
 Gate order follows ``execute_tool_block`` (tool_execution.py:915-926 then :1064-1080): the
 untrusted-context gate first, then the admin gates, then (in Odysseus: inside the tool) path
 confinement. Confinement is also run in ``decide`` so that an escape is refused BEFORE execution.
@@ -34,6 +38,7 @@ from interplane.core import Catalog, CapabilityRequest, Decision, ToolResult
 from interplane.crossveil import RuntimeAuthority, make_result
 
 from . import _odysseus
+from .launch import launch_preflight
 from .domains import catalog_with_domains
 
 RUNTIME_ID = "odysseus"
@@ -103,6 +108,10 @@ class OdysseusAuthority(RuntimeAuthority):
     @property
     def available(self) -> bool:
         return self._ody is not None
+
+    def launch_preflight(self, workspace: Optional[str] = None, tool: str = "bash"):
+        """Structural process-launch check (see ``launch.py``); never authorizes or executes."""
+        return launch_preflight(self._ody, self.workspace if workspace is None else workspace, tool)
 
     # -- helpers --------------------------------------------------------------------------------
 

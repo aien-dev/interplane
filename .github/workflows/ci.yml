@@ -219,3 +219,12 @@ jobs:
             python -m interplane_adapter_odysseus.t3 --out $RUNNER_TEMP/t3-verdicts.json
       - name: bench runner offline test (scripted endpoint, sim-1 backends, runtime-v1 with denial/approval negative controls)
         run: ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_runner_offline.py
+      - name: launch preflight (#93) against current Odysseus (odysseus-dev/odysseus @ a8c147b; no skips allowed)
+        run: |
+          git clone -q https://github.com/odysseus-dev/odysseus.git ../odysseus-a8c147b
+          git -C ../odysseus-a8c147b checkout -q a8c147b
+          pip install -q -c $GITHUB_WORKSPACE/constraints/ci-python.txt -r ../odysseus-a8c147b/requirements.txt
+          cd adapters/odysseus
+          ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus-a8c147b PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 \
+            python -m pytest tests/test_launch_preflight.py -q -p no:cacheprovider -rs | tee pytest-a8c147b.log
+          ! grep -q "skipped" pytest-a8c147b.log

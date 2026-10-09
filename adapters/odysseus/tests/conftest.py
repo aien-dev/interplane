@@ -1,7 +1,15 @@
+import os
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
+
+# A controlled layout for the launch-preflight tests: DATA_DIR is <home>/data, so sibling directories
+# of it are disjoint workspaces. Must be set before Odysseus is first imported; an operator value wins.
+_home = Path(tempfile.mkdtemp(prefix="interplane-odysseus-home-")).resolve()
+(_home / "data").mkdir()
+os.environ.setdefault("ODYSSEUS_DATA_DIR", str(_home / "data"))
 
 ADAPTER = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ADAPTER))

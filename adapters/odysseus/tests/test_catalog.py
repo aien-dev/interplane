@@ -8,10 +8,10 @@ from interplane_adapter_odysseus import (
 from interplane_adapter_odysseus.catalog import tool_names
 
 
-def test_recorded_catalog_has_71_tools():
+def test_recorded_catalog_has_88_tools():
     record = load_record()
-    assert record["runtime"] == "odysseus" and record["catalog_version"] == "2992bf6"
-    assert len(record["capabilities"]) == 71
+    assert record["runtime"] == "odysseus" and record["catalog_version"] == "a8c147b"
+    assert len(record["capabilities"]) == 88
     assert isinstance(load_catalog(), Catalog)
 
 
@@ -57,7 +57,7 @@ def test_mapping_table_aliases_and_passthrough():
     assert isinstance(table, MappingTable) and table.runtime == "odysseus"
     assert table.catalog_digest == load_record()["catalog_digest"]
     kinds = [r.kind for r in table.rules]
-    assert kinds.count("alias") == 16 and kinds.count("passthrough") == 71
+    assert kinds.count("alias") == 16 and kinds.count("passthrough") == 88
     assert {r.to for r in table.rules if r.kind == "passthrough"} == set(tool_names())
 
 
@@ -77,3 +77,14 @@ def test_mapping_resolves_every_alias_and_native_name():
         assert cap == native
     for name in tool_names():
         assert table.map(_req(None, name)).capability == name
+
+
+def test_recorded_catalog_equals_a_fresh_extraction(ody):
+    # The record is produced by tools/extract_catalog.py, never edited: re-running it on the pinned
+    # checkout must give the same capabilities and digest.
+    from tools.extract_catalog import extract
+
+    fresh = extract("a8c147b", "ignored")
+    record = load_record()
+    assert fresh["capabilities"] == record["capabilities"]
+    assert fresh["catalog_digest"] == record["catalog_digest"]

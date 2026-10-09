@@ -1,9 +1,11 @@
-# Exact versions CI installs (pip -c). Resolved on CPython 3.12 from the Odysseus 2992bf6 requirements
+# Exact versions CI installs (pip -c). Resolved on CPython 3.12 from the Odysseus a8c147b requirements (#95;
+# first resolved from 2992bf6, plus av, ctranslate2, faster-whisper, pdfminer.six, pdfplumber, pypdfium2, yt-dlp for a8c147b)
 # plus pytest, pyflakes, jsonschema. Regenerate deliberately; never loosen.
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
 attrs==26.1.0
+av==19.0.1
 bcrypt==5.0.0
 beautifulsoup4==4.15.0
 caldav==3.3.1
@@ -14,10 +16,12 @@ chromadb-client==1.5.9
 click==8.5.0
 croniter==6.2.4
 cryptography==50.0.2
+ctranslate2==4.8.2
 defusedxml==0.7.1
 dnspython==2.8.0
 fastapi==0.142.2
 fastembed==0.8.1
+faster-whisper==1.2.1
 filelock==4.0.10
 flatbuffers==25.12.19
 fsspec==2026.9.0
@@ -57,6 +61,8 @@ opentelemetry-semantic-conventions==0.66b0
 orjson==3.12.0
 overrides==7.7.0
 packaging==26.3
+pdfminer.six==20260107
+pdfplumber==0.11.10
 pillow==12.3.0
 pluggy==1.6.0
 protobuf==7.36.2
@@ -65,13 +71,14 @@ py_rust_stemmers==0.1.8
 pybase64==1.5.1
 pycparser==3.0
 pydantic==2.13.5
-pydantic-settings==2.15.0
 pydantic_core==2.46.5
+pydantic-settings==2.15.0
 pyflakes==4.0.2
 Pygments==2.21.0
 PyJWT==2.15.1
 PyOTP==2.10.0
 pypdf==6.19.0
+pypdfium2==5.14.0
 pytest==9.1.1
 pytest-asyncio==1.4.0
 python-dateutil==2.9.0.post0
@@ -93,8 +100,8 @@ tenacity==9.1.4
 tokenizers==0.23.2
 tqdm==4.70.1
 truststore==0.10.4
-typing-inspection==0.4.4
 typing_extensions==4.16.0
+typing-inspection==0.4.4
 tzdata==2026.5
 urllib3==2.8.0
 urllib3-future==2.25.902
@@ -102,3 +109,4 @@ uvicorn==0.54.0
 wassima==2.1.4
 x-wr-timezone==2.0.1
 youtube-transcript-api==1.2.4
+yt-dlp==2026.8.19

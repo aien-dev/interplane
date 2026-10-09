@@ -11,9 +11,9 @@ Odysseus's own handlers executing read_file/ls/glob/grep. Nothing here grants au
                (`interplane_capabilities_search{query}`; it grants nothing and executes nothing in
                the runtime), plus bounded evidence-based expansion (spec/CROSSAXIS.md).
 
-Run (needs the Odysseus checkout at 2992bf6 and its venv, see adapters/odysseus/README.md):
+Run (needs the Odysseus checkout at a8c147b and its venv, see adapters/odysseus/README.md):
 
-  ODYSSEUS_SRC=<odysseus@2992bf6> <odysseus-venv>/bin/python bench/tools/run_bench.py \\
+  ODYSSEUS_SRC=<odysseus@a8c147b> <odysseus-venv>/bin/python bench/tools/run_bench.py \\
       --tasks dev --condition both --out bench/runs/pilot-<ts>/
 
 Tool arguments are never written to receipts; only digests and key names. Receipts are written
@@ -87,7 +87,7 @@ def check_base_sets(catalog, conds) -> None:
         if missing:
             raise SystemExit(f"condition {cond}: base set names not in the catalog: {missing}")
 FROZEN_PROMPT_SHA = "207dd449409bacd6260943a1d918087334d9601586c1e2f069bf9336aaf647f5"
-ODYSSEUS_COMMIT = "2992bf6"
+ODYSSEUS_COMMIT = "a8c147b"
 DISCOVERY_SPEC = {
     "type": "function",
     "function": {
@@ -1072,7 +1072,7 @@ def main(argv=None) -> int:
     src = os.environ.get("ODYSSEUS_SRC", "")
     ody = _odysseus.load()
     if ody is None or not src:
-        raise SystemExit("set ODYSSEUS_SRC to an Odysseus checkout at 2992bf6")
+        raise SystemExit("set ODYSSEUS_SRC to an Odysseus checkout at a8c147b")
     if os.path.realpath(ody.root) != os.path.realpath(src) and not os.path.realpath(ody.root).startswith(os.path.realpath(src)):
         raise SystemExit(f"Odysseus loaded from {ody.root}, not ODYSSEUS_SRC={src}")
     ody_commit = sh(f"git -C {src} rev-parse HEAD")

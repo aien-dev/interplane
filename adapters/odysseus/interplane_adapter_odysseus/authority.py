@@ -4,21 +4,21 @@ Every ``decide`` outcome below comes from Odysseus's own code (cited per branch)
 maps Odysseus's answers onto INTERPLANE's five decision values. If Odysseus cannot be imported the
 adapter fails closed (``denied``); it never authorizes on its own.
 
-Reused from Odysseus (commit 2992bf6), by call:
-  * ``src.agent_tools.TOOL_TAGS``                       name known?       (tool_schemas.py:1411 rule)
-  * ``src.tool_schemas.function_call_to_tool_block``    argument validity (tool_schemas.py:1370)
+Reused from Odysseus (commit a8c147b), by call; line numbers are at a8c147b:
+  * ``src.agent_tools.TOOL_TAGS``                       name known?       (tool_schemas.py:2161 rule)
+  * ``src.tool_schemas.function_call_to_tool_block``    argument validity (tool_schemas.py:2048)
   * ``src.tool_capabilities.ToolRunSecurityContext.decision_for`` + ``observe_tool_result`` +
-    ``capabilities_for_action``                         untrusted-context gate (:569, :654-684)
+    ``capabilities_for_action``                         untrusted-context gate (tool_capabilities.py:818-876, :878)
   * ``src.tool_security.NON_ADMIN_BLOCKED_TOOLS`` / ``is_public_blocked_tool`` and
-    ``src.tool_execution._ADMIN_TOOLS``                 admin gates (tool_execution.py:1064-1080)
+    ``src.tool_execution._ADMIN_TOOLS``                 admin gates (tool_execution.py:2032-2036, :2060-2074)
   * ``src.tool_execution._resolve_tool_path_in_workspace`` / ``vet_workspace`` /
     ``_active_workspace`` + ``src.agent_tools.TOOL_HANDLERS`` (ReadFileTool, LsTool, GlobTool,
     GrepTool)                                           confinement and execution
-Added for the launch preflight (commit a8c147b, see launch.py):
+Used by the launch preflight (see launch.py):
   * ``src.agent_runtime.process_resources.guard_launch_workspace`` (:379) with
     ``src.agent_runtime.resources.FilesystemRoot.seal`` / ``ResourceIdentityError``,
     ``src.constants.DATA_DIR`` and ``src.tool_execution.vet_workspace`` (read-only, structural).
-Gate order follows ``execute_tool_block`` (tool_execution.py:915-926 then :1064-1080): the
+Gate order follows ``execute_tool_block`` (tool_execution.py:1858-1869 then :2032-2074): the
 untrusted-context gate first, then the admin gates, then (in Odysseus: inside the tool) path
 confinement. Confinement is also run in ``decide`` so that an escape is refused BEFORE execution.
 """
@@ -197,12 +197,12 @@ class OdysseusAuthority(RuntimeAuthority):
         if block is None:
             return self._decision(req, "invalid", message)
 
-        # 1. untrusted-context gate (tool_execution.py:915-926; tool_capabilities.py:654-684)
+        # 1. untrusted-context gate (tool_execution.py:1858-1869; tool_capabilities.py:818-876)
         sc = self._context_for(str(ctx.get("trace_id")), ctx)
         gate = sc.decision_for(name, block.content)
         if not gate.allowed and self.delegated_credential and ody.tool_security.is_public_blocked_tool(name):
-            # tool_capabilities.py:654-662: "no approval can lift that"; the agent loop also adds
-            # these tools to its policy blocklist (agent_loop.py:3498-3501). A refusal, not a prompt.
+            # tool_capabilities.py:782-784, :822-829: "no approval can lift that"; the agent loop also adds
+            # these tools to its policy blocklist (agent_loop.py:21075, :21279). A refusal, not a prompt.
             return self._denied(req, "delegated_credential", gate.reason or "refused for API-token callers")
         if not gate.allowed:
             reason = gate.reason or "tool blocked by the untrusted-context gate"
@@ -222,7 +222,7 @@ class OdysseusAuthority(RuntimeAuthority):
                 },
             )
 
-        # 2. admin gates (tool_execution.py:1064-1080)
+        # 2. admin gates (tool_execution.py:2032-2036, :2060-2074)
         if not self.admin:
             if name in ody.tool_execution._ADMIN_TOOLS:
                 return self._denied(req, "admin_tool", f"Tool '{name}' requires an admin user.")
@@ -263,7 +263,7 @@ class OdysseusAuthority(RuntimeAuthority):
         raw = args.get("path")
         raw = raw if isinstance(raw, str) else ""
         if name != "read_file":
-            raw = raw.strip() or self.workspace  # same default as _resolve_search_root (:513)
+            raw = raw.strip() or self.workspace  # same default as _resolve_search_root (tool_execution.py:1237)
         try:
             self._ody.tool_execution._resolve_tool_path_in_workspace(self.workspace, raw)
         except ValueError as err:
@@ -312,8 +312,8 @@ class OdysseusAuthority(RuntimeAuthority):
 
         ``workspace_untrusted`` and ``external_untrusted`` carry over. ``system`` is Odysseus's
         label for server-authored output and its default for a registered tool
-        (tool_capabilities.py:37-46 at 2992bf6): it maps to ``trusted_runtime``, unless
-        Odysseus's own ``tool_result_should_arm_gate`` (:506-528) says this result carries
+        (tool_capabilities.py:39-42 at a8c147b): it maps to ``trusted_runtime``, unless
+        Odysseus's own ``tool_result_should_arm_gate`` (:619-664) says this result carries
         non-system content (the producer set ``untrusted_content``), then ``external_untrusted``.
         Any other value is ``external_untrusted``.
         """
@@ -366,8 +366,8 @@ def _exposure_untrusted(ctx: dict) -> bool:
 
     ``ctx["exposure"]`` is computed by the pipeline from its own input ledger (CROSSVEIL.md Trust
     rules 5 and 6), never by the model or the caller. A floor below ``user_supplied`` arms the gate,
-    as Odysseus arms it natively after any non-system tool result (tool_capabilities.py:506-536,
-    686-694). A missing or malformed exposure arms it too (fail closed).
+    as Odysseus arms it natively after any non-system tool result (tool_capabilities.py:619-664,
+    878-887). A missing or malformed exposure arms it too (fail closed).
     """
     exposure = ctx.get("exposure")
     if not isinstance(exposure, dict):

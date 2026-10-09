@@ -134,7 +134,7 @@ they were published with the 0.2 run. The 0.2x gate uses only the held-out set i
 1. Write `tasks/<category>-NNN.json` against the schema. Set `requested_domains` to the output of
    `python3 bench/tools/validate.py --derive "<user_request>"`. Never edit `domains.json` to make a
    task fit. Reword the request or change its category instead.
-2. Every capability name must be in `adapters/odysseus/catalog.odysseus-2992bf6.json`.
+2. Every capability name must be in `adapters/odysseus/catalog.odysseus-2992bf6.json` (the frozen corpus catalog, 71 tools; the adapter itself now loads `catalog.odysseus-a8c147b.json`, #95).
 3. Coverage:
    - Non-expansion tasks must be covered by the initial condition-B selection.
    - Expansion tasks must not be covered.
@@ -151,7 +151,7 @@ exist.
 ## Running it (paired runner and analyzer)
 
 - `tools/run_bench.py` runs both conditions per task through the INTERPLANE pipeline with the real
-  `OdysseusAuthority` (Odysseus at 2992bf6, via `ODYSSEUS_SRC`), against an OpenAI-compatible
+  `OdysseusAuthority` (Odysseus at a8c147b, via `ODYSSEUS_SRC`), against an OpenAI-compatible
   endpoint, and writes `runs/<run-id>/manifest.json` plus one receipt per task and condition
   (`receipts/<task>.<A|B>.json`). `--prepare` writes only the manifest, so it can be committed
   before the first request; `--resume` skips completed pairs. Condition B also exposes one
@@ -219,14 +219,14 @@ Each seed block also writes `gpu_at_start.txt`, `gpu_at_end.txt` and `latency_va
 **Pilot on dev tasks only, all seven conditions** (about 0.9 h, 44 tasks x 7 conditions):
 
 ```
-ODYSSEUS_SRC=<odysseus@2992bf6> <odysseus-venv>/bin/python bench/tools/run_bench.py \
+ODYSSEUS_SRC=<odysseus@a8c147b> <odysseus-venv>/bin/python bench/tools/run_bench.py \
     --corpus 0.2 --tasks all --condition all --backends sim-1 --seed 42 --out bench/runs/pilot-0.2x-<ts>
 ```
 
 **Campaign** (120 tasks x 7 conditions x 3 seeds = 2520 runs, about 7.6 h at the 0.2 median of 10.8 s per run, plus the token measurements; reasoning-off runs should be shorter). Needs an uncontended GPU. Write the manifests first, commit them, then run the three seed blocks one after another:
 
 ```
-export ODYSSEUS_SRC=<odysseus@2992bf6>
+export ODYSSEUS_SRC=<odysseus@a8c147b>
 PY=<odysseus-venv>/bin/python
 RUN=bench/runs/heldout-0.2x-$(date -u +%Y%m%dT%H%MZ)
 for s in 42 43 44; do $PY bench/tools/run_bench.py --corpus 0.2x --condition all --backends sim-1 --seed $s --out $RUN/seed-$s --prepare; done

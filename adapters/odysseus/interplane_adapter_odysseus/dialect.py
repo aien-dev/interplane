@@ -1,10 +1,10 @@
 """Lenshift dialect ``odysseus_text``: the text-mode tool-call forms Odysseus's own parser accepts.
 
 Registered adapter-locally (``make_registry()``), which is the proof that Core needs no change to
-gain a dialect. Shapes are copied from Odysseus 2992bf6:
-  * ``src/tool_parsing.py:1288-1310`` (``parse_tool_blocks`` docstring and pattern order:
+gain a dialect. Shapes are copied from Odysseus a8c147b (line numbers at a8c147b):
+  * ``src/tool_parsing.py:1850-1875`` (``parse_tool_blocks`` docstring and pattern order:
     fenced ``` blocks, then ``[TOOL_CALL]``, then XML ``<tool_call>/<invoke>``) and the regexes at
-    ``:33-37`` (fence), ``:91-92`` (TOOL_CALL), ``:106-136`` (XML).
+    ``:35-39`` (fence), ``:110-119`` (TOOL_CALL), ``:124-166`` (XML).
   * ``tests/test_redos_xml_tool_parsers.py:49`` (``<tool_call><invoke name="bash">
     <parameter name="command">ls -la</parameter></invoke></tool_call>``), ``:99``
     (``[TOOL_CALL]{tool => "shell", args => {--command "ls"}}[/TOOL_CALL]``) and ``:111-114``
@@ -37,7 +37,7 @@ NAME = "odysseus_text"
 _TRUNCATED = "truncated tool call"
 _CODE_TAGS = {"bash": "command", "python": "code"}
 # fenced tag -> the argument its raw (non-JSON) body fills, as tool_execution._MCP_ARG_PARSERS
-# (:632 read_file) and the code tools do. Tags outside this table need a JSON object body.
+# (tool_execution.py:1358, read_file at :1363) and the code tools do. Tags outside this table need a JSON object body.
 _PRIMARY = {
     "bash": "command", "python": "code", "read_file": "path", "ls": "path", "glob": "pattern",
     "grep": "pattern", "web_search": "query", "web_fetch": "url",
@@ -171,7 +171,7 @@ def _scan_fenced(text: str) -> tuple:
         if tag not in known:
             continue  # ```json / ```xml with no invoke markup: ordinary prose
         if not (inline or body_s):
-            continue  # an empty fence runs nothing (tool_parsing.py:1325-1335)
+            continue  # an empty fence runs nothing (tool_parsing.py:1902-1910; upstream still dispatches an empty fence for email tools, which this dialect has no tag for)
         try:
             args = _fence_args(tag, inline, body)
         except _Bad as err:
@@ -257,7 +257,7 @@ def _parse_tool_call_inner(inner: str) -> tuple:
     if arg_pos is None:
         return name, {}
     brace = inner.find("{", arg_pos)
-    close = inner.rfind("}")  # through the LAST brace, as tool_parsing.py:849-852
+    close = inner.rfind("}")  # through the LAST brace, as tool_parsing.py:1228-1233
     if brace < 0 or close < brace:
         raise _Bad("args is not a braced block")
     body = inner[brace + 1 : close].strip()
@@ -398,7 +398,9 @@ def parse(input: Any, model: str, trace_id: str, turn: int):
         out.reasoning_digest = text_digest(reasoning) if reasoning else None
         text = think[end + len("</think>") :]
 
-    # Odysseus's precedence (tool_parsing.py:1317-1346): fenced, else [TOOL_CALL], else XML.
+    # Odysseus's precedence (tool_parsing.py:1889-2013): fenced, else [TOOL_CALL], else XML. Known drift at
+    # a8c147b: upstream skips fences when a non-fenced call envelope is also present
+    # (_contains_explicit_tool_markup, tool_parsing.py:271, :1889); this scan does not model that.
     calls, spans = _scan_fenced(text)
     if not calls:
         calls, spans = _scan_tool_call_blocks(text)
@@ -447,12 +449,12 @@ def _describe(intent: Optional[Any]) -> str:
 
 
 def render_result(result: Any, intent: Optional[Any] = None) -> str:
-    """One tool result as Odysseus's text-mode ``format_tool_result`` text (tool_execution.py:1359).
+    """One tool result as Odysseus's text-mode ``format_tool_result`` text (tool_execution.py:2485).
 
-    Reimplements only the ``output`` and ``error`` branches (:1367-1371 and :1409-1410) plus the
+    Reimplements only the ``output`` and ``error`` branches (:2499-2503 and :2532-2533) plus the
     ``### <description>`` header and the ``**data:**`` fallback; a differential test pins it to the
     real function when Odysseus is importable. Odysseus wraps a whole round of these once in
-    ``untrusted_context_message`` (agent_loop.py:3095-3120): use :func:`round_message` for that.
+    ``untrusted_context_message`` (agent_loop.py:16112-16116): use :func:`round_message` for that.
     """
     data = result.to_dict() if hasattr(result, "to_dict") else result
     desc = _describe(intent)
@@ -469,7 +471,7 @@ def render_result(result: Any, intent: Optional[Any] = None) -> str:
         return "\n".join(parts)
     err = data.get("error") or {}
     if status in ("denied", "requires_approval", "rejected", "not_found"):
-        desc = f"{desc.split(':', 1)[0]}: BLOCKED"  # tool_execution.py:1067 shape
+        desc = f"{desc.split(':', 1)[0]}: BLOCKED"  # tool_execution.py:2032-2036 shape
     return f"### {desc}\n**Error:** {err.get('message')}"
 
 

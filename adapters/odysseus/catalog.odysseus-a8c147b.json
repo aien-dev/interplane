@@ -1,0 +1,4212 @@
+{
+  "capabilities": [
+    {
+      "canonical": null,
+      "description": "Register an existing tmux model server (started manually or outside the cookbook flow) into Cookbook tracking, AND add it as a chat endpoint. Use when the user (or you) launched something via ssh+tmux and now want it visible in the UI / stoppable via stop_served_model / usable in the model picker. Verifies the tmux session + port respond before adding.",
+      "domains": [],
+      "name": "adopt_served_model",
+      "parameters": {
+        "properties": {
+          "add_endpoint": {
+            "description": "Also register as a chat endpoint (default true)",
+            "type": "boolean"
+          },
+          "dry_run": {
+            "description": "Preview validation and registration without checking tmux or changing state",
+            "type": "boolean"
+          },
+          "host": {
+            "description": "Remote host in user@host form (e.g. 'user@192.0.2.10'). Omit for localhost.",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model repo_id or display name (e.g. 'cyankiwi/MiniMax-M2.7-AWQ-4bit')",
+            "type": "string"
+          },
+          "name": {
+            "description": "Optional display name (defaults to model basename)",
+            "type": "string"
+          },
+          "port": {
+            "description": "Port the server is listening on (default 8000)",
+            "type": "integer"
+          },
+          "tmux_session": {
+            "description": "Existing tmux session name (e.g. 'minimax-m27')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tmux_session",
+          "model"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c1fcc3b01c82f699e1ab6ab542e807703110dd00a31e68e6ff26c2409088a4ae"
+    },
+    {
+      "canonical": null,
+      "description": "Call a registered API integration (RSS reader, git forge, bookmark manager, smart home, etc.). Check the system context for available integrations and their endpoints.",
+      "domains": [],
+      "name": "api_call",
+      "parameters": {
+        "properties": {
+          "body": {
+            "description": "JSON request body (for POST/PUT/PATCH)",
+            "type": "object"
+          },
+          "integration": {
+            "description": "Integration name or ID (e.g. 'Miniflux', 'Gitea')",
+            "type": "string"
+          },
+          "method": {
+            "description": "HTTP method",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "description": "API endpoint path (e.g. '/v1/entries?status=unread&limit=20')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "integration",
+          "method",
+          "path"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:07422f1ef27b605348b620ed4e9850d376175af1752bd24e9372200a39a53a70"
+    },
+    {
+      "canonical": null,
+      "description": "Generic loopback to allowed internal Odysseus endpoints. Use this when there's no named tool for what the user wants. For 'best model for my hardware', call GET /api/hwfit/models with query {fit_only:true,limit:10,sort:'fit'}; it detects GPU/VRAM/RAM/CPU and returns ranked compatible models. Hits the same routes the UI buttons hit (cookbook, gallery, library/documents, memory, notes, calendar, tasks, settings, themes, research, compare, etc.). action='endpoints' returns the OpenAPI surface (use `filter` to narrow). action='call' (default) takes method+path+body. Sensitive auth/user/admin/shell paths and host-control Cookbook mutation routes are blocked for safety. Do not use for shell commands; use named command tooling instead. Do not use for package installs, engine rebuilds, PID signalling, or email account discovery; use list_email_accounts for email accounts because /api/email/accounts is owner-filtered in tool context.",
+      "domains": [],
+      "name": "app_api",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "'call' to hit an endpoint, 'endpoints' to list what's available",
+            "enum": [
+              "call",
+              "endpoints"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "description": "JSON request body for POST/PUT/PATCH",
+            "type": "object"
+          },
+          "filter": {
+            "description": "For action=endpoints: substring to filter paths/summaries (e.g. 'cookbook', 'gallery')",
+            "type": "string"
+          },
+          "method": {
+            "description": "HTTP method (default GET)",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "description": "Endpoint path starting with /api/ (e.g. '/api/cookbook/gpus', '/api/gallery/list', '/api/calendar/events')",
+            "type": "string"
+          },
+          "query": {
+            "description": "Querystring params as a key-value object",
+            "type": "object"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:34c2702a6170e180089174ea6ea343d7607ec3696aa953c055514d7ca6152e64"
+    },
+    {
+      "canonical": null,
+      "description": "Apply a multi-file source-code patch to disk. Use for real project files in the workspace when several edits belong together. Patch must use *** Begin Patch / *** End Patch with Add File, Update File, or Delete File sections. Prefer this over bash redirects/heredocs/sed.",
+      "domains": [],
+      "name": "apply_patch",
+      "parameters": {
+        "properties": {
+          "patch_text": {
+            "description": "Patch text beginning with *** Begin Patch and ending with *** End Patch",
+            "type": "string"
+          }
+        },
+        "required": [
+          "patch_text"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:aba1b28633047a13aba43842832ea714f3538e2b75729bb07fde9568eed74093"
+    },
+    {
+      "canonical": null,
+      "description": "Archive one email by UID. For multiple messages, use bulk_email instead. Always pass account when the email came from a named account such as Gmail.",
+      "domains": [],
+      "name": "archive_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Email UID from list_emails/read_email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:335f678cd38ad4f72d98668e4099759f8a4007b500fc8dfcd54f477069e54cea"
+    },
+    {
+      "canonical": null,
+      "description": "Ask a more capable AI model for help when stuck on a difficult problem. The teacher provides guidance that can be saved as a learned skill.",
+      "domains": [],
+      "name": "ask_teacher",
+      "parameters": {
+        "properties": {
+          "model": {
+            "description": "Teacher model name (e.g. 'claude-sonnet-4') or 'auto' for configured default",
+            "type": "string"
+          },
+          "problem": {
+            "description": "Describe the problem or question you need help with",
+            "type": "string"
+          }
+        },
+        "required": [
+          "problem"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:440b018b45c288606cbc9ed8f0e9dc80083b8a2b003a1a87c189fc186b633043"
+    },
+    {
+      "canonical": null,
+      "description": "Ask the user a question to get a decision or clarification when the task is genuinely ambiguous and the answer changes what you do next (e.g. pick between approaches, confirm an assumption, choose a target, or request required missing data). The user sees clickable option buttons; calling this ENDS your turn and their selection arrives as your next message. For open-ended missing data such as an exact calendar date, include an 'Exact date' option and ask the user to type it; do not invent arbitrary choices. Prefer sensible defaults over asking — only ask when you truly cannot proceed well without the user's input. Do NOT use it to confirm irreversible/destructive actions that have a dedicated confirmation flow.",
+      "domains": [],
+      "name": "ask_user",
+      "parameters": {
+        "properties": {
+          "multi": {
+            "description": "Set true ONLY when the question explicitly allows choosing more than one option. Otherwise omit it or set false. Default false.",
+            "type": "boolean"
+          },
+          "options": {
+            "description": "2-6 choices. Each is an object with a short `label` and an optional `description` explaining the trade-off. For open-ended missing data, include a generic option such as 'Exact date' instead of guessing arbitrary values.",
+            "items": {
+              "properties": {
+                "description": {
+                  "description": "Optional one-line explanation of this choice.",
+                  "type": "string"
+                },
+                "label": {
+                  "description": "Concise choice text the user clicks (1-5 words).",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "question": {
+            "description": "The question to ask. Be specific and self-contained.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question",
+          "options"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "user_interaction"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:fd1d000811d89e12efbd72f4ee5c0dbd8b0f4d4f5ef56166e3f6734f00ccabbd"
+    },
+    {
+      "canonical": null,
+      "description": "Run a shell command (full access). Prefer a dedicated tool whenever one fits the job (reading, writing, editing, searching, or listing files); use bash only for what no dedicated tool covers (installs, git, builds, running programs, system info). Do NOT create or edit files via bash redirects/heredocs/sed -- use the dedicated file tools.",
+      "domains": [],
+      "name": "bash",
+      "parameters": {
+        "properties": {
+          "command": {
+            "description": "The shell command to execute",
+            "type": "string"
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "execute_code"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c5a260edb550d371f6fe640e06ebbd0f3023dfe47616e106a904de95cc325798"
+    },
+    {
+      "canonical": null,
+      "description": "Block one or more email senders after user approval. Records a local sender block rule and optionally moves matching current messages to Junk/Spam. Use after listing/scanning suspected spam and confirming the user wants to block the sender.",
+      "domains": [],
+      "name": "block_sender",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts, e.g. Gmail or user@example.com",
+            "type": "string"
+          },
+          "folder": {
+            "description": "Source folder for UID lookup/current-message moves, default INBOX",
+            "type": "string"
+          },
+          "move_existing": {
+            "description": "Move matching current messages to Junk/Spam, default true",
+            "type": "boolean"
+          },
+          "reason": {
+            "description": "Short reason for the block, e.g. phishing, scam, unsolicited sales",
+            "type": "string"
+          },
+          "sender": {
+            "description": "Sender email address to block",
+            "type": "string"
+          },
+          "uids": {
+            "description": "Email UIDs whose senders should be blocked",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:eccf6ed6bb6daac85d4130811587a3b88b05f1ec3dcbb726bbd798b9b7628282"
+    },
+    {
+      "canonical": null,
+      "description": "Perform one action on many emails at once. Use this for 'delete all those', 'archive these', 'mark all read', 'move these to spam/junk', or any bulk operation after list_emails. For suspected spam, show the candidates/reasons and get user confirmation before moving or deleting. Always pass account when the listed emails came from a named account such as Gmail.",
+      "domains": [],
+      "name": "bulk_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts, e.g. Gmail or user@example.com",
+            "type": "string"
+          },
+          "action": {
+            "description": "Bulk action to perform",
+            "enum": [
+              "mark_read",
+              "mark_unread",
+              "archive",
+              "delete",
+              "junk"
+            ],
+            "type": "string"
+          },
+          "all_unread": {
+            "description": "Operate on all unread messages in folder instead of explicit UIDs",
+            "type": "boolean"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "permanent": {
+            "description": "For delete: hard-delete instead of moving to Trash",
+            "type": "boolean"
+          },
+          "uids": {
+            "description": "UIDs from the latest list_emails result",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:1799266d41516b7164fc1f0758c9ebfb98f2780014887a910c2a3c4877a79e32"
+    },
+    {
+      "canonical": null,
+      "description": "Cancel an in-progress model download by killing its tmux session. Use list_downloads first to get the session_id.",
+      "domains": [],
+      "name": "cancel_download",
+      "parameters": {
+        "properties": {
+          "session_id": {
+            "description": "Tmux session ID from list_downloads (e.g. 'cookbook-a1b2c3d4')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:67d6acfbdea55913e1ea387e61a929f94ae796c4708da6a9d3e4b5a070888a20"
+    },
+    {
+      "canonical": null,
+      "description": "Send a message to another AI model and get its response. Use for getting a second opinion, delegating subtasks, or AI-to-AI communication.",
+      "domains": [],
+      "name": "chat_with_model",
+      "parameters": {
+        "properties": {
+          "message": {
+            "description": "The message to send to the model",
+            "type": "string"
+          },
+          "model": {
+            "description": "Model name (e.g. 'qwen3-32b') or model@endpoint_name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "message"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c4d801efbeea0adb195155882f732dce6654296845185834b6cc6d16d2071f23"
+    },
+    {
+      "canonical": null,
+      "description": "Create a new document in the editor panel. Use this when the user asks to write, create, build, make, or generate code, scripts, programs, games, apps, or any long-form or structured content that is more than a short paragraph, AND there is no already-open document/email draft that the request refers to. If an email compose draft is open, edit that draft instead of creating another document. NEVER put large generated content directly in chat — use this tool instead.",
+      "domains": [],
+      "name": "create_document",
+      "parameters": {
+        "properties": {
+          "content": {
+            "description": "The document content",
+            "type": "string"
+          },
+          "language": {
+            "description": "Editor language or format. This is not a human-language code: use richtext for formatted prose/articles and markdown or text for plain prose; use html only for requested HTML source or a runnable page.",
+            "enum": [
+              "python",
+              "javascript",
+              "typescript",
+              "html",
+              "css",
+              "richtext",
+              "markdown",
+              "json",
+              "yaml",
+              "bash",
+              "sql",
+              "rust",
+              "go",
+              "java",
+              "c",
+              "cpp",
+              "xml",
+              "toml",
+              "ini",
+              "ruby",
+              "php",
+              "csv",
+              "email",
+              "text",
+              "plain",
+              "svg"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "description": "Document title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:e5974efd3ad62f901a985431897fb09a63943e2664d2d8fb14996e964340b013"
+    },
+    {
+      "canonical": null,
+      "description": "Create a new chat for ongoing conversations with a specific model. (The UI calls these 'chats'; 'session' is the internal term.)",
+      "domains": [],
+      "name": "create_session",
+      "parameters": {
+        "properties": {
+          "model": {
+            "description": "Model name or model@endpoint_name",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name for the new chat",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "model"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:f3ff4fca1f82ae316a8beaec48fe388055de1f01457d4a71a0171c4ce5478713"
+    },
+    {
+      "canonical": null,
+      "description": "Delete one email by UID. For multiple messages, use bulk_email instead. Always pass account when the email came from a named account such as Gmail.",
+      "domains": [],
+      "name": "delete_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "permanent": {
+            "description": "Hard-delete instead of moving to Trash",
+            "type": "boolean"
+          },
+          "uid": {
+            "description": "Email UID from list_emails/read_email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "destructive",
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:7c8c860b6dc883f87bf0776cc61737761ffde57d64c062a9792dcf24108bd84c"
+    },
+    {
+      "canonical": null,
+      "description": "Read/download an email attachment using the UID, index, account and folder from read_email. Returns extracted PDF, DOCX, XLSX and text contents inline. Open relevant attachments when the email body does not answer the question. Reports extraction limitations explicitly.",
+      "domains": [],
+      "name": "download_attachment",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, especially when the UID came from a non-default mailbox",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "index": {
+            "description": "Attachment index from read_email's attachment list, usually 0 for the first attachment",
+            "type": "integer"
+          },
+          "uid": {
+            "description": "Email UID from list_emails/read_email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid",
+          "index"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:a310f4c7682c0c5c8c1c27eb7c8218d4f417cb0893a52306ec49741b8aee50e4"
+    },
+    {
+      "canonical": null,
+      "description": "Download a HuggingFace model to a server. If `host` is omitted, defaults to the cookbook's currently-selected server (NOT localhost) — call list_cookbook_servers first if you're unsure where it should go.",
+      "domains": [],
+      "name": "download_model",
+      "parameters": {
+        "properties": {
+          "host": {
+            "description": "Target server — use the friendly NAME from list_cookbook_servers (e.g. 'gpu-box', 'workstation') or a raw user@host. Omit to use the cookbook's selected default server.",
+            "type": "string"
+          },
+          "include": {
+            "description": "Glob filter for specific files (e.g. '*Q4_K_M*')",
+            "type": "string"
+          },
+          "local": {
+            "description": "Force download to THIS machine (localhost) instead of the default remote server.",
+            "type": "boolean"
+          },
+          "repo_id": {
+            "description": "HuggingFace repo (e.g. 'Qwen/Qwen3-8B')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo_id"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:fc70cdd380d05140042386e835c09f1fef63f60d86ee4c909af8de7855f7657c"
+    },
+    {
+      "canonical": null,
+      "description": "Create a new Odysseus email draft document for review. This does not send. Use this as the default for normal 'send/write/email someone saying X' requests so the user sees the composed message in the document editor and can edit/send it from there.",
+      "domains": [],
+      "name": "draft_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, e.g. Gmail or user@example.com",
+            "type": "string"
+          },
+          "bcc": {
+            "description": "Optional BCC recipients",
+            "type": "string"
+          },
+          "body": {
+            "description": "Draft body text",
+            "type": "string"
+          },
+          "cc": {
+            "description": "Optional CC recipients",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Email subject line",
+            "type": "string"
+          },
+          "title": {
+            "description": "Optional Odysseus document title",
+            "type": "string"
+          },
+          "to": {
+            "description": "Recipient email address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "subject",
+          "body"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:cf76e6ece9b3db55823885c4e978ed070a3d712985530e21309125527cf9b614"
+    },
+    {
+      "canonical": null,
+      "description": "Create a threaded Odysseus reply draft document by email UID. This does not send. Use this for normal 'reply/write back/send them X' requests so the user sees the reply in the document editor before sending.",
+      "domains": [],
+      "name": "draft_email_reply",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, especially when the UID came from a non-default mailbox",
+            "type": "string"
+          },
+          "body": {
+            "description": "Reply draft body text",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "reply_all": {
+            "description": "Whether to reply all instead of replying only to sender",
+            "type": "boolean"
+          },
+          "title": {
+            "description": "Optional Odysseus document title",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Exact UID of the email to reply to from list_emails/read_email; never invent UID 1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid",
+          "body"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:31646670545f70617bcbde6b2172c1b58f2e697cd8960708b0bfec6b990d7f2a"
+    },
+    {
+      "canonical": null,
+      "description": "Edit a document OPEN IN THE EDITOR PANEL (created via create_document) — NOT a file on disk. For files on disk (home folder, project files, anything with a path like ~/x.txt or /path/to/file) use edit_file instead. Targeted find-and-replace with multiple FIND/REPLACE pairs per call; use for any edit smaller than a full rewrite. Do NOT send the whole file back via update_document for small edits.",
+      "domains": [],
+      "name": "edit_document",
+      "parameters": {
+        "properties": {
+          "command": {
+            "description": "FIND/REPLACE command text using <<<FIND>>>...<<<REPLACE>>>...<<<END>>> blocks",
+            "type": "string"
+          },
+          "edits": {
+            "description": "List of exact edits. Each target must be unique unless replace_all is explicitly true.",
+            "items": {
+              "properties": {
+                "find": {
+                  "description": "Exact text to find in the document",
+                  "type": "string"
+                },
+                "replace": {
+                  "description": "Text to replace it with",
+                  "type": "string"
+                },
+                "replace_all": {
+                  "description": "Set true to correct every exact occurrence of the same error throughout the document. Never use for selection-only edits.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "find",
+                "replace"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "more": {
+            "description": "Set true when more affected passages remain for a following edit batch.",
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:48b906f1cc18ee8f99a1c042f2e84181d2fdda73954738b202eca25b287d1293"
+    },
+    {
+      "canonical": null,
+      "description": "Edit a file ON DISK by exact string replacement (home folder, project files, any real path like ~/sweden.txt or /path/to/file). This is the right tool for files on disk — NOT edit_document (that's for editor-panel documents). PREFER this over bash (sed/echo) — it shows a diff. old_string must match the file exactly and be unique (or set replace_all). Use write_file to create a new file.",
+      "domains": [],
+      "name": "edit_file",
+      "parameters": {
+        "properties": {
+          "new_string": {
+            "description": "Replacement text",
+            "type": "string"
+          },
+          "old_string": {
+            "description": "Exact text to replace (must match the file, including indentation)",
+            "type": "string"
+          },
+          "path": {
+            "description": "File path to edit",
+            "type": "string"
+          },
+          "replace_all": {
+            "description": "Replace all occurrences instead of requiring a unique match",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path",
+          "old_string",
+          "new_string"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:e76668603ed4fd48fac9c2d30764650e4e08efe2fd205ae1701d784c3d7f3fff"
+    },
+    {
+      "canonical": null,
+      "description": "Edit an existing gallery image, preserving it as the source. For follow-ups such as adding an object or changing colors, use action=prompt with the previous tool result's image_id and the edit instructions. This sends the actual image plus prompt to the configured image model and saves a new copy. Also supports upscale and rembg. Report a missing optional dependency or unavailable editing directly; do not install packages or substitute a new text-only generation or shell commands.",
+      "domains": [],
+      "name": "edit_image",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "Edit action",
+            "enum": [
+              "prompt",
+              "upscale",
+              "rembg"
+            ],
+            "type": "string"
+          },
+          "image_id": {
+            "description": "Gallery image ID or supplied odysseus://attachment/ID reference for an owned upload",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "For action=prompt: requested changes, preserving the rest of the source image",
+            "type": "string"
+          },
+          "scale": {
+            "description": "For upscale: scale factor (default 2)",
+            "type": "number"
+          }
+        },
+        "required": [
+          "image_id",
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:e83bf3ccd9ef821d4985ded6ba9feef30fa3b57992045a13d6313fcf1ef43c96"
+    },
+    {
+      "canonical": null,
+      "description": "Extract exact visible text and pixel coordinates from an owned uploaded image or local workspace image with Odysseus local OCR. Use for screenshots, scans, labels, numbers, receipts, forms, and text-location tasks; use inspect_media for general visual understanding.",
+      "domains": [],
+      "name": "extract_text",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "include_layout": {
+            "description": "Include full bounding quadrilaterals; compact pixel centers are always returned.",
+            "type": "boolean"
+          },
+          "max_results": {
+            "maximum": 512,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "min_confidence": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "mode": {
+            "enum": [
+              "all",
+              "numbers"
+            ],
+            "type": "string"
+          },
+          "path": {
+            "description": "Supplied odysseus://attachment/ID reference for an owned upload, or a confined workspace image path.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:4e9bdd3ea0941dbbdaaf343728be016fae90637630a7f96eb63660b6f6ec52f0"
+    },
+    {
+      "canonical": null,
+      "description": "Generate an AI image from a text prompt and save it to the gallery. If this tool reports that no image model or endpoint is configured, report that limitation directly; do not substitute Bash, Python, SVG, or another tool.",
+      "domains": [],
+      "name": "generate_image",
+      "parameters": {
+        "properties": {
+          "model": {
+            "description": "Optional image model",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "Detailed image description",
+            "type": "string"
+          },
+          "quality": {
+            "description": "Optional output quality",
+            "type": "string"
+          },
+          "size": {
+            "description": "Optional output size",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:3fee5df539e2b9fbd5e2b8897fa7177417f8861fdb9e6129e2d716010fff7361"
+    },
+    {
+      "canonical": null,
+      "description": "Get current conditions and a three-day forecast for a location from Open-Meteo. No API key. Prefer this over web_search for weather questions.",
+      "domains": [],
+      "name": "get_weather",
+      "parameters": {
+        "properties": {
+          "location": {
+            "description": "City or place, optionally with region/country",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:1456222c8d7f26c83859a24d09ffe0ea1813346d3a345b89f8d73355174ffc6d"
+    },
+    {
+      "canonical": null,
+      "description": "Return the absolute path of the active workspace folder the user is working in. File tools are confined to it; the shell starts there but is not sandboxed. Call this first when the user refers to 'the project'/'the code'/'this folder' without a path, instead of asking them. Takes no arguments.",
+      "domains": [],
+      "name": "get_workspace",
+      "parameters": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c8a1ac469a826ea3547ac220c7bbfdcd6b58080d4ec596ff2a0149c5ccb9b699"
+    },
+    {
+      "canonical": null,
+      "description": "Find files by glob pattern (recursive), newest first. e.g. '**/*.py'. PREFER this over `bash find/ls` for locating files — confined to the allowed roots.",
+      "domains": [],
+      "name": "glob",
+      "parameters": {
+        "properties": {
+          "path": {
+            "description": "Base directory (optional; defaults to the project root)",
+            "type": "string"
+          },
+          "pattern": {
+            "description": "Glob pattern, e.g. '**/*.ts' or 'src/**/test_*.py'",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:f6dcb35e6879ce6464a42eb86ce87045765c0a6c00d53e14a997f57040f16f61"
+    },
+    {
+      "canonical": null,
+      "description": "Search file contents for a regular expression across a directory tree (uses ripgrep when available, respecting .gitignore). Returns file:line:match. PREFER this over `bash grep/rg` for code search — confined to the allowed roots, structured output.",
+      "domains": [],
+      "name": "grep",
+      "parameters": {
+        "properties": {
+          "glob": {
+            "description": "Only search files matching this glob, e.g. '*.py' (optional)",
+            "type": "string"
+          },
+          "ignore_case": {
+            "description": "Case-insensitive match (optional)",
+            "type": "boolean"
+          },
+          "max_results": {
+            "description": "Max matches to return (optional)",
+            "type": "integer"
+          },
+          "path": {
+            "description": "Directory or file to search (optional; defaults to the project root)",
+            "type": "string"
+          },
+          "pattern": {
+            "description": "Regular expression to search for",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pattern"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:6877000dd296314dabb6ea964a6c25b63d1524586b4b64676861f08f9bd89117"
+    },
+    {
+      "canonical": null,
+      "description": "Run a shell command through an explicitly advertised TUI-host bridge, not inside the backend container. Use only for host/LAN/network tasks where backend Docker/container runtime is limited and the client runtime context says a host bridge is available. Prefer backend bash for normal workspace/server commands.",
+      "domains": [],
+      "name": "host_shell",
+      "parameters": {
+        "properties": {
+          "command": {
+            "description": "The host-side shell command to execute",
+            "type": "string"
+          },
+          "timeout": {
+            "description": "Optional timeout in seconds, capped by the bridge",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "command"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "execute_code"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:a0f432b6f87dbbbff1fa77f94e84689470508bc7f771cca546d5733e90f91a69"
+    },
+    {
+      "canonical": null,
+      "description": "Inspect a local image, SVG, video, or PDF with the current multimodal model. For SVG, provide a .png output_path to render it reliably. For video, returns 4 timestamped 512px-max preview frames by default (up to 8 when needed) and can export clips or captioned still images. For PDF, renders query-relevant pages or an explicit page range as images for visual figure/table inspection. Use a focused start/end range for a known interval; increase frames only when sparse sampling could miss the requested event. This tool samples pixels; query/caption text does not perform semantic video search or event counting.",
+      "domains": [],
+      "name": "inspect_media",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "caption": {
+            "description": "Optional text drawn on a saved still only when the user explicitly requested visible caption text. Never add a caption to internal evidence frames or use caption text as evidence about what the pixels show.",
+            "type": "string"
+          },
+          "crop": {
+            "description": "Optional still-image pixel crop",
+            "properties": {
+              "height": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "width": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "x": {
+                "type": "integer"
+              },
+              "y": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "duration": {
+            "description": "Optional range length from start, in seconds or a compact duration such as 2m30s. Prefer explicit start/end when exact absolute boundaries matter; ignored when end is supplied.",
+            "type": "string"
+          },
+          "end": {
+            "description": "Optional range end in seconds, HH:MM:SS, or percent of video such as 75%",
+            "type": "string"
+          },
+          "exports": {
+            "description": "Export several timestamped video stills, or one video clip with start, end, and output_path. Every output_path must be inside /workspace; never use /tmp.",
+            "items": {
+              "oneOf": [
+                {
+                  "required": [
+                    "timestamp",
+                    "output_path"
+                  ]
+                },
+                {
+                  "required": [
+                    "start",
+                    "end",
+                    "output_path"
+                  ]
+                }
+              ],
+              "properties": {
+                "caption": {
+                  "description": "Visible text requested by the user; omit for evidence or ordinary extracted frames",
+                  "type": "string"
+                },
+                "crop": {
+                  "properties": {
+                    "height": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "width": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "x": {
+                      "type": "integer"
+                    },
+                    "y": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "end": {
+                  "type": "string"
+                },
+                "output_path": {
+                  "description": "Required destination inside /workspace, for example /workspace/student1.png or /workspace/clip.mp4; never use /tmp",
+                  "type": "string"
+                },
+                "speed": {
+                  "maximum": 4.0,
+                  "minimum": 0.25,
+                  "type": "number"
+                },
+                "start": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                },
+                "timestamp_path": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "frames": {
+            "description": "Number of video observations. Requests up to 8 return individual frames; denser requests up to 64 preserve the chosen strategy and are packed into bounded timestamped contact sheets. A uniform request above 8 is normalized to overview.",
+            "maximum": 64,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "max_dimension": {
+            "description": "Optional maximum width/height of transient preview images sent to the model; default 512. Increase to 768 or 1024 only for small visual details. Saved exports keep source quality.",
+            "maximum": 1024,
+            "minimum": 256,
+            "type": "integer"
+          },
+          "output_path": {
+            "description": "For SVG, the required PNG render path. For video, an optional clip or still path. The path must be inside /workspace; never use /tmp. To inspect and save every sampled video frame in one call, use an image template such as /workspace/frames/frame_{frame:02d}.png",
+            "type": "string"
+          },
+          "page": {
+            "description": "For PDF only, optional first 1-based page to render",
+            "minimum": 1,
+            "type": "integer"
+          },
+          "pages": {
+            "description": "For PDF only, either the number of consecutive/relevant pages to return (default 2, maximum 4) or an ordered list of up to 12 exact 1-based page numbers",
+            "oneOf": [
+              {
+                "maximum": 4,
+                "minimum": 1,
+                "type": "integer"
+              },
+              {
+                "items": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "maxItems": 12,
+                "minItems": 1,
+                "type": "array",
+                "uniqueItems": true
+              }
+            ]
+          },
+          "path": {
+            "description": "Workspace path to an image, SVG, video, or PDF, for example /workspace/fixtures/video.mp4",
+            "type": "string"
+          },
+          "query": {
+            "description": "Label describing what to inspect in the returned visuals; it does not search for or filter video events",
+            "type": "string"
+          },
+          "sampling": {
+            "description": "Video frame strategy. uniform covers the timeline evenly; scene finds visual cuts; motion ranks visually active moments; overview packs uniform observations into timestamped row-major contact sheets for coarse navigation. Any strategy requesting more than 8 observations uses contact-sheet transport. Refine candidate intervals afterward for event verification.",
+            "enum": [
+              "uniform",
+              "scene",
+              "motion",
+              "overview"
+            ],
+            "type": "string"
+          },
+          "segments": {
+            "description": "Optional focused ranges. Without output_path, inspect up to 32 ranges: one midpoint per range by default, or distribute an explicit frames budget across them. With a video output_path, concatenate at most 12 ranges in listed order and preview their source midpoints. Positions accept seconds, HH:MM:SS, or percentages.",
+            "items": {
+              "properties": {
+                "end": {
+                  "type": "string"
+                },
+                "start": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "start",
+                "end"
+              ],
+              "type": "object"
+            },
+            "maxItems": 32,
+            "type": "array"
+          },
+          "speed": {
+            "description": "Optional playback-speed multiplier for an exported video clip, preserving audio pitch; for example 2 for 2x",
+            "maximum": 4.0,
+            "minimum": 0.25,
+            "type": "number"
+          },
+          "start": {
+            "description": "Optional range start in seconds, HH:MM:SS, or percent of video such as 25%",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Inspect one exact video frame, or select the frame for a still-image output_path; accepts seconds, HH:MM:SS, or percent",
+            "type": "string"
+          },
+          "timestamp_path": {
+            "description": "Optional workspace text file to save the exported clip's HH:MM:SS - HH:MM:SS range; use with output_path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:97a2607cf188fa990291c699ecc3df97768f756bccd62411357d3896e9bcd0dc"
+    },
+    {
+      "canonical": null,
+      "description": "List models already cached on disk locally or on a remote server. `host` accepts friendly Cookbook server names from list_cookbook_servers (for example workstation) or raw user@host. Also reports completed Cookbook download tasks when the filesystem cache scan cannot locate the HF cache path.",
+      "domains": [],
+      "name": "list_cached_models",
+      "parameters": {
+        "properties": {
+          "host": {
+            "description": "Friendly Cookbook server name (e.g. 'workstation', 'gpu-box') or raw remote host (e.g. 'user@gpu-box'). Omit for local.",
+            "type": "string"
+          },
+          "model_dir": {
+            "description": "Comma-separated additional model directories to scan beyond ~/.cache/huggingface/hub",
+            "type": "string"
+          },
+          "platform": {
+            "description": "Remote platform",
+            "enum": [
+              "linux",
+              "windows"
+            ],
+            "type": "string"
+          },
+          "ssh_port": {
+            "description": "SSH port for remote host (default 22)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:d8f9ccdc05f30702eed5d09cdac4ad697beac391117c163c8d99dca0c079cea3"
+    },
+    {
+      "canonical": null,
+      "description": "List the cookbook's configured servers (remote GPU boxes + local) and the current default host. Call this before download_model/serve_model when the user didn't specify a host, so models go to the right machine (where the GPUs and model cache are) instead of localhost. If multiple servers and intent is ambiguous, show them and ask the user which.",
+      "domains": [],
+      "name": "list_cookbook_servers",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+    },
+    {
+      "canonical": null,
+      "description": "List in-progress model downloads in the Cookbook. Shows each download's model name, phase, percent (if available), session ID, and remote host.",
+      "domains": [],
+      "name": "list_downloads",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+    },
+    {
+      "canonical": null,
+      "description": "List configured email accounts. Use this before checking mail when the user names a mailbox/account such as Gmail, work, or a custom domain, then pass the returned account name/email/id to the other email tools.",
+      "domains": [],
+      "name": "list_email_accounts",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+    },
+    {
+      "canonical": null,
+      "description": "List emails from an account/folder, newest first; date_from is inclusive and date_to is exclusive, so today means today-to-tomorrow and last month means month-start to current-month-start. Returns subject, sender, date, UID, account, and summary.",
+      "domains": [],
+      "name": "list_emails",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, e.g. Gmail or user@example.com",
+            "type": "string"
+          },
+          "date_from": {
+            "description": "Inclusive ISO date/datetime lower bound, e.g. 2026-07-01 for last-month filtering.",
+            "type": "string"
+          },
+          "date_to": {
+            "description": "Exclusive ISO date/datetime upper bound, e.g. 2026-08-01 for last-month filtering.",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Backward-compatible alias for max_results",
+            "type": "integer"
+          },
+          "max_results": {
+            "description": "Max emails to return (default: 20)",
+            "type": "integer"
+          },
+          "unread_only": {
+            "description": "Only show unread emails. Default false; set true only when the user asks for unread emails.",
+            "type": "boolean"
+          },
+          "unresponded_only": {
+            "description": "Only show unanswered emails. Default false.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:ccaaa297707cd662b3c70f1515d453fbf3422ae40bb2e39a9956e2d0396b727d"
+    },
+    {
+      "canonical": null,
+      "description": "List AI models across configured endpoints. A normal filter matches model IDs. Use filter='recommended' to detect this machine's GPU/VRAM/RAM/CPU and return ranked compatible models.",
+      "domains": [],
+      "name": "list_models",
+      "parameters": {
+        "properties": {
+          "filter": {
+            "description": "Optional keyword to filter models",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:1d3b734eb2d9232f2ebc336268c7be93fa131cb7caeb7319da7c94139a81feef"
+    },
+    {
+      "canonical": null,
+      "description": "List saved Cookbook serve presets. Each preset is a launch template (name, model, host, port, tmux cmd) the user previously saved from the UI. Call this BEFORE raw serve_model when the user asks to launch a model by name manually.",
+      "domains": [],
+      "name": "list_serve_presets",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+    },
+    {
+      "canonical": null,
+      "description": "List currently running model servers with status, model name, port, throughput, and structured Cookbook diagnoses. If a serve failed, this includes recent logs plus retry suggestions/adjusted commands the agent can use with serve_model.",
+      "domains": [],
+      "name": "list_served_models",
+      "parameters": {
+        "properties": {},
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49"
+    },
+    {
+      "canonical": null,
+      "description": "List the user's chats (the UI calls them 'chats') as clickable markdown links. Use this to enumerate chats before opening, renaming, archiving, or deleting them. When replying to the user, preserve the returned [title](#session-id) links; do not strip them into plain text. Optionally filter by keyword.",
+      "domains": [],
+      "name": "list_sessions",
+      "parameters": {
+        "properties": {
+          "filter": {
+            "description": "Optional keyword to filter chats by name",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:f63a34bbb02708f46d8cf244c51d52c7ecb94c2ce578d4e26acddcbf0cf5e636"
+    },
+    {
+      "canonical": null,
+      "description": "List the entries of a directory (folders first, then files with sizes). PREFER this over `bash ls` — confined to the allowed roots.",
+      "domains": [],
+      "name": "ls",
+      "parameters": {
+        "properties": {
+          "path": {
+            "description": "Directory to list (optional; defaults to the project root)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:64362ceccf39a48638b4e475024252f86755f6b5f92244e557e074d90736d450"
+    },
+    {
+      "canonical": null,
+      "description": "Inspect and control detached background `bash` jobs (started with the `#!bg` marker). action='list' shows this chat's jobs with id/status/age/command; action='output' returns a job's captured output so far (use for a still-running job, or to re-read a finished one); action='kill' terminates a runaway job's process tree instead of waiting out its max-runtime. output and kill need job_id from list.",
+      "domains": [],
+      "name": "manage_bg_jobs",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "list | output | kill (default: list)",
+            "enum": [
+              "list",
+              "output",
+              "kill"
+            ],
+            "type": "string"
+          },
+          "job_id": {
+            "description": "Background job id (required for output/kill; from action='list')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "execute_code"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:466396919554ddad470f6d093093aa8bd25568d6f5301dde8f2370c13fa58cdb"
+    },
+    {
+      "canonical": null,
+      "description": "Manage calendar events: list events in a date range, create, update, delete. Each event can carry a tag/category (event_type) and importance level. Resolve relative dates like today/tomorrow against the 'Current date and time' system context, then pass ISO 8601 datetimes in the user's local wall time; for all-day events set all_day=true and pass YYYY-MM-DD. If a create/update request lacks a required date, time, or target event, call ask_user once instead of guessing. For update_event, only pass event_type/tag/category/type when the user explicitly asks to tag, retag, categorize, or clear the event tag; otherwise omit it so manually tagged events keep their existing tag. For event reminders/alarms, pass reminder_minutes; the tool creates the Odysseus note reminder, so do not also call manage_notes for the same reminder. Do not set rrule for single-occurrence requests such as 'next Wednesday only'; use rrule only when the user explicitly wants recurrence.",
+      "domains": [],
+      "name": "manage_calendar",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "Action to perform",
+            "enum": [
+              "list_events",
+              "create_event",
+              "update_event",
+              "delete_event",
+              "list_calendars"
+            ],
+            "type": "string"
+          },
+          "all_day": {
+            "description": "Whether this is an all-day event",
+            "type": "boolean"
+          },
+          "calendar": {
+            "description": "Filter list_events by calendar name or href",
+            "type": "string"
+          },
+          "calendar_href": {
+            "description": "Specific calendar URL (optional; defaults to first calendar)",
+            "type": "string"
+          },
+          "description": {
+            "description": "Event description / notes",
+            "type": "string"
+          },
+          "dtend": {
+            "description": "End ISO datetime; defaults to +1h (or +1 day for all_day)",
+            "type": "string"
+          },
+          "dtstart": {
+            "description": "Start ISO datetime, or YYYY-MM-DD if all_day",
+            "type": "string"
+          },
+          "end": {
+            "description": "list_events range end (ISO datetime). Use this for month/week requests after resolving the date range; defaults to +14 days only when no range is requested. Prefer end; backend also accepts end_time, end_date, range_end, to, dtend, until.",
+            "type": "string"
+          },
+          "event_type": {
+            "description": "Tag / category for the event. Common values: work, personal, health, travel, meal, social, admin, other. Aliases accepted: tag, category, type. For update_event, omit this unless the user explicitly asks to tag, retag, categorize, or clear the tag; omitting preserves manual tags.",
+            "type": "string"
+          },
+          "importance": {
+            "description": "Priority level (defaults to 'normal')",
+            "enum": [
+              "low",
+              "normal",
+              "high",
+              "critical"
+            ],
+            "type": "string"
+          },
+          "local_end": {
+            "description": "End date and clock time in the same timezone as local_start. Alternative to dtend.",
+            "properties": {
+              "date": {
+                "description": "YYYY-MM-DD",
+                "type": "string"
+              },
+              "time": {
+                "description": "HH:MM or HH:MM:SS; omit for all_day=true",
+                "type": "string"
+              }
+            },
+            "required": [
+              "date"
+            ],
+            "type": "object"
+          },
+          "local_start": {
+            "description": "Original stated start date and clock time; backend handles timezone conversion. Alternative to dtstart.",
+            "properties": {
+              "date": {
+                "description": "YYYY-MM-DD",
+                "type": "string"
+              },
+              "time": {
+                "description": "HH:MM or HH:MM:SS; omit for all_day=true",
+                "type": "string"
+              }
+            },
+            "required": [
+              "date"
+            ],
+            "type": "object"
+          },
+          "location": {
+            "description": "Event location",
+            "type": "string"
+          },
+          "query": {
+            "description": "Optional text filter for list_events. Use with explicit start/end when verifying whether a named event is present or absent; do not pass query by itself.",
+            "type": "string"
+          },
+          "reminder_minutes": {
+            "description": "For create_event/update_event: create or replace the Odysseus reminder this many minutes before the event, e.g. 5 for 'reminder 5 min before'. For update_event, use reminder='off' to remove the reminder.",
+            "type": "integer"
+          },
+          "rrule": {
+            "description": "Recurrence rule in iCalendar RRULE format, e.g. 'FREQ=WEEKLY;BYDAY=MO' for weekly on Monday, 'FREQ=MONTHLY;BYMONTHDAY=1' for the first day of each month, 'FREQ=MONTHLY;BYDAY=1MO,-1MO' for the first and last Monday of each month, 'FREQ=MONTHLY;BYDAY=2TH' for the second Thursday of each month, or 'FREQ=MONTHLY;BYDAY=-1SU' for the last Sunday of each month. Use with create_event or update_event. For update_event, pass an explicit empty string to remove recurrence and make the event single-occurrence.",
+            "type": "string"
+          },
+          "start": {
+            "description": "list_events range start (ISO datetime). Use this for month/week requests after resolving the date range; pass start and end in the same call. Prefer start; backend also accepts start_time, start_date, range_start, from, dtstart, since.",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Event title (for create/update)",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "For timed create/update: stated timezone, e.g. UTC, +05:30, or Europe/Paris. Pass dtstart/dtend in that zone's original clock time; the backend converts. Omit for user-local time or all-day dates.",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Event UID (for update/delete)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b134cccf9679450a9f8c7ad26903cf61117c920fbdaf6d29160ec9b955b0f6f6"
+    },
+    {
+      "canonical": null,
+      "description": "Create, update, delete, or list the user's CardDAV contacts. Use to save a new contact, update an existing one (email/phone/address), or remove one. Add does not require email: name + phone or name + address is valid. For update/delete you need the contact's uid — call action='list' first to find it. Writes go through the same dedupe + validation as the Contacts UI.",
+      "domains": [],
+      "name": "manage_contact",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "list = show all contacts (with uids); search/find = filter contacts by name/email/phone; add = create; update = edit by uid; delete = remove by uid.",
+            "enum": [
+              "list",
+              "search",
+              "find",
+              "add",
+              "update",
+              "delete"
+            ],
+            "type": "string"
+          },
+          "address": {
+            "description": "Postal/mailing address as a single human-readable string.",
+            "type": "string"
+          },
+          "email": {
+            "description": "Single email address (convenience for add, or the primary email for update). Optional when phone or address is provided.",
+            "type": "string"
+          },
+          "emails": {
+            "description": "Full list of email addresses (first is primary).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Contact's display name (for add/update).",
+            "type": "string"
+          },
+          "phones": {
+            "description": "Full list of phone numbers. Valid for add/update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "uid": {
+            "description": "Contact UID (required for update/delete; get it from action=list).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:0708fdcbfcea38b64e067fb10bf91dd6f8a954c92e563b1a885f5c119516d92f"
+    },
+    {
+      "canonical": null,
+      "description": "Manage stored editor-panel documents. Use this for ANY request to find/search/list/open/show/read/summarize/quote a document by title or content. For a titled document, call action='list' with search/title text to get the document_id, then action='read' with that document_id before answering. Do not answer document-read requests from memory or injected context when this tool is available. Also supports delete and tidy cleanup.",
+      "domains": [],
+      "name": "manage_documents",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "read",
+              "delete",
+              "tidy"
+            ],
+            "type": "string"
+          },
+          "document_id": {
+            "description": "Document ID (for read/delete)",
+            "type": "string"
+          },
+          "language": {
+            "description": "Filter by language (for list)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max results for list or max characters for read",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "Character offset for read pagination",
+            "type": "integer"
+          },
+          "search": {
+            "description": "Search query (for list)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:52ea5706a159e67e99e19c3358c6e7c2eb7b7dac9baa102d71523f30751b0eb5"
+    },
+    {
+      "canonical": null,
+      "description": "Compact reversible email state manager. Use for favorite/unfavorite, done/undone, unarchive, list blocked senders, and unblock sender; use mark_email_read for read/unread.",
+      "domains": [],
+      "name": "manage_email_state",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "favorite",
+              "unfavorite",
+              "mark_read",
+              "mark_unread",
+              "mark_done",
+              "mark_undone",
+              "unarchive",
+              "list_blocked",
+              "unblock_sender"
+            ],
+            "type": "string"
+          },
+          "folder": {
+            "description": "Source folder, default INBOX except unarchive defaults Archive",
+            "type": "string"
+          },
+          "sender": {
+            "description": "Sender email address for unblock_sender",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Email UID for message actions",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:507ca241a3b9e69e697644a4e0b9ba9409dedba1addb9d73efd47d54ac491e4a"
+    },
+    {
+      "canonical": null,
+      "description": "Manage model API endpoints: list configured endpoints, add new ones, delete, enable or disable them.",
+      "domains": [],
+      "name": "manage_endpoints",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "add",
+              "delete",
+              "enable",
+              "disable"
+            ],
+            "type": "string"
+          },
+          "api_key": {
+            "description": "API key (for add)",
+            "type": "string"
+          },
+          "base_url": {
+            "description": "API base URL e.g. https://api.openai.com/v1 (for add)",
+            "type": "string"
+          },
+          "endpoint_id": {
+            "description": "Endpoint ID (for delete/enable/disable)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Display name (for add)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:a138d1336a163a1d1bfcdb95b3f4ef0b470054c30078b13e254f7cd5ae0b57ad"
+    },
+    {
+      "canonical": null,
+      "description": "Manage MCP (Model Context Protocol) tool servers: list servers and their tools, add new servers, delete, enable/disable, reconnect, or list all available tools.",
+      "domains": [],
+      "name": "manage_mcp",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "add",
+              "delete",
+              "enable",
+              "disable",
+              "reconnect",
+              "list_tools"
+            ],
+            "type": "string"
+          },
+          "args": {
+            "description": "Command arguments (for add)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "command": {
+            "description": "Command to run e.g. npx (for add)",
+            "type": "string"
+          },
+          "env": {
+            "description": "Environment variables (for add)",
+            "type": "object"
+          },
+          "name": {
+            "description": "Server name (for add)",
+            "type": "string"
+          },
+          "server_id": {
+            "description": "Server ID (for delete/enable/disable/reconnect)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:5f4c50f3b8212c53c2cd7f4b7f3501e4d0cdff3bb024449bbd9797352265b46c"
+    },
+    {
+      "canonical": null,
+      "description": "Manage the user's memory system: list, add, edit, delete, or search memories. Memories persist across sessions.",
+      "domains": [],
+      "name": "manage_memory",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "The action to perform",
+            "enum": [
+              "list",
+              "add",
+              "edit",
+              "delete",
+              "search"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "description": "Memory category (for add/list filter)",
+            "enum": [
+              "fact",
+              "event",
+              "contact",
+              "preference"
+            ],
+            "type": "string"
+          },
+          "command": {
+            "description": "Text command form, e.g. add\\n<memory text>\\n<category>",
+            "type": "string"
+          },
+          "memory_id": {
+            "description": "Memory ID (for edit/delete)",
+            "type": "string"
+          },
+          "text": {
+            "description": "Memory text (for add/edit) or search query (for search)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:3c8d8211ed805f8644f27e08d7e131e174c026a40dbae90543c3fc09307d1541"
+    },
+    {
+      "canonical": null,
+      "description": "Saved notes/checklists only; no tools for word definitions like musical note or pinned; tagged/archive lists use action=list+label/archived; archive uses update. Use view only with an explicit note id when you need the full body. Search is only for saved-note title/topic lookup. IMPORTANT: For to-do lists / checklists, set note_type='checklist' and pass the items as the `checklist_items` array — do NOT serialize them into `content` as plain text. For freeform notes, use note_type='note' and put the body in `content`. `due_date` accepts natural language like 'tomorrow at 9am' (parsed in the user's timezone) and fires a notification — do not also create a calendar event for the same reminder. Delete only when the user explicitly says delete.",
+      "domains": [],
+      "name": "manage_notes",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "The action to perform",
+            "enum": [
+              "list",
+              "search",
+              "view",
+              "add",
+              "update",
+              "delete",
+              "toggle_item"
+            ],
+            "type": "string"
+          },
+          "archived": {
+            "description": "For update: archive/unarchive. For list: show archived notes when true.",
+            "type": "boolean"
+          },
+          "checklist_items": {
+            "description": "Checklist items for note_type='checklist'. Each item is {text, done}. REQUIRED for checklists — leaving this empty produces a blank note.",
+            "items": {
+              "properties": {
+                "done": {
+                  "description": "Whether the item is checked off",
+                  "type": "boolean"
+                },
+                "text": {
+                  "description": "The to-do item text",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "color": {
+            "description": "Optional color label (e.g. 'yellow', 'blue', 'green')",
+            "type": "string"
+          },
+          "content": {
+            "description": "Freeform body text. Use this for note_type='note'. Do NOT use this for checklists — pass `checklist_items` instead.",
+            "type": "string"
+          },
+          "done": {
+            "description": "For toggle_item: target checked state; omit to toggle.",
+            "type": "boolean"
+          },
+          "due_date": {
+            "description": "Reminder time. Accepts natural language ('tomorrow at 9am', '11pm today') or ISO 8601. Fires a notification at that time.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Note id (for view/update/delete/toggle_item); 8-char prefix is fine",
+            "type": "string"
+          },
+          "index": {
+            "description": "Required for toggle_item: 0-based checklist item index. Use view if unknown.",
+            "type": "integer"
+          },
+          "label": {
+            "description": "Optional category label (also used as a list filter)",
+            "type": "string"
+          },
+          "note_id": {
+            "description": "Alias for id; accepted for view/update/delete/toggle_item when the model emits note_id",
+            "type": "string"
+          },
+          "note_type": {
+            "description": "'note' = freeform text in `content`. 'checklist' = structured to-do items in `checklist_items`. Defaults to 'checklist' if checklist_items is supplied, else 'note'.",
+            "enum": [
+              "note",
+              "checklist"
+            ],
+            "type": "string"
+          },
+          "pinned": {
+            "description": "Pin the note to the top",
+            "type": "boolean"
+          },
+          "query": {
+            "description": "Search text for action='search'",
+            "type": "string"
+          },
+          "title": {
+            "description": "Note title (for add/update, or exact-title delete when no id is available)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:d0164a8c826063a48463d302b65f9d7594956fc3b7db5d51a0fb8522784e8585"
+    },
+    {
+      "canonical": null,
+      "description": "List, read/open, or delete saved deep research reports from the Library. Use this for existing research reports; use trigger_research to start a new report.",
+      "domains": [],
+      "name": "manage_research",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "List reports, read/open one report, or delete one report.",
+            "enum": [
+              "list",
+              "read",
+              "open",
+              "view",
+              "get",
+              "delete"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "description": "Research report id from action=list, required for read/open/view/get/delete.",
+            "type": "string"
+          },
+          "search": {
+            "description": "Optional search text for action=list.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b0dd64409dd6ea1867ea5610ab4da5ecf95b98d69b49fa1fddf2780e5dccc4ca"
+    },
+    {
+      "canonical": null,
+      "description": "Manage a chat: rename, archive, unarchive, delete, mark important, truncate history, or fork it. (The UI calls these 'chats'; 'session' is the internal term.) For destructive actions like delete, call list_sessions first and pass the exact id returned there; never invent ids.",
+      "domains": [],
+      "name": "manage_session",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "The action to perform",
+            "enum": [
+              "rename",
+              "archive",
+              "unarchive",
+              "delete",
+              "important",
+              "unimportant",
+              "truncate",
+              "fork"
+            ],
+            "type": "string"
+          },
+          "session_id": {
+            "description": "Exact target chat id from list_sessions, or 'current' for the active chat where supported",
+            "type": "string"
+          },
+          "value": {
+            "description": "Action parameter: new name (rename), keep_count (truncate/fork)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "session_id"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:18cc8acaec412c7ab697dd3d31f5c28495676d5f33557fad086203c6e416dfdc"
+    },
+    {
+      "canonical": null,
+      "description": "Manage user preferences and settings. Use `disable_tool`/`enable_tool`/`list_tools` to turn individual tools on or off globally (e.g. shell, search, browser, documents, memory, skills, images, tasks, notes, calendar, email). Use list/get/set/delete for free-form preferences.",
+      "domains": [],
+      "name": "manage_settings",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "get",
+              "set",
+              "delete",
+              "disable_tool",
+              "enable_tool",
+              "list_tools"
+            ],
+            "type": "string"
+          },
+          "key": {
+            "description": "Setting key (for get/set/delete)",
+            "type": "string"
+          },
+          "tool": {
+            "description": "Tool name to disable/enable (for disable_tool/enable_tool). Accepts aliases: shell, search, browser, documents, memory, skills, images, tasks, notes, calendar, email — or a raw tool name like 'bash' or 'web_search'.",
+            "type": "string"
+          },
+          "value": {
+            "description": "Setting value (for set) — can be string, number, boolean, or object"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:0bec1cd9833e2adc50915a39c4f11be25a67c2840b6e7c7b245038127b3d46e3"
+    },
+    {
+      "canonical": null,
+      "description": "Read or modify the user's skill library. Skills are SKILL.md files (YAML frontmatter + structured body: When to Use / Procedure / Pitfalls / Verification) and follow a draft → published lifecycle. Use progressive disclosure: 'list' to see what exists, 'view' to load full content for a single skill, 'view_ref' for sub-files. Use 'patch' for surgical text edits and 'edit' for full rewrites. 'publish' once you've verified the procedure works. For add, always provide an explicit name slug and only tell the user the exact name returned by the tool.",
+      "domains": [],
+      "name": "manage_skills",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "list = name+description summary; view = full SKILL.md; view_ref = sub-file under the skill dir; add = create; edit = full rewrite (content); patch = old_string→new_string; publish = flip status; delete; search = relevance match on published skills.",
+            "enum": [
+              "list",
+              "view",
+              "view_ref",
+              "add",
+              "edit",
+              "patch",
+              "publish",
+              "delete",
+              "search"
+            ],
+            "type": "string"
+          },
+          "category": {
+            "description": "Organizational grouping like 'dev', 'email', 'system' (for add).",
+            "type": "string"
+          },
+          "confidence": {
+            "description": "0-1 (for add/publish).",
+            "type": "number"
+          },
+          "content": {
+            "description": "Full SKILL.md text (for edit).",
+            "type": "string"
+          },
+          "description": {
+            "description": "One-line summary surfaced in the skills index (for add or metadata-only edit).",
+            "type": "string"
+          },
+          "fallback_for_toolsets": {
+            "description": "Hide when these toolsets are active (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Slug/name of the skill. Required for add/view/view_ref/edit/patch/publish/delete. For add, choose the exact kebab-case name the user should see and report only the returned name.",
+            "type": "string"
+          },
+          "new_string": {
+            "description": "Replacement text (for patch).",
+            "type": "string"
+          },
+          "old_string": {
+            "description": "Exact substring to replace (for patch). Must appear exactly once.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Sub-path under the skill directory for view_ref (e.g. 'references/example.md').",
+            "type": "string"
+          },
+          "pitfalls": {
+            "description": "Known failure modes + recovery (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "platforms": {
+            "description": "Restrict to OSes (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "procedure": {
+            "description": "Numbered steps (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "query": {
+            "description": "Search query (for search).",
+            "type": "string"
+          },
+          "requires_toolsets": {
+            "description": "Hide unless these toolsets are active (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "description": "Defaults to 'draft' on add.",
+            "enum": [
+              "draft",
+              "published"
+            ],
+            "type": "string"
+          },
+          "tags": {
+            "description": "Keyword tags (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "verification": {
+            "description": "How to confirm the procedure succeeded (for add).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "version": {
+            "description": "Semver-ish, e.g. '1.0.0' (for add).",
+            "type": "string"
+          },
+          "when_to_use": {
+            "description": "Trigger conditions in plain English (for add).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:af83bd69e18a4a033b37bcf21b903e0b7f71d74229629a7521ceee7bd32b0ef7"
+    },
+    {
+      "canonical": null,
+      "description": "Manage scheduled/automated tasks: list, create, edit, delete, pause, resume, or run tasks. Use this for ANY recurring/scheduled request ('every morning…', 'each day at 7:30', 'daily summarize…') and for explicit one-off future retry requests ('try again in 15 minutes') — create a task rather than claiming the current agent can sleep. Task types: llm (AI runs a prompt), research (runs the deep-research pipeline on a question), or action (built-in automation). Triggers can be time-based or event-based.",
+      "domains": [],
+      "name": "manage_tasks",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "The action to perform",
+            "enum": [
+              "list",
+              "create",
+              "edit",
+              "delete",
+              "pause",
+              "resume",
+              "run"
+            ],
+            "type": "string"
+          },
+          "action_name": {
+            "description": "Built-in action (for task_type=action)",
+            "enum": [
+              "tidy_sessions",
+              "tidy_documents",
+              "consolidate_memory",
+              "tidy_research",
+              "summarize_emails",
+              "draft_email_replies",
+              "extract_email_events",
+              "classify_events",
+              "learn_sender_signatures",
+              "test_skills",
+              "audit_skills",
+              "check_email_urgency"
+            ],
+            "type": "string"
+          },
+          "cron_expression": {
+            "description": "For schedule=cron: five-field UTC cron (minute hour day-of-month month weekday). Use for multiple weekdays or other custom recurrence; weekdays 0=Sunday, 1=Monday.",
+            "type": "string"
+          },
+          "day_of_month": {
+            "description": "Day of month for a monthly task. For weekly tasks use weekdays instead.",
+            "maximum": 31,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "name": {
+            "description": "Task name",
+            "type": "string"
+          },
+          "output_target": {
+            "description": "Where results go. Defaults to 'session' (results land in a dedicated chat session the user reads) — this is the right choice for 'summarize for me' / 'send to me'. Do NOT go hunting for the user's email address; only use an email MCP tool name here if the user explicitly asked to be emailed AND an address is already known.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "The instruction (for task_type=llm) or the research question (for task_type=research). Required for both.",
+            "type": "string"
+          },
+          "query": {
+            "description": "Text filter for action=list when searching task names/prompts",
+            "type": "string"
+          },
+          "schedule": {
+            "description": "Schedule frequency (for trigger_type=schedule)",
+            "enum": [
+              "once",
+              "daily",
+              "weekly",
+              "monthly",
+              "cron"
+            ],
+            "type": "string"
+          },
+          "scheduled_date": {
+            "description": "ISO datetime for one-off tasks when schedule is 'once', e.g. 2026-08-23T14:30:00Z.",
+            "type": "string"
+          },
+          "scheduled_day": {
+            "description": "Day of week 0=Mon (weekly) or day of month (monthly)",
+            "type": "integer"
+          },
+          "scheduled_time": {
+            "description": "HH:MM in UTC (for schedule triggers). Convert the user's stated local time using the UTC offset given in the 'Current date and time' context.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Optional status filter for action=list",
+            "enum": [
+              "active",
+              "paused"
+            ],
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task ID (for edit/delete/pause/resume/run)",
+            "type": "string"
+          },
+          "task_type": {
+            "description": "llm = AI runs your prompt; research = runs the deep-research pipeline on the prompt as a question; action = direct built-in function",
+            "enum": [
+              "llm",
+              "research",
+              "action"
+            ],
+            "type": "string"
+          },
+          "trigger_count": {
+            "description": "Fire every N events (for trigger_type=event)",
+            "type": "integer"
+          },
+          "trigger_event": {
+            "description": "Event name (for trigger_type=event)",
+            "enum": [
+              "session_created",
+              "message_sent",
+              "document_created",
+              "memory_added",
+              "research_completed",
+              "email_received",
+              "skill_added"
+            ],
+            "type": "string"
+          },
+          "trigger_type": {
+            "description": "schedule = time-based, event = count-based",
+            "enum": [
+              "schedule",
+              "event"
+            ],
+            "type": "string"
+          },
+          "weekdays": {
+            "description": "Days for one recurring task, with scheduled_time in UTC. Server builds the schedule; omit day_of_month, scheduled_date, cron_expression and scheduled_day.",
+            "items": {
+              "enum": [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b7ec3d0d498720094a90ac7b1eaa287388d12a9e105cd13c034006dbd6699c84"
+    },
+    {
+      "canonical": null,
+      "description": "Manage API access tokens: list existing tokens, create new ones, or delete them.",
+      "domains": [],
+      "name": "manage_tokens",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "create",
+              "delete"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Token name (for create)",
+            "type": "string"
+          },
+          "token_id": {
+            "description": "Token ID (for delete)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:13c5e5de6a8ef3565213d95f517e58d30599d02d12e627d4f0e3f363a29d4dab"
+    },
+    {
+      "canonical": null,
+      "description": "Manage webhooks: list, add, delete, enable or disable webhook endpoints.",
+      "domains": [],
+      "name": "manage_webhooks",
+      "parameters": {
+        "properties": {
+          "action": {
+            "enum": [
+              "list",
+              "add",
+              "delete",
+              "enable",
+              "disable"
+            ],
+            "type": "string"
+          },
+          "events": {
+            "description": "Comma-separated event names (for add)",
+            "type": "string"
+          },
+          "name": {
+            "description": "Webhook name (for add)",
+            "type": "string"
+          },
+          "url": {
+            "description": "Webhook URL (for add)",
+            "type": "string"
+          },
+          "webhook_id": {
+            "description": "Webhook ID (for delete/enable/disable)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:e32a96e38f84759875fc483941890c85d849495ed7dc2782a33f0b2742288558"
+    },
+    {
+      "canonical": null,
+      "description": "Mark one email read or unread by UID; always include read=true for read and read=false for unread. For multiple messages, use bulk_email instead.",
+      "domains": [],
+      "name": "mark_email_read",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "read": {
+            "description": "True marks read; false marks unread",
+            "type": "boolean"
+          },
+          "uid": {
+            "description": "Email UID from list_emails/read_email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:5619697cd00374db313efde36f28068a7efdaa1231876b212e7db9f71a410b43"
+    },
+    {
+      "canonical": null,
+      "description": "Extract focused evidence from an online PDF URL or task-local /workspace/*.pdf using Odysseus' native document reader. Use this instead of Python requests, curl, pdftotext, or manual downloads. Supply the exact model, metric, and table terms in query. Treat only values visible in the returned passages as verified; never fill missing values from memory or estimates.",
+      "domains": [],
+      "name": "pdf_extract",
+      "parameters": {
+        "properties": {
+          "path": {
+            "description": "Task-local /workspace/*.pdf path; use url for an online PDF",
+            "type": "string"
+          },
+          "query": {
+            "description": "Required focused terms, including the target model and every requested metric/table heading",
+            "type": "string"
+          },
+          "url": {
+            "description": "Direct http/https PDF URL or task-local /workspace/*.pdf path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b6aef1ca0fa0b1ab0f5a13986870862e09254c72d1f0246431f7441351295ee0"
+    },
+    {
+      "canonical": null,
+      "description": "Run a multi-step AI pipeline where each model's output feeds the next. Example: Draft -> Critique -> Revise.",
+      "domains": [],
+      "name": "pipeline",
+      "parameters": {
+        "properties": {
+          "steps": {
+            "description": "Pipeline steps in order",
+            "items": {
+              "properties": {
+                "instruction": {
+                  "description": "What this step should do",
+                  "type": "string"
+                },
+                "model": {
+                  "description": "Model name for this step",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "model",
+                "instruction"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "steps"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:6ef06b8c8fdd3492c7b9f333db22dc90e372e6c7fa0720af5cfba8d3435a74b6"
+    },
+    {
+      "canonical": null,
+      "description": "Trusted browser session metadata only. Page/document operations are unavailable because the local producer cannot atomically bind a captured target. No batch or raw CLI flags. Use web_search/web_fetch for supported web access.",
+      "domains": [],
+      "name": "private_browser",
+      "parameters": {
+        "additionalProperties": false,
+        "properties": {
+          "action": {
+            "enum": [
+              "session_info",
+              "tabs",
+              "open",
+              "read",
+              "snapshot",
+              "find",
+              "evaluate",
+              "click",
+              "fill",
+              "press",
+              "scroll",
+              "wait",
+              "screenshot",
+              "close",
+              "navigate",
+              "reload",
+              "back",
+              "forward",
+              "select_page",
+              "close_page",
+              "network",
+              "console",
+              "new_page"
+            ],
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "find": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "page": {
+            "description": "Observed alias only; page commands remain disabled for the current producer.",
+            "pattern": "^t[1-9][0-9]*$",
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "ref": {
+            "type": "string"
+          },
+          "script": {
+            "type": "string"
+          },
+          "selector": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "timeout_ms": {
+            "maximum": 20000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:1bc8851da751778bd0ac98fbb035272081bf233a8490939d9357bd26ee78b5c4"
+    },
+    {
+      "canonical": null,
+      "description": "Execute Python code to compute a result or test something. Prefer a dedicated tool whenever one fits the job (reading, writing, or searching files); use python only for computation, data processing, or scripting no dedicated tool covers.",
+      "domains": [],
+      "name": "python",
+      "parameters": {
+        "properties": {
+          "code": {
+            "description": "Python code to execute",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "execute_code"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:19d49c8431f6ecf8cd2712ef29abd3268c033cc8349c6961ea60bc1d5a384b9f"
+    },
+    {
+      "canonical": null,
+      "description": "Read the full content of a specific email by UID.",
+      "domains": [],
+      "name": "read_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, especially when the UID came from a non-default mailbox",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Email UID to read",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c877ec7e581d67318d0c67dc1b5cf8a96d7c880f71bc706d5f486350a01b4ac2"
+    },
+    {
+      "canonical": null,
+      "description": "Read a local file from disk. This does not download URLs; use web_fetch for http:// or https:// resources. Optionally read a line range with offset/limit for large local files.",
+      "domains": [],
+      "name": "read_file",
+      "parameters": {
+        "properties": {
+          "limit": {
+            "description": "Max number of lines to read from offset (optional)",
+            "type": "integer"
+          },
+          "offset": {
+            "description": "1-based line to start reading from (optional)",
+            "type": "integer"
+          },
+          "path": {
+            "description": "File path to read",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:8add648ca6a61d996ef5e81c1e8748be6ef7869c6f45157574a1b43501f1672e"
+    },
+    {
+      "canonical": null,
+      "description": "SEND a reply email immediately by UID. Do not use this when the user asks to write/draft/open/start a reply; use draft_email_reply so the user can review in the Odysseus document editor. Only use when the user explicitly says to send now. Use the exact UID from the latest read_email/list_emails result; never invent UID 1. Automatically threads with In-Reply-To/References headers.",
+      "domains": [],
+      "name": "reply_to_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, especially when the UID came from a non-default mailbox",
+            "type": "string"
+          },
+          "body": {
+            "description": "Reply body text",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Exact UID of the email to reply to from list_emails/read_email; never invent UID 1",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid",
+          "body"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:4ce12b26164b2d54e01f728614a589383ca28b45eb40ad05dd632dd96a1d13f4"
+    },
+    {
+      "canonical": null,
+      "description": "Look up a contact by name. Searches CardDAV address book and sent email history. Returns email addresses (when available) or phone numbers. Use when the user says 'message [name]', 'email [name]', or asks for someone's contact details.",
+      "domains": [],
+      "name": "resolve_contact",
+      "parameters": {
+        "properties": {
+          "name": {
+            "description": "Person's name to search for",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:609ce05766e2c7c8a25653fa8a1f6fedb5fb3175e08fb1d72b027515fd25f67c"
+    },
+    {
+      "canonical": null,
+      "description": "Scan up to 500 newest email headers for likely spam/newsletter unsubscribe candidates. Does not unsubscribe anything. Review candidates with the user before acting; mailto methods can be executed with unsubscribe_email, web URL methods require browser/web tools after approval.",
+      "domains": [],
+      "name": "scan_email_unsubscribes",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder to scan (default: INBOX)",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum candidates to return (default: 25)",
+            "type": "integer"
+          },
+          "max_scan": {
+            "description": "How many newest emails to inspect, capped at 500 (default: 500)",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:ef11f7499c6c9ff6e0ab0435b2bc2a02a37157c675cf980b965303ada2e95f1f"
+    },
+    {
+      "canonical": null,
+      "description": "Review recent inbox messages for likely spam/phishing. Returns candidates with UID, sender, subject, score, and reasons. Does not move/delete/block anything; ask the user to confirm before bulk_email action=junk or block_sender.",
+      "domains": [],
+      "name": "scan_spam",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "folder": {
+            "description": "IMAP folder to scan, default INBOX",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Maximum candidates to return, default 10",
+            "type": "integer"
+          },
+          "max_scan": {
+            "description": "How many newest messages to inspect, default 100",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:dadc795ae42c3c57b58c878d6dea8bff1bfd0662cd8a2e6c994bdcf4c1144f8c"
+    },
+    {
+      "canonical": null,
+      "description": "Search the user's past session transcripts by keyword. Use when the user asks about previous chats, past conversations, or when direct transcript evidence is better than persistent memory. Returns matching sessions with clickable links and nearby context.",
+      "domains": [],
+      "name": "search_chats",
+      "parameters": {
+        "properties": {
+          "query": {
+            "description": "Search keyword(s) to find in past conversations",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:4cc2938433f99a286a3f2ad97f53754b2affc5533f7428c4e800b80e9ccf971a"
+    },
+    {
+      "canonical": null,
+      "description": "Search email subjects, senders, and message bodies by topic or person, then use read_email with a returned UID when full message content is needed.",
+      "domains": [],
+      "name": "search_emails",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "days_back": {
+            "description": "Optional positive lookback window in days; omit to search the available mailbox history",
+            "type": "integer"
+          },
+          "folder": {
+            "description": "Limit search to this IMAP folder; omit to search across mailbox folders",
+            "type": "string"
+          },
+          "max_results": {
+            "description": "Maximum matching messages to return (default: 20)",
+            "type": "integer"
+          },
+          "query": {
+            "description": "Topic, person, sender, or phrase to find",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:2394886f3cc8d907376090bfa2a8f3d0c5446b4092b5bb69e91b84c847b369d0"
+    },
+    {
+      "canonical": null,
+      "description": "Search Hugging Face Hub models using the official HF API. Returns repo IDs, HF URLs, update times, likes, and download counts. Use this when the user wants to find/link a model to download. Set official_only=true for 'official', 'latest Qwen/DeepSeek/Llama/etc.', or provider-owned models. Do not include quant/community variants by default; only search AWQ/GGUF/GPTQ/FP8/Q4/etc. when the user asks for quantized versions.",
+      "domains": [],
+      "name": "search_hf_models",
+      "parameters": {
+        "properties": {
+          "author": {
+            "description": "Optional exact Hugging Face namespace/author to search, e.g. Qwen or meta-llama.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max results (default 10)",
+            "type": "integer"
+          },
+          "official_only": {
+            "description": "Restrict to the official provider/org namespace inferred from the query, such as Qwen, deepseek-ai, meta-llama, mistralai, google, microsoft, nvidia, or openai.",
+            "type": "boolean"
+          },
+          "quant": {
+            "description": "Set true only when searching quantized variants such as AWQ, GGUF, GPTQ, EXL2, MLX, FP8, Q4, or Q8.",
+            "type": "boolean"
+          },
+          "query": {
+            "description": "Search terms (e.g. 'Qwen 8B', 'flux', 'llama-3 instruct')",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:5326a920e7b558540f683c597e47c381e6975ffe4eb6a6fab1c2723f53a2b31b"
+    },
+    {
+      "canonical": null,
+      "description": "Send a new email immediately. Use only when the user explicitly says to send now, deliver now, or approve/send without further review. For normal 'send/write/email someone saying X' requests, use draft_email so Odysseus opens a reviewable email document. Use resolve_contact first if you only have a name and need to find the email address. If multiple accounts exist, pass account from list_email_accounts.",
+      "domains": [],
+      "name": "send_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts, e.g. Gmail or user@example.com",
+            "type": "string"
+          },
+          "body": {
+            "description": "Email body text",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Email subject line",
+            "type": "string"
+          },
+          "to": {
+            "description": "Recipient email address",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to",
+          "subject",
+          "body"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c51c291d2271bd3fbd9b8fce489854240ac10e6ed445787726cadbaccd59cd43"
+    },
+    {
+      "canonical": null,
+      "description": "Send a new message to an existing live chat and get that chat model's response. Do not use this to retrieve, read, summarize, or inspect old chats; use search_chats or list_sessions for past chat evidence.",
+      "domains": [],
+      "name": "send_to_session",
+      "parameters": {
+        "properties": {
+          "message": {
+            "description": "The message to send",
+            "type": "string"
+          },
+          "session_id": {
+            "description": "The id of the chat to send the message to",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "message"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:3af7d13efc4edf9865988a1f67f7dcb63a7db0afb9b1e9f87dd069d7f6992116"
+    },
+    {
+      "canonical": null,
+      "description": "Start serving a model with vLLM, SGLang, llama.cpp, Ollama, MLX Image, or Diffusers. If `host` is omitted, defaults to the cookbook's selected server (not localhost). For MLX image models on Apple Silicon use `python3 scripts/mlx_image_server.py --model <repo> --port 8100`; for non-MLX image/inpainting/diffusion models use `python3 scripts/diffusion_server.py --model <repo> --port 8100`. Never serve image models with `mlx_lm.server`; that is only for text/chat MLX models. After launching, call list_served_models to check readiness/errors; if it reports a diagnosis with retry suggestions, retry via serve_model using the suggested adjusted cmd.",
+      "domains": [],
+      "name": "serve_model",
+      "parameters": {
+        "properties": {
+          "cmd": {
+            "description": "Full serve command (e.g. 'vllm serve <repo> --port 8000 --tp 2', 'python3 -m sglang.launch_server --model-path <repo> --port 30000', for MLX image models: 'python3 scripts/mlx_image_server.py --model <repo> --port 8100', or for non-MLX image models: 'python3 scripts/diffusion_server.py --model <repo> --port 8100')",
+            "type": "string"
+          },
+          "host": {
+            "description": "Target server — friendly NAME from list_cookbook_servers (e.g. 'gpu-box', 'workstation') or raw user@host. Omit to use the cookbook's selected default.",
+            "type": "string"
+          },
+          "local": {
+            "description": "Force serve on THIS machine instead of the default remote server.",
+            "type": "boolean"
+          },
+          "repo_id": {
+            "description": "Model repo (e.g. 'Qwen/Qwen3-8B')",
+            "type": "string"
+          }
+        },
+        "required": [
+          "repo_id",
+          "cmd"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b5a12d3a85206a5ab45fc636a760f07467044a3f041d323257f882d3266bc398"
+    },
+    {
+      "canonical": null,
+      "description": "Launch a saved Cookbook serve preset by name. Reuses the exact tmux command + host the user saved before. This is the preferred way to start a known model (SD3.5, vLLM presets, etc.) — don't fabricate launch commands when a preset exists.",
+      "domains": [],
+      "name": "serve_preset",
+      "parameters": {
+        "properties": {
+          "dry_run": {
+            "description": "Resolve and preview the preset without starting a server",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Preset name (exact or case-insensitive substring of one returned by list_serve_presets)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:a5f3fb67fed7d2c02725299ce2284b8f2734e6cd24002176d4441fc899ac1acf"
+    },
+    {
+      "canonical": null,
+      "description": "Stop a running model server.",
+      "domains": [],
+      "name": "stop_served_model",
+      "parameters": {
+        "properties": {
+          "session_id": {
+            "description": "Tmux session ID of the server to stop",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "admin_change"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:1841798a3df55b336346595a6e8f94767ce40b7f8e2fd337d7cbd465d53cb08e"
+    },
+    {
+      "canonical": null,
+      "description": "Suggest improvements to the active document WITHOUT editing it. Creates inline comment bubbles the user can accept or reject. Use when the user asks for suggestions, review, improvements, or feedback. Every replacement must materially differ from its exact source text; never emit a no-op suggestion.",
+      "domains": [],
+      "name": "suggest_document",
+      "parameters": {
+        "properties": {
+          "more": {
+            "description": "Set true when more distinct affected passages remain for a following suggestion batch.",
+            "type": "boolean"
+          },
+          "suggestions": {
+            "description": "List of suggested changes with reasons",
+            "items": {
+              "properties": {
+                "find": {
+                  "description": "Exact text in the document to suggest changing",
+                  "type": "string"
+                },
+                "reason": {
+                  "description": "Brief explanation of why this change helps",
+                  "type": "string"
+                },
+                "replace": {
+                  "description": "Suggested replacement text; MUST be materially different from find",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "find",
+                "replace",
+                "reason"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "suggestions"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:326cf4b80f431fb7463ecd029e00566254c5a2778ca8b92446b62fdbd1372103"
+    },
+    {
+      "canonical": null,
+      "description": "Read the last N lines of a cookbook serve/download task's tmux pane. Use ONLY in this exact sequence: (1) the user asked to serve a model, (2) you launched it via serve_model, (3) list_served_models reports the NEW task as crashed/error, (4) call tail_serve_output on the new sessionId to find the root cause, (5) call serve_model again with adjusted flags. DO NOT call this on old stopped/completed download tasks — they are historical and won't tell you anything about the current attempt. DO NOT investigate past failures before launching; the environment may have changed since.",
+      "domains": [],
+      "name": "tail_serve_output",
+      "parameters": {
+        "properties": {
+          "session_id": {
+            "description": "Tmux session id from list_served_models (e.g. 'serve-abc12345', 'cookbook-a1b2c3d4').",
+            "type": "string"
+          },
+          "tail": {
+            "description": "How many lines of pane scrollback to fetch (default 300, max 4000). Bump this if the error in the visible tail references an earlier line ('see root cause above').",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:f20656eb206b5514e50a35d5a39a72009b2de7b53f24f9de7bcf48680feb1782"
+    },
+    {
+      "canonical": null,
+      "description": "Create and maintain a structured task list for the current coding session. Use during multi-step implementation/debug/refactor work and keep statuses current.",
+      "domains": [],
+      "name": "todowrite",
+      "parameters": {
+        "properties": {
+          "todos": {
+            "description": "Current task list. Only one item should be in_progress.",
+            "items": {
+              "properties": {
+                "content": {
+                  "description": "Task description",
+                  "type": "string"
+                },
+                "priority": {
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "in_progress",
+                    "completed"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "content",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "todos"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:137f0d7204362fe6a6e721b35f2ab7c4c9846ac5e5c28f70dc77565f2e5f31f1"
+    },
+    {
+      "canonical": null,
+      "description": "Transcribe speech from a local workspace audio or video file with Odysseus local Whisper. Returns timestamped speech segments in [START --> END] TEXT form; the spoken text begins after the first '] '. For a request limited to a named chapter, question, scene, or topic, first locate that section and its next boundary, then use start/end or filter only that interval rather than matching the whole recording. This transcribes audio speech; use inspect_media for visually burned-in text or subtitles.",
+      "domains": [],
+      "name": "transcribe_media",
+      "parameters": {
+        "properties": {
+          "end": {
+            "description": "Optional transcription end in seconds or HH:MM:SS. Pass the requested end directly instead of transcribing and filtering the whole recording.",
+            "type": "string"
+          },
+          "force_language": {
+            "description": "Set true only when the spoken language is known and auto-detection must be overridden.",
+            "type": "boolean"
+          },
+          "language": {
+            "description": "Optional speech-language hint such as zh or en; auto-detection remains the default.",
+            "type": "string"
+          },
+          "model": {
+            "description": "Optional local Whisper size. Focused ranges up to five minutes default to small for accuracy; longer or unbounded recordings default to base for speed.",
+            "enum": [
+              "tiny",
+              "base",
+              "small"
+            ],
+            "type": "string"
+          },
+          "output_path": {
+            "description": "Optional workspace destination for the timestamped transcript. Use .txt for readable timestamped text, .jsonl for one {start, end, text} object per speech segment, or .srt/.vtt for subtitle files. If the requested final artifact is one of these formats, pass its path directly so the tool writes it atomically. If omitted, a .txt transcript is saved automatically under /workspace/.odysseus/transcripts/.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Workspace audio/video path, for example /workspace/fixtures/video.mp4",
+            "type": "string"
+          },
+          "start": {
+            "description": "Optional transcription start in seconds or HH:MM:SS. Pass the requested start directly when the user names a time interval.",
+            "type": "string"
+          },
+          "timestamp_precision": {
+            "description": "Decimal places for JSONL start/end seconds (default 3). Match an explicitly requested rounding precision.",
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "read_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:c081668379ff4350a07a47b6f8060ea949f01a117a4d33b8f8a858c6e54df8a8"
+    },
+    {
+      "canonical": null,
+      "description": "Start background research on a topic. Chat-started jobs return findings to this chat. Chat defaults to a quick two-round pass; set max_rounds explicitly for deeper work. Returns a progress link.",
+      "domains": [],
+      "name": "trigger_research",
+      "parameters": {
+        "properties": {
+          "category": {
+            "description": "Optional report format.",
+            "enum": [
+              "product",
+              "comparison",
+              "howto",
+              "factcheck"
+            ],
+            "type": "string"
+          },
+          "max_rounds": {
+            "description": "Optional research-round limit; omit or use 0 for automatic rounds.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "topic": {
+            "description": "Research question or topic",
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "network_egress",
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:4b4a296b2ed2cdca2f8d8bd90bb59aec96b0610402367456fd383f1878757161"
+    },
+    {
+      "canonical": null,
+      "description": "Control the user interface. Actions: toggle (turn tools on/off), open_panel (open a modal: documents/library, gallery, calendar/schedule, email, sessions, notes, memories/brain, skills, settings, theme, cookbook; calendar supports month/week/year/agenda plus a date; Cookbook supports models/download, launch/serve, active/running, dependencies, and settings views), open_email_reply (legacy UI-only reply opener; prefer email MCP draft_email_reply for assistant-written reply drafts so a normal document-backed email draft is created), set_mode, switch_model, set_theme (built-in presets: dark, light, midnight, cyberpunk, retrowave, forest, ocean, ume, terminal, organs, gpt, claude, cute, eclipse, porcelain, arcade, blueprint, monolith, yoyo), create_theme (CREATE any custom theme with a name + colors object — pick distinctive, evocative hex colors that match the requested aesthetic, NOT generic defaults. The theme auto-applies after creation), get_theme, and get_toggles. When a user asks for ANY theme not in the built-in preset list, ALWAYS use create_theme.",
+      "domains": [],
+      "name": "ui_control",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "The UI action. Use set_theme for presets, create_theme to build a custom theme with any hex colors",
+            "enum": [
+              "toggle",
+              "open_panel",
+              "open_email_reply",
+              "set_mode",
+              "switch_model",
+              "set_theme",
+              "create_theme",
+              "get_theme",
+              "get_toggles"
+            ],
+            "type": "string"
+          },
+          "background": {
+            "description": "For create_theme: choose an effect matching the requested mood. Use none for a plain background or random for a saved random choice.",
+            "properties": {
+              "intensity": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "pattern": {
+                "enum": [
+                  "none",
+                  "dots",
+                  "synapse",
+                  "rain",
+                  "constellations",
+                  "perlin-flow",
+                  "petals",
+                  "sparkles",
+                  "embers",
+                  "starfield-depth",
+                  "ascii-fireflies",
+                  "random"
+                ],
+                "type": "string"
+              },
+              "size": {
+                "maximum": 3,
+                "minimum": 0.2,
+                "type": "number"
+              },
+              "speed": {
+                "maximum": 2.5,
+                "minimum": 0.05,
+                "type": "number"
+              }
+            },
+            "required": [
+              "pattern"
+            ],
+            "type": "object"
+          },
+          "body": {
+            "description": "For open_email_reply: reply body to pre-fill. Required whenever the user told you what the reply should say. Opens a draft, does not send.",
+            "type": "string"
+          },
+          "colors": {
+            "description": "For create_theme: choose bg and accent. Omitted fg, panel and border are derived for readability. Accepts #RGB or #RRGGBB. Explicit overrides are preserved.",
+            "properties": {
+              "accent": {
+                "description": "Accent color for buttons, brand, highlights (hex)",
+                "type": "string"
+              },
+              "accentError": {
+                "description": "Error/danger color (hex, optional)",
+                "type": "string"
+              },
+              "accentPrimary": {
+                "description": "Primary accent override (hex, optional)",
+                "type": "string"
+              },
+              "aiBubbleBg": {
+                "description": "AI chat bubble background (hex, optional)",
+                "type": "string"
+              },
+              "bg": {
+                "description": "Background color (hex, e.g. #1a1a2e)",
+                "type": "string"
+              },
+              "border": {
+                "description": "Border/divider color (hex)",
+                "type": "string"
+              },
+              "brandColor": {
+                "description": "Brand/logo color (hex, optional)",
+                "type": "string"
+              },
+              "bubbleBorder": {
+                "description": "Chat bubble border color (hex, optional)",
+                "type": "string"
+              },
+              "codeBg": {
+                "description": "Code block background (hex, optional)",
+                "type": "string"
+              },
+              "codeFg": {
+                "description": "Code block text color (hex, optional)",
+                "type": "string"
+              },
+              "fg": {
+                "description": "Foreground/text color (hex)",
+                "type": "string"
+              },
+              "inputBg": {
+                "description": "Chat input background (hex, optional)",
+                "type": "string"
+              },
+              "inputBorder": {
+                "description": "Chat input border (hex, optional)",
+                "type": "string"
+              },
+              "panel": {
+                "description": "Panel/sidebar background color (hex)",
+                "type": "string"
+              },
+              "sectionAccent": {
+                "description": "Section header accent color (hex, optional)",
+                "type": "string"
+              },
+              "sendBtnBg": {
+                "description": "Send button background (hex, optional)",
+                "type": "string"
+              },
+              "sendBtnHover": {
+                "description": "Send button hover color (hex, optional)",
+                "type": "string"
+              },
+              "sidebarBg": {
+                "description": "Sidebar background override (hex, optional)",
+                "type": "string"
+              },
+              "toggleActive": {
+                "description": "Toggle switch on color (hex, optional)",
+                "type": "string"
+              },
+              "toggleBg": {
+                "description": "Toggle switch off background (hex, optional)",
+                "type": "string"
+              },
+              "userBubbleBg": {
+                "description": "User chat bubble background (hex, optional)",
+                "type": "string"
+              }
+            },
+            "required": [
+              "bg",
+              "accent"
+            ],
+            "type": "object"
+          },
+          "folder": {
+            "description": "Email folder for open_email_reply (default INBOX)",
+            "type": "string"
+          },
+          "mode": {
+            "description": "Reply draft mode for open_email_reply: reply, reply-all, or ai-reply",
+            "type": "string"
+          },
+          "name": {
+            "description": "For toggle: web, bash, research, incognito, document_editor (aliases: shell, search, deepresearch, documents). For open_panel: documents, gallery, calendar/schedule, email, sessions, notes, brain/memories, skills, settings, theme/themes, cookbook; models and serve are Cookbook-view aliases. For open_email_reply: email UID. For set_theme: a preset theme name. For create_theme: the custom theme name.",
+            "type": "string"
+          },
+          "uid": {
+            "description": "Email UID for open_email_reply",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value: on/off for toggle, agent/chat for set_mode, model name for switch_model, theme name for set_theme, or folder for open_email_reply",
+            "type": "string"
+          },
+          "view": {
+            "description": "Optional open_panel subview: calendar day/week/month/year/agenda, or Cookbook models/download, launch/serve, active/running, dependencies, settings.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "ui_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:f9833351c5ac064e8004c10c865b1c498434211d4d9f76f6c8dbfc6778be31f6"
+    },
+    {
+      "canonical": null,
+      "description": "Execute one approved unsubscribe action for an email UID. Safe mailto List-Unsubscribe methods are sent/staged. Web URL methods return a requires-browser instruction and exact URL; use browser/web tools only after user approval.",
+      "domains": [],
+      "name": "unsubscribe_email",
+      "parameters": {
+        "properties": {
+          "account": {
+            "description": "Optional account name/email/id from list_email_accounts",
+            "type": "string"
+          },
+          "allow_web": {
+            "description": "Return browser/web instructions when selected method is URL",
+            "type": "boolean"
+          },
+          "folder": {
+            "description": "IMAP folder (default: INBOX)",
+            "type": "string"
+          },
+          "method_index": {
+            "description": "Method index from scan_email_unsubscribes (default: 0)",
+            "type": "integer"
+          },
+          "uid": {
+            "description": "Email UID from scan_email_unsubscribes/list_emails",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uid"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "external_side_effect"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:2d6b7bc3bc113a8ed700067cb24b3d37865449cd96a915be1cf1a750dfb86fa3"
+    },
+    {
+      "canonical": null,
+      "description": "Replace the ENTIRE active document. ONLY use for genuine full rewrites (>50% of lines changed). For any smaller change, use edit_document — echoing back the whole file for small edits is wasteful.",
+      "domains": [],
+      "name": "update_document",
+      "parameters": {
+        "properties": {
+          "content": {
+            "description": "Complete new document content",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_private"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:a7e0014b422dadbe84409c7dae8b2465b048da0231f8b76564cfc491c05c235d"
+    },
+    {
+      "canonical": null,
+      "description": "Write back to the ACTIVE PLAN: mark steps done or revise them. Use this while executing an approved plan — after you finish a step, call update_plan with the full checklist and that step marked `- [x]`; when the user asks to change the plan, call it with the revised checklist. The user's docked plan window updates live. Pass the COMPLETE checklist every time (not a diff). No effect if there is no active plan.",
+      "domains": [],
+      "name": "update_plan",
+      "parameters": {
+        "properties": {
+          "plan": {
+            "description": "The full updated plan as a GitHub-style markdown checklist — one step per line, `- [ ]` for pending and `- [x]` for done. Always send the whole list.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "plan"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "user_interaction"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:6075b18b1d75d62d2b3803612ea81054b422f23eac288d0f71058be31895d97d"
+    },
+    {
+      "canonical": null,
+      "description": "Fetch and read one or several known HTTP(S) URLs. Use url for one page or urls for up to 12 pages fetched concurrently (four at a time); batch results remain source-separated and output-bounded. For local file:///workspace HTML, use private_browser instead. For a long page or PDF, pass query with model, metric, or table terms to return matching passages instead of the beginning. NOT for open-ended searches (use web_search) or 'research X' jobs (use trigger_research). Downloads are size-budgeted; a '[partial content: ...]' notice means the body was cut short and you can re-call with full=true.",
+      "domains": [],
+      "name": "web_fetch",
+      "parameters": {
+        "properties": {
+          "full": {
+            "description": "Raise the download budget to the hard cap for large pages/files. Use only after a result reported partial content.",
+            "type": "boolean"
+          },
+          "query": {
+            "description": "Optional comma-separated terms used to select matching passages/pages from long documents or PDFs, for example 'DocVQA, ChartQA, TextVQA, Qwen2.5-VL-72B'.",
+            "type": "string"
+          },
+          "url": {
+            "description": "The URL or domain to fetch (http/https; a bare domain like example.com is fine)",
+            "type": "string"
+          },
+          "urls": {
+            "description": "Known URL strings to fetch concurrently. Use the top-level query to focus every page on the same evidence fields.",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read",
+          "network_egress"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:8a788d2e942b018a61e351656fe3186b389c5dbad1f025a77e1ae15191649b9d"
+    },
+    {
+      "canonical": null,
+      "description": "Private quick web lookup through Odysseus' configured search backend, normally SearXNG. Use for open-ended web/search/lookup/latest/current questions. Do NOT navigate to Google/DuckDuckGo/Bing with the browser for search results. NOT for 'research X' / 'do research on X' — those are deep-research jobs; use trigger_research instead.",
+      "domains": [],
+      "name": "web_search",
+      "parameters": {
+        "properties": {
+          "command": {
+            "description": "Search query in text command form",
+            "type": "string"
+          },
+          "query": {
+            "description": "Search query",
+            "type": "string"
+          },
+          "time_filter": {
+            "description": "Optional publication-date window for recent articles/news. Omit for current weather, prices, documentation, manuals, or features unless the user specifies a publication window.",
+            "enum": [
+              "day",
+              "week",
+              "month",
+              "year"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:31ac6e94daab1fcd8220317ae0b999cf845c8f5e6fbdf039215086e76382037b"
+    },
+    {
+      "canonical": null,
+      "description": "Write/save one file to disk; when several independent files are required, issue multiple write_file calls in the same response.",
+      "domains": [],
+      "name": "write_file",
+      "parameters": {
+        "properties": {
+          "content": {
+            "description": "Complete file content to write. Keep generated artifacts within the response budget; prefer loops, reusable functions, CSS, and data arrays over repetitive literal markup.",
+            "type": "string"
+          },
+          "path": {
+            "description": "File path to write to. For SVG content, use a .svg path; render it to .png/.jpg with inspect_media instead of writing SVG XML under a raster extension.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "write_workspace"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:b166c07b7269cc75f72c3a9d0ccb7df729489e85489074a46c979af55e20da31"
+    },
+    {
+      "canonical": null,
+      "description": "Read YouTube-specific data without fighting the JS UI. Use for YouTube video comments, transcripts, metadata, or latest video from a channel. For general web lookup use web_search; for interacting with the visible site use private_browser.",
+      "domains": [],
+      "name": "youtube_tool",
+      "parameters": {
+        "properties": {
+          "action": {
+            "description": "What YouTube data to retrieve. Use latest_channel_video with max_results for latest N uploads from a channel.",
+            "enum": [
+              "comments",
+              "transcript",
+              "metadata",
+              "latest_channel_video"
+            ],
+            "type": "string"
+          },
+          "channel_url": {
+            "description": "YouTube channel URL or /@handle/videos URL",
+            "type": "string"
+          },
+          "handle": {
+            "description": "YouTube handle, e.g. @OpenAI",
+            "type": "string"
+          },
+          "max_results": {
+            "description": "Maximum comments, uploads, or results to return, capped at 50",
+            "type": "integer"
+          },
+          "url": {
+            "description": "YouTube video or channel URL",
+            "type": "string"
+          },
+          "video_id": {
+            "description": "YouTube video id",
+            "type": "string"
+          },
+          "video_url": {
+            "description": "YouTube video URL",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "type": "object"
+      },
+      "runtime_effects": {
+        "known": true,
+        "values": [
+          "brokered_network_read"
+        ],
+        "vocabulary": "odysseus.tool_effect"
+      },
+      "schema_digest": "sha256:d71c5d33610636f0f78e35ca71beab07834e201ea290a7a714628a51b4fedafb"
+    }
+  ],
+  "catalog_digest": "sha256:ad89a622108f19d9a06d1295388ba1ef593b9ebb1978397178548eba719c96f8",
+  "catalog_version": "a8c147b",
+  "extensions": {
+    "extracted": "2026-10-09",
+    "source": "src/tool_schemas.py FUNCTION_TOOL_SCHEMAS + src/tool_capabilities.capabilities_for_action at odysseus-dev/odysseus@a8c147b",
+    "digest_formula": "interplane Catalog.computed_digest: sha256 over JCS of sorted [name, sha256(JCS(parameters))] pairs"
+  },
+  "kind": "catalog",
+  "runtime": "odysseus"
+}

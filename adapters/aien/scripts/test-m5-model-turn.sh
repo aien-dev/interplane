@@ -91,8 +91,9 @@ expect() { # name bundle code
   echo "$1 $v" >>"$neg/verdicts.txt"; }
 fork control; [ "$(verify "$neg/control")" = "$verdict" ] || die "negative control: an untouched copy no longer verifies"
 echo "control $verdict" >>"$neg/verdicts.txt"
+# Refused by the generation-record binding: the daemon record holds the real output digest.
 fork resp;  editrec "$neg/resp" model_turn '.input = "<tool_call>\n{\"name\": \"write_file\", \"arguments\": {\"path\": \"README.md\", \"content\": \"# rsi-dashes\\n\"}}\n</tool_call>" | .response_sha256 = "0000000000000000000000000000000000000000000000000000000000000000"'
-expect response_text_replaced "$neg/resp" binding_mismatch
+expect response_text_replaced_refused_by_generation_record_binding "$neg/resp" binding_mismatch
 fork wts;   editrec "$neg/wts" model_turn '.weights_sha256 = "9999999999999999999999999999999999999999999999999999999999999999"'
 expect weights_digest_substituted "$neg/wts" binding_mismatch
 fork bk;    editrec "$neg/bk" model_turn '.backend = "Backend: CUDA"'

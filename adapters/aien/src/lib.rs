@@ -34,7 +34,7 @@ pub mod fix_the_test;
 pub mod provenance_export;
 pub mod rsi_m5;
 pub use compose_ledger::{
-    hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient,
+    hmac_sha256, ApprovalBinding, ComposeLedgerAuthority, DeskKey, LedgerClient, ModelTurn,
     APPROVAL_BINDING_VERSION, BOUND_REQUIREMENTS, DEFAULT_APPROVER, LEDGER_BOUNDARY,
     REQUIREMENTS_TAG_V1,
 };

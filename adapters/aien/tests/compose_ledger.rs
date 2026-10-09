@@ -38,6 +38,8 @@ use std::time::{Duration, Instant};
 
 const NOW: &str = "2026-10-06T00:00:00Z";
 const TRACE: &str = "ledger";
+/// The id the trace names as sender of a real model turn (the model the daemon loaded).
+const MODEL_LABEL: &str = "llama-3.2-1b-instruct";
 const EXPECTED: &str = "Decisions: ship v0.3 on Friday.\nOwners: Ada (release), Lin (docs).\n";
 const MODEL_SNAPSHOT: &str = ".cache/huggingface/hub/models--unsloth--Llama-3.2-1B-Instruct/snapshots/5a8abab4a5d6f164389b1079fb721cfab8d7126c";
 
@@ -383,6 +385,7 @@ fn export_provenance(
     t_done: &str,
     slice: Option<&fix_the_test::TestRunEvidence>,
     evaluation: Option<&provenance_export::Evaluation>,
+    model_turn: Option<&provenance_export::ModelTurnRun>,
 ) {
     if std::env::var("LEDGER_OUT").is_err() {
         return;
@@ -405,7 +408,11 @@ fn export_provenance(
         workspace: &d.ws(),
         model_dir: &d.model,
         model_origin: (&model_id, &revision),
-        model_label: "scripted-test-model",
+        model_label: if model_turn.is_some() {
+            MODEL_LABEL
+        } else {
+            "scripted-test-model"
+        },
         trace_id: TRACE,
         intent,
         pending,
@@ -414,6 +421,7 @@ fn export_provenance(
         t_done,
         slice,
         evaluation,
+        model_turn,
     })
     .expect("provenance export");
     println!("PROVENANCE_BUNDLE {}", rep.dir.display());
@@ -511,7 +519,7 @@ fn row1_approved_write_lands_and_is_done() {
         "receipt": rc, "journal": recs, "file_sha256": hex(&written), "expected_sha256": hex(EXPECTED.as_bytes())}),
     );
     export_provenance(
-        &d, &intent_v, &pending_v, &res, &t_request, &t_done, None, None,
+        &d, &intent_v, &pending_v, &res, &t_request, &t_done, None, None, None,
     );
 }
 
@@ -1415,6 +1423,7 @@ fn slice1_fix_the_test_lands_and_tests_pass() {
         &t_done,
         Some(&evidence),
         None,
+        None,
     );
 }
 
@@ -1518,6 +1527,7 @@ fn m5_rsi_judged_change_lands_and_rolls_back() {
         &t_done,
         Some(&evidence),
         Some(&judged.evaluation),
+        None,
     );
 
     // Rollback: a second approved write restores the pinned source bytes, with its own records.
@@ -1570,5 +1580,463 @@ fn m5_rsi_judged_change_lands_and_rolls_back() {
         "target_blob_sha256_before": task.target_blob_sha256, "target_blob_sha256_after": hex(&written),
         "rollback": {"receipt": rc2, "journal": recs2, "disk_sha256": hex(&restored),
             "test_exit_after_rollback": rollback_run.exit_code}}),
+    );
+}
+
+/// The prompt of the model-turn row: a system message with the reply form and the style rule, one
+/// worked example on another file (so the format and the two replacements are shown once), and the
+/// task with the README exactly as it is. Prompts that failed before this one (the model copied
+/// the placeholder; the model kept the dashes) are not retained: this is the fourth tried.
+fn model_turn_messages(readme: &str) -> Value {
+    let system = "You are a file editing assistant. You never write prose. You answer every request with \
+        exactly one tool call in this form and nothing else:\n<tool_call>\n{\"name\": \"write_file\", \
+        \"arguments\": {\"path\": \"FILE\", \"content\": \"FULL NEW TEXT\"}}\n</tool_call>\nLine breaks inside \
+        the text are written as \\n. The new text must contain no em dash (\u{2014}) and no en dash \
+        (\u{2013}): write a comma where an em dash was, and the word to where an en dash was.";
+    json!([
+        {"role": "system", "content": system},
+        {"role": "user", "content": "File NOTES.md contains:\n# Plan\n\nA small tool\u{2014}fast on purpose.\nIt covers pages 4\u{2013}6\u{2014}nothing more.\n"},
+        {"role": "assistant", "content": "<tool_call>\n{\"name\": \"write_file\", \"arguments\": {\"path\": \"NOTES.md\", \"content\": \"# Plan\\n\\nA small tool, fast on purpose.\\nIt covers pages 4 to 6, nothing more.\\n\"}}\n</tool_call>"},
+        {"role": "user", "content": format!("File README.md contains:\n{readme}")}
+    ])
+}
+
+/// VAC M5 with a REAL model turn: the daemon's own loaded model (StreamTurn, CPU) writes the
+/// tool call that proposes the README change. The change then takes the same road as the scripted
+/// M5 row: the separate judge builds and evaluates the exact bytes and signs a version 2 receipt,
+/// the harness refuses to propose unless the receipt binds those bytes, the change lands through
+/// ComposeApprovedProposal with the normal approval, the tests pass, and a second approved write
+/// rolls it back. The bundle names the model turn (request and response bytes, the daemon's own
+/// generation record, weights digest, backend, times) so the verifier can chain it to the effect.
+/// If the model's text does not parse into one README write, or the judge does not admit it, the
+/// row FAILS: nothing is repaired or replaced by a scripted turn.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN, M5_HOOK and M5_JUDGE_KEY are set: run with --ignored"]
+fn m5_model_turn_proposal_is_judged_lands_and_chains() {
+    let _g = lock();
+    let (Ok(hook), Ok(key_file)) = (std::env::var("M5_HOOK"), std::env::var("M5_JUDGE_KEY")) else {
+        panic!("NOT_RUN m5mt: M5_HOOK and M5_JUDGE_KEY must be set");
+    };
+    let key = interplane_provenance::evaluation::parse_judge_key(
+        &std::fs::read_to_string(&key_file).expect("M5_JUDGE_KEY file"),
+    )
+    .expect("judge key");
+    let Some(d) = daemon("m5mt") else { return };
+    let c = d.client();
+    let fixture = Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/rsi_dashes");
+    let task = fix_the_test::prepare_task(&fixture, &d.ws(), rsi_m5::TARGET, "rsi_dashes")
+        .expect("prepare the task workspace");
+    let before_run = fix_the_test::run_tests(&task).expect("tests before");
+    assert_ne!(before_run.exit_code, 0, "the task must start red");
+    let pinned_policy =
+        std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join("m5/policy.json")).unwrap();
+
+    // 1. The model turn: the daemon generates; the harness keeps the exact bytes either way.
+    let readme = std::fs::read_to_string(d.ws().join(&task.target)).unwrap();
+    let messages = model_turn_messages(&readme);
+    let request = serde_json::to_vec(&messages).unwrap();
+    let (max_tokens, temperature) = (512u64, 0.0f64);
+    let started_at = provenance_export::now_rfc3339();
+    let turn = c.stream_turn(&messages, max_tokens, temperature);
+    let finished_at = provenance_export::now_rfc3339();
+    let attempt = d.root.join("attempt");
+    std::fs::create_dir_all(&attempt).unwrap();
+    std::fs::write(attempt.join("request.json"), &request).unwrap();
+    let turn = turn.unwrap_or_else(|e| panic!("the model turn failed: {e}"));
+    std::fs::write(attempt.join("response.txt"), turn.text.as_bytes()).unwrap();
+    let mt = provenance_export::ModelTurnRun {
+        request,
+        response: turn.text.clone(),
+        generation_record: turn.generation_record,
+        total_tokens: turn.total_tokens,
+        max_tokens,
+        temperature,
+        started_at,
+        finished_at,
+    };
+
+    // 2. The proposal is exactly what the dialect parses from that text; nothing is repaired.
+    let parsed = DialectRegistry::with_defaults()
+        .get("aien_legacy")
+        .expect("aien_legacy")
+        .parse(
+            &json!(turn.text),
+            &interplane_lenshift::ParseContext {
+                trace_id: TRACE.into(),
+                turn: 0,
+                model: MODEL_LABEL.into(),
+            },
+        );
+    assert!(
+        parsed.intents.len() == 1 && parsed.rejected.is_empty() && !parsed.partial,
+        "MODEL_TURN_NOT_A_PROPOSAL: the text parses to {} request(s), {} rejected; response in {}",
+        parsed.intents.len(),
+        parsed.rejected.len(),
+        attempt.display()
+    );
+    let args = serde_json::to_value(&parsed.intents[0].arguments).unwrap();
+    assert_eq!(parsed.intents[0].tool.name, "write_file");
+    let (path, content) = (
+        args["path"].as_str().expect("path").to_string(),
+        args["content"].as_str().expect("content").to_string(),
+    );
+    assert_eq!(path, task.target, "the model must write the task's README");
+    let proposal_file = d.root.join("model-proposal.json");
+    std::fs::write(
+        &proposal_file,
+        serde_json::to_vec_pretty(
+            &json!({"id": format!("model-gen-{}", turn.generation_record),
+            "title": "README without dashes", "description": "proposed by a model turn",
+            "target_file": path, "proposed_patch": content, "kind": "Style",
+            "created_at": provenance_export::now_rfc3339(), "sandbox_path": null}),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+
+    // 3. The same judge, the same gate before the write.
+    let judged = rsi_m5::judge_model_proposal(
+        Path::new(&hook),
+        &task.ws,
+        &d.root.join("judged"),
+        &pinned_policy,
+        &proposal_file,
+    )
+    .expect("the judge must admit the model's change (a refusal fails the row)");
+    assert_eq!(
+        judged.content, content,
+        "the judge evaluated the model's bytes"
+    );
+    interplane_provenance::evaluation::precheck(
+        &judged.evaluation.receipt,
+        &judged.evaluation.policy,
+        &key,
+        &interplane_provenance::evaluation::Expect {
+            path: &task.target,
+            content: judged.content.as_bytes(),
+            parent_commit: &task.commit,
+            policy_sha256: Some(&hex(&pinned_policy)),
+        },
+    )
+    .expect("the judge's receipt must bind the proposed bytes");
+
+    // 4. The approved write of the model's own tool call.
+    let before = count(&c);
+    let l = ledger(&d);
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    let out = p.run_turn("aien_legacy", MODEL_LABEL, &json!(turn.text), TRACE, 0);
+    assert_eq!(out.results.len(), 1, "{out:?}");
+    assert_eq!(out.results[0].status, ResultStatus::RequiresApproval);
+    let rid = out.intents[0].request_id.clone();
+    let intent_v = serde_json::to_value(&out.intents[0]).unwrap();
+    let pending_v = serde_json::to_value(&out.results[0]).unwrap();
+    let t_request = provenance_export::now_rfc3339();
+    let (res, _) = approve(&mut p, &l, &rid);
+    assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    let t_done = provenance_export::now_rfc3339();
+    let rc = res.data["receipt"].clone();
+    assert_eq!(rc["state"], "DONE");
+    let written = std::fs::read(d.ws().join(&task.target)).unwrap();
+    assert_eq!(
+        written,
+        judged.content.as_bytes(),
+        "the daemon wrote the judged bytes"
+    );
+    assert_eq!(rc["disk_sha256"], json!(hex(judged.content.as_bytes())));
+    let ids: Vec<u64> = ["grant_id", "intent_id", "ack_record_id"]
+        .iter()
+        .map(|k| rc[*k].as_u64().unwrap())
+        .collect();
+    let recs = records(&c, &ids);
+    assert!(recs.iter().all(|r| r["verified"] == true));
+    assert_eq!(
+        recs[0]["text"]["prior_sha256"],
+        json!(task.target_blob_sha256)
+    );
+    let after_run = fix_the_test::run_tests(&task).expect("tests after");
+    assert_eq!(after_run.exit_code, 0, "the task must end green");
+    let evidence = fix_the_test::evidence(&task, &before_run, &after_run).unwrap();
+    let after = count(&c);
+    export_provenance(
+        &d,
+        &intent_v,
+        &pending_v,
+        &res,
+        &t_request,
+        &t_done,
+        Some(&evidence),
+        Some(&judged.evaluation),
+        Some(&mt),
+    );
+
+    // 5. Rollback: a second approved write restores the pinned source bytes.
+    let prior = std::fs::read(fixture.join(&task.target)).unwrap();
+    assert_eq!(hex(&prior), task.target_blob_sha256);
+    propose(
+        &mut p,
+        1,
+        "w2",
+        &task.target,
+        std::str::from_utf8(&prior).unwrap(),
+    );
+    let (res2, _) = approve(&mut p, &l, "w2");
+    assert_eq!(res2.status, ResultStatus::Ok, "{res2:?}");
+    let rc2 = res2.data["receipt"].clone();
+    assert_eq!(rc2["state"], "DONE");
+    let restored = std::fs::read(d.ws().join(&task.target)).unwrap();
+    assert_eq!(restored, prior, "rollback restored the pinned bytes");
+    let rollback_run = fix_the_test::run_tests(&task).expect("tests after rollback");
+    assert_ne!(
+        rollback_run.exit_code, 0,
+        "the restored README fails its test again"
+    );
+    save(
+        &d,
+        "m5mt",
+        json!({"verdict": "PASS", "records_before": before, "records_after": after,
+        "receipt": rc, "journal": recs, "task_id": evidence.task_id,
+        "proposal_id": judged.proposal_id, "request_id": rid,
+        "model_turn": {"generation_record": turn.generation_record, "total_tokens": turn.total_tokens,
+            "request_sha256": hex(&mt.request), "response_sha256": hex(mt.response.as_bytes()),
+            "started_at": mt.started_at, "finished_at": mt.finished_at},
+        "evaluation_receipt_sha256": hex(&judged.evaluation.receipt),
+        "evaluation_policy_sha256": hex(&judged.evaluation.policy),
+        "test_exit_before": evidence.exit_before, "test_exit_after": evidence.exit_after,
+        "source_commit": task.commit, "tree_commit_after": evidence.tree_commit_after,
+        "target_blob_sha256_before": task.target_blob_sha256, "target_blob_sha256_after": hex(&written),
+        "rollback": {"receipt": rc2, "disk_sha256": hex(&restored),
+            "test_exit_after_rollback": rollback_run.exit_code}}),
+    );
+}
+
+/// Kill the test's own daemon and start a new one on the SAME home (same compose ledger, same
+/// state directory, same desk key). The old log stays where it was; the new daemon writes
+/// `daemon-restart-<n>.log`, and `d.log` points at it. Waits for the declared warm-up line.
+fn restart(d: &mut Daemon, n: u32) {
+    let _ = d.child.kill();
+    let _ = d.child.wait();
+    let bin = std::env::var("AIEN_BIN").expect("AIEN_BIN");
+    let _ = std::fs::remove_file(&d.sock);
+    let log = d.root.join(format!("daemon-restart-{n}.log"));
+    d.child = Command::new(&bin)
+        .arg("daemon")
+        .env_remove("AIEN_GPU_BACKEND")
+        .env_remove("AIEN_REQUIRE_BLACKWELL")
+        .env("AIEN_MODEL_PATH", d.model.join("model.safetensors"))
+        .env("AIEN_TOKENIZER_PATH", d.model.join("tokenizer.json"))
+        .env("AIEN_REQUIRE_CHECKPOINT", "1")
+        .env("AIEN_COMPOSE_DIR", d.root.join("compose"))
+        .env("AIEN_RUNTIME_STATE_DIR", d.root.join("state"))
+        .env("AIEN_PROVENANCE_DIR", d.root.join("prov"))
+        .env("AIEN_RUNTIME_SOCK", &d.sock)
+        .stdin(Stdio::null())
+        .stdout(std::fs::File::create(&log).unwrap())
+        .stderr(std::fs::File::create(d.root.join(format!("daemon-restart-{n}.err"))).unwrap())
+        .spawn()
+        .expect("respawn aien-cli daemon");
+    d.log = log.clone();
+    let t0 = Instant::now();
+    loop {
+        let text = std::fs::read_to_string(&log).unwrap_or_default();
+        if d.sock.exists() && text.contains("Warm-up:") {
+            break;
+        }
+        if let Ok(Some(st)) = d.child.try_wait() {
+            panic!("DAEMON_NOT_RESTARTED: exited {st}; log {}", log.display());
+        }
+        assert!(
+            t0.elapsed() < Duration::from_secs(600),
+            "no warm-up after restart"
+        );
+        std::thread::sleep(Duration::from_millis(500));
+    }
+    std::thread::sleep(Duration::from_millis(500));
+}
+
+/// The exact approval of request `id` handed to the daemon again (same desk MAC, same bytes).
+fn rehandoff(
+    d: &Daemon,
+    c: &LedgerClient,
+    rc: &Value,
+    id: &str,
+    path: &str,
+    content: &str,
+) -> Result<Value, String> {
+    let key = DeskKey::load(&d.desk()).unwrap();
+    let b = binding(
+        d,
+        id,
+        rc["approval_id"].as_str().unwrap(),
+        "drake",
+        path,
+        content,
+    );
+    c.approved(&handoff(Some(&key), &b, content), d.ws().to_str().unwrap())
+}
+
+/// A daemon restart does not make a spent approval spendable again. The write lands and is
+/// acknowledged; the daemon process is killed and a new one starts on the same ledger. The same
+/// approval handed over again returns the ORIGINAL result and runs nothing (same replay claim);
+/// a second intent on the spent grant is refused; the same approval id under a fresh request id is
+/// refused by the durable replay ledger. No restart, no replay appends a record or touches the file.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn row12_daemon_restart_does_not_make_a_spent_approval_spendable() {
+    let _g = lock();
+    let Some(mut d) = daemon("row12") else { return };
+    let l = ledger(&d);
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    propose(&mut p, 0, "r1", "summary.txt", EXPECTED);
+    let (res, _) = approve(&mut p, &l, "r1");
+    assert_eq!(res.status, ResultStatus::Ok, "{res:?}");
+    let rc = res.data["receipt"].clone();
+    let sha_before = hex(&std::fs::read(d.ws().join("summary.txt")).unwrap());
+    let (claim, _) = claim_grant(&rc);
+    let ids: Vec<u64> = (claim..=rc["ack_record_id"].as_u64().unwrap()).collect();
+    let recs_before = records(&d.client(), &ids);
+    restart(&mut d, 1);
+    let c = d.client();
+    assert_eq!(
+        records(&c, &ids),
+        recs_before,
+        "every record of the write survived the restart byte for byte (digests included)"
+    );
+    // The daemon appends its own start-up records; the baseline for the replays is after them.
+    let before = count(&c);
+    let again = rehandoff(&d, &c, &rc, "r1", "summary.txt", EXPECTED).expect("original result");
+    assert_eq!(again["state"], "ALREADY_COMMITTED");
+    assert!(
+        again["task"].is_null(),
+        "a replay must not run the task again"
+    );
+    assert_eq!(again["replay_claim"], rc["handoff"]["replay_claim"]);
+    let second_intent = c
+        .intent(
+            rc["grant_id"].as_u64().unwrap(),
+            rc["proposal_sha256"].as_str().unwrap(),
+            "summary.txt",
+            rc["target"].as_str().unwrap(),
+            rc["content_sha256"].as_str().unwrap(),
+            (std::process::id(), 1),
+        )
+        .unwrap_err();
+    assert!(
+        second_intent.contains("EFFECT_REFUSED AlreadySpent"),
+        "{second_intent}"
+    );
+    let reminted = rehandoff(&d, &c, &rc, "r1-again", "summary.txt", EXPECTED).unwrap_err();
+    assert!(
+        reminted.starts_with("REPLAY_REFUSED AlreadyCommitted"),
+        "{reminted}"
+    );
+    assert_eq!(
+        count(&c),
+        before,
+        "no replay after the restart appends a record"
+    );
+    assert_eq!(
+        hex(&std::fs::read(d.ws().join("summary.txt")).unwrap()),
+        sha_before
+    );
+    save(
+        &d,
+        "row12",
+        json!({"verdict": "PASS", "records_after_restart": before, "records_after_replays": count(&c),
+        "daemon_replay": again, "second_intent": second_intent, "same_approval_new_request": reminted,
+        "receipt": rc}),
+    );
+}
+
+/// The daemon dies after the intent record exists and the bytes are on disk, before the ack. The
+/// adapter must not report success: the receipt is `UNRESOLVED` and the result is an error. After a
+/// restart the ledger holds the intent and no ack, the grant is spent (a second intent is refused),
+/// and the same approval handed over again returns the original result (no second run). Whether the
+/// bytes on disk are the approved ones is a fact only a read of the file can state (they are, here,
+/// and are reported as such), never something the missing ack proves.
+#[test]
+#[ignore = "NOT_RUN unless AIEN_BIN names an aien-cli binary: run with --ignored"]
+fn row13_restart_between_intent_and_ack_is_unresolved_not_success() {
+    let _g = lock();
+    let Some(mut d) = daemon("row13") else { return };
+    let l = ledger(&d);
+    let pid = d.child.id();
+    l.set_before_ack(move |_| {
+        // The daemon dies here: intent recorded, bytes written, no ack sent yet.
+        let _ = Command::new("kill")
+            .args(["-KILL", &pid.to_string()])
+            .status();
+        std::thread::sleep(Duration::from_millis(500));
+    });
+    let mut rt = l.clone();
+    let mut p = pipe(&mut rt, &l);
+    propose(&mut p, 0, "u1", "unacked.txt", EXPECTED);
+    let (res, _) = approve(&mut p, &l, "u1");
+    assert_ne!(
+        res.status,
+        ResultStatus::Ok,
+        "ATTACK SUCCEEDED: success without an ack: {res:?}"
+    );
+    let rc = l.receipts().pop().unwrap();
+    assert_eq!(rc["state"], "UNRESOLVED", "{rc}");
+    assert!(rc.get("ack_record_id").is_none(), "{rc}");
+    let intent_id = rc["intent_id"].as_u64().expect("the intent exists");
+    let grant = rc["grant_id"].as_u64().unwrap();
+    let on_disk = std::fs::read(d.ws().join("unacked.txt")).unwrap();
+    restart(&mut d, 1);
+    let c = d.client();
+    let recs = records(&c, &[intent_id]);
+    assert_eq!(recs[0]["verified"], true);
+    assert_eq!(
+        effects_for(&c, grant).len(),
+        1,
+        "the ledger holds the intent and no ack after the restart"
+    );
+    // The restarted daemon looked at the open intent and DID NOT DECIDE it (its executor, this test
+    // process, is still running): it is neither done nor not-done in the ledger.
+    let boot = std::fs::read_to_string(&d.log).unwrap();
+    let reconcile = boot
+        .lines()
+        .find(|l| l.starts_with("Reconcile:"))
+        .expect("a Reconcile line")
+        .to_string();
+    assert!(
+        reconcile.contains("checked 1 unsettled effect(s): DONE 0"),
+        "{reconcile}"
+    );
+    assert!(reconcile.contains("\"state\":\"OPEN\""), "{reconcile}");
+    let before = count(&c);
+    let second_intent = c
+        .intent(
+            grant,
+            rc["proposal_sha256"].as_str().unwrap(),
+            "unacked.txt",
+            rc["target"].as_str().unwrap(),
+            rc["content_sha256"].as_str().unwrap(),
+            (std::process::id(), 1),
+        )
+        .unwrap_err();
+    assert!(
+        second_intent.contains("EFFECT_REFUSED ReconciliationRequired")
+            && second_intent.contains("is OPEN"),
+        "{second_intent}"
+    );
+    let again = rehandoff(&d, &c, &rc, "u1", "unacked.txt", EXPECTED).expect("original result");
+    assert_eq!(again["state"], "ALREADY_COMMITTED");
+    assert!(again["task"].is_null());
+    assert_eq!(
+        count(&c),
+        before,
+        "replays after the restart append nothing"
+    );
+    save(
+        &d,
+        "row13",
+        json!({"verdict": "PASS", "adapter_state": rc["state"], "intent_id": intent_id,
+        "effects_after_restart": effects_for(&c, grant).len(),
+        "disk_sha256_after_crash": hex(&on_disk), "approved_sha256": hex(EXPECTED.as_bytes()),
+        "second_intent": second_intent, "daemon_replay": again, "restart_reconcile": reconcile,
+        "receipt": rc}),
     );
 }

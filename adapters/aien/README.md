@@ -460,3 +460,15 @@ cargo fmt --check && cargo clippy --offline --all-targets -- -D warnings
 Building `aegis` runs its `build.rs`, which writes `mojo/libaegis_simd.so` into the pinned
 aegis clone as an untracked file. This crate is its own Cargo workspace and is not a member of
 `rust/Cargo.toml`.
+
+### The same cycle with a real model turn
+
+`scripts/test-m5-model-turn.sh` (same inputs as `test-m5-rsi.sh`, plus the two restart rows) replaces the
+deterministic proposer with the model the daemon loaded: the harness sends one `StreamTurn` (CPU), the daemon
+generates the `write_file` tool call and writes its own generation record, and the same judge, approval and
+rollback follow. The bundle carries a `model-turn/2` record (request and response bytes, weights digest, the
+backend line, times). The verifier compares each with the retained bytes and the daemon's record, so the
+verdict is `PASS complete ... proposal=model_generation/2` only when the digests chain; a turn that does not
+chain is a `FAIL`, and a bundle that says its turn was scripted stays `PASS_LABELLED_INCOMPLETE
+missing=link:model_turn`. Limits: one 1B model turn with a worked example in the prompt is not a learning
+system; the request bytes and times are the harness's own; the generation record is unsigned.

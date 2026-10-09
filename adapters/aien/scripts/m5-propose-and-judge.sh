@@ -11,6 +11,7 @@
 #    binary) inside its mode-700 home, builds both trees itself into a fresh target directory,
 #    runs the holdouts in the jail and signs a version 2 receipt with its own key.
 #
+# M5_PROPOSAL_FILE=<file>: judge a model-turn proposal instead of running `spark-rsi propose`.
 # Environment: SPARK_RSI_DIR (holds release `spark-rsi` and `spark-rsi-judge`), M5_POLICY (the
 # pinned policy file), M5_HOLDOUTS (holdout suite directory); JUDGE_USER, RSI_USER, JUDGE_HOME.
 # Negative tests only (the gate script uses these to make counterfeit evidence, never the row):
@@ -62,10 +63,18 @@ export_commit "$stage/view"
 [ -z "$(find "$stage/view" -type l -print -quit)" ] || die "the task commit contains a symlink: refused"
 chmod -R a+rX,a-w "$stage/view" "$stage/bin"
 
-# 1. Propose, as the RSI account, from a read-only view.
-sudo -n -u "$rsi_user" env -i HOME=/nonexistent PATH=/usr/bin:/bin \
-  "$stage/bin/spark-rsi" propose "$stage/view" >"$out/proposal.json" \
-  || die "spark-rsi propose failed"
+# 1. Propose. Normally the RSI account, from a read-only view. With M5_PROPOSAL_FILE (the model-turn
+# row) the proposal is the whole-file change a real model turn produced, written by the harness as
+# a proposal.json-shaped file. Every later step is the same: the target check, the candidate tree
+# and the judge, which builds and evaluates the exact bytes on holdouts the proposer cannot read.
+if [ -n "${M5_PROPOSAL_FILE:-}" ]; then
+  [ -f "$M5_PROPOSAL_FILE" ] || die "M5_PROPOSAL_FILE is not a file: $M5_PROPOSAL_FILE"
+  cp "$M5_PROPOSAL_FILE" "$out/proposal.json"
+else
+  sudo -n -u "$rsi_user" env -i HOME=/nonexistent PATH=/usr/bin:/bin \
+    "$stage/bin/spark-rsi" propose "$stage/view" >"$out/proposal.json" \
+    || die "spark-rsi propose failed"
+fi
 # 2. Only the task's file.
 got="$(jq -r '.target_file // "none"' "$out/proposal.json")"
 [ "$got" = "$target" ] || die "RSI proposed a change to $got; only $target is allowed: refused"

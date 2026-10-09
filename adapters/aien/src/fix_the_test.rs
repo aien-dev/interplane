@@ -221,9 +221,54 @@ pub fn evidence(
     })
 }
 
+/// The `daemon` block of a harness-written row receipt, with no absolute paths: `log` and `home`
+/// are relative to the row's root, and `aien_bin` is the file name only (the binary's digest is
+/// recorded in the exported records). The daemon's own records are digest-bound and are never
+/// rewritten; only this harness-side block is redacted.
+pub fn receipt_daemon(
+    root: &Path,
+    log: &Path,
+    home: &Path,
+    start_ms: u128,
+    aien_bin: Option<&str>,
+) -> Value {
+    let rel = |p: &Path| -> String {
+        match p.strip_prefix(root) {
+            Ok(r) => r.display().to_string(),
+            Err(_) => p
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+        }
+    };
+    json!({"log": rel(log), "home": rel(home), "start_ms": start_ms,
+        "aien_bin": aien_bin.map(|b| Path::new(b).file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default())})
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn receipt_daemon_block_has_no_absolute_paths() {
+        let root = Path::new("/home/someone/out/rows/slice1");
+        let v = receipt_daemon(
+            root,
+            &root.join("daemon.log"),
+            &root.join("compose"),
+            7,
+            Some("/home/someone/bin/aien-cli"),
+        );
+        assert_eq!(v["log"], "daemon.log");
+        assert_eq!(v["home"], "compose");
+        assert_eq!(v["aien_bin"], "aien-cli");
+        assert_eq!(v["start_ms"], 7);
+        // A path outside the root is reduced to its file name, never kept absolute.
+        let o = receipt_daemon(root, Path::new("/var/x/d.log"), root, 0, None);
+        assert_eq!(o["log"], "d.log");
+        assert!(!o.to_string().contains("/home/") && !o.to_string().contains("/var/"));
+        assert!(o["aien_bin"].is_null());
+    }
 
     fn fixture() -> PathBuf {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("fixtures/fix_the_test")

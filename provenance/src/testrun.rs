@@ -172,13 +172,17 @@ pub fn check(a: &Archive, m: &Value, ledger_checked: bool) -> Result<(), Fail> {
         let Some(d) = s(&run, &[field]).filter(|d| is_hex64(d)) else {
             return bad(field);
         };
-        // The retained output (when kept) must be the output the digest names.
-        if a.has(record) {
-            if a.bytes(record)?.is_some() && a.sha(record)? != d {
-                return bad(&format!("{field} vs retained {record}"));
-            }
-        } else if field == "stdout_sha256" {
-            return bad("test_stdout record absent");
+        // A claimed digest must be backed by retained bytes that hash to it. A missing entry, or
+        // one labelled not retained, would otherwise let any 64-hex value pass.
+        if !a.has(record) {
+            return bad(&format!(
+                "{record} record absent: {field} has nothing to match"
+            ));
+        }
+        match a.bytes(record)? {
+            None => return bad(&format!("{record} not retained: {field} cannot be checked")),
+            Some(_) if a.sha(record)? != d => return bad(&format!("{field} vs retained {record}")),
+            Some(_) => {}
         }
     }
     check_native(a, m)

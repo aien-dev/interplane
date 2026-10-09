@@ -307,3 +307,67 @@ fn task_without_a_target_path_is_a_task_scope_mismatch() {
     });
     refused(&d, "task_scope_mismatch");
 }
+
+#[test]
+fn stderr_digest_claimed_but_stderr_file_missing_is_refused() {
+    let d = scratch(FIX, "ftt-stderr-missing");
+    let p = path_of(&d, "test_stderr");
+    std::fs::remove_file(&p).unwrap();
+    // Drop the record entry too: the digest alone must not pass.
+    let mut c = companion(&d);
+    let recs = c["records"].as_object_mut().expect("records object");
+    recs.remove("test_stderr");
+    write_companion(&d, &c);
+    refused(&d, "test_run_mismatch");
+}
+
+#[test]
+fn stderr_digest_claimed_but_stderr_not_retained_is_refused() {
+    let d = scratch(FIX, "ftt-stderr-unretained");
+    let mut c = companion(&d);
+    let r = &mut c["records"]["test_stderr"];
+    r.as_object_mut().unwrap().remove("path");
+    r["retained"] = json!(false);
+    c["completeness"]["missing"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!("record:test_stderr"));
+    write_companion(&d, &c);
+    refused(&d, "test_run_mismatch");
+}
+
+#[test]
+fn stderr_altered_by_one_byte_is_refused() {
+    let d = scratch(FIX, "ftt-stderr-flip");
+    let p = path_of(&d, "test_stderr");
+    let mut b = std::fs::read(&p).unwrap();
+    if b.is_empty() {
+        b.push(b'x');
+    } else {
+        b[0] ^= 1;
+    }
+    std::fs::write(&p, b).unwrap();
+    restamp(&d, "test_stderr");
+    refused(&d, "test_run_mismatch");
+}
+
+#[test]
+fn intact_stderr_still_passes() {
+    let d = scratch(FIX, "ftt-stderr-ok");
+    assert!(code(&d).starts_with("PASS_LABELLED_INCOMPLETE"));
+}
+
+#[test]
+fn stdout_digest_claimed_but_stdout_not_retained_is_refused() {
+    let d = scratch(FIX, "ftt-stdout-unretained");
+    let mut c = companion(&d);
+    let r = &mut c["records"]["test_stdout"];
+    r.as_object_mut().unwrap().remove("path");
+    r["retained"] = json!(false);
+    c["completeness"]["missing"]
+        .as_array_mut()
+        .unwrap()
+        .push(json!("record:test_stdout"));
+    write_companion(&d, &c);
+    refused(&d, "test_run_mismatch");
+}

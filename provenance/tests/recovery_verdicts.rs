@@ -118,7 +118,7 @@ fn test_records_without_a_section_on_an_unlanded_effect_are_still_refused_as_suc
 #[test]
 fn an_unknown_ack_state_is_still_a_generic_mismatch() {
     for s in ["OPEN", "done", "WRITTEN"] {
-        let d = scratch(REAL, &format!("m4d-real-{s}"));
+        let d = scratch(REAL, &format!("m4d-real-unknown-{s}"));
         set_state(&d, s);
         let v = verify(&d);
         assert_eq!(v, format!("FAIL binding_mismatch: ledger_ack.state={s}"));

@@ -1666,6 +1666,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "execute_code"
         ],
         "vocabulary": "odysseus.tool_effect"
@@ -1807,7 +1808,9 @@
       "runtime_effects": {
         "known": true,
         "values": [
-          "read_private"
+          "destructive",
+          "read_private",
+          "write_private"
         ],
         "vocabulary": "odysseus.tool_effect"
       },
@@ -1871,6 +1874,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -1923,7 +1927,9 @@
       "runtime_effects": {
         "known": true,
         "values": [
-          "read_private"
+          "destructive",
+          "read_private",
+          "write_private"
         ],
         "vocabulary": "odysseus.tool_effect"
       },
@@ -1975,6 +1981,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "external_side_effect",
           "read_private",
           "write_private"
         ],
@@ -2024,6 +2031,8 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "admin_change",
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2082,6 +2091,8 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "admin_change",
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2136,6 +2147,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2248,6 +2260,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2291,7 +2304,9 @@
       "runtime_effects": {
         "known": true,
         "values": [
-          "read_private"
+          "destructive",
+          "read_private",
+          "write_private"
         ],
         "vocabulary": "odysseus.tool_effect"
       },
@@ -2336,6 +2351,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2382,6 +2398,8 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "admin_change",
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2521,6 +2539,7 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2688,7 +2707,9 @@
       "runtime_effects": {
         "known": true,
         "values": [
-          "read_private"
+          "destructive",
+          "read_private",
+          "write_private"
         ],
         "vocabulary": "odysseus.tool_effect"
       },
@@ -2726,6 +2747,8 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "admin_change",
+          "destructive",
           "read_private",
           "write_private"
         ],
@@ -2775,6 +2798,8 @@
       "runtime_effects": {
         "known": true,
         "values": [
+          "admin_change",
+          "destructive",
           "read_private",
           "write_private"
         ],

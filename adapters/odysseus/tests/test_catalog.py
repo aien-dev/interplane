@@ -88,3 +88,13 @@ def test_recorded_catalog_equals_a_fresh_extraction(ody):
     record = load_record()
     assert fresh["capabilities"] == record["capabilities"]
     assert fresh["catalog_digest"] == record["catalog_digest"]
+
+
+def test_action_dependent_admin_tools_record_admin_change():
+    # Security metadata is never weaker than upstream: the five admin managers keep admin_change
+    # (plus the union of their action effects), not the empty-action fallback.
+    from interplane_adapter_odysseus.catalog import effects_of
+
+    for name in ("manage_endpoints", "manage_mcp", "manage_settings", "manage_tokens", "manage_webhooks"):
+        values = effects_of(name)
+        assert {"admin_change", "destructive", "read_private", "write_private"} <= set(values), (name, values)

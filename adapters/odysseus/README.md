@@ -13,7 +13,7 @@ and needs no change (the `odysseus_text` dialect is registered adapter-locally).
 | File | Job |
 |---|---|
 | `catalog.odysseus-a8c147b.json` | The record: 88 tools extracted from a live import, with `odysseus.tool_effect` values. Never edited; regenerate with `tools/extract_catalog.py`. |
-| `tools/extract_catalog.py` | The extraction (#95): imports Odysseus, reads `FUNCTION_TOOL_SCHEMAS` and `capabilities_for_action(name, "")`, sorts by name, takes digests from Core. Run against `2992bf6` it reproduces the old record byte for byte (checked when it was written). |
+| `tools/extract_catalog.py` | The extraction (#95): imports Odysseus, reads `FUNCTION_TOOL_SCHEMAS` and `capabilities_for_action`, records the union of effects over every known action, sorts by name, takes digests from Core. Run against `2992bf6` with `--empty-action` and the old `--formula` text it reproduces the old record byte for byte (see the docstring). |
 | `interplane_adapter_odysseus/catalog.py` | Loads the record. |
 | `.../domains.py` | Hand-curated `TOOL_DOMAINS` (one reviewable line per tool, fixed 19-domain set; the 17 tools new at a8c147b were assigned by hand), 16 `CANONICAL` aliases, `catalog_with_domains()`. |
 | `.../mapping.py` | `mapping_table()`: 16 alias rules + 88 passthrough rules, `catalog_digest` from the record. |
@@ -103,7 +103,7 @@ Odysseus app state. Not modeled: `tool_policy`/disabled tools, exact-approval re
 
 At `2992bf6`, `tail_serve_output` was in the catalog but not in `TOOL_TAGS`, so the adapter answered `not_found`. At `a8c147b` it is registered (`tool_types.py:13`): every recorded tool is in `TOOL_TAGS`, and the call is `authorized` but not executed (only the four read-only tools run). Tests pin both facts; the `not_found` branch is covered by a test that removes a tool from `TOOL_TAGS` for its duration.
 
-Re-pin facts (a8c147b vs 2992bf6, from re-extraction): 17 tools added (`block_sender`, `download_attachment`, `draft_email`, `draft_email_reply`, `extract_text`, `generate_image`, `get_weather`, `host_shell`, `inspect_media`, `manage_email_state`, `manage_research`, `pdf_extract`, `private_browser`, `scan_spam`, `search_emails`, `transcribe_media`, `youtube_tool`), none removed, 34 of the 71 old tools changed in some field (22 of them in their parameter schema). Recorded effects changed for `manage_endpoints`, `manage_mcp`, `manage_settings`, `manage_tokens`, `manage_webhooks`: `admin_change` before, `read_private` + `write_private` now. That is an artifact of recording each tool with an empty action: upstream now classifies those managers by action, and an empty action falls to its read/write fallback. The adapter never uses the recorded effects to decide; `decide` calls `capabilities_for_action` with the real arguments. A differential run of every tool across 8 configurations (admin, external context, delegated credential) gave identical decisions at both pins, except the `tail_serve_output` change and schema-dependent argument validity.
+Re-pin facts (a8c147b vs 2992bf6, from re-extraction): 17 tools added (`block_sender`, `download_attachment`, `draft_email`, `draft_email_reply`, `extract_text`, `generate_image`, `get_weather`, `host_shell`, `inspect_media`, `manage_email_state`, `manage_research`, `pdf_extract`, `private_browser`, `scan_spam`, `search_emails`, `transcribe_media`, `youtube_tool`), none removed, 34 of the 71 old tools changed in some field (22 of them in their parameter schema). Recorded effects: for an action-dependent tool the record holds the UNION of the effects of all its known actions (plus the empty-action fallback), so it is never weaker than upstream: `manage_endpoints`, `manage_mcp`, `manage_settings`, `manage_tokens`, `manage_webhooks` record `admin_change`, `destructive`, `read_private`, `write_private`. (Recording only the empty action would have dropped `admin_change`, since upstream now classifies those managers by action.) At 2992bf6 the old record used the empty action; `--empty-action` reproduces it byte for byte (control). The union also adds `destructive` and `write_private` to several other `manage_*` tools. The catalog digest is unchanged by this (it covers names and parameter schemas only). The adapter never uses the recorded effects to decide; `decide` calls `capabilities_for_action` with the real arguments. A differential run of every tool across 8 configurations (admin, external context, delegated credential) gave identical decisions at both pins, except the `tail_serve_output` change and schema-dependent argument validity.
 
 The recorded `catalog_digest` (`sha256:ad89a622...`) is `Catalog.computed_digest()` over the 88
 recorded capabilities, so anyone can recompute it from the record with Core alone. The previous record
@@ -142,12 +142,12 @@ Four separate questions, answered by four separate things:
 
 Results carry fixed text only: no paths, no upstream exception text.
 
-**Qualification matrix** (full suite `tests`: 117 tests, no skips; `tests/test_launch_preflight.py`: 24 of them, real upstream calls):
+**Qualification matrix** (full suite `tests`: 118 tests, no skips; `tests/test_launch_preflight.py`: 24 of them, real upstream calls):
 
 | Odysseus | Full suite | Preflight |
 |---|---|---|
-| a8c147b (catalog pin, 2026-10-07) | 117 passed, 0 skipped | full table: sibling and lookalike eligible; equals, nested, ancestor, other-control-path, symlink, hardlink, invalid, inaccessible denied |
-| 2992bf6 (previous pin) | 113 passed, 4 failed (the three drift tests and the fresh-extraction check, which now describe a8c147b) | 24 passed: every workspace case reports `host_api_unsupported` (no `process_resources.py`) |
+| a8c147b (catalog pin, 2026-10-07) | 118 passed, 0 skipped | full table: sibling and lookalike eligible; equals, nested, ancestor, other-control-path, symlink, hardlink, invalid, inaccessible denied |
+| 2992bf6 (previous pin) | 114 passed, 4 failed (the three drift tests and the fresh-extraction check, which now describe a8c147b) | 24 passed: every workspace case reports `host_api_unsupported` (no `process_resources.py`) |
 
 Execution stays fail-closed (only `read_file`, `ls`, `glob`, `grep` run). CI runs the full suite once, at `a8c147b`, with `set -o pipefail` and no skips allowed.
 

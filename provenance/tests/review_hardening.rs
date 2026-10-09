@@ -69,7 +69,7 @@ fn a_duplicate_key_inside_a_ledger_note_is_refused() {
 
 #[test]
 fn test_material_never_verifies_as_complete() {
-    for (class, want) in [
+    for (i, (class, want)) in [
         (
             json!("synthetic"),
             "FAIL synthetic_complete: fixture.class=synthetic",
@@ -79,8 +79,11 @@ fn test_material_never_verifies_as_complete() {
             "FAIL synthetic_complete: fixture.class=staged",
         ),
         (json!(null), "FAIL malformed_companion: fixture.class"),
-    ] {
-        let d = scratch(REAL, "fixture_class");
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let d = scratch(REAL, &format!("fixture_class_{i}"));
         let mut c = companion(&d);
         c["fixture"]["class"] = class;
         write_companion(&d, &c);

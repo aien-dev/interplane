@@ -56,7 +56,7 @@ def load(src_dir: Optional[str] = None) -> Optional[Odysseus]:
 
 def _import(root: str) -> Optional[Odysseus]:
     # Importing Odysseus's core.database creates data/app.db inside the checkout. Point its data
-    # directory (src/constants.py:12, ODYSSEUS_DATA_DIR) at a scratch directory so the checkout is
+    # directory (src/constants.py:56, ODYSSEUS_DATA_DIR) at a scratch directory so the checkout is
     # never written; an operator-set value is respected.
     os.environ.setdefault("ODYSSEUS_DATA_DIR", tempfile.mkdtemp(prefix="interplane-odysseus-data-"))
     if root:

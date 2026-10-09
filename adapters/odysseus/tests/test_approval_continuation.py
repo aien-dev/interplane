@@ -1,6 +1,6 @@
 """Approval continuation on Odysseus (0.3 cut A4): unsupported, so every continuation is refused.
 
-Odysseus at 2992bf6 seals approvals as task- or chat-scoped bypasses of its whole untrusted-context
+Odysseus at a8c147b seals approvals as task- or chat-scoped bypasses of its whole untrusted-context
 gate, bound to owner, session and run (tool_approvals.py), which INTERPLANE's single-effect
 continuation cannot express. The adapter therefore mints no approval id: the pipeline keeps no
 pending entry, so a host continuation is refused (`no_pending_approval`) and nothing executes. These

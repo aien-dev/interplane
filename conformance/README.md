@@ -154,7 +154,7 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 `TRUST-DIGEST.txt`. Current subsets: T3 43 fixtures (30 injection, 13 approval), T4 32 (18
 injection, 14 approval).
 
-- T3: `ODYSSEUS_SRC=<odysseus@2992bf6> PYTHONPATH=python:adapters/odysseus <venv>/bin/python -m interplane_adapter_odysseus.t3 --out t3-verdicts.json`
+- T3: `ODYSSEUS_SRC=<odysseus@a8c147b> PYTHONPATH=python:adapters/odysseus <venv>/bin/python -m interplane_adapter_odysseus.t3 --out t3-verdicts.json`
   (real `Pipeline` + `OdysseusAuthority`, Odysseus's own gate).
 - T4: `cd adapters/aien && T4_OUT=t4-verdicts.json cargo test --test t4_corpus -- --nocapture`
   (real `Pipeline` + `AienAuthority`; needs `python3` for the plans and the sibling checkouts of `adapters/aien/README.md`).

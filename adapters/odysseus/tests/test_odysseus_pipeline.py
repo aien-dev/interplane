@@ -15,13 +15,26 @@ from interplane_adapter_odysseus.catalog import tool_names
 
 
 def test_catalog_tools_vs_odysseus_tool_tags(ody):
-    # Finding at 2992bf6: tail_serve_output has a function schema (tool_schemas.py:899) and an
-    # executor branch (tool_execution.py:1205) but is missing from TOOL_TAGS, so Odysseus's own
-    # function_call_to_tool_block rejects it as an unknown function. Pinned so a fix is noticed.
-    assert set(tool_names()) - set(ody.tool_tags) == {"tail_serve_output"}
+    # At 2992bf6 tail_serve_output had a function schema but was missing from TOOL_TAGS (Odysseus's
+    # own function_call_to_tool_block rejected it). At a8c147b it is registered, so every recorded
+    # tool is in TOOL_TAGS. Pinned so a regression (a recorded tool dropped from TOOL_TAGS) is noticed.
+    assert set(tool_names()) - set(ody.tool_tags) == set()
+    assert "tail_serve_output" in ody.tool_tags
 
 
-def test_tool_missing_from_tool_tags_is_not_found(run):
+def test_formerly_missing_tool_is_authorized_but_not_executed(run):
+    # tail_serve_output used to be not_found. Now Odysseus accepts it; the adapter still executes
+    # only read_file, ls, glob, grep, so it is authorized and reports "not executed".
+    authority, res, rec = run("tail_serve_output", {"session_id": "s"})
+    assert (res.status, rec.decision) == ("error", "authorized")
+    assert res.error.code == "execution_error" and NOT_EXECUTED in res.error.message
+    assert authority.execute_calls == 1
+
+
+def test_tool_missing_from_tool_tags_is_not_found(run, ody, monkeypatch):
+    # Simulated: drop a recorded tool from Odysseus's registry for this test only (no recorded tool is
+    # missing at a8c147b), to keep the adapter's not_found branch covered.
+    monkeypatch.setattr(ody.agent_tools, "TOOL_TAGS", set(ody.tool_tags) - {"tail_serve_output"})
     authority, res, rec = run("tail_serve_output", {"session_id": "s"})
     assert (res.status, rec.decision) == ("not_found", "not_found") and authority.execute_calls == 0
 
@@ -66,7 +79,9 @@ def test_mutation_after_external_context_requires_approval(run):
     decision = authority.decisions[res.request_id]
     assert decision.approval is None  # no id minted: approval continuation is unsupported here
     assert decision.runtime_state["vocabulary"] == "odysseus.tool_gate"
-    assert "External untrusted context" in decision.runtime_state["values"][0]
+    # reason text is Odysseus's own (tool_capabilities.py:874 at a8c147b: "external untrusted context
+    # blocks <effects>"); it was "External untrusted context ..." at 2992bf6
+    assert "external untrusted context blocks" in decision.runtime_state["values"][0].lower()
     assert authority.execute_calls == 0
 
 
@@ -274,9 +289,9 @@ def test_importing_odysseus_does_not_write_inside_the_checkout(ody):
 
 
 def test_system_result_integrity_maps_to_a_trust_level(ody, workspace):
-    # Odysseus ResultIntegrity.SYSTEM (tool_capabilities.py:37-46 at 2992bf6) is not a
+    # Odysseus ResultIntegrity.SYSTEM (tool_capabilities.py:39-42 at a8c147b) is not a
     # TrustLevel. It is Odysseus's label for server-authored output, so it maps to
-    # trusted_runtime, unless Odysseus's own tool_result_should_arm_gate (:506-528) says the
+    # trusted_runtime, unless Odysseus's own tool_result_should_arm_gate (:619-664) says the
     # producer marked this result untrusted_content; then external_untrusted.
     a = OdysseusAuthority(str(workspace), admin=True)
     assert ody.tool_capabilities.capabilities_for_action("update_plan", "").result_integrity.value == "system"

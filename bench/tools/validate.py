@@ -245,10 +245,16 @@ def derive_domains(request: str, rule: dict) -> list:
 
 
 def tool_domains() -> dict:
+    """The adapter's domains for the tools of the FROZEN catalog (2992bf6) only.
+
+    The adapter was re-pinned to a8c147b (88 tools, #95); the frozen corpora and their digests
+    stay bound to the 71-tool 2992bf6 record, so tools added since are outside them.
+    """
     sys.path[:0] = [str(REPO / "python"), str(REPO / "adapters" / "odysseus")]
     from interplane_adapter_odysseus.domains import TOOL_DOMAINS  # noqa: E402
 
-    return TOOL_DOMAINS
+    frozen = {c["name"] for c in json.loads(CATALOG_PATH.read_text(encoding="utf-8"))["capabilities"]}
+    return {n: d for n, d in TOOL_DOMAINS.items() if n in frozen}
 
 
 def initial_selection(domains: list, rule: dict, tdom: dict) -> set:

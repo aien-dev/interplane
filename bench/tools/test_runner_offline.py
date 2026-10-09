@@ -8,7 +8,7 @@ tool name, and (``--backends sim-1``) every simulated backend kind, twice, with 
 rule, the cap-exhausted note, and the negative controls N1 (denied) and N2 (approval pending).
 Needs the Odysseus venv and ODYSSEUS_SRC (CI job adapter-odysseus runs it):
 
-  ODYSSEUS_SRC=<odysseus@2992bf6> <venv>/bin/python bench/tools/test_runner_offline.py
+  ODYSSEUS_SRC=<odysseus@a8c147b> <venv>/bin/python bench/tools/test_runner_offline.py
 """
 
 import copy
@@ -23,6 +23,9 @@ HERE = Path(__file__).resolve().parent
 BENCH = HERE.parent
 sys.path.insert(0, str(HERE))
 import run_bench  # noqa: E402
+
+# The runner renders the adapter's whole recorded catalog (71 tools at 2992bf6, 88 at a8c147b).
+N_TOOLS = len(run_bench.catalog_with_domains().capabilities)
 
 
 SIM_ARGS = {
@@ -166,7 +169,7 @@ def main() -> int:
         R = lambda tid, c: json.loads((out / "receipts" / f"{tid}.{c}.json").read_text())
 
         a, b = R("expansion-901", "A"), R("expansion-901", "B")
-        assert a["metrics"]["exposed_tools_first"] == 71 and a["metrics"]["expansions"] == 0
+        assert a["metrics"]["exposed_tools_first"] == N_TOOLS and a["metrics"]["expansions"] == 0
         assert b["metrics"]["exposed_tools_first"] < 15, b["metrics"]["exposed_tools_first"]
         assert b["metrics"]["unexposed_calls"] == 1, b["metrics"]
         assert b["metrics"]["effective_expansions"] == 1 and b["judge"]["success"], b["judge"]
@@ -348,7 +351,7 @@ def main() -> int:
         # family: A family renders the full catalog and has no discovery tool; B family does
         for c in ("A", "A2", "A4"):
             r = C("RT-T2", c)
-            assert r["metrics"]["exposed_tools_first"] == 71 and r["discovery_tool"] is None and r["final_exposed_names"] is None
+            assert r["metrics"]["exposed_tools_first"] == N_TOOLS and r["discovery_tool"] is None and r["final_exposed_names"] is None
         for c in ("B1", "B2", "B3", "B4"):
             r = C("RT-T2", c)
             assert r["metrics"]["exposed_tools_first"] < 15 and r["discovery_tool"] == run_bench.DISCOVERY

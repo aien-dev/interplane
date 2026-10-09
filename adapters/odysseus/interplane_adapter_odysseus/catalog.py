@@ -1,4 +1,4 @@
-"""The recorded Odysseus catalog (extracted from a live import at commit 2992bf6)."""
+"""The recorded Odysseus catalog (extracted from a live import at commit a8c147b)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from typing import Optional
 
 from interplane.core import Catalog
 
-RECORD_NAME = "catalog.odysseus-2992bf6.json"
+RECORD_NAME = "catalog.odysseus-a8c147b.json"
 RECORD_PATH = Path(__file__).resolve().parent.parent / RECORD_NAME
 RUNTIME_ID = "odysseus"
 

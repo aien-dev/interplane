@@ -58,7 +58,9 @@ def _no_leak(got, ws):
     assert got.code in REASON_CODES
     assert got.remediation and str(importlib.import_module("src.constants").DATA_DIR) not in text
     if ws:
-        assert str(ws) not in text and os.path.realpath(ws) not in text
+        assert str(ws) not in text
+        if "\0" not in str(ws):
+            assert os.path.realpath(ws) not in text
 
 
 def test_disjoint_sibling_is_eligible(ody, sibling):
@@ -86,8 +88,8 @@ def test_ancestor_contains_data_dir(ody, home):
     _check(ody, home, "workspace_contains_server_state", "launch_boundary")
 
 
-def test_ancestor_vet_accepts_but_guard_refuses(ody, home):
-    # The #6651 disagreement: selection accepts, launch boundary refuses.
+def test_ancestor_is_accepted_by_selection(ody, home):
+    # Selection half of the #6651 disagreement; the guard half is test_ancestor_contains_data_dir.
     assert ody.tool_execution.vet_workspace(str(home)) == str(home)
 
 
@@ -115,6 +117,10 @@ def test_hardlink_alias_to_app_db(ody, data, sibling):
 
 def test_nonexistent_path(ody, home):
     _check(ody, home / "nope-does-not-exist", "workspace_invalid", "selection")
+
+
+def test_embedded_null_byte_is_invalid_not_raised(ody, home):
+    _check(ody, str(home) + "/bad\0name", "workspace_invalid", "selection")
 
 
 def test_file_not_directory(ody, sibling):

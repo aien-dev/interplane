@@ -105,6 +105,8 @@ def _inside(path: str, base: str) -> bool:
 def _selection(ody: Any, workspace: Optional[str]) -> Optional[str]:
     if not workspace or not isinstance(workspace, str):
         return "workspace_missing"
+    if "\0" in workspace:  # os.path raises on it; an unusable name is an invalid workspace
+        return "workspace_invalid"
     real = os.path.realpath(workspace)
     if not os.path.isdir(real):
         return "workspace_invalid"

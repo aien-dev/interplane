@@ -114,7 +114,7 @@ Four separate questions, answered by four separate things:
 3. **Launch preflight** is `launch_preflight()` here: would the launch boundary (`guard_launch_workspace`, `src/agent_runtime/process_resources.py:379`) structurally accept this workspace for bash, python, host_shell or manage_bg_jobs? Read-only; asks the real upstream code.
 4. **Authorization** stays with Odysseus at launch: tool permission, admin, delegated credentials, untrusted context, approvals. A positive preflight is none of these and not a claim that anything ran.
 
-**Verified disagreement** (a8c147b, real run): a workspace that is an ancestor of `DATA_DIR` is accepted by selection but refused by the launch guard ("contains server control state"), so the workspace can be chosen and then every launch fails. A workspace nested inside `DATA_DIR` is the reverse: refused by selection, passed by the guard alone. The preflight asks both. Upstream: odysseus-dev/odysseus#6651 (open, unfixed at a8c147b). INTERPLANE does not bypass or weaken either gate.
+**Verified disagreement** (a8c147b, real run): a workspace that is an ancestor of `DATA_DIR` is accepted by selection but refused by the launch guard ("contains server control state"), so the workspace can be chosen and then every launch fails. A workspace nested inside `DATA_DIR` is the reverse: refused by selection, passed by the guard alone. The preflight runs both: Odysseus's own `vet_workspace` and launch guard, preceded by the adapter's equal/nested check against `DATA_DIR` (the same rule `vet_workspace` applies, repeated so the reason code can name the case). Upstream: odysseus-dev/odysseus#6651 (open, unfixed at a8c147b). INTERPLANE does not bypass or weaken either gate.
 
 **Safe layout.** Keep `ODYSSEUS_DATA_DIR` disjoint from every agent workspace (siblings, not parent or child). The loader defaults it to a fresh temp directory only when unset; an operator value is always honoured. The adapter never moves, copies or rewrites existing state; the fix for a refused layout is the operator's.
 
@@ -137,12 +137,12 @@ Four separate questions, answered by four separate things:
 
 Results carry fixed text only: no paths, no upstream exception text.
 
-**Qualification matrix** (`tests/test_launch_preflight.py`: 23 tests, no skips, real upstream calls):
+**Qualification matrix** (`tests/test_launch_preflight.py`: 24 tests, no skips, real upstream calls):
 
 | Odysseus | Full suite | Preflight |
 |---|---|---|
-| 2992bf6 (catalog pin) | 114 passed (91 existing + 23) | every workspace case reports `host_api_unsupported` (no `process_resources.py`) |
-| a8c147b (2026-10-07) | 111 passed, 3 failed | full table: sibling and lookalike eligible; equals, nested, ancestor, other-control-path, symlink, hardlink, invalid, inaccessible denied |
+| 2992bf6 (catalog pin) | 115 passed (91 existing + 24) | every workspace case reports `host_api_unsupported` (no `process_resources.py`) |
+| a8c147b (2026-10-07) | 112 passed, 3 failed (known drift detectors) | full table: sibling and lookalike eligible; equals, nested, ancestor, other-control-path, symlink, hardlink, invalid, inaccessible denied |
 
 The 3 failures at a8c147b are the existing drift detectors in `test_odysseus_pipeline.py`: `tail_serve_output` is now in `TOOL_TAGS`, and the untrusted-context message was reworded. Execution stays fail-closed (only `read_file`, `ls`, `glob`, `grep` run). Re-pinning the catalog to a8c147b is a separate follow-up. CI runs the preflight tests against a8c147b in addition to the full suite at 2992bf6.
 

@@ -255,6 +255,15 @@ pub fn self_executor() -> (u32, u64) {
 
 static OPERATION: AtomicU64 = AtomicU64::new(0);
 
+/// What the daemon returned for one `StreamTurn`: its own text and the id of its own generation
+/// record (sovereign-core `DAEMON_GENERATION_RECORD.md`).
+#[derive(Clone, Debug)]
+pub struct ModelTurn {
+    pub text: String,
+    pub generation_record: u64,
+    pub total_tokens: u64,
+}
+
 /// Newline-JSON client for the daemon's control socket (`aien-runtime` client.rs framing).
 #[derive(Clone, Debug)]
 pub struct LedgerClient {
@@ -304,6 +313,64 @@ impl LedgerClient {
             Some(e) => Err(e.as_str().map_or_else(|| e.to_string(), str::to_string)),
             None => Ok(v),
         }
+    }
+
+    /// One `StreamTurn` (the generation path `aien-cli chat` uses) on the daemon's loaded model.
+    /// The daemon answers with a stream of lines and ends with `TurnFinished`; the request is sent
+    /// as `messages` exactly as given and the returned [`ModelTurn`] carries the daemon's own text
+    /// and the id of its generation record (`TurnFinished.generation_record`). `Err` when the
+    /// stream ends without `TurnFinished`, carries an `Error`, or names no generation record: no
+    /// record means no claim, so this never invents one.
+    pub fn stream_turn(
+        &self,
+        messages: &Value,
+        max_tokens: u64,
+        temperature: f64,
+    ) -> Result<ModelTurn, String> {
+        let me = fs::metadata("/proc/self").map_err(|e| e.to_string())?.uid();
+        let owner = fs::metadata(&self.socket)
+            .map_err(|e| format!("socket {}: {e}", self.socket.display()))?
+            .uid();
+        if owner != me {
+            return Err(format!(
+                "refusing socket {}: owned by uid {owner}",
+                self.socket.display()
+            ));
+        }
+        let mut s = UnixStream::connect(&self.socket)
+            .map_err(|e| format!("connect {}: {e}", self.socket.display()))?;
+        s.set_read_timeout(Some(Duration::from_secs(1800)))
+            .map_err(|e| e.to_string())?;
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default();
+        let op = now.as_nanos() as u64 + OPERATION.fetch_add(1, Ordering::SeqCst);
+        let env = json!({"protocol_version": 1, "request_id": now.as_millis() as u64,
+            "operation_id": op, "operator_session": 1,
+            "command": {"StreamTurn": {"messages": messages, "max_tokens": max_tokens,
+                "temperature": temperature}}});
+        s.write_all(format!("{env}\n").as_bytes())
+            .map_err(|e| format!("send: {e}"))?;
+        for line in BufReader::new(&s).lines() {
+            let line = line.map_err(|e| format!("receive: {e}"))?;
+            let v: Value =
+                serde_json::from_str(line.trim()).map_err(|e| format!("response: {e}: {line}"))?;
+            if let Some(e) = v.get("Error") {
+                return Err(e.as_str().map_or_else(|| e.to_string(), str::to_string));
+            }
+            if let Some(f) = v.get("TurnFinished") {
+                let text = f["text"].as_str().ok_or("TurnFinished without text")?;
+                let generation_record = f["generation_record"]
+                    .as_u64()
+                    .ok_or("the daemon returned no generation_record: no record means no claim")?;
+                return Ok(ModelTurn {
+                    text: text.to_string(),
+                    generation_record,
+                    total_tokens: f["total_tokens"].as_u64().unwrap_or(0),
+                });
+            }
+        }
+        Err("StreamTurn ended without TurnFinished".into())
     }
 
     fn body(&self, command: Value, variant: &str) -> Result<Value, String> {
@@ -405,6 +472,7 @@ struct LedgerState {
     desk_key: PathBuf,
     approvers: HashMap<String, String>,
     before_intent: Option<Hook>,
+    before_ack: Option<Hook>,
     grants_minted: u32,
     receipts: Vec<Value>,
 }
@@ -455,6 +523,7 @@ impl ComposeLedgerAuthority {
                 desk_key,
                 approvers: HashMap::new(),
                 before_intent: None,
+                before_ack: None,
                 grants_minted: 0,
                 receipts: vec![],
             })),
@@ -480,6 +549,13 @@ impl ComposeLedgerAuthority {
     /// Every ledger receipt this authority produced, oldest first.
     pub fn receipts(&self) -> Vec<Value> {
         self.state.borrow().receipts.clone()
+    }
+
+    /// Fault-injection seam for the window between the written bytes and the acknowledgement: runs
+    /// after the intent record exists and the bytes are on disk, just before `ComposeEffectAck`.
+    /// A daemon that dies here leaves an intent without an ack: the receipt must say `UNRESOLVED`.
+    pub fn set_before_ack(&self, hook: impl FnMut(&Path) + 'static) {
+        self.state.borrow_mut().before_ack = Some(Box::new(hook));
     }
 
     /// Fault-injection seam (the analogue of aien-cli's `fault_hold("before_intent")`): runs after
@@ -737,6 +813,11 @@ impl ComposeLedgerAuthority {
         rc["intent_id"] = json!(intent_id);
         rc["intent_digest"] = intent["digest"].clone();
         rc["disk_sha256"] = reported["written_sha256"].clone();
+        let hook = self.state.borrow_mut().before_ack.take();
+        if let Some(mut h) = hook {
+            h(&target);
+            self.state.borrow_mut().before_ack = Some(h);
+        }
         let ack = client.ack(intent_id, &reported);
         let state = match &ack {
             Ok(a) => {

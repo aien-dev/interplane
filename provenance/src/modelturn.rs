@@ -239,5 +239,102 @@ pub fn check(a: &Archive, t: &Value, call: Option<&Call>) -> Result<(), Fail> {
             "trace request source vs model_turn.model",
         );
     }
+    check_turn_record(a)?;
+    Ok(())
+}
+
+fn is_rfc3339_utc(x: &str) -> bool {
+    let b = x.as_bytes();
+    b.len() == 20
+        && b[19] == b'Z'
+        && [4, 7].iter().all(|&i| b[i] == b'-')
+        && b[10] == b'T'
+        && [13, 16].iter().all(|&i| b[i] == b':')
+        && b.iter()
+            .enumerate()
+            .all(|(i, c)| [4, 7, 10, 13, 16, 19].contains(&i) || c.is_ascii_digit())
+}
+
+/// `model-turn/2`: the retained model turn names the exact request and response bytes, the model
+/// and the weights digest, the backend and the times, and each one is compared with what the
+/// bundle retains. Runs only for a turn that declares `record: "model-turn/2"`; a turn without
+/// the marker keeps the older, weaker checks above and is not read as carrying these links.
+/// Compared, never trusted: the request bytes are the harness's own (the daemon's record holds
+/// only the token-id digest of the prompt, which this offline check cannot recompute), and the
+/// backend line is the daemon's log line quoted by the harness.
+fn check_turn_record(a: &Archive) -> Result<(), Fail> {
+    let Some(turn) = a.json("model_turn")? else {
+        return fail("missing_record", "model_turn (not retained)");
+    };
+    if s(&turn, &["record"]) != Some("model-turn/2") {
+        return Ok(());
+    }
+    let bad =
+        |what: &str| -> Result<(), Fail> { fail("binding_mismatch", format!("model_turn.{what}")) };
+    let hex64 = |x: Option<&str>| {
+        x.is_some_and(|h| h.len() == 64 && h.bytes().all(|b| b.is_ascii_hexdigit()))
+    };
+    // Request bytes: the retained record is exactly the bytes whose digest the turn names.
+    if s(&turn, &["request_record"]) != Some("model_request") {
+        return bad("request_record");
+    }
+    if !a.has("model_request") {
+        return fail("missing_record_entry", "model_request");
+    }
+    let Some(req) = a.bytes("model_request")? else {
+        return fail("missing_record", "model_request (not retained)");
+    };
+    let req_sha = sha256_hex(req);
+    if !hex64(s(&turn, &["request_sha256"])) || s(&turn, &["request_sha256"]) != Some(&req_sha) {
+        return bad("request_sha256 != sha256(model_request)");
+    }
+    if a.sha("model_request")? != req_sha {
+        return bad("request_sha256 != record digest");
+    }
+    // The request is a messages array that really asks for something (not an empty shell).
+    match crate::strict::parse(req) {
+        Some(Value::Array(m)) if !m.is_empty() => {}
+        _ => return bad("model_request (not a non-empty messages array)"),
+    }
+    // Response bytes: the exact text the dialect parsed.
+    let Some(text) = s(&turn, &["input"]) else {
+        return bad("input");
+    };
+    if s(&turn, &["response_sha256"]) != Some(sha256_hex(text.as_bytes()).as_str()) {
+        return bad("response_sha256 != sha256(input)");
+    }
+    // Weights: the digest the turn names is the exported file the daemon's record also names.
+    if s(&turn, &["weights_sha256"]) != Some(a.sha("export_weights")?) {
+        return bad("weights_sha256 != export_weights");
+    }
+    for k in ["model_id", "backend"] {
+        if s(&turn, &[k]).is_none_or(str::is_empty) {
+            return bad(k);
+        }
+    }
+    // The backend line is quoted from the load log the bundle retains.
+    let backend = s(&turn, &["backend"]).unwrap_or("");
+    let log = a
+        .bytes("aien_load_log")?
+        .map(|b| String::from_utf8_lossy(b).into_owned())
+        .unwrap_or_default();
+    if !log.lines().any(|l| l.trim() == backend) {
+        return bad("backend (not a line of aien_load_log)");
+    }
+    // Times: well formed, ordered, and the model finished before the request was admitted.
+    let (Some(t0), Some(t1)) = (
+        s(&turn, &["stream_started"]),
+        s(&turn, &["stream_finished"]),
+    ) else {
+        return bad("stream_started/stream_finished");
+    };
+    if !is_rfc3339_utc(t0) || !is_rfc3339_utc(t1) || t0 > t1 {
+        return bad("stream_started/stream_finished (order or form)");
+    }
+    let trace = a.json("interplane_trace")?.unwrap_or(Value::Null);
+    match trace.get(0).and_then(|e| s(e, &["timestamp"])) {
+        Some(req_t) if t1 <= req_t => {}
+        _ => return bad("stream_finished is after the trace request"),
+    }
     Ok(())
 }

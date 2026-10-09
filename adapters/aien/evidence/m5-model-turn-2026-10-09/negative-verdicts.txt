@@ -1,0 +1,11 @@
+control PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none
+response_text_replaced FAIL binding_mismatch: generation record output_text_sha256 != sha256(model_turn.input)
+weights_digest_substituted FAIL binding_mismatch: model_turn.weights_sha256 != export_weights
+backend_not_in_load_log FAIL binding_mismatch: model_turn.backend (not a line of aien_load_log)
+request_digest_substituted FAIL binding_mismatch: model_turn.request_sha256 != sha256(model_request)
+generation_record_other FAIL binding_mismatch: model_turn.generation_record_id != ledger_generation.id
+generation_record_dropped FAIL missing_record_entry: ledger_generation
+model_turn_dropped FAIL missing_record_entry: model_turn
+scripted_downgrade PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn
+scripted_but_declared_complete FAIL unlabelled_missing: link:model_turn (declared complete)
+edited_subject FAIL evaluation_signature_bad: receipt_digest does not match the receipt's fields

@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-q"
+  ],
+  "before": {
+    "stderr_sha256": "7b1f5d41b607c2552bd3afa9745f6ee796109268b2a956fd6851f7dbeb08052c",
+    "stdout_sha256": "529911fac03facaca20f466251670d3424bfde3440581cc652a339e394284b82"
+  },
+  "cwd_rel": ".",
+  "duration_ms": 147,
+  "exit_code": 0,
+  "kind": "vac-test-run",
+  "started_unix_ms": 1791548631887,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "e4b442ba923bff2b9f7fef266120fe8b99c1562b834cab3452f49b7e83d89e32",
+  "target_blob_sha256_after": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+  "task_id": "vac/m5-rsi-dashes-1",
+  "test_exit_before": 101,
+  "tree_commit_after": "025adb4ca4cbe606d582a202616f7526c4c502e3",
+  "v": 1
+}

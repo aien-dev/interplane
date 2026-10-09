@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-10-09T12:23:50Z",
+  "description": "proposed by a model turn",
+  "id": "model-gen-6",
+  "kind": "Style",
+  "proposed_patch": "# rsi-dashes\n\nA tiny fixture, small on purpose. The judge runs its holdout command and reads the answers; the proposer never sees them.\nIt covers pages 1 to 3 of the VAC M5 note, nothing more.\n",
+  "sandbox_path": null,
+  "target_file": "README.md",
+  "title": "README without dashes"
+}

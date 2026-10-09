@@ -1,0 +1,23 @@
+{
+  "backend": "Backend: NativeTransformerBackend/CPU-reference (Omega GPU engine not linked, explicit fallback)",
+  "dialect": "aien_legacy",
+  "generation_record_id": 6,
+  "generation_record_source": "TurnFinished.generation_record",
+  "input": "<tool_call>\n{\"name\": \"write_file\", \"arguments\": {\"path\": \"README.md\", \"content\": \"# rsi-dashes\\n\\nA tiny fixture, small on purpose. The judge runs its holdout command and reads the answers; the proposer never sees them.\\nIt covers pages 1 to 3 of the VAC M5 note, nothing more.\\n\"}}\n</tool_call>",
+  "model": "llama-3.2-1b-instruct",
+  "model_id": "unsloth/Llama-3.2-1B-Instruct",
+  "record": "model-turn/2",
+  "request_record": "model_request",
+  "request_sha256": "64b5e18a282638663fa897a3822d84b65d09b74d413dd7dee51286426f61c346",
+  "response_sha256": "0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+  "sampling": {
+    "max_tokens": 512,
+    "temperature": 0.0,
+    "total_tokens": 358
+  },
+  "stream_finished": "2026-10-09T12:23:50Z",
+  "stream_started": "2026-10-09T12:23:02Z",
+  "trace_id": "ledger",
+  "turn": 0,
+  "weights_sha256": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f"
+}

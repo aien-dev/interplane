@@ -63,6 +63,30 @@ pub fn propose_and_judge(
     out: &Path,
     pinned_policy: &[u8],
 ) -> Result<Judged, String> {
+    run_hook(hook, ws, out, pinned_policy, None)
+}
+
+/// The same hook and the same checks, for a proposal a real model turn produced: `proposal` is a
+/// `proposal.json`-shaped file the harness wrote from the model's tool call (`id`, `target_file`,
+/// `proposed_patch`). The hook skips `spark-rsi propose`; the judge still builds and evaluates the
+/// exact bytes, and the receipt and policy are checked as for any other proposal.
+pub fn judge_model_proposal(
+    hook: &Path,
+    ws: &Path,
+    out: &Path,
+    pinned_policy: &[u8],
+    proposal: &Path,
+) -> Result<Judged, String> {
+    run_hook(hook, ws, out, pinned_policy, Some(proposal))
+}
+
+fn run_hook(
+    hook: &Path,
+    ws: &Path,
+    out: &Path,
+    pinned_policy: &[u8],
+    proposal: Option<&Path>,
+) -> Result<Judged, String> {
     if out.exists() {
         return Err(format!(
             "{} exists: a judged run is never reused",
@@ -74,6 +98,11 @@ pub fn propose_and_judge(
     cmd.arg(ws).arg(out);
     for v in NEGATIVE_ONLY_ENV {
         cmd.env_remove(v);
+    }
+    // Only the model-turn row may redirect the proposal; the RSI row never does.
+    cmd.env_remove("M5_PROPOSAL_FILE");
+    if let Some(p) = proposal {
+        cmd.env("M5_PROPOSAL_FILE", p);
     }
     let run = cmd
         .output()

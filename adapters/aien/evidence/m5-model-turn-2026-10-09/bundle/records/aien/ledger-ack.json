@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "9a2f31ae0072ee2e5cd2ac536dcefb5e589d44d5442c74463a2cda93ab0a7c13",
+  "id": 22,
+  "kind": 65554,
+  "links": [
+    21,
+    20,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"authorization\":20,\"content_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\",\"disk_error\":null,\"disk_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\",\"executor_reported\":{\"bytes\":193,\"error\":null,\"written_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\"},\"intent\":21,\"path\":\"README.md\",\"phase\":\"ack\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"state\":\"DONE\",\"tool\":\"write_file\"}",
+  "verified": true
+}

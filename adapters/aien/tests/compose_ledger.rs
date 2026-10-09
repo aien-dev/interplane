@@ -216,8 +216,13 @@ fn records(c: &LedgerClient, ids: &[u64]) -> Vec<Value> {
 fn save(d: &Daemon, row: &str, mut v: Value) {
     v["row"] = json!(row);
     v["boundary"] = json!(LEDGER_BOUNDARY);
-    v["daemon"] = json!({"log": d.log, "home": d.root.join("compose"), "start_ms": d.started_ms,
-        "aien_bin": std::env::var("AIEN_BIN").ok()});
+    v["daemon"] = interplane_adapter_aien::fix_the_test::receipt_daemon(
+        &d.root,
+        &d.log,
+        &d.root.join("compose"),
+        d.started_ms,
+        std::env::var("AIEN_BIN").ok().as_deref(),
+    );
     std::fs::write(
         d.root.join("receipt.json"),
         serde_json::to_vec_pretty(&v).unwrap(),

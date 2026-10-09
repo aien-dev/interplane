@@ -226,7 +226,7 @@ and, when the daemon reports it, `"aien": {..., "native": {"claimed": bool, "ome
    from `task.test_cmd`; `exit_code` is not 0 (the slice claims the test passes after the write);
    `test_exit_before` is 0 (nothing was fixed) or missing; `target_blob_sha256_after` differs from the
    ack's `disk_sha256` (the daemon's read-back) or the grant's `content_sha256`; `stdout_sha256` or
-   `stderr_sha256` is not hex or differs from the retained `test_stdout`/`test_stderr`.
+   `stderr_sha256` is not hex, differs from the retained `test_stdout`/`test_stderr`, or the record is absent or labelled not retained (a claimed digest needs the bytes it names).
 6. **`native_claim_contradicted`**: see below.
 
 ### Native claim, and what a missing one means

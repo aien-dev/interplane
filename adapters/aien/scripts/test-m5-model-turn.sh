@@ -144,7 +144,7 @@ jq -n \
         evaluation_subject_sha256: $ev[0].binding.subject_sha256,
         intent_id: $ig[0].id, ack_id: $ak[0].id,
         ack_disk_sha256: ($ak[0].text | fromjson | .disk_sha256 // null)}')" \
-  --arg restart_a "$(grep -h '"verdict":"PASS"' "$OUT/rows/row12/receipt.json" >/dev/null 2>&1 && jq -c '{records_after_restart, records_after_replays, daemon_replay_state: .daemon_replay.state, second_intent}' "$OUT/rows/row12/receipt.json")" \
+  --arg restart_a "$(jq -c '{records_after_restart, records_after_replays, daemon_replay_state: .daemon_replay.state, second_intent}' "$OUT/rows/row12/receipt.json")" \
   --arg restart_b "$(jq -c '{adapter_state, intent_id, effects_after_restart, second_intent, restart_reconcile}' "$OUT/rows/row13/receipt.json")" \
   --arg negatives "$(cat "$neg/verdicts.txt")" --arg started "$started" --arg finished "$finished" \
   '{kind: "interplane-aien-m5-model-turn-receipt", adapter_commit: $adapter_commit, adapter_dirty: $adapter_dirty,

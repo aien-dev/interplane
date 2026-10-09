@@ -1,0 +1,182 @@
+[
+  {
+    "destination": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-1",
+    "payload": {
+      "arguments": {
+        "content": "# rsi-dashes\n\nA tiny fixture, small on purpose. The judge runs its holdout command and reads the answers; the proposer never sees them.\nIt covers pages 1 to 3 of the VAC M5 note, nothing more.\n",
+        "path": "README.md"
+      },
+      "kind": "tool_request",
+      "provenance": {
+        "coercion": "none",
+        "dialect": "aien_legacy",
+        "dialect_version": "1",
+        "exposure": {
+          "floor": "user_supplied",
+          "inputs": [
+            "in-user"
+          ]
+        },
+        "model": "llama-3.2-1b-instruct",
+        "parser_version": "1.0.0",
+        "raw_name": "write_file",
+        "source_digest": "sha256:0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+        "source_turn": 0
+      },
+      "request_id": "ledger:t0:c0",
+      "tool": {
+        "name": "write_file",
+        "namespace": null
+      }
+    },
+    "source": {
+      "id": "llama-3.2-1b-instruct",
+      "kind": "model"
+    },
+    "timestamp": "2026-10-09T12:16:27Z",
+    "trace_id": "ledger"
+  },
+  {
+    "destination": {
+      "id": "llama-3.2-1b-instruct",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-2",
+    "parent_id": "m-1",
+    "payload": {
+      "data": null,
+      "decision": {
+        "approval": {
+          "approval_id": "aien-approval:ledger:t0:c0:1e254965876f60c4",
+          "expires_at": null,
+          "scope": "1e254965876f60c4d2982f081770cefe5adc3869fe95327e718dc5ec92a23162"
+        },
+        "authority": {
+          "decision_id": null,
+          "policy_engine": "aien-mcp.EffectClassAuthority",
+          "runtime": "aien"
+        },
+        "capability": "write_file",
+        "constraints": [],
+        "decision": "requires_approval",
+        "kind": "decision",
+        "reason": "tool `write_file` needs approval (effect bits 0x8)",
+        "request_id": "ledger:t0:c0",
+        "runtime_state": {
+          "values": [
+            "effect_class=WorldMutation",
+            "staged=true",
+            "intent_digest=1e254965876f60c4d2982f081770cefe5adc3869fe95327e718dc5ec92a23162"
+          ],
+          "vocabulary": "aien.effect_intent"
+        }
+      },
+      "error": {
+        "code": "approval_required",
+        "message": "approval required: aien-approval:ledger:t0:c0:1e254965876f60c4",
+        "retryable": false
+      },
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": null,
+        "duration_ms": null,
+        "runtime": "aien",
+        "trust": null,
+        "trusted": null
+      },
+      "request_id": "ledger:t0:c0",
+      "status": "requires_approval"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-09T12:16:27Z",
+    "trace_id": "ledger"
+  },
+  {
+    "destination": {
+      "id": "llama-3.2-1b-instruct",
+      "kind": "model"
+    },
+    "interplane_version": "0.1",
+    "message_id": "m-3",
+    "parent_id": "m-1",
+    "payload": {
+      "data": {
+        "receipt": {
+          "ack_digest": "9a2f31ae0072ee2e5cd2ac536dcefb5e589d44d5442c74463a2cda93ab0a7c13",
+          "ack_record_id": 22,
+          "approval_id": "aien-approval:ledger:t0:c0:1e254965876f60c4",
+          "approved_proposal_sha256": "0c8ac735e87e5eea8c1e5d0d839086fe6c3d60a0b4ffcbf75067cd7743a6e74f",
+          "approver": "drake",
+          "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+          "compose_proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+          "content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+          "disk_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+          "grant_digest": "540cdfe3446216cce2bee49bb769a616c5ec933bc059e7c7cb716d7c54193972",
+          "grant_id": 20,
+          "handoff": {
+            "aegis_pass_mask": 1,
+            "approval_key": "c39f97702d5f2fd0b597de1e1e667f1f8d6033511a331b5691928118d27c4090",
+            "approved_grant": 20,
+            "branch_count": 1,
+            "committed": true,
+            "cx_evidence": 16,
+            "cx_goal": 9,
+            "cx_promotion": 17,
+            "desk_key_id": "a62e9af21bb783e1",
+            "grant_links": [
+              17,
+              16
+            ],
+            "outcome": 1,
+            "proposer": "hook:approved-proposal",
+            "record_digest": "9b57855b51a0316ba66dcaeae267623bee7e3f8124db8538c29eff2ce386346a",
+            "replay_claim": 7,
+            "state": "COMMITTED",
+            "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+            "task": 11883397495144080649,
+            "winner": 0,
+            "winner_digest": "cdb0d6700d2fc68e69f8ccbf884a56f4d56e9e8ef26a0e0fbb0fe44fd813785b"
+          },
+          "intent_digest": "b3768f42919dcac404803b099e5e09f1486a61d2579e356fc499778c2761bc9b",
+          "intent_id": 21,
+          "path": "README.md",
+          "prior_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+          "proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+          "request_id": "ledger:t0:c0",
+          "state": "DONE",
+          "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+          "trace_id": "ledger"
+        }
+      },
+      "decision": null,
+      "error": null,
+      "kind": "result",
+      "provenance": {
+        "capability": "write_file",
+        "content_kind": "tool_result",
+        "duration_ms": 0,
+        "runtime": "aien",
+        "trust": "trusted_runtime",
+        "trusted": true
+      },
+      "request_id": "ledger:t0:c0",
+      "status": "ok"
+    },
+    "source": {
+      "id": "aien",
+      "kind": "runtime"
+    },
+    "timestamp": "2026-10-09T12:16:27Z",
+    "trace_id": "ledger"
+  }
+]

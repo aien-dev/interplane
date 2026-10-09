@@ -1,0 +1,82 @@
+{
+  "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+  "daemon": {
+    "aien_bin": "/home/drakestapleton/.claude/jobs/300ce471/tmp/target-rel/release/aien-cli",
+    "home": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/row12/compose",
+    "log": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/row12/daemon-restart-1.log",
+    "start_ms": 24023
+  },
+  "daemon_replay": {
+    "approval_id": "aien-approval:r1:c32f6a1235828648",
+    "approval_key": "ad3d5a7b1230ffabd346260719ed3bf9045fe24d556677e0501ec806188ca5f4",
+    "approved_grant": null,
+    "approved_proposal_sha256": "f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb",
+    "approver": "drake",
+    "compose_proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+    "content_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+    "desk_key_id": "1c3c55d884eb2faa",
+    "grant_links": [
+      16,
+      15
+    ],
+    "path": "summary.txt",
+    "replay_claim": 6,
+    "request_id": "r1",
+    "state": "ALREADY_COMMITTED",
+    "target": null,
+    "task": null,
+    "trace_id": "ledger"
+  },
+  "receipt": {
+    "ack_digest": "21d4c84191cf95bb211abb3e9131f35549e1857e501663c45e9d3eab15a57911",
+    "ack_record_id": 21,
+    "approval_id": "aien-approval:r1:c32f6a1235828648",
+    "approved_proposal_sha256": "f76658a79c36626ae9b8c536e94201cff36bd33c81281fd32fb42d9005cc66cb",
+    "approver": "drake",
+    "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+    "compose_proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+    "content_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+    "disk_sha256": "7a65c4e950042829f746638a08944dc94888a23cab75f9f8babf07a92f12fdc4",
+    "grant_digest": "a5e9c6f3691872cfa17bbc1c655f7006f8772c1ef9697e19afdc4e995d15c84e",
+    "grant_id": 19,
+    "handoff": {
+      "aegis_pass_mask": 1,
+      "approval_key": "ad3d5a7b1230ffabd346260719ed3bf9045fe24d556677e0501ec806188ca5f4",
+      "approved_grant": 19,
+      "branch_count": 1,
+      "committed": true,
+      "cx_evidence": 15,
+      "cx_goal": 8,
+      "cx_promotion": 16,
+      "desk_key_id": "1c3c55d884eb2faa",
+      "grant_links": [
+        16,
+        15
+      ],
+      "outcome": 1,
+      "proposer": "hook:approved-proposal",
+      "record_digest": "ceb93d58e04cd8af0f50aa0ac4c7d5030dd6aaae1dca4b7d4472b133a6dc2bc9",
+      "replay_claim": 6,
+      "state": "COMMITTED",
+      "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/row12/ws/summary.txt",
+      "task": 6841003676507701391,
+      "winner": 0,
+      "winner_digest": "dfb255f693966f4bd637a92443e5c6da1067b48fae34a85a3c8c544783d9c8be"
+    },
+    "intent_digest": "b6461684e35c2cca7f2b476074849baf9ac4409fd115f7faa81ba3fae9016291",
+    "intent_id": 20,
+    "path": "summary.txt",
+    "prior_sha256": null,
+    "proposal_sha256": "356b6665b6c4a451bef4117a31874887bd1289eda6585527f2adff72934659c0",
+    "request_id": "r1",
+    "state": "DONE",
+    "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/row12/ws/summary.txt",
+    "trace_id": "ledger"
+  },
+  "records_after_replays": 26,
+  "records_after_restart": 26,
+  "row": "row12",
+  "same_approval_new_request": "REPLAY_REFUSED AlreadyCommitted: claim #6 (request r1, approval aien-approval:r1:c32f6a1235828648, key ad3d5a7b1230ffabd346260719ed3bf9045fe24d556677e0501ec806188ca5f4) is COMMITTED: committed; the original result is attached",
+  "second_intent": "EFFECT_REFUSED AlreadySpent: authorization #19 was spent by intent #20 (DONE); a new effect needs a new authorization",
+  "verdict": "PASS"
+}

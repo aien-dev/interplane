@@ -1,0 +1,10 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/compose_ledger.rs (/home/drakestapleton/.claude/jobs/300ce471/tmp/target-ip/debug/deps/compose_ledger-e07b2d101ab9ed54)
+
+running 3 tests
+test m5_model_turn_proposal_is_judged_lands_and_chains ... ok
+test row12_daemon_restart_does_not_make_a_spent_approval_spendable ... ok
+test row13_restart_between_intent_and_ack_is_unresolved_not_success ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 282.79s
+

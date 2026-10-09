@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "8e7e2830f9aad5b676f9012c961dbd37fc966240fd7410293b58ab531e04080f",
+  "id": 6,
+  "kind": 65554,
+  "links": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"daemon\":{\"pid\":982007,\"start_ticks\":26182446,\"started_unix_ms\":\"1791548132303\"},\"decoding\":{\"greedy_tokens\":85,\"mode\":\"greedy\",\"sampled_tokens\":0},\"finish_reason\":\"eos\",\"generation\":1,\"model_path\":\"/home/drakestapleton/.cache/huggingface/hub/models--unsloth--Llama-3.2-1B-Instruct/blobs/1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f\",\"model_sha256\":\"1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f\",\"operation_id\":\"1791548138299525524\",\"output_text_sha256\":\"0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf\",\"output_token_ids_sha256\":\"0760d756e37b8ff794777ee3f35855f9959b9bcc2d24ef19b03fbbae484c0f72\",\"output_tokens\":84,\"prompt_ids_sha256\":\"a08ecf1dd4222e681c449d8fca129c4fd69c0ad4c41c44cb0af946f33ba7173d\",\"request_id\":1791548138299,\"tokenizer_path\":\"/home/drakestapleton/.cache/huggingface/hub/models--unsloth--Llama-3.2-1B-Instruct/blobs/6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b\",\"tokenizer_sha256\":\"6b9e4e7fb171f92fd137b777cc2714bf87d11576700a1dcd7a399e7bbe39537b\",\"total_tokens\":358,\"v\":1}",
+  "verified": true
+}

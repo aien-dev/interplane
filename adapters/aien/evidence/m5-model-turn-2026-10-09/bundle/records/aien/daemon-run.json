@@ -1,0 +1,10 @@
+{
+  "boot_id": "8ff5f413-7f55-4bfa-999b-a80f3145d5de",
+  "executable_sha256": "920324dad6a12115e14795a2820c224d9f656d9af1c6dd611faf72908c4e31ec",
+  "kind": "aien-daemon-run",
+  "note": "written by the run harness from /proc/<pid>/stat and the spawned child pid, not by the daemon",
+  "pid": 982007,
+  "socket": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/aien.sock",
+  "start_ticks": 26182446,
+  "workspace": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws"
+}

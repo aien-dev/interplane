@@ -1,0 +1,98 @@
+{
+  "kind": "interplane-aien-m5-model-turn-receipt",
+  "adapter_commit": "c31e4fe3ac084da160ebedd8aa4c2378fb828509",
+  "adapter_dirty": false,
+  "aien_cli_sha256": "920324dad6a12115e14795a2820c224d9f656d9af1c6dd611faf72908c4e31ec",
+  "verifier_sha256": "b8137126863c24762bcd66c80b2eb6d56aaa4e9dd867868de340d3988de4a28d",
+  "spark_rsi_judge_sha256": "00c8e8c769acbb69862c363eb9fb836ea66525957e8d75c631c45d9cbab08504",
+  "judge_public_key": "045695a73ec66bbeb2974f41836ff19237515e17e61282216d9b6fd8b8a3469e1d73bf7a8c057762abca9c5cb5b3cde89715f4be4c020e962bdc8cc106f2ed3354",
+  "operator_policy_sha256": "81cfeb99a2f1dcbe833012290c4a017d213d5b770e58e4fcc3766e77eae1b4f3",
+  "sovereign_core_rev": "47f1014a1aa0cf54b732132c6958bc142e91c20b",
+  "backend": "CPU reference (as printed in the daemon log)",
+  "task": {
+    "task_id": "vac/m5-rsi-dashes-1",
+    "proposal_id": "model-gen-6",
+    "request_id": "ledger:t0:c0",
+    "model_turn": {
+      "finished_at": "2026-10-09T12:16:26Z",
+      "generation_record": 6,
+      "request_sha256": "64b5e18a282638663fa897a3822d84b65d09b74d413dd7dee51286426f61c346",
+      "response_sha256": "0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+      "started_at": "2026-10-09T12:15:38Z",
+      "total_tokens": 358
+    },
+    "source_commit": "ad5452bd5f65043b3fe9e0e7cfa3f1a410c56f50",
+    "tree_commit_after": "8974c9584ec10cc349066c5125653afc7dc4b508",
+    "test_exit_before": 101,
+    "test_exit_after": 0,
+    "target_blob_sha256_before": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+    "target_blob_sha256_after": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+    "evaluation_receipt_sha256": "2ad88d57656be0de8cae407a1bfc552fb2126aa8e7cb5f624b782d8b01b7b70e",
+    "evaluation_policy_sha256": "81cfeb99a2f1dcbe833012290c4a017d213d5b770e58e4fcc3766e77eae1b4f3",
+    "rollback": {
+      "disk_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+      "test_exit_after_rollback": 101
+    }
+  },
+  "chain": {
+    "model_id": "unsloth/Llama-3.2-1B-Instruct",
+    "weights_sha256": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+    "backend": "Backend: NativeTransformerBackend/CPU-reference (Omega GPU engine not linked, explicit fallback)",
+    "request_sha256": "64b5e18a282638663fa897a3822d84b65d09b74d413dd7dee51286426f61c346",
+    "response_sha256": "0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+    "generation_record_id": 6,
+    "generation_output_text_sha256": "0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+    "generation_model_sha256": "1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f",
+    "stream_started": "2026-10-09T12:15:38Z",
+    "stream_finished": "2026-10-09T12:16:26Z",
+    "grant_id": 20,
+    "grant_content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+    "evaluation_subject_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+    "intent_id": 21,
+    "ack_id": 22,
+    "ack_disk_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a"
+  },
+  "verdict": "PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none",
+  "verdict_without_judge_key": "FAIL evaluation_untrusted: no judge public key supplied; a receipt never carries the key that verifies it",
+  "restart_rows": {
+    "daemon_restart_replay": {
+      "records_after_restart": 26,
+      "records_after_replays": 26,
+      "daemon_replay_state": "ALREADY_COMMITTED",
+      "second_intent": "EFFECT_REFUSED AlreadySpent: authorization #19 was spent by intent #20 (DONE); a new effect needs a new authorization"
+    },
+    "restart_between_intent_and_ack": {
+      "adapter_state": "UNRESOLVED",
+      "intent_id": 20,
+      "effects_after_restart": 1,
+      "second_intent": "EFFECT_REFUSED ReconciliationRequired: intent #20 for authorization #19 is OPEN; run aien compose reconcile",
+      "restart_reconcile": "Reconcile: checked 1 unsettled effect(s): DONE 0, NOT_DONE 0, UNRESOLVED 0 recorded, 1 left as they were; [{\"intent\":20,\"authorization\":19,\"state\":\"OPEN\",\"disk_sha256\":null,\"record\":null,\"note\":\"executor pid 981984 still running; not decided\"}]"
+    }
+  },
+  "negative_checks": [
+    "control PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none",
+    "response_text_replaced FAIL binding_mismatch: generation record output_text_sha256 != sha256(model_turn.input)",
+    "weights_digest_substituted FAIL binding_mismatch: model_turn.weights_sha256 != export_weights",
+    "backend_not_in_load_log FAIL binding_mismatch: model_turn.backend (not a line of aien_load_log)",
+    "request_digest_substituted FAIL binding_mismatch: model_turn.request_sha256 != sha256(model_request)",
+    "generation_record_other FAIL binding_mismatch: model_turn.generation_record_id != ledger_generation.id",
+    "generation_record_dropped FAIL missing_record_entry: ledger_generation",
+    "model_turn_dropped FAIL missing_record_entry: model_turn",
+    "scripted_downgrade PASS_LABELLED_INCOMPLETE missing=link:model_turn effect=aien-ledger-slice/1:strong proposal=scripted_turn",
+    "scripted_but_declared_complete FAIL unlabelled_missing: link:model_turn (declared complete)",
+    "edited_subject FAIL evaluation_signature_bad: receipt_digest does not match the receipt's fields"
+  ],
+  "started": "2026-10-09T12:15:13Z",
+  "finished": "2026-10-09T12:21:05Z",
+  "limits": [
+    "one model turn is not a learning system: a 1B instruction model, greedy decoding, one prompt (a worked example on another file is part of the retained request), no feedback loop",
+    "several prompts were tried before this one (the model copied the placeholder; the model kept the dashes): only the run that landed is retained",
+    "the request bytes and the timestamps are the harness own; the daemon generation record carries only the token-id digest of the prompt, which the offline verifier cannot recompute without the tokenizer",
+    "the generation record is unsigned and the weights digest is of the file at load time (hash-then-load gap), as in provenance/REAL-CHAIN.md",
+    "the judge key is readable by the operator account (sudo): separation holds against the proposer, not the operator",
+    "the holdout cases are in this public repository: integrity is pinned by digest, secrecy is not claimed",
+    "the speed allowance of the pinned policy is 200 percent (see the committed scripted M5 evidence)",
+    "CPU evidence only, not a frozen candidate (candidate_id null), not the minted flow"
+  ],
+  "bundle_note": "bundle/ omits records/export/ (the 2.4 GB model weights, tokenizer and config the daemon loaded); their SHA-256 and sizes are in bundle/COMPANION.json and the weights digest equals chain.weights_sha256. Re-verify by restoring those files from the named Hugging Face snapshot (unsloth/Llama-3.2-1B-Instruct, revision 5a8abab4a5d6f164389b1079fb721cfab8d7126c) into bundle/records/export/."
+}

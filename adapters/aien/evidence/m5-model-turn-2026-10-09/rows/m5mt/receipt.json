@@ -1,0 +1,209 @@
+{
+  "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+  "daemon": {
+    "aien_bin": "/home/drakestapleton/.claude/jobs/300ce471/tmp/target-rel/release/aien-cli",
+    "home": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/compose",
+    "log": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/daemon.log",
+    "start_ms": 24021
+  },
+  "evaluation_policy_sha256": "81cfeb99a2f1dcbe833012290c4a017d213d5b770e58e4fcc3766e77eae1b4f3",
+  "evaluation_receipt_sha256": "2ad88d57656be0de8cae407a1bfc552fb2126aa8e7cb5f624b782d8b01b7b70e",
+  "journal": [
+    {
+      "digest": "540cdfe3446216cce2bee49bb769a616c5ec933bc059e7c7cb716d7c54193972",
+      "id": 20,
+      "note": "authorization",
+      "text": {
+        "approval_id": "aien-approval:ledger:t0:c0:1e254965876f60c4",
+        "approval_key": "c39f97702d5f2fd0b597de1e1e667f1f8d6033511a331b5691928118d27c4090",
+        "approved_grant": 1,
+        "approved_proposal_sha256": "0c8ac735e87e5eea8c1e5d0d839086fe6c3d60a0b4ffcbf75067cd7743a6e74f",
+        "approver": "drake",
+        "content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+        "cx_evidence": 16,
+        "cx_promotion": 17,
+        "desk_key_id": "a62e9af21bb783e1",
+        "path": "README.md",
+        "prior_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+        "proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+        "provenance": {
+          "allen_agent": "none",
+          "generation_record": null
+        },
+        "replay_claim": 7,
+        "request_id": "ledger:t0:c0",
+        "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+        "trace_id": "ledger",
+        "workspace": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws"
+      },
+      "verified": true
+    },
+    {
+      "digest": "b3768f42919dcac404803b099e5e09f1486a61d2579e356fc499778c2761bc9b",
+      "id": 21,
+      "note": "effect",
+      "text": {
+        "authorization": 20,
+        "content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+        "executor": {
+          "pid": 981984,
+          "start": 26182444
+        },
+        "path": "README.md",
+        "phase": "intent",
+        "prior_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+        "proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+        "provenance": {
+          "allen_agent": "none",
+          "generation_record": null
+        },
+        "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+        "tool": "write_file"
+      },
+      "verified": true
+    },
+    {
+      "digest": "9a2f31ae0072ee2e5cd2ac536dcefb5e589d44d5442c74463a2cda93ab0a7c13",
+      "id": 22,
+      "note": "effect",
+      "text": {
+        "authorization": 20,
+        "content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+        "disk_error": null,
+        "disk_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+        "executor_reported": {
+          "bytes": 193,
+          "error": null,
+          "written_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a"
+        },
+        "intent": 21,
+        "path": "README.md",
+        "phase": "ack",
+        "provenance": {
+          "allen_agent": "none",
+          "generation_record": null
+        },
+        "state": "DONE",
+        "tool": "write_file"
+      },
+      "verified": true
+    }
+  ],
+  "model_turn": {
+    "finished_at": "2026-10-09T12:16:26Z",
+    "generation_record": 6,
+    "request_sha256": "64b5e18a282638663fa897a3822d84b65d09b74d413dd7dee51286426f61c346",
+    "response_sha256": "0cb56db283d14d54d3e1f0ece3db024ed26f653d08f53d1a0f14120139690fdf",
+    "started_at": "2026-10-09T12:15:38Z",
+    "total_tokens": 358
+  },
+  "proposal_id": "model-gen-6",
+  "receipt": {
+    "ack_digest": "9a2f31ae0072ee2e5cd2ac536dcefb5e589d44d5442c74463a2cda93ab0a7c13",
+    "ack_record_id": 22,
+    "approval_id": "aien-approval:ledger:t0:c0:1e254965876f60c4",
+    "approved_proposal_sha256": "0c8ac735e87e5eea8c1e5d0d839086fe6c3d60a0b4ffcbf75067cd7743a6e74f",
+    "approver": "drake",
+    "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+    "compose_proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+    "content_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+    "disk_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+    "grant_digest": "540cdfe3446216cce2bee49bb769a616c5ec933bc059e7c7cb716d7c54193972",
+    "grant_id": 20,
+    "handoff": {
+      "aegis_pass_mask": 1,
+      "approval_key": "c39f97702d5f2fd0b597de1e1e667f1f8d6033511a331b5691928118d27c4090",
+      "approved_grant": 20,
+      "branch_count": 1,
+      "committed": true,
+      "cx_evidence": 16,
+      "cx_goal": 9,
+      "cx_promotion": 17,
+      "desk_key_id": "a62e9af21bb783e1",
+      "grant_links": [
+        17,
+        16
+      ],
+      "outcome": 1,
+      "proposer": "hook:approved-proposal",
+      "record_digest": "9b57855b51a0316ba66dcaeae267623bee7e3f8124db8538c29eff2ce386346a",
+      "replay_claim": 7,
+      "state": "COMMITTED",
+      "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+      "task": 11883397495144080649,
+      "winner": 0,
+      "winner_digest": "cdb0d6700d2fc68e69f8ccbf884a56f4d56e9e8ef26a0e0fbb0fe44fd813785b"
+    },
+    "intent_digest": "b3768f42919dcac404803b099e5e09f1486a61d2579e356fc499778c2761bc9b",
+    "intent_id": 21,
+    "path": "README.md",
+    "prior_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+    "proposal_sha256": "1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f",
+    "request_id": "ledger:t0:c0",
+    "state": "DONE",
+    "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+    "trace_id": "ledger"
+  },
+  "records_after": 22,
+  "records_before": 6,
+  "request_id": "ledger:t0:c0",
+  "rollback": {
+    "disk_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+    "receipt": {
+      "ack_digest": "76d4d0d17466600364613555886a3f708e4b85e258da0f4ef489bf4de66a2297",
+      "ack_record_id": 38,
+      "approval_id": "aien-approval:w2:9aef7fc8e1281e99",
+      "approved_proposal_sha256": "b0af594a1396714381c17b7bce03d1fffe9af12da8e8e5878d5e29515eed1ca3",
+      "approver": "drake",
+      "boundary": "boundary = authenticated daemon handoff (ComposeApprovedProposal: desk MAC, durable replay claim) -> compose verify + AEGIS -> J-Space branch -> World commit -> Cortex promotion/evidence -> daemon-written grant on compose_proposal_sha256 -> effect intent -> write -> ack; the production effect path, not WALDO provenance",
+      "compose_proposal_sha256": "0dfe91ff8303809dabbe2d92179c3c4a628a7a4a0d067d937ed8546f4105e2cc",
+      "content_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+      "disk_sha256": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+      "grant_digest": "c93fefd3d0dac5eb171ce4ac029de3d75370789aa701360854ba295d07130726",
+      "grant_id": 36,
+      "handoff": {
+        "aegis_pass_mask": 1,
+        "approval_key": "11aa4480afad6039503e184e8bd9f23b0dcea026bf810012bd4edd1d15fb327f",
+        "approved_grant": 36,
+        "branch_count": 1,
+        "committed": true,
+        "cx_evidence": 32,
+        "cx_goal": 25,
+        "cx_promotion": 33,
+        "desk_key_id": "a62e9af21bb783e1",
+        "grant_links": [
+          33,
+          32
+        ],
+        "outcome": 1,
+        "proposer": "hook:approved-proposal",
+        "record_digest": "d4323d8893cb8cdeb377c863eb10cf83306a2a6b650be83e47a04270c2c8e716",
+        "replay_claim": 23,
+        "state": "COMMITTED",
+        "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+        "task": 17464242932482611191,
+        "winner": 0,
+        "winner_digest": "a30a33e978430335522964f25d17852250a8f32b8a9b19f6ca1d18209cb646f6"
+      },
+      "intent_digest": "a40c8f8bdcf90012a769485b6d0c8364ae5e1bce79bcc7104d68f8a5f4ec341d",
+      "intent_id": 37,
+      "path": "README.md",
+      "prior_sha256": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+      "proposal_sha256": "0dfe91ff8303809dabbe2d92179c3c4a628a7a4a0d067d937ed8546f4105e2cc",
+      "request_id": "w2",
+      "state": "DONE",
+      "target": "/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md",
+      "trace_id": "ledger"
+    },
+    "test_exit_after_rollback": 101
+  },
+  "row": "m5mt",
+  "source_commit": "ad5452bd5f65043b3fe9e0e7cfa3f1a410c56f50",
+  "target_blob_sha256_after": "d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a",
+  "target_blob_sha256_before": "97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f",
+  "task_id": "vac/m5-rsi-dashes-1",
+  "test_exit_after": 0,
+  "test_exit_before": 101,
+  "tree_commit_after": "8974c9584ec10cc349066c5125653afc7dc4b508",
+  "verdict": "PASS"
+}

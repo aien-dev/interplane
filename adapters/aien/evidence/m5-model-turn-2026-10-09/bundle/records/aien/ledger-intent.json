@@ -1,0 +1,17 @@
+{
+  "cls": 6,
+  "digest": "b3768f42919dcac404803b099e5e09f1486a61d2579e356fc499778c2761bc9b",
+  "id": 21,
+  "kind": 65554,
+  "links": [
+    20,
+    0,
+    0,
+    0
+  ],
+  "note": "effect",
+  "subject": 0,
+  "tag": 4,
+  "text": "{\"authorization\":20,\"content_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\",\"executor\":{\"pid\":981984,\"start\":26182444},\"path\":\"README.md\",\"phase\":\"intent\",\"prior_sha256\":\"97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f\",\"proposal_sha256\":\"1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"target\":\"/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md\",\"tool\":\"write_file\"}",
+  "verified": true
+}

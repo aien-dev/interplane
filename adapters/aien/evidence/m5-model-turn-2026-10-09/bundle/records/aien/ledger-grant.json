@@ -1,6 +1,6 @@
 {
   "cls": 6,
-  "digest": "540cdfe3446216cce2bee49bb769a616c5ec933bc059e7c7cb716d7c54193972",
+  "digest": "a5b1416a708a2761771e81557ced8f372b29655a9c282b496bf1bf15bcc0b74b",
   "id": 20,
   "kind": 65556,
   "links": [
@@ -12,6 +12,6 @@
   "note": "authorization",
   "subject": 0,
   "tag": 3,
-  "text": "{\"approval_id\":\"aien-approval:ledger:t0:c0:1e254965876f60c4\",\"approval_key\":\"c39f97702d5f2fd0b597de1e1e667f1f8d6033511a331b5691928118d27c4090\",\"approved_grant\":1,\"approved_proposal_sha256\":\"0c8ac735e87e5eea8c1e5d0d839086fe6c3d60a0b4ffcbf75067cd7743a6e74f\",\"approver\":\"drake\",\"content_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\",\"cx_evidence\":16,\"cx_promotion\":17,\"desk_key_id\":\"a62e9af21bb783e1\",\"path\":\"README.md\",\"prior_sha256\":\"97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f\",\"proposal_sha256\":\"1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"replay_claim\":7,\"request_id\":\"ledger:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws/README.md\",\"trace_id\":\"ledger\",\"workspace\":\"/home/drakestapleton/.claude/jobs/300ce471/tmp/gate3/rows/m5mt/ws\"}",
+  "text": "{\"approval_id\":\"aien-approval:ledger:t0:c0:1e254965876f60c4\",\"approval_key\":\"87a956a8147814a6bba44043d64adf1c539c430364842fdba36428f2cee7a918\",\"approved_grant\":1,\"approved_proposal_sha256\":\"0c8ac735e87e5eea8c1e5d0d839086fe6c3d60a0b4ffcbf75067cd7743a6e74f\",\"approver\":\"drake\",\"content_sha256\":\"d4965fdde4501d20dc04cead7e3cdec8a1053d561f10c45c8ffbc233cf24105a\",\"cx_evidence\":16,\"cx_promotion\":17,\"desk_key_id\":\"173ad004b48706f3\",\"path\":\"README.md\",\"prior_sha256\":\"97d16a1b1081f0f6c940d223e58231cd036ff34782178ec4ceaa3a11e495497f\",\"proposal_sha256\":\"1af7be7a3ee53ce8c275d533b705b574ab5c0844a1c49b0d75297d61fb14dc9f\",\"provenance\":{\"allen_agent\":\"none\",\"generation_record\":null},\"replay_claim\":7,\"request_id\":\"ledger:t0:c0\",\"target\":\"/home/drakestapleton/.claude/jobs/300ce471/tmp/gate4/rows/m5mt/ws/README.md\",\"trace_id\":\"ledger\",\"workspace\":\"/home/drakestapleton/.claude/jobs/300ce471/tmp/gate4/rows/m5mt/ws\"}",
   "verified": true
 }

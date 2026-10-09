@@ -1,8 +1,8 @@
 {
-  "cycle_id": "m5-20261009T121626Z-985884",
+  "cycle_id": "m5-20261009T122350Z-1036048",
   "candidate_id": "model-gen-6",
-  "parent_id": "ad5452bd5f65043b3fe9e0e7cfa3f1a410c56f50",
-  "evaluated_at": "2026-10-09T12:16:27.463196564+00:00",
+  "parent_id": "1c376da0f25b1c68fc89539536859d7c6d81ab69",
+  "evaluated_at": "2026-10-09T12:23:51.694237253+00:00",
   "evaluator_version": "0.1.0",
   "passed_all_hard_invariants": true,
   "passed_statistical_gates": true,
@@ -37,7 +37,7 @@
       "is_hard_invariant": false,
       "passed": true,
       "score": 1.0,
-      "summary": "Performance: delta=0.25%, p_val=0.9884, p95_ci_upper=13.51%, p99_ci_upper=6.04%, sig=NO",
+      "summary": "Performance: delta=-5.37%, p_val=0.4124, p95_ci_upper=7.39%, p99_ci_upper=5.04%, sig=NO",
       "violations": []
     },
     {
@@ -45,7 +45,7 @@
       "is_hard_invariant": false,
       "passed": true,
       "score": 1.0,
-      "summary": "ResourceEfficiency: rss_growth=0.00%, limit_mb_ok=true, ctxt_delta=1",
+      "summary": "ResourceEfficiency: rss_growth=0.00%, limit_mb_ok=true, ctxt_delta=4",
       "violations": []
     },
     {
@@ -58,15 +58,15 @@
     }
   ],
   "metrics_summary": {
-    "latency_delta_pct": 0.24769796366203603,
-    "p_value": 0.9884,
-    "p95_ci_upper_degradation_pct": 13.513996202005416,
-    "p99_ci_upper_degradation_pct": 6.04260014875301,
+    "latency_delta_pct": -5.369460526343269,
+    "p_value": 0.4124,
+    "p95_ci_upper_degradation_pct": 7.391175809133686,
+    "p99_ci_upper_degradation_pct": 5.041006509817817,
     "rss_growth_pct": 0.0,
     "candidate_resident_mb": 2
   },
-  "receipt_digest": "70e53cad7b5302f1be9291f108e13448dcd61d0f6bb9e65ba76e64f4d3fb4755",
-  "signature": "tpm2-p256:b02d518a3c5976f211ee198e29a8fec5ee2395b8e77931b772a28b399b668564dd3959f6d82729153185a4ef0b8992471e768305f50b5a17ed231488fe0d478e",
+  "receipt_digest": "d3c734ee7f9b32c40ee4052d9e6895af9cd4b9344a754a612ba939950de35f86",
+  "signature": "tpm2-p256:c8272cc3092e5394ffc3215b265fda7fe1273a368e35fe2d0c223db9257cbfc5f2addec75140b08a4abb0e77f4894e3c4cd009f1d86b105c635fb634190a8da2",
   "format_version": 2,
   "binding": {
     "subject_path": "README.md",

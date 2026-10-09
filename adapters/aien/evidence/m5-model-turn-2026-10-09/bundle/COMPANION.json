@@ -54,17 +54,17 @@
     "aien_load_log": {
       "bytes": 1557,
       "path": "records/aien/daemon-load.log",
-      "sha256": "e307b0bd7770b8d6c3f330adedf4c7f00423a48ceca72ffe505397dd20e8a9b4"
+      "sha256": "c31af16184d49068897ec7e1a63441b46604057df70bdd622ac0f864e8daaa8f"
     },
     "compose_recall": {
-      "bytes": 14156,
+      "bytes": 14161,
       "path": "records/aien/compose-recall.json",
-      "sha256": "4749efc8ad341b789f39b828a9656154f1cfd25dee72b5747225b5bcbc6284b0"
+      "sha256": "0dfe94dd212adc48abf51173e5ee194053d7671331c4dd7a9773faab0b2e970a"
     },
     "daemon_run": {
-      "bytes": 498,
+      "bytes": 499,
       "path": "records/aien/daemon-run.json",
-      "sha256": "21841a01bc7d94ab5c43163303b42030d8e12e90f8dbd311de57748a40961080"
+      "sha256": "ea3aa3eaa6d0cf0be1fb8e5a8db5d345962a48f237192309e127315909b7b9ea"
     },
     "evaluation_policy": {
       "bytes": 399,
@@ -74,7 +74,7 @@
     "evaluation_receipt": {
       "bytes": 2750,
       "path": "records/evaluation/receipt.json",
-      "sha256": "2ad88d57656be0de8cae407a1bfc552fb2126aa8e7cb5f624b782d8b01b7b70e"
+      "sha256": "48b80ffd13e9daf1df75f42f4d8e9e92c1c4dfb8e43eb4c823536d8f003da854"
     },
     "export_config": {
       "bytes": 894,
@@ -94,7 +94,7 @@
     "interplane_trace": {
       "bytes": 6321,
       "path": "records/interplane/trace.json",
-      "sha256": "4db8e158ad061130aa0a15db5c854c1bd0ae53836e078269e8484f20d4faf1a3"
+      "sha256": "af7725e5093acaefe570f74d1a715eafa8ba4d8e9c860cb62a6f9d97342a0434"
     },
     "ledger_ack": {
       "bytes": 775,
@@ -102,29 +102,29 @@
       "sha256": "39c7c18bf9147884f774540060c95707b661f2dce6b4ae067dcd36cc9ebdb531"
     },
     "ledger_claim": {
-      "bytes": 542,
+      "bytes": 543,
       "path": "records/aien/ledger-claim.json",
-      "sha256": "9ccba1c1f2e2f41a9b460af414823d659981a315c490ad524d1fce888ede69f2"
+      "sha256": "28c8c062f0dc49c42d16298a4119684f5bdd120c12b060b3894f7aabd179716b"
     },
     "ledger_committed": {
       "bytes": 482,
       "path": "records/aien/ledger-committed.json",
-      "sha256": "04385684be6929131403946871552467d2201d6d82af5bb8a9c38c76097664ef"
+      "sha256": "44957ad402b4ce1cad56e75441a88d09976c2a0364503a0a94059ec332201658"
     },
     "ledger_generation": {
-      "bytes": 1387,
+      "bytes": 1388,
       "path": "records/aien/ledger-generation.json",
-      "sha256": "039deb13c11429ce3a91a94c0def5dabc6809b4733e0a835f03cb3198712b87d"
+      "sha256": "1ed85efdf80282c9240d1281ddb16a98e19d610ee39eefd65005d589ca9ddb67"
     },
     "ledger_grant": {
       "bytes": 1233,
       "path": "records/aien/ledger-grant.json",
-      "sha256": "86311d6fa224db36d3dddf2a3b20597314f46974a30ac568ae02af3642a22cd1"
+      "sha256": "6751da4cdeac437ae030378d2d1ba2d07064b5731e31730ff67bcdf017f5657b"
     },
     "ledger_intent": {
-      "bytes": 813,
+      "bytes": 814,
       "path": "records/aien/ledger-intent.json",
-      "sha256": "ea54c0ae98a9691cb48958e4eac24b36c1eb00dbe583277a35dfb975ec1d74c3"
+      "sha256": "b3eaf5caa60909644a4311164a6c533c4c28dc690e1ee911b7e800fb262b0d4e"
     },
     "model_request": {
       "bytes": 1107,
@@ -134,22 +134,22 @@
     "model_turn": {
       "bytes": 1197,
       "path": "records/interplane/model-turn.json",
-      "sha256": "f2aef33c8f20ec3674314d712d620701db1b50b844b96e9d2b1a4a4eb67e0991"
+      "sha256": "49b5555f022ff94a439eab07c479d3382e44f163ff4837b6d30bdc76004c9c93"
     },
     "source_pin": {
       "bytes": 232,
       "path": "records/task/source-pin.json",
-      "sha256": "54e715ede98d432bd155446ad50ee29165d3fbd5bc7e3a9268981cd5f8792f67"
+      "sha256": "e315c920e664b551eb752c6aa50b025e2e437b399611129c531360ed4c980979"
     },
     "task": {
       "bytes": 239,
       "path": "records/task/task.json",
-      "sha256": "f66249c9bd0633508cd61d1f72672556219c6392238fbb9f0491a7ce6a8ac8f2"
+      "sha256": "31448cac17a70fcfbacf71ae771c88f10e788b2f414dc9f739cb9619c33822a1"
     },
     "test_run_record": {
       "bytes": 814,
       "path": "records/task/test-run.json",
-      "sha256": "a372367e35fa4b7a489f857f201061502854b76b4d0853efd960a2e266c03e0a"
+      "sha256": "22da61ecc67641900be908985d87821df7a36730068dd24f3e02868f75d9aadf"
     },
     "test_stderr": {
       "bytes": 0,

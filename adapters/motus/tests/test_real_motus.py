@@ -8,7 +8,9 @@ import json
 
 import pytest
 
-motus = pytest.importorskip("motus")
+# Import a real Motus submodule, not the bare name: a directory called "motus" (this
+# adapter's own folder when pytest runs from adapters/) would satisfy the bare import.
+pytest.importorskip("motus.agent", reason="lithosai-motus is not installed")
 
 from motus.agent import ReActAgent  # noqa: E402
 from motus.models.base import BaseChatClient, ChatCompletion, FunctionCall, ToolCall  # noqa: E402

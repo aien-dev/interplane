@@ -18,6 +18,7 @@ aegis-gate = ["dep:aegis"]
 interplane-core = { path = "../../rust/crates/interplane-core" }
 interplane-crossaxis = { path = "../../rust/crates/interplane-crossaxis" }
 interplane-crossveil = { path = "../../rust/crates/interplane-crossveil" }
+serde = "1"
 serde_json = "1"
 sha2 = "0.10"
 tokio = { version = "1", features = ["rt"] }

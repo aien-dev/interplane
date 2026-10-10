@@ -472,3 +472,13 @@ verdict is `PASS complete ... proposal=model_generation/2` only when the digests
 chain is a `FAIL`, and a bundle that says its turn was scripted stays `PASS_LABELLED_INCOMPLETE
 missing=link:model_turn`. Limits: one 1B model turn with a worked example in the prompt is not a learning
 system; the request bytes and times are the harness's own; the generation record is unsigned.
+
+## Bridge binary (`aien-authority-bridge`)
+
+`cargo build --bin aien-authority-bridge`, then `aien-authority-bridge <workspace>`. It reads one JSON
+request per line on stdin (`catalog`, `mapping_table`, `decide`, `execute`, `approve`, `discard`) and
+writes one JSON line per request on stdout. Every call goes straight to `AienAuthority`; answers are
+the serde JSON of `interplane-core`'s `Catalog`, `Decision` and `ToolResult`. Unknown ops, malformed
+JSON or a wrong shape return `{"ok":false,"error":...}` and never a decision. `approve` is the host-only
+approver channel (AIEN's desk issues one single-use grant, the bridge allows one approve per request id).
+The Python consumer is `adapters/motus` (`AienBridgeAuthority`). Test: `cargo test --test bridge`.

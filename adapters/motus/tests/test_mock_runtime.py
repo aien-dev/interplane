@@ -71,10 +71,13 @@ def test_approver_that_fails_or_answers_nonsense_executes_nothing(make_mock):
         raise RuntimeError("no")
 
     assert gate.approve(rid, boom).record["error_code"] == "approver_failed"
-    assert gate.approve(rid, lambda p: "authorized").record["error_code"] == "approver_failed"
+    # one approver call per request, whatever its outcome: the authority is never asked twice
+    asked = []
+    again = gate.approve(rid, lambda p: asked.append(p) or "authorized")
+    assert again.record["error_code"] == "no_pending_approval" and asked == []
     assert rt.execute_calls == 0
-    # the failed attempts did not spend the pending entry
-    assert gate.approve(rid, mock_approver()).executed
+    nonsense = gate.approve(rid, mock_approver())
+    assert not nonsense.executed and rt.execute_calls == 0
 
 
 def test_stale_mapping_table_refuses_before_the_runtime(make_mock):
@@ -141,10 +144,12 @@ def test_timeout_from_the_runtime_is_not_retried(make_mock):
     assert gate.evidence()["records"][-1]["retried"] is False
 
 
-def test_failed_execution_is_reported_as_failed_once(make_mock):
+def test_error_after_execute_started_is_uncertain_and_not_retried(make_mock):
     rt, gate = make_mock()
     out = gate.call("fail_tool", "{}")
-    assert out.outcome == "failed" and rt.execute_calls == 1
+    # an error after the execute request went out never claims the effect occurred or did not
+    assert (out.outcome, out.record["effect_certainty"]) == ("uncertain", "uncertain")
+    assert rt.execute_calls == 1 and out.record["retried"] is False
 
 
 def test_runtime_that_raises_on_decide_is_unavailable(make_mock):

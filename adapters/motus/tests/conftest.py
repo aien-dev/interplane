@@ -5,12 +5,13 @@ import pytest
 
 ADAPTER = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ADAPTER))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from interplane.core import Decision  # noqa: E402
 from interplane.crossveil import MockRuntime, mock_mapping_table  # noqa: E402
 
 from interplane_adapter_motus.gate import Gate  # noqa: E402
-from interplane_adapter_motus.local_authority import LocalReadOnlyAuthority, build_catalog  # noqa: E402
+from fake_authority import LocalReadOnlyAuthority, build_catalog  # noqa: E402
 from interplane_adapter_motus.mapping import mapping_for  # noqa: E402
 
 

@@ -6,7 +6,7 @@ import os
 import pytest
 
 from interplane_adapter_motus.verify import verify_bundle
-from interplane_adapter_motus.local_authority import UncertainEffect
+from fake_authority import UncertainEffect
 
 J = json.dumps
 
@@ -57,7 +57,7 @@ def test_unknown_capability_never_reaches_the_authority(make_local):
 def test_not_found_from_the_authority_fails_closed(workspace):
     from interplane.core import CapabilityDescriptor, ToolRef
     from interplane_adapter_motus.gate import Gate
-    from interplane_adapter_motus.local_authority import LocalReadOnlyAuthority, build_catalog
+    from fake_authority import LocalReadOnlyAuthority, build_catalog
     from interplane_adapter_motus.mapping import mapping_for
 
     wider = build_catalog()

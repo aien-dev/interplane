@@ -250,8 +250,3 @@ jobs:
             PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.demo --aien $RUNNER_TEMP/aien-ws $RUNNER_TEMP/motus-aien-bundle.json | tee demo-aien.log
           grep -q "Authority: AIEN (adapters/aien via bridge)" demo-aien.log
           PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.verify $RUNNER_TEMP/motus-aien-bundle.json
-      - name: demo writes a bundle and the independent verifier accepts it
-        run: |
-          cd adapters/motus
-          PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.demo $RUNNER_TEMP/motus-bundle.json
-          PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.verify $RUNNER_TEMP/motus-bundle.json

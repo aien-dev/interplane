@@ -26,15 +26,29 @@ from interplane.core import Catalog, CapabilityRequest, Decision, ErrorCode, Too
 from interplane.crossaxis import MappingTable
 from interplane.crossveil import PendingApproval, make_result
 
+from .gate import PRE_EXECUTE_UNAVAILABLE
+
 ENV_BRIDGE = "INTERPLANE_AIEN_BRIDGE"
 UNAVAILABLE = "aien bridge unavailable"
 POLICY_ENGINE = "interplane-adapter-motus.aien-bridge.fail_closed"
 DEFAULT_TIMEOUT = 10.0
 MAX_LINE = 4 * 1024 * 1024
+# The bridge needs no secrets: only a way to find libraries, a home, a locale and quiet backtraces.
+_ENV_KEEP = ("PATH", "HOME", "LANG", "LC_ALL", "TMPDIR")
+
+
+def minimal_env() -> dict:
+    env = {k: os.environ[k] for k in _ENV_KEEP if k in os.environ}
+    env["RUST_BACKTRACE"] = "0"
+    return env
 
 
 class BridgeFault(Exception):
     """The bridge could not give a trustworthy answer. Always ends in a fail-closed result."""
+
+
+class BridgeUnavailable(BridgeFault):
+    """The bridge was gone before any byte of the request was written: nothing was sent."""
 
 
 def _plain(value: Any) -> Any:
@@ -73,7 +87,9 @@ class AienBridgeAuthority:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
+                env=minimal_env(),
             )
+            os.set_blocking(self._proc.stdin.fileno(), False)
         except (OSError, ValueError) as err:
             self._fail(f"cannot start bridge: {err.__class__.__name__}")
             return
@@ -134,15 +150,38 @@ class AienBridgeAuthority:
         line, _, self._buf = self._buf.partition(b"\n")
         return line
 
-    def _rpc(self, message: dict, key: str) -> dict:
+    def _write(self, data: bytes, deadline: float) -> None:
+        """Write the whole request before the deadline; a bridge that stops reading cannot hang the host."""
+        fd = self._proc.stdin.fileno()
+        view = memoryview(data)
+        total = len(view)
+        while view:
+            left = deadline - time.monotonic()
+            if left <= 0:
+                raise BridgeFault("timeout writing to bridge")
+            _, writable, _ = select.select([], [fd], [], left)
+            if not writable:
+                raise BridgeFault("timeout writing to bridge")
+            try:
+                view = view[os.write(fd, view[:65536]):]
+            except BlockingIOError:
+                continue
+            except BrokenPipeError as err:
+                if len(view) == total:
+                    raise BridgeUnavailable("bridge closed its input") from err
+                raise
+
+    def _rpc(self, message: dict, key: str, request_id: Optional[str] = None) -> dict:
         """One request line, one response line. Raises BridgeFault on anything but a clean answer."""
         if self._proc is None:
-            raise BridgeFault(self.fault or "bridge not running")
+            raise BridgeUnavailable(self.fault or "bridge not running")
+        if self._proc.poll() is not None:
+            raise BridgeUnavailable("bridge exited")
         deadline = time.monotonic() + self.timeout
         try:
-            self._proc.stdin.write(json.dumps(message, separators=(",", ":")).encode("utf-8") + b"\n")
-            self._proc.stdin.flush()
+            self._write(json.dumps(message, separators=(",", ":")).encode("utf-8") + b"\n", deadline)
             line = self._readline(deadline)
+            self._no_stray_bytes()
         except (BrokenPipeError, OSError, ValueError) as err:
             raise BridgeFault(f"bridge io: {err.__class__.__name__}") from err
         try:
@@ -151,12 +190,22 @@ class AienBridgeAuthority:
             raise BridgeFault("malformed json from bridge") from err
         if not isinstance(resp, dict) or resp.get("ok") is not True or not isinstance(resp.get(key), dict):
             raise BridgeFault("bridge refused or returned an unexpected shape")
+        if request_id is not None and resp[key].get("request_id") != request_id:
+            raise BridgeFault("response is for a different request")
         return resp[key]
 
-    def _call(self, message: dict, key: str) -> dict:
+    def _no_stray_bytes(self) -> None:
+        """One request, one line. Anything already buffered or waiting on the pipe is a framing fault."""
+        if self._buf:
+            raise BridgeFault("unexpected extra output from bridge")
+        ready, _, _ = select.select([self._proc.stdout.fileno()], [], [], 0)
+        if ready:
+            raise BridgeFault("unexpected extra output from bridge")
+
+    def _call(self, message: dict, key: str, request_id: Optional[str] = None) -> dict:
         with self._lock:
             try:
-                return self._rpc(message, key)
+                return self._rpc(message, key, request_id)
             except BridgeFault as err:
                 self._fail(str(err))
                 raise
@@ -200,7 +249,8 @@ class AienBridgeAuthority:
             return self._denied(req)
         try:
             raw = self._call(
-                {"op": "decide", "request": req.to_dict(), "ctx": self._ctx(ctx)}, "decision"
+                {"op": "decide", "request": req.to_dict(), "ctx": self._ctx(ctx)}, "decision",
+                req.request_id,
             )
             return self._checked_decision(raw, req)
         except Exception as err:  # noqa: BLE001 - fail closed on anything at all
@@ -212,17 +262,22 @@ class AienBridgeAuthority:
         rid = req.request_id
         if not self.available:
             return make_result(rid, "error", runtime=self.runtime_id, capability=req.capability,
-                               code=ErrorCode.RUNTIME_UNAVAILABLE, message=UNAVAILABLE)
+                               code=ErrorCode.RUNTIME_UNAVAILABLE, message=PRE_EXECUTE_UNAVAILABLE)
         try:
             raw = self._call(
                 {"op": "execute", "request": req.to_dict(), "decision": decision.to_dict(),
                  "ctx": self._ctx(ctx)},
                 "result",
+                rid,
             )
             result = ToolResult.from_dict(raw)
             if result.request_id != rid:
                 raise BridgeFault("result is for a different request")
             return result
+        except BridgeUnavailable as err:
+            self._fail(f"execute: {err}")
+            return make_result(rid, "error", runtime=self.runtime_id, capability=req.capability,
+                               code=ErrorCode.RUNTIME_UNAVAILABLE, message=PRE_EXECUTE_UNAVAILABLE)
         except Exception as err:  # noqa: BLE001
             self._fail(f"execute: {err}")
             return make_result(
@@ -237,5 +292,5 @@ class AienBridgeAuthority:
         req = pending.capability_request
         if not approved:
             raise BridgeFault("decline with Gate.cancel_approval; this adapter issues no decisions")
-        raw = self._call({"op": "approve", "request": req.to_dict()}, "decision")
+        raw = self._call({"op": "approve", "request": req.to_dict()}, "decision", req.request_id)
         return self._checked_decision(raw, req)

@@ -32,8 +32,8 @@ from . import MOTUS_PIN
 from .evidence import UNAVAILABLE_MOTUS_ID, build_bundle
 from .ids import new_trace_id, valid_id, valid_trace_id
 
-UNCERTAIN_PREFIX = "uncertain effect"
-_EXEC_FAULT = "runtime authority raised an error"
+# The authority was already gone before the execute request was written: nothing was sent, so no effect.
+PRE_EXECUTE_UNAVAILABLE = "aien bridge unavailable before execute; no request was sent"
 _MOTUS_ID_KEYS = ("task_id", "run_id", "tool_call_id")
 
 # Outcome vocabulary (contract C2, lower case) and effect certainty.
@@ -114,9 +114,10 @@ def classify(status: Optional[str], code: Optional[str], message: str, executed:
     if status == "timed_out":
         return TIMEOUT, "uncertain"
     if status == "error" and executed:
-        if message.startswith(UNCERTAIN_PREFIX) or message == _EXEC_FAULT:
-            return UNCERTAIN, "uncertain"
-        return FAILED, "occurred"
+        if code == ErrorCode.RUNTIME_UNAVAILABLE and message == PRE_EXECUTE_UNAVAILABLE:
+            return UNAVAILABLE, "none"  # our own exact marker: the request was never written
+        # After the execute request went out, only an explicit ok result says the effect occurred.
+        return UNCERTAIN, "uncertain"
     if status == "requires_approval":
         return APPROVAL_PENDING, "none"
     if code == ErrorCode.RUNTIME_UNAVAILABLE:
@@ -152,6 +153,7 @@ class Gate:
         self._turn = 0
         self._cancelled: set = set()
         self._records: list = []
+        self._continued: set = set()  # request ids for which an approver was already asked
         self._calls: dict = {}  # request_id -> the call record (for continuations)
         self._closed = False
         self._motus_run_id = motus_run_id
@@ -178,7 +180,7 @@ class Gate:
     def new_call_id(self) -> str:
         with self._lock:
             self._turn += 1
-            return f"mc-{self._turn:06d}"
+            return f"{self.trace_id}-{self._turn:06d}"
 
     def note_cancellation(self, call_id: str) -> None:
         """Motus cancelled the call. The call is never retried; its record says cancelled."""
@@ -215,7 +217,7 @@ class Gate:
     def _call(self, tool_name, raw_arguments, call_id, motus_ids) -> CallOutcome:
         if call_id is None:
             self._turn += 1
-            call_id = f"mc-{self._turn:06d}"
+            call_id = f"{self.trace_id}-{self._turn:06d}"
         base = self._base_record("call", call_id, tool_name, motus_ids)
         if self._closed:
             return self._refuse(base, "session_closed", "gate is closed")
@@ -315,6 +317,10 @@ class Gate:
         digest_seen = (self.authority.seen.get(request_id) or {}).get("request_digest")
         if held is None or held["outcome"] != APPROVAL_PENDING or pending is None or digest_seen is None:
             return self._refuse(base, "no_pending_approval", "no pending approval for this request")
+        if request_id in self._continued:
+            # One approver call per request, ever: the authority never sees a second approve request.
+            return self._refuse(base, "no_pending_approval", "approval already continued for this request")
+        self._continued.add(request_id)
         try:
             decision = approver(pending)
             if isinstance(decision, dict):

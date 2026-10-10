@@ -1,8 +1,10 @@
-"""LocalReadOnlyAuthority: a clearly labelled LOCAL STAND-IN, not AIEN.
+"""TEST DOUBLE, never ship. LocalReadOnlyAuthority: a LOCAL STAND-IN, not AIEN.
 
-AIEN's authority (``adapters/aien``, Rust: ``AienAuthority`` over ``aien-mcp``) is reachable only
-as an in-process Rust crate. There is no Python-callable, CLI or JSON seam to it in this
-repository, so this adapter cannot call it and does not claim to. This class is a small,
+This lives under tests/ on purpose. It mints \"authorized\" decisions in Python, which the adapter must
+never do; it exists only so the gate can be exercised offline. It is not importable from the package
+and the demo does not use it.
+
+The real authority is AIEN's, reached through ``aien-authority-bridge`` (``adapters/aien``). This class is a small,
 separate ``RuntimeAuthority`` implementation so the Motus path can be exercised end to end:
 
 * three capabilities: ``read_file`` and ``list_dir`` (read only) and ``write_note`` (creates a

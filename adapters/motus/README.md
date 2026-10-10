@@ -58,20 +58,22 @@ Motus ReActAgent -> InterplaneTool(args: str) -> ToolBridge -> Gate.call
 * Outcomes are preserved: `authorized`, `denied`, `requires_approval`, `not_found`, `invalid`, stale
   catalog, timeout, cancellation, uncertain effect, authority unavailable. Labels in the evidence use the
   contract C2 words: `finished`, `rejected`, `approval_pending`, `timeout`, `cancelled`, `uncertain`,
-  `failed`, `unavailable`, with `effect_certainty` of `none`, `uncertain` or `occurred`.
+  `failed`, `unavailable`, with `effect_certainty` of `none`, `uncertain` or `occurred`. After an execute
+  request has been written, only an explicit ok result is labelled `occurred`; any error is `uncertain`.
+  A bridge already gone before the request was written is `unavailable` with `none`.
 * Model-visible text is whatever the Pipeline renders. Text inside a tool result (including text that
   claims authorization) is data; it changes no decision and the next effect is decided afresh.
 * Approval continuation is host-only: `Gate.approve(request_id, approver)`. The `approver` is the
   authority's side and returns the runtime's own continuation decision. The gate binds it to the
   request digest recorded when the authority was asked; the Pipeline re-checks id, digest, expiry and
-  catalog and executes at most once. A second continuation is refused.
+  catalog and executes at most once. A second continuation is refused before the authority is asked.
 
 ## Authorities
 
 1. **Core mock runtime** (`interplane.crossveil.MockRuntime`) for unit tests.
-2. **`LocalReadOnlyAuthority`** (this package): `read_file` and `list_dir` inside one workspace
-   (no `..`, no outside absolute paths, no symlinks, size limit) and `write_note` (creates a new file,
-   always held for approval). It is a clearly labelled **local stand-in, not AIEN**.
+2. **`tests/fake_authority.py`** (TEST DOUBLE, never ship): a small read-only authority used only by
+   the offline gate tests. It lives under `tests/`, is not part of the package, and the demo does not
+   use it. The package mints no authorization: `aien_bridge.py` builds only a `denied` Decision.
 3. **`AienBridgeAuthority`** (this package): the **real AIEN authority**. `adapters/aien` (Rust)
    ships the binary `aien-authority-bridge`, which wraps `AienAuthority` over a workspace and speaks
    one JSON line per call on stdin and stdout. See "AIEN-backed authority (real path)" below.
@@ -82,8 +84,7 @@ Motus ReActAgent -> InterplaneTool(args: str) -> ToolBridge -> Gate.call
 python3 -m venv .venv-motus && . .venv-motus/bin/activate
 pip install -e python -e adapters/motus pytest          # from the repository root
 python -m pytest adapters/motus/tests -q                # offline, no credentials
-python -m interplane_adapter_motus.demo out.json        # from adapters/motus
-python -m interplane_adapter_motus.verify out.json
+python -m interplane_adapter_motus.verify out.json      # the demo needs the AIEN bridge, see below
 ```
 
 Optional, to run against the real Motus (pulls about twenty dependencies; do it in its own venv):
@@ -95,6 +96,7 @@ python -m pytest adapters/motus/tests -q                # the Motus tests run in
 
 Without Motus, `interplane_tool_class()` raises `MotusNotInstalled` and the host stays on the tiny
 `FakeHostTool` (same shape as a Motus tool); the demo says so. Nothing is authorized either way.
+The demo has no stand-in authority: without `--aien` it prints a plain message and exits non-zero.
 
 ## AIEN-backed authority (real path)
 
@@ -105,10 +107,12 @@ class add no authority and invent no schema. The mapping table also comes from A
 (`AienBridgeAuthority.mapping_table()`), and the evidence header records the authority `runtime_id`
 reported by the bridge (`aien`). A held request is continued through AIEN's own approval desk (op
 `approve`: one single-use grant for exactly that request, spent by AIEN; the bridge allows one
-approve per request id); declining is `Gate.cancel_approval`.
+approve attempt per request id, and `execute` only for a request it decided `authorized` itself,
+once; a decision supplied by the client is never trusted. Request ids are `<trace_id>-<turn>` so
+runs on one bridge never collide); declining is `Gate.cancel_approval`.
 
 Fail closed: if the binary is missing, will not start, answers with malformed JSON or a decision for
-another request id, exceeds the timeout (10 s default) or exits in the middle of a call, `decide`
+another request id, answers with extra bytes after a response, exceeds the timeout (10 s default, writes included) or exits in the middle of a call, `decide`
 returns `denied` with reason `aien bridge unavailable`, the bridge is not used again, and `execute`
 is never reached. A bridge lost during `execute` is reported as an uncertain effect and never retried.
 

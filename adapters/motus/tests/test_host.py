@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 import pathlib
 import threading
 import time
@@ -86,10 +87,26 @@ def test_importing_the_adapter_does_not_import_motus():
 
 
 def test_adapter_code_never_builds_a_decision_or_a_result():
-    for name in ("gate.py", "host.py", "motus_tool.py", "verify.py", "evidence.py", "mapping.py", "ids.py"):
-        text = (SRC / name).read_text()
-        for needle in ("Decision(", "ToolResult(", "make_result(", "AuthorizedEffect"):
-            assert needle not in text, (name, needle)
+    modules = sorted(SRC.rglob("*.py"))
+    assert len(modules) >= 8
+    assert not (SRC / "local_authority.py").exists(), "no authority-minting stand-in ships in the package"
+    for path in modules:
+        text = path.read_text()
+        for needle in ("ToolResult(", "make_result(", "AuthorizedEffect", "LocalReadOnlyAuthority", "UncertainEffect"):
+            if path.name == "aien_bridge.py" and needle == "make_result(":
+                continue  # builds only error results for a lost bridge, never a success
+            assert needle not in text, (path.name, needle)
+        assert not re.search(r"""(decision|status)["']?\s*[=:]\s*["']authorized""", text), path.name
+        assert path.name == "aien_bridge.py" or "Decision(" not in text, path.name
+    bridge = (SRC / "aien_bridge.py").read_text()
+    assert bridge.count("Decision(") == 1 and 'decision="denied"' in bridge
+
+
+def test_demo_without_aien_fails_closed(tmp_path, capsys):
+    from interplane_adapter_motus import demo
+    assert demo.main([str(tmp_path / "bundle.json")]) != 0
+    assert "fails closed" in capsys.readouterr().out
+    assert not (tmp_path / "bundle.json").exists()
 
 
 def test_no_dashes_in_adapter_text():
@@ -99,10 +116,16 @@ def test_no_dashes_in_adapter_text():
         assert chr(0x2014) not in text and chr(0x2013) not in text, path
 
 
-def test_demo_runs_and_its_bundle_verifies(tmp_path, capsys):
+def test_demo_against_aien_runs_and_its_bundle_verifies(tmp_path, capsys):
+    import os
     from interplane_adapter_motus import demo
+    binary = os.environ.get("INTERPLANE_AIEN_BRIDGE")
+    if not binary or not os.access(binary, os.X_OK):
+        pytest.skip("INTERPLANE_AIEN_BRIDGE not set to a built aien-authority-bridge")
+    ws = tmp_path / "ws"
+    ws.mkdir()
     out = tmp_path / "bundle.json"
-    assert demo.main([str(out)]) == 0
+    assert demo.main(["--aien", str(ws), str(out)]) == 0
     assert verify_bundle(json.loads(out.read_text())) == []
     printed = capsys.readouterr().out
-    assert "LOCAL STAND-IN" in printed and "refused" in printed
+    assert "Authority: AIEN" in printed and "refused" in printed

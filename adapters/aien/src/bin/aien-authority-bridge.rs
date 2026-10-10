@@ -9,14 +9,15 @@
 //!   `catalog`                                   -> `{"ok":true,"catalog":Catalog}`
 //!   `mapping_table`                             -> `{"ok":true,"mapping_table":MappingTable}` (pinned)
 //!   `decide`   `request`, `ctx`                 -> `{"ok":true,"decision":Decision}`
-//!   `execute`  `request`, `decision`, `ctx`     -> `{"ok":true,"result":ToolResult}`
+//!   `execute`  `request`, `decision`, `ctx`     -> `{"ok":true,"result":ToolResult}` (only for a request this
+//!              bridge decided `authorized` itself, once; the supplied `decision` is never trusted)
 //!   `approve`  `request`, optional `ttl_secs`   -> `{"ok":true,"decision":Decision}`  (host-only
 //!              approver channel: AIEN's own desk issues one single-use grant for exactly this
 //!              request and `present_approval` spends it; the continuation decision is AIEN's)
 //!   `discard`  `request_id`                     -> `{"ok":true,"discarded":bool}`
 //! Anything else (unknown op, malformed JSON, wrong shape, bad trace id) is `{"ok":false,"error":..}`
 //! and never a decision.
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::{BufRead, Write};
 
 use interplane_adapter_aien::{host_clock, AienAuthority};
@@ -92,7 +93,22 @@ fn to_value<T: serde::Serialize>(key: &str, v: &T) -> Value {
     }
 }
 
-fn handle(aien: &mut AienAuthority, approved: &mut HashSet<String>, line: &str) -> Value {
+/// What this bridge itself recorded for one request id. Restriction only: it never grants anything.
+struct Seen {
+    request: CapabilityRequest,
+    decision: Decision,
+    executed: bool,
+}
+
+#[derive(Default)]
+struct State {
+    /// Request ids for which an approve was attempted (any outcome).
+    approved: HashSet<String>,
+    /// Request ids decided by AIEN through this bridge, with AIEN's own decision.
+    seen: HashMap<String, Seen>,
+}
+
+fn handle(aien: &mut AienAuthority, state: &mut State, line: &str) -> Value {
     let parsed: Value = match serde_json::from_str(line) {
         Ok(v) => v,
         Err(e) => return err(format!("malformed json: {e}")),
@@ -110,13 +126,46 @@ fn handle(aien: &mut AienAuthority, approved: &mut HashSet<String>, line: &str) 
             "decide" => {
                 let req: CapabilityRequest = field(obj, "request")?;
                 let ctx = context(obj)?;
-                Ok(to_value("decision", &aien.decide(&req, &ctx)))
+                if state.seen.contains_key(&req.request_id) {
+                    return Err(format!("request {} was already decided", req.request_id));
+                }
+                let decision = aien.decide(&req, &ctx);
+                state.seen.insert(
+                    req.request_id.clone(),
+                    Seen {
+                        request: req,
+                        decision: decision.clone(),
+                        executed: false,
+                    },
+                );
+                Ok(to_value("decision", &decision))
             }
             "execute" => {
                 let req: CapabilityRequest = field(obj, "request")?;
-                let decision: Decision = field(obj, "decision")?;
+                // A client-supplied decision is parsed for shape only; it is never authority.
+                let _: Decision = field(obj, "decision")?;
                 let ctx = context(obj)?;
-                Ok(to_value("result", &aien.execute(&req, &decision, &ctx)))
+                let Some(seen) = state.seen.get_mut(&req.request_id) else {
+                    return Err(format!("request {} was never decided here", req.request_id));
+                };
+                if seen.request != req {
+                    return Err(format!(
+                        "request {} differs from the decided one",
+                        req.request_id
+                    ));
+                }
+                if !seen.decision.is_authorized() {
+                    return Err(format!(
+                        "request {} has no authorized decision",
+                        req.request_id
+                    ));
+                }
+                if seen.executed {
+                    return Err(format!("request {} was already executed", req.request_id));
+                }
+                seen.executed = true;
+                let own = seen.decision.clone();
+                Ok(to_value("result", &aien.execute(&req, &own, &ctx)))
             }
             "approve" => {
                 let req: CapabilityRequest = field(obj, "request")?;
@@ -127,15 +176,23 @@ fn handle(aien: &mut AienAuthority, approved: &mut HashSet<String>, line: &str) 
                         .filter(|t| (1..=MAX_TTL_SECS).contains(t))
                         .ok_or("ttl_secs must be an integer from 1 to 3600")?,
                 };
-                // Restriction only: one approval call per request id. AIEN's desk would issue another grant.
-                if approved.contains(&req.request_id) {
+                // Restriction only: one approval attempt per request id, recorded on any attempt. AIEN's desk would issue another grant.
+                if state.approved.contains(&req.request_id) {
                     return Err(format!("approval already requested for {}", req.request_id));
+                }
+                // Recorded before AIEN is asked, whatever the outcome: a failed attempt is not retried.
+                state.approved.insert(req.request_id.clone());
+                match state.seen.get(&req.request_id) {
+                    Some(seen) if seen.request == req && !seen.executed => {}
+                    _ => return Err(format!("request {} was not decided here", req.request_id)),
                 }
                 let now = (host_clock())();
                 let grant = aien.issue_approval(&req, now + ttl)?;
                 let decision = aien.present_approval(&req, &grant, now);
                 if decision.is_authorized() {
-                    approved.insert(req.request_id.clone());
+                    if let Some(seen) = state.seen.get_mut(&req.request_id) {
+                        seen.decision = decision.clone();
+                    }
                 }
                 Ok(to_value("decision", &decision))
             }
@@ -161,7 +218,7 @@ fn main() {
             std::process::exit(2);
         }
     };
-    let mut approved = HashSet::new();
+    let mut state = State::default();
     let stdin = std::io::stdin();
     let mut out = std::io::stdout().lock();
     for line in stdin.lock().lines() {
@@ -169,7 +226,7 @@ fn main() {
         if line.trim().is_empty() {
             continue;
         }
-        let answer = handle(&mut aien, &mut approved, &line);
+        let answer = handle(&mut aien, &mut state, &line);
         if writeln!(out, "{answer}")
             .and_then(|()| out.flush())
             .is_err()

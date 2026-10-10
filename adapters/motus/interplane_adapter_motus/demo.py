@@ -1,11 +1,12 @@
 """Offline demo: a Motus-shaped host calls tools through INTERPLANE and exports evidence.
 
-    PYTHONPATH=<repo>/python:<repo>/adapters/motus python -m interplane_adapter_motus.demo [out.json]
+    PYTHONPATH=<repo>/python:<repo>/adapters/motus python -m interplane_adapter_motus.demo --aien <workspace> [out.json]
 
-Default: the LOCAL read-only stand-in authority (not AIEN). With ``--aien <workspace>`` the same
-scripted calls go to the real AIEN authority through ``adapters/aien``'s ``aien-authority-bridge``
-(binary path from the INTERPLANE_AIEN_BRIDGE environment variable). Motus itself is optional: if it
-is not installed this prints so and drives the fake host interface instead.
+``--aien <workspace>`` is required: the scripted calls go to the real AIEN authority through
+``adapters/aien``'s ``aien-authority-bridge`` (binary path from the INTERPLANE_AIEN_BRIDGE environment
+variable). Without it the demo fails closed (plain message, non-zero exit); there is no stand-in
+authority. Motus itself is optional: if it is not installed this prints so and drives the fake host
+interface instead.
 """
 
 from __future__ import annotations
@@ -19,8 +20,6 @@ from pathlib import Path
 from .aien_bridge import ENV_BRIDGE, AienBridgeAuthority
 from .gate import Gate
 from .host import build_tools, dispatch
-from .local_authority import LABEL, LocalReadOnlyAuthority, build_catalog
-from .mapping import mapping_for
 from .motus_tool import MotusNotInstalled, installed_version, interplane_tool_class, pin_matches
 from .verify import verify_bundle
 
@@ -29,20 +28,17 @@ AIEN_LABEL = "AIEN (adapters/aien via bridge)"
 
 
 async def run(out_path: Path, workspace: Path, aien: bool = False) -> int:
+    if not aien:
+        print("No authority: pass --aien <workspace> (and set INTERPLANE_AIEN_BRIDGE). The demo has no stand-in authority and fails closed.")
+        return 2
     (workspace / "notes.txt").write_text("hello from the workspace\n", encoding="utf-8")
-    if aien:
-        authority = AienBridgeAuthority(str(workspace))
-        if not authority.available:
-            print(f"Authority: {AIEN_LABEL} NOT AVAILABLE ({authority.fault}); set {ENV_BRIDGE} to the built bridge.")
-            return 2
-        table, hold_cap = authority.mapping_table(), "write_file"
-        hold_args = {"path": "copy.txt", "content": "hello\n"}
-        label = AIEN_LABEL
-    else:
-        authority = LocalReadOnlyAuthority(str(workspace))
-        table, hold_cap = mapping_for(build_catalog(), authority.runtime_id), "write_note"
-        hold_args = {"path": "copy.txt", "text": "hello\n"}
-        label = LABEL
+    authority = AienBridgeAuthority(str(workspace))
+    if not authority.available:
+        print(f"Authority: {AIEN_LABEL} NOT AVAILABLE ({authority.fault}); set {ENV_BRIDGE} to the built bridge.")
+        return 2
+    table, hold_cap = authority.mapping_table(), "write_file"
+    hold_args = {"path": "copy.txt", "content": "hello\n"}
+    label = AIEN_LABEL
     version = installed_version()
     try:
         interplane_tool_class()
@@ -70,7 +66,8 @@ async def run(out_path: Path, workspace: Path, aien: bool = False) -> int:
     print(f"{'approval continuation (first)':42} -> {first.outcome:17} executed={first.executed!s:5}")
     second = gate.approve(held, lambda p: authority.issue_continuation(p, approved=True))
     print(f"{'approval continuation (second, refused)':42} -> {second.outcome:17} executed={second.executed!s:5} {second.record['error_code']}")
-    dup = gate.call("read_file", json.dumps({"path": "notes.txt"}), call_id="mc-000001")
+    first_id = gate.evidence()["records"][0]["request_id"]
+    dup = gate.call("read_file", json.dumps({"path": "notes.txt"}), call_id=first_id)
     print(f"{'duplicate request id replay':42} -> {dup.outcome:17} executed={dup.executed!s:5} {dup.record['error_code']}")
     bundle = gate.evidence()
     authority_close = getattr(authority, "close", None)

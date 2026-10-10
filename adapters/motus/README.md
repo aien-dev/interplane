@@ -72,10 +72,9 @@ Motus ReActAgent -> InterplaneTool(args: str) -> ToolBridge -> Gate.call
 2. **`LocalReadOnlyAuthority`** (this package): `read_file` and `list_dir` inside one workspace
    (no `..`, no outside absolute paths, no symlinks, size limit) and `write_note` (creates a new file,
    always held for approval). It is a clearly labelled **local stand-in, not AIEN**.
-3. **AIEN-backed authority: NOT executed, NOT claimed.** `adapters/aien` (`AienAuthority`) is an
-   in-process Rust crate. There is no Python-callable, CLI or JSON seam to it in this repository, so
-   this adapter cannot call it. A live Motus to Interplane to AIEN run needs that seam (for example a
-   Rust process speaking INTERPLANE over stdio) and is a follow-up, not part of this change.
+3. **`AienBridgeAuthority`** (this package): the **real AIEN authority**. `adapters/aien` (Rust)
+   ships the binary `aien-authority-bridge`, which wraps `AienAuthority` over a workspace and speaks
+   one JSON line per call on stdin and stdout. See "AIEN-backed authority (real path)" below.
 
 ## Install and run
 
@@ -97,6 +96,46 @@ python -m pytest adapters/motus/tests -q                # the Motus tests run in
 Without Motus, `interplane_tool_class()` raises `MotusNotInstalled` and the host stays on the tiny
 `FakeHostTool` (same shape as a Motus tool); the demo says so. Nothing is authorized either way.
 
+## AIEN-backed authority (real path)
+
+`AienBridgeAuthority` spawns `aien-authority-bridge` and forwards every `decide` and `execute` to
+AIEN's own `AienAuthority` (pinned in `adapters/aien/Cargo.toml`). Answers are the serde JSON of the
+real `Catalog`, `Decision` and `ToolResult`, parsed with `interplane.core`; the bridge and the Python
+class add no authority and invent no schema. The mapping table also comes from AIEN
+(`AienBridgeAuthority.mapping_table()`), and the evidence header records the authority `runtime_id`
+reported by the bridge (`aien`). A held request is continued through AIEN's own approval desk (op
+`approve`: one single-use grant for exactly that request, spent by AIEN; the bridge allows one
+approve per request id); declining is `Gate.cancel_approval`.
+
+Fail closed: if the binary is missing, will not start, answers with malformed JSON or a decision for
+another request id, exceeds the timeout (10 s default) or exits in the middle of a call, `decide`
+returns `denied` with reason `aien bridge unavailable`, the bridge is not used again, and `execute`
+is never reached. A bridge lost during `execute` is reported as an uncertain effect and never retried.
+
+Build and run (the sibling checkouts in `adapters/aien/PINS` are needed; see `adapters/aien/README.md`):
+
+```
+adapters/aien/setup-siblings.sh                                   # from the repository root
+(cd adapters/aien && cargo build --bin aien-authority-bridge)
+export INTERPLANE_AIEN_BRIDGE=$PWD/adapters/aien/target/debug/aien-authority-bridge
+cd adapters/motus
+python -m interplane_adapter_motus.demo --aien /path/to/workspace out.json   # prints "Authority: AIEN (adapters/aien via bridge)"
+python -m interplane_adapter_motus.verify out.json
+```
+
+Tests (offline, no credentials, CPU only; no GB10 claim):
+
+```
+(cd adapters/aien && cargo test --test bridge)                    # Rust: the binary driven over a pipe
+cd adapters/motus && python -m pytest tests/test_aien_bridge.py -q -rs
+```
+
+The fail-closed tests use fake bridge scripts and always run. The end-to-end class (authorized read,
+path escape denied with no read, malformed arguments, duplicate request id, held write with a
+single-use continuation, evidence verifies, tampered bundle fails) runs against the real binary and
+skips with a reason when it is not built. CI job `adapter-motus` builds the bridge and fails if those
+tests skip.
+
 ## Evidence bundle and verifier
 
 `Gate.evidence()` returns a JSON-able bundle: `schema`, `trace_id`, `header`, `records`, `bundle_digest`.
@@ -116,7 +155,7 @@ invented.
 
 ## Not done
 
-* No live Motus plus AIEN run (see Authorities, item 3).
+* No live Motus plus AIEN run: the AIEN path is exercised through the host-neutral gate and the fake host tool; a real Motus agent loop over the bridge is not run. No GB10 path.
 * Backends are synchronous behind the authority; wrapping an existing async Motus tool is not provided.
 * Approvals live in memory (a restart refuses every continuation, fail closed).
 * The real-Motus tests are not in CI (Motus's dependencies are not in `constraints/ci-python.txt`).

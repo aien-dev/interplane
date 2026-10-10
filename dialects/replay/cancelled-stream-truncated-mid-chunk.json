@@ -1,0 +1,51 @@
+{
+  "format": "interplane-replay/1",
+  "name": "cancelled-stream-truncated-mid-chunk",
+  "provider": "synthetic-openai-compatible",
+  "model": "mock-model",
+  "endpoint_kind": "chat_completions_stream",
+  "provenance": {
+    "origin": "synthetic",
+    "source_commit": "f1cc43cd",
+    "captured_on": "2026-10-10",
+    "note": "Client cancelled; the last chunk ends inside a JSON string. The half call must be rejected, never guessed."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "header_names": [
+      "Content-Type",
+      "Authorization",
+      "Accept"
+    ],
+    "body": {
+      "model": "mock-model",
+      "stream": true,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<USER_CONTENT>"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "header_names": [
+      "Content-Type",
+      "Retry-After"
+    ],
+    "chunks": [
+      "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call_a\",\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"pa\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"argum"
+    ]
+  },
+  "expect": {
+    "class": "parsed",
+    "text": "",
+    "tool_calls": [],
+    "rejected": [
+      "malformed_tool_call"
+    ],
+    "partial": true
+  }
+}

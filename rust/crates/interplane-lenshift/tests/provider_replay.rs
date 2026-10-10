@@ -7,11 +7,23 @@ fn dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../dialects/replay")
 }
 
+fn collect(d: &std::path::Path, out: &mut Vec<PathBuf>) {
+    for e in std::fs::read_dir(d).expect("dialects/replay present") {
+        let p = e.unwrap().path();
+        if p.is_dir() {
+            collect(&p, out);
+        } else if p.extension().and_then(|e| e.to_str()) == Some("json") {
+            out.push(p);
+        }
+    }
+}
+
+/// Every fixture below `dialects/replay`, recursively.
 fn load_all() -> Vec<(String, Value)> {
-    let mut v: Vec<_> = std::fs::read_dir(dir())
-        .expect("dialects/replay present")
-        .map(|e| e.unwrap().path())
-        .filter(|p| p.extension().and_then(|e| e.to_str()) == Some("json"))
+    let mut paths = Vec::new();
+    collect(&dir(), &mut paths);
+    let mut v: Vec<_> = paths
+        .into_iter()
         .map(|p| {
             let t = std::fs::read_to_string(&p).unwrap();
             (p.display().to_string(), serde_json::from_str(&t).unwrap())
@@ -224,4 +236,82 @@ fn scrubber_output_passes_the_scanner() {
 fn authorization_word_in_model_text_is_not_a_secret() {
     // The adversarial fixture must stay admissible: prose is not a credential.
     assert!(scan(&json!({"c": "authorization: approved"})).is_empty());
+}
+
+#[test]
+fn scanner_refuses_the_extra_classes() {
+    let seeds: &[(&str, &str)] = &[
+        ("ip", "server at 192.168.10.44 replied"),
+        ("path", "opened /home/someone/project/secret.txt"),
+        ("windows path", "C:\\Users\\someone\\file"),
+        (
+            "jwt",
+            "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcDEF123",
+        ),
+        ("pem", "-----BEGIN PRIVATE KEY-----"),
+        ("stripe", "sk_live_abcdefgh12345678"),
+        ("hf", "hf_AbCdEfGhIjKlMnOpQrSt"),
+        ("cookie", "Cookie: sid=abc123"),
+    ];
+    for (label, seed) in seeds {
+        let mut v = candidate();
+        v["response"]["chunks"][0] = json!(seed);
+        assert!(!scan(&v).is_empty(), "scanner accepted seeded {label}");
+    }
+    let mut v = candidate();
+    v["request"]["body"]["prompt"] = json!("tell me a secret");
+    assert!(!scan(&v).is_empty(), "raw prompt");
+    let mut v = candidate();
+    v["request"]["body"]["messages"] =
+        json!([{"role":"system","content":"You are a private assistant for ACME."}]);
+    assert!(!scan(&v).is_empty(), "raw system prompt");
+}
+
+#[test]
+fn scrubber_blanks_model_text_but_keeps_tool_calls() {
+    let mut v = candidate();
+    v["request"]["body"]["messages"] = json!([
+        {"role":"system","content":"private system prompt"},
+        {"role":"assistant","content":"earlier private answer"},
+        {"role":"user","content":"private question"}]);
+    v["response"]["chunks"] = json!([
+        "data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"secret words\",\"reasoning\":\"private thought\"},\"finish_reason\":null}]}\n\n",
+        "data: {\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"c1\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"a\\\"}\"}}]},\"finish_reason\":null}]}\n\n"]);
+    scrub_value(&mut v);
+    let s = v.to_string();
+    for gone in ["private", "secret words"] {
+        assert!(!s.contains(gone), "{gone} survived: {s}");
+    }
+    assert!(s.contains("<MODEL_TEXT>") && s.contains("<REASONING>"));
+    assert!(
+        s.contains("read_file") && s.contains("path"),
+        "tool call must stay: {s}"
+    );
+    assert_eq!(scan(&v), Vec::<String>::new());
+}
+
+#[test]
+fn recorded_fixture_keeps_no_real_model_text() {
+    let (_, v) = load_all()
+        .into_iter()
+        .find(|(p, _)| p.contains("recorded-"))
+        .unwrap();
+    let s = v["response"]["chunks"].to_string();
+    assert!(
+        !s.contains("wants") && !s.contains("README.md. I need"),
+        "reasoning text kept"
+    );
+    assert!(s.contains("<REASONING>"));
+}
+
+#[test]
+fn fixture_discovery_is_recursive() {
+    let root = std::env::temp_dir().join(format!("replay-rec-{}", std::process::id()));
+    let deep = root.join("a").join("b");
+    std::fs::create_dir_all(&deep).unwrap();
+    std::fs::write(deep.join("x.json"), "{}").unwrap();
+    let mut out = Vec::new();
+    collect(&root, &mut out);
+    std::fs::remove_dir_all(&root).unwrap();
+    assert_eq!(out.len(), 1, "depth-2 file must be found");
 }

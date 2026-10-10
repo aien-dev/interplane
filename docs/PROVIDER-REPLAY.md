@@ -49,15 +49,31 @@ Replay joins `chunks` in order and parses them as live bytes would be. Status 42
 ## Scrubbing and scanning
 
 `interplane_lenshift::replay::scrub_value` runs before a fixture is written: tenant style ids
-become `<ID>`, user and tool request content becomes a placeholder, and every string is passed
+become `<ID>`, system, assistant, user and tool request content and a top level `prompt` become placeholders, response `content` and `reasoning` text becomes `<MODEL_TEXT>` or `<REASONING>` (tool-call fragments are kept), and every string is passed
 through `scrub_text`. `scan` runs over every fixture in the test and refuses: bearer or basic
 tokens, authorization / cookie / set-cookie / x-api-key style headers with values, `sk-`,
 `AKIA`, GitHub, Slack and Google style keys, hex runs of 32 or more, base64-looking runs of 40 or
-more, emails, `org-`/`ws_`/`tenant-` style ids and tenant/workspace/org/account id keys without a
+more, JWTs, PEM blocks, `sk_live_` style payment keys, `hf_` tokens, IP addresses, home, system and
+Windows file paths, `Cookie:` values, emails, `org-`/`ws_`/`tenant-` style ids and tenant/workspace/org/account id keys without a
 placeholder, query-string secrets (`?api_key=`, `token=`, `sig=` ...), header lists that contain a
 value, and unscrubbed user content. The test `scanner_refuses_each_seeded_secret_class` seeds each
 class into a clean candidate and asserts refusal. The scanner is a safety net, not a proof: a
 human still reviews a new fixture.
+
+## Never commit
+
+Raw captures straight from a provider; real user prompts or system prompts (the scrubber replaces
+system, assistant and user content and model reasoning with placeholders, but you still read the
+result); real model output you have not reviewed; API keys, tokens, cookies, certificates or
+private keys; emails, tenant, workspace or account ids; IP addresses, hostnames and local file
+paths; anything the scanner refuses. Tool-call deltas are kept on purpose, they are the golden, so
+check their arguments by hand.
+
+Scan any file or tree before committing, recursively, with no test run needed:
+
+```
+cd rust && cargo run -q -p interplane-lenshift --example replay_scan -- ../dialects/replay <other paths>
+```
 
 ## Regenerating a fixture from a live run
 
@@ -96,6 +112,10 @@ truncated stream.
   Ollama fixture is recorded (from the repo's own qualification capture).
 - Observed gaps pinned as goldens, not endorsed: schema drift in `tool_calls` yields no call and
   no rejection; `finish_reason: length` on plain text is not flagged `partial`.
+- Rust only, by design. There is no Python mirror of the replay runner or scanner: the repository
+  forbids new Python in AIEN-owned code, the replay needs only the Rust parsers it already feeds,
+  and the existing Python parser mirror keeps its own fixtures. The Rust-Python byte-for-byte
+  invariant is therefore NOT extended to `dialects/replay`.
 - Chunk strings are UTF-8: splits inside a multi-byte character cannot be represented.
 - Timing is recorded but not exercised; no retry, backoff or timeout logic is replayed.
 - The scanner is regex based and can both miss novel secret shapes and flag long identifiers.

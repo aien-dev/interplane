@@ -194,6 +194,34 @@ const RULES: &[Rule] = &[
         re: r"\b(ghp|gho|ghs|xox[abp]|AIza)[-_A-Za-z0-9]{16,}",
     },
     Rule {
+        class: "cookie-value",
+        re: r"(?i)\b(cookie|set-cookie)\s*:\s*[^\s=;]+=\S+",
+    },
+    Rule {
+        class: "jwt",
+        re: r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]*",
+    },
+    Rule {
+        class: "pem-block",
+        re: r"-----BEGIN [A-Z ]+-----",
+    },
+    Rule {
+        class: "payment-key",
+        re: r"\b(sk|pk|rk)_(live|test)_[A-Za-z0-9]{8,}",
+    },
+    Rule {
+        class: "hf-token",
+        re: r"\bhf_[A-Za-z0-9]{16,}",
+    },
+    Rule {
+        class: "ip-address",
+        re: r"\b(\d{1,3}\.){3}\d{1,3}\b",
+    },
+    Rule {
+        class: "file-path",
+        re: r"(/home/|/Users/|/root/|/etc/|/var/|/tmp/|\b[A-Za-z]:\\)",
+    },
+    Rule {
         class: "long-hex",
         re: r"\b[0-9a-fA-F]{32,}\b",
     },
@@ -270,6 +298,72 @@ fn walk(v: &mut Value, f: &mut dyn FnMut(&str, &mut Value)) {
     }
 }
 
+/// Replace model-authored text in one decoded message or delta object. Tool-call fragments are
+/// left alone: they are the golden under test.
+fn blank_model_text(o: &mut serde_json::Map<String, Value>) {
+    for (k, label) in [
+        ("content", "<MODEL_TEXT>"),
+        ("reasoning", "<REASONING>"),
+        ("reasoning_content", "<REASONING>"),
+    ] {
+        if let Some(Value::String(s)) = o.get_mut(k) {
+            if !s.is_empty() {
+                *s = label.into();
+            }
+        }
+    }
+}
+
+/// Blank model text in the response chunks. Complete SSE events (`data: {json}`) are rewritten
+/// in place; a non-stream JSON body is rewritten whole. Chunks that are not self contained
+/// (split mid-event) are left for the scanner and the human reviewer.
+fn scrub_response_text(v: &mut Value) {
+    let Some(chunks) = v
+        .pointer_mut("/response/chunks")
+        .and_then(Value::as_array_mut)
+    else {
+        return;
+    };
+    for c in chunks {
+        let Some(s) = c.as_str() else { continue };
+        let new = if let Ok(Value::Object(mut body)) = serde_json::from_str::<Value>(s) {
+            if let Some(cs) = body.get_mut("choices").and_then(Value::as_array_mut) {
+                for ch in cs {
+                    for key in ["message", "delta"] {
+                        if let Some(Value::Object(m)) = ch.get_mut(key) {
+                            blank_model_text(m);
+                        }
+                    }
+                }
+            }
+            Value::Object(body).to_string()
+        } else {
+            s.split_inclusive('\n')
+                .map(|line| {
+                    let Some(data) = line.strip_prefix("data: ") else {
+                        return line.to_string();
+                    };
+                    match serde_json::from_str::<Value>(data.trim_end()) {
+                        Ok(Value::Object(mut ev)) => {
+                            if let Some(cs) = ev.get_mut("choices").and_then(Value::as_array_mut) {
+                                for ch in cs {
+                                    if let Some(Value::Object(d)) = ch.get_mut("delta") {
+                                        blank_model_text(d);
+                                    }
+                                }
+                            }
+                            let tail = &line[data.trim_end().len() + 6..];
+                            format!("data: {}{}", Value::Object(ev), tail)
+                        }
+                        _ => line.to_string(),
+                    }
+                })
+                .collect()
+        };
+        *c = Value::String(new);
+    }
+}
+
 /// Scrub a capture value BEFORE it is written: header values dropped, user content replaced by a
 /// placeholder, tenant-style ids replaced, every string passed through [`scrub_text`].
 pub fn scrub_value(v: &mut Value) {
@@ -289,13 +383,21 @@ pub fn scrub_value(v: &mut Value) {
                 .and_then(Value::as_str)
                 .unwrap_or("")
                 .to_string();
-            if role == "user" || role == "tool" {
+            if matches!(role.as_str(), "user" | "tool" | "system" | "assistant")
+                && m.get("content").is_some_and(Value::is_string)
+            {
                 if let Some(c) = m.get_mut("content") {
                     *c = Value::String(format!("<{}_CONTENT>", role.to_ascii_uppercase()));
                 }
             }
         }
     }
+    if let Some(p) = v.pointer_mut("/request/body/prompt") {
+        if p.is_string() {
+            *p = Value::String("<USER_CONTENT>".into());
+        }
+    }
+    scrub_response_text(v);
     walk(v, &mut |_, x| {
         if let Value::String(s) = x {
             *s = scrub_text(s);
@@ -361,16 +463,20 @@ pub fn scan(v: &Value) -> Vec<String> {
     {
         for (i, m) in msgs.iter().enumerate() {
             let role = m.get("role").and_then(Value::as_str).unwrap_or("");
-            if (role == "user" || role == "tool")
-                && !m
-                    .get("content")
+            if matches!(role, "user" | "tool" | "system" | "assistant")
+                && m.get("content")
                     .and_then(Value::as_str)
-                    .is_some_and(|s| ph.is_match(s))
+                    .is_some_and(|s| !s.is_empty() && !ph.is_match(s))
             {
                 found.push(format!(
                     "unscrubbed {role} content in /request/body/messages/{i}"
                 ));
             }
+        }
+    }
+    if let Some(p) = v.pointer("/request/body/prompt").and_then(Value::as_str) {
+        if !ph.is_match(p) {
+            found.push("unscrubbed prompt in /request/body/prompt".into());
         }
     }
     found

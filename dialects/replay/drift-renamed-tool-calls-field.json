@@ -1,0 +1,49 @@
+{
+  "format": "interplane-replay/1",
+  "name": "drift-renamed-tool-calls-field",
+  "provider": "synthetic-openai-compatible",
+  "model": "mock-model",
+  "endpoint_kind": "chat_completions_stream",
+  "provenance": {
+    "origin": "synthetic",
+    "source_commit": "f1cc43cd",
+    "captured_on": "2026-10-10",
+    "note": "Provider renamed delta.tool_calls to delta.tool_call_list. The golden pins today's behaviour: the call is silently absent. Drift detector, not endorsement."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "header_names": [
+      "Content-Type",
+      "Authorization",
+      "Accept"
+    ],
+    "body": {
+      "model": "mock-model",
+      "stream": true,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<USER_CONTENT>"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "header_names": [
+      "Content-Type",
+      "Retry-After"
+    ],
+    "chunks": [
+      "data: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{\"tool_call_list\":[{\"index\":0,\"id\":\"call_c\",\"type\":\"function\",\"function\":{\"name\":\"read_file\",\"arguments\":\"{\\\"path\\\":\\\"a\\\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"object\":\"chat.completion.chunk\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n"
+    ]
+  },
+  "expect": {
+    "class": "parsed",
+    "text": "",
+    "tool_calls": [],
+    "rejected": [],
+    "partial": false
+  }
+}

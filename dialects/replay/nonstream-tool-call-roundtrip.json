@@ -1,0 +1,58 @@
+{
+  "format": "interplane-replay/1",
+  "name": "nonstream-tool-call-roundtrip",
+  "provider": "synthetic-openai-compatible",
+  "model": "mock-model",
+  "endpoint_kind": "chat_completions",
+  "provenance": {
+    "origin": "synthetic",
+    "source_commit": "f1cc43cd",
+    "captured_on": "2026-10-10",
+    "note": "Non-stream body whose arguments string holds escaped newlines and quotes; the round-trip test re-serializes the parsed call."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "header_names": [
+      "Content-Type",
+      "Authorization",
+      "Accept"
+    ],
+    "body": {
+      "model": "mock-model",
+      "stream": false,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<USER_CONTENT>"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "header_names": [
+      "Content-Type",
+      "Retry-After"
+    ],
+    "chunks": [
+      "{\"id\":\"x1\",\"object\":\"chat.completion\",\"c",
+      "hoices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[{\"id\":\"call_b\",\"type\":\"function\",\"function\":{\"name\":\"write_file\",\"arguments\":\"{\\\"path\\\":\\\"notes.txt\\\",\\\"content\\\":\\\"line1\\\\nline2 \\\\\\\"quoted\\\\\\\"\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}]}"
+    ]
+  },
+  "expect": {
+    "class": "parsed",
+    "text": "",
+    "tool_calls": [
+      {
+        "name": "write_file",
+        "arguments": {
+          "path": "notes.txt",
+          "content": "line1\nline2 \"quoted\""
+        }
+      }
+    ],
+    "rejected": [],
+    "partial": false
+  }
+}

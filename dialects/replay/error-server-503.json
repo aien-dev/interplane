@@ -1,0 +1,49 @@
+{
+  "format": "interplane-replay/1",
+  "name": "error-server-503",
+  "provider": "synthetic-openai-compatible",
+  "model": "mock-model",
+  "endpoint_kind": "chat_completions_stream",
+  "provenance": {
+    "origin": "synthetic",
+    "source_commit": "f1cc43cd",
+    "captured_on": "2026-10-10",
+    "note": "5xx with a non-JSON body."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "header_names": [
+      "Content-Type",
+      "Authorization",
+      "Accept"
+    ],
+    "body": {
+      "model": "mock-model",
+      "stream": true,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<USER_CONTENT>"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 503,
+    "header_names": [
+      "Content-Type",
+      "Retry-After"
+    ],
+    "chunks": [
+      "upstream connect error"
+    ]
+  },
+  "expect": {
+    "class": "server_error",
+    "text": "",
+    "tool_calls": [],
+    "rejected": [],
+    "partial": false
+  }
+}

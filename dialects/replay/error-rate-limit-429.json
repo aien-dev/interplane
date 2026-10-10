@@ -1,0 +1,49 @@
+{
+  "format": "interplane-replay/1",
+  "name": "error-rate-limit-429",
+  "provider": "synthetic-openai-compatible",
+  "model": "mock-model",
+  "endpoint_kind": "chat_completions",
+  "provenance": {
+    "origin": "synthetic",
+    "source_commit": "f1cc43cd",
+    "captured_on": "2026-10-10",
+    "note": "429 with a JSON error body; a tool-call-shaped body must never be parsed as a call."
+  },
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/completions",
+    "header_names": [
+      "Content-Type",
+      "Authorization",
+      "Accept"
+    ],
+    "body": {
+      "model": "mock-model",
+      "stream": false,
+      "messages": [
+        {
+          "role": "user",
+          "content": "<USER_CONTENT>"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 429,
+    "header_names": [
+      "Content-Type",
+      "Retry-After"
+    ],
+    "chunks": [
+      "{\"error\":{\"message\":\"rate limited\",\"type\":\"rate_limit_error\"}}"
+    ]
+  },
+  "expect": {
+    "class": "rate_limited",
+    "text": "",
+    "tool_calls": [],
+    "rejected": [],
+    "partial": false
+  }
+}

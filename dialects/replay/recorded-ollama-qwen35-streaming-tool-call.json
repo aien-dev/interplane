@@ -1,0 +1,171 @@
+{
+  "endpoint_kind": "chat_completions_stream",
+  "expect": {
+    "class": "parsed",
+    "partial": false,
+    "rejected": [],
+    "text": "",
+    "tool_calls": [
+      {
+        "arguments": {
+          "path": "README.md"
+        },
+        "name": "read_file"
+      }
+    ]
+  },
+  "format": "interplane-replay/1",
+  "model": "qwen3.5:9b",
+  "name": "h1-streaming",
+  "provenance": {
+    "captured_on": "2026-10-04",
+    "note": "scrubbed from a qualification capture named h1-streaming",
+    "origin": "recorded",
+    "source_commit": "f1cc43cd"
+  },
+  "provider": "ollama",
+  "request": {
+    "body": {
+      "messages": [
+        {
+          "content": "<USER_CONTENT>",
+          "role": "user"
+        }
+      ],
+      "model": "qwen3.5:9b",
+      "seed": 42,
+      "stream": true,
+      "temperature": 0,
+      "tools": [
+        {
+          "function": {
+            "description": "Read a text file and return its contents.",
+            "name": "read_file",
+            "parameters": {
+              "properties": {
+                "path": {
+                  "description": "File path",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "function"
+        },
+        {
+          "function": {
+            "description": "List the entries of a directory.",
+            "name": "list_dir",
+            "parameters": {
+              "properties": {
+                "path": {
+                  "description": "Directory path",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "function"
+        },
+        {
+          "function": {
+            "description": "Write text content to a file, replacing it.",
+            "name": "write_file",
+            "parameters": {
+              "properties": {
+                "content": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "content"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "function"
+        },
+        {
+          "function": {
+            "description": "Send an email.",
+            "name": "send_email",
+            "parameters": {
+              "properties": {
+                "body": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "to",
+                "body"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "function"
+        }
+      ]
+    },
+    "header_names": [
+      "Content-Type"
+    ],
+    "method": "POST",
+    "path": "/v1/chat/completions"
+  },
+  "response": {
+    "chunks": [
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\",\"role\":\"assistant\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"reasoning\":\"<REASONING>\"},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"\",\"tool_calls\":[{\"function\":{\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\",\"name\":\"read_file\"},\"id\":\"call_croxjxnr\",\"index\":0,\"type\":\"function\"}]},\"finish_reason\":null,\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"tool_calls\",\"index\":0}],\"created\":1791145856,\"id\":\"chatcmpl-192\",\"model\":\"qwen3.5:9b\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\":\"fp_ollama\"}\n\n",
+      "data: [DONE]\n\n"
+    ],
+    "header_names": [
+      "Content-Type"
+    ],
+    "status": 200
+  }
+}

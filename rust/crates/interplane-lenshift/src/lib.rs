@@ -13,6 +13,7 @@ pub mod ajax;
 pub mod openai;
 pub mod openai_stream;
 pub mod qwen35;
+pub mod replay;
 
 /// What a dialect needs to know to fill request ids and provenance.
 #[derive(Debug, Clone)]

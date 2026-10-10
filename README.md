@@ -57,11 +57,17 @@ rust/            Cargo workspace: interplane-core, -lenshift, -crossaxis, -cross
 python/          interplane package (stdlib only at runtime)
 dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
-adapters/        aien/, odysseus/ reference adapters (depend on their hosts; Core never does)
+adapters/        aien/, odysseus/, motus/ reference adapters (depend on their hosts; Core never does)
 examples/        minimal mock runtime and mock model
 docs/adr/        decisions
 CURRENT_STATE.md what the host projects' live code actually contained when this started
 ```
+
+## Motus adapter
+
+`adapters/motus/` lets a Lithos AI Motus agent send its tool calls through INTERPLANE and exports an
+evidence bundle that anyone can verify. Motus is optional, the authority stays outside the adapter,
+and Core is untouched. Install, demo and verification steps: [`adapters/motus/README.md`](adapters/motus/README.md).
 
 ## Security in one paragraph
 

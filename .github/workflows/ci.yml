@@ -220,3 +220,33 @@ jobs:
             python -m interplane_adapter_odysseus.t3 --out $RUNNER_TEMP/t3-verdicts.json
       - name: bench runner offline test (scripted endpoint, sim-1 backends, runtime-v1 with denial/approval negative controls)
         run: ODYSSEUS_SRC=$GITHUB_WORKSPACE/../odysseus PYTHONDONTWRITEBYTECODE=1 python bench/tools/test_runner_offline.py
+  adapter-motus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.12.14"}
+      - run: pip install -q -c constraints/ci-python.txt pytest pyflakes
+      - run: python -m pyflakes adapters/motus
+      - name: pinned AIEN sibling checkouts from adapters/aien/PINS (same script as job adapter-aien)
+        run: adapters/aien/setup-siblings.sh
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0"}
+      - name: build the real AIEN authority bridge (the Motus end-to-end AIEN tests need it)
+        run: cargo build --bin aien-authority-bridge
+        working-directory: adapters/aien
+      - name: adapter tests without Motus installed (offline; the real-Motus tests skip here and run locally with the motus extra)
+        run: |
+          cd adapters/motus
+          set -o pipefail
+          export INTERPLANE_AIEN_BRIDGE=$GITHUB_WORKSPACE/adapters/aien/target/debug/aien-authority-bridge
+          PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m pytest tests -q -p no:cacheprovider -rs | tee pytest.log
+          ! grep -q "aien-authority-bridge not built" pytest.log
+      - name: demo against the real AIEN authority through the bridge
+        run: |
+          cd adapters/motus
+          mkdir $RUNNER_TEMP/aien-ws
+          INTERPLANE_AIEN_BRIDGE=$GITHUB_WORKSPACE/adapters/aien/target/debug/aien-authority-bridge \
+            PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.demo --aien $RUNNER_TEMP/aien-ws $RUNNER_TEMP/motus-aien-bundle.json | tee demo-aien.log
+          grep -q "Authority: AIEN (adapters/aien via bridge)" demo-aien.log
+          PYTHONPATH=$GITHUB_WORKSPACE/python:. PYTHONDONTWRITEBYTECODE=1 python -m interplane_adapter_motus.verify $RUNNER_TEMP/motus-aien-bundle.json

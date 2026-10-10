@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "interplane-adapter-motus"
+version = "0.1.0"
+description = "INTERPLANE reference adapter for the Lithos AI Motus agent host (the authority stays outside the adapter)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+# `interplane` is the sibling Core package at ../../python. Install it by path first:
+#   pip install -e ../../python -e .
+# Motus is NOT a hard dependency. The optional extra pins the one upstream release this adapter
+# was inspected against; without it the adapter runs against a tiny fake host interface.
+dependencies = ["interplane"]
+
+[project.optional-dependencies]
+motus = ["lithosai-motus==0.4.3"]
+
+[tool.setuptools.packages.find]
+include = ["interplane_adapter_motus*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

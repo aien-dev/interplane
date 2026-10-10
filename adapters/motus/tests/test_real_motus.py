@@ -63,3 +63,39 @@ def test_react_agent_dispatch_goes_through_the_gate(make_local, workspace):
     assert sorted(r["outcome"] for r in recs) == ["approval_pending", "finished", "rejected"]
     assert not (workspace / "n.txt").exists() and authority.execute_calls == 1
     assert verify_bundle(gate.evidence()) == []
+
+
+def test_react_agent_through_the_gate_backed_by_real_aien(tmp_path):
+    """Real Motus ReActAgent, scripted client, gate backed by AienBridgeAuthority (real AIEN)."""
+    import os
+
+    from interplane_adapter_motus.aien_bridge import ENV_BRIDGE, AienBridgeAuthority
+    from interplane_adapter_motus.gate import Gate
+
+    bridge = os.environ.get(ENV_BRIDGE)
+    if not bridge or not os.access(bridge, os.X_OK):
+        pytest.skip(f"aien-authority-bridge not built or {ENV_BRIDGE} unset")
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    (ws / "notes.txt").write_text("hello from the workspace\n", encoding="utf-8")
+    authority = AienBridgeAuthority(str(ws), bridge_path=bridge, timeout=20)
+    assert authority.available, authority.fault
+    try:
+        gate = Gate(authority, authority.mapping_table())
+        gate.register_user_turn("read my notes")
+        tools = host.build_tools(gate, motus_tool.interplane_tool_class())
+        client = ScriptedClient([
+            [("read_file", json.dumps({"path": "notes.txt"})),
+             ("write_file", json.dumps({"path": "n.txt", "content": "x"}))],
+            "done",
+        ])
+        agent = ReActAgent(client=client, model_name="scripted", tools=list(tools.values()))
+        assert resolve(agent("read my notes")) == "done"
+        assert "write_file" in client.seen_tools[0]
+        bundle = gate.evidence()
+        assert sorted(r["outcome"] for r in bundle["records"]) == ["approval_pending", "finished"]
+        assert not (ws / "n.txt").exists()
+        assert bundle["header"]["runtime_id"] == authority.runtime_id == "aien"
+        assert verify_bundle(bundle) == []
+    finally:
+        authority.close()

@@ -40,6 +40,8 @@ read as a grant. The normative contract is in `CORE.md` (Approval continuation);
    is DENIED and stays DENIED. The approval covers the exact effect that will run, not a class of
    effects that sounds like it.
 2. **Expiry.** `approval.expires_at` as minted is checked against the host's clock. Expired is DENIED.
+   A null `expires_at` is not compared, so that approval has no time limit (CORE, continuation
+   check 5).
 3. **Catalog.** A runtime catalog that changed between pending and continuation is `stale_capability`
    and DENIED.
 4. **Cancellation** by the host is DENIED and terminal.

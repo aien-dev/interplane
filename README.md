@@ -13,8 +13,9 @@ Runtime side:      Odysseus        AIEN         other runtimes
 ```
 
 INTERPLANE belongs to neither side. Odysseus and AIEN are the first two reference runtimes; Qwen3.5
-is the first qualified model dialect. Both runtimes keep their own tools, policy, approvals, memory
-and execution. INTERPLANE only standardizes what crosses between them and makes it measurable.
+is the first qualified model dialect. A third adapter connects Motus agents (see below). Each runtime
+keeps its own tools, policy, approvals, memory and execution. INTERPLANE only standardizes what
+crosses between them and makes it measurable.
 
 ## Try it offline (no model, no GPU, no network)
 
@@ -33,14 +34,19 @@ To connect your own program, see `docs/WRITING-AN-ADAPTER.md` and its runnable e
 `examples/adapter/todo_adapter.py`: a to-do list host with its own policy, an approval a person
 grants and one they decline.
 
-## What is in 0.1 (the Reality Layer)
+## What is in the repository (version 0.3.0)
+
+The Rust workspace and the Python package are at version 0.3.0. The base is 0.1, the Reality Layer.
+0.2 (Capability) is closed with its pre-registered gate failed and the failure published
+(`docs/REPORT-0.2.md`). 0.3 (Trust) is closed with its gate passed (`docs/REPORT-0.3.md`). 0.4 and 0.5
+are planned, not built (`ROADMAP.md`).
 
 | Module | What it is | Status |
 |---|---|---|
-| **Core** | normative JSON Schemas (2020-12) for envelope, intent, capability, decision, result, event, catalog, selection, probe report; versioning and error codes | see `STATUS.md` |
+| **Core** | normative JSON Schemas (2020-12) for envelope, intent, capability, decision, result, event, catalog, selection, input record, probe report; versioning and error codes | see `STATUS.md` |
 | **Lenshift** | model dialect parsers and result renderers: `openai`, `qwen35`; `ajax` reserved | see `STATUS.md` |
 | **Crossveil** | the authority-boundary contract: two runtime callbacks, a lifecycle with fail-closed invariants, trust classes | see `STATUS.md` |
-| **CrossAxis** | explicit, versioned capability mapping; a deterministic domain selector with a before/after receipt | minimal in 0.1 |
+| **CrossAxis** | explicit, versioned capability mapping; a deterministic domain selector with a before/after receipt; bounded expansion | see `STATUS.md` |
 | **Interplane Probe** | measured capability qualification of an OpenAI-compatible endpoint | see `STATUS.md` |
 | **Conformance** | 106 conformance cases plus 56 dialect fixtures; Rust and Python runners must agree byte for byte | see `STATUS.md` |
 | Vectorveil | the envelope and canonical JSON; no transport framework | envelope only |
@@ -58,8 +64,14 @@ python/          interplane package (stdlib only at runtime)
 dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
 adapters/        aien/, odysseus/, motus/ reference adapters (depend on their hosts; Core never does)
-examples/        minimal mock runtime and mock model
+examples/        offline/ (scripted model, mock runtime), adapter/ (to-do host), receipt/ (before/after receipt)
+bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), runner tools, published runs
+qualification/   real-model probe captures, evidence and reports
+provenance/      companion manifest verifier, outside Core (ADR 0004)
+docs/            reports (REPORT-*.md), WRITING-AN-ADAPTER.md, plans, analysis
 docs/adr/        decisions
+STATUS.md        what is implemented, tested, conformant or qualified
+ROADMAP.md       the layers and where each stands
 CURRENT_STATE.md what the host projects' live code actually contained when this started
 ```
 
@@ -78,5 +90,6 @@ carries the decision and refuses to upgrade it. Denied never becomes authorized 
 
 ## License
 
-Apache-2.0 for the protocol, schemas, fixtures and reference SDKs. The reference adapters under
-`adapters/` depend on their host projects and are licensed to match them; see `docs/adr/0002-licensing.md`.
+Apache-2.0 for the protocol, schemas, fixtures and reference SDKs. `adapters/aien` and
+`adapters/odysseus` depend on AGPL host projects and are AGPL-3.0-or-later, each with its own
+`LICENSE`; see `docs/adr/0002-licensing.md`. `adapters/motus` is Apache-2.0, like Core.

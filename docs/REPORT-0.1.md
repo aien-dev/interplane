@@ -1,6 +1,6 @@
 # INTERPLANE 0.1 readiness report (2026-10-04)
 
-Repository: https://github.com/aien-dev/interplane (public, Apache-2.0 core; adapters AGPL-3.0-or-later).
+Repository: https://github.com/aien-spark/interplane (public, Apache-2.0 core; adapters AGPL-3.0-or-later).
 Format follows the mission's reporting discipline. Every claim below is backed by a file in the
 repository or a command whose output is recorded there; nothing planned is described as done.
 

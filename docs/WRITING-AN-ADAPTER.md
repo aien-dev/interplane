@@ -69,7 +69,7 @@ One behaviour to know about: when a request is refused or held, the pipeline's r
 carries no labels, and it is recorded as `unknown`, which counts as `external_untrusted`. After a
 single refusal, the floor for the rest of the trace is `external_untrusted`. The example shows this at
 step 5. It is the spec as written and fails safe; whether it should change is
-[issue #57](https://github.com/aien-dev/interplane/issues/57).
+[issue #57](https://github.com/aien-spark/interplane/issues/57).
 
 ## 5. Wiring the pipeline
 

@@ -10,12 +10,12 @@ Pinned sources:
 | Project | Repo | Commit | Default branch | License |
 |---|---|---|---|---|
 | Odysseus | odysseus-dev/odysseus | 2992bf6 (2026-10-01) | dev | AGPL-3.0 |
-| AIEN sovereign core | aien-dev/aien-sovereign-core | 9b5e6e8 (2026-10-08 adapter pin; was 7580039 at the 2026-10-04 re-audit) | main | AGPL-3.0-or-later |
+| AIEN sovereign core | aien-spark/aien-sovereign-core | 9b5e6e8 (2026-10-08 adapter pin; was 7580039 at the 2026-10-04 re-audit) | main | AGPL-3.0-or-later |
 
 VAC M3b (2026-10-08): the adapter still pins 9b5e6e8 for its crates. The fix-the-test slice gate (adapters/aien/scripts/test-fix-the-test.sh) was run against a daemon built from sovereign-core 47f1014 (#346: `ComposeRecall` reports `compose_native` and `omega_sha`; the daemon prints `Compose: native (omega <sha>)`), CPU only, native compose linked from omega 6c6180c. Receipt: adapters/aien/evidence/fix-the-test-2026-10-08/receipt.json. The model turn of that run is scripted.
-| AIEN aegis-runtime | aien-dev/aegis-runtime | f4e8709 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
-| AIEN protocols | aien-dev/aien-protocols | 3a4cdbe (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
-| AIEN architecture | aien-dev/aien-architecture | 6c95697 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
+| AIEN aegis-runtime | aien-spark/aegis-runtime | f4e8709 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
+| AIEN protocols | aien-spark/aien-protocols | 3a4cdbe (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
+| AIEN architecture | aien-spark/aien-architecture | 6c95697 (2026-10-04 re-audit: still origin/main) | main | AGPL-3.0-or-later |
 | Qwen3.5 chat template | Qwen/Qwen3.5-9B `chat_template.jinja` | sha256 a4aee8af... (153 lines) | main | Apache-2.0 |
 
 Classification key: implemented / partially implemented / merged but unused / experimental /

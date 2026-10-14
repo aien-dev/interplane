@@ -76,14 +76,14 @@ record is never rewritten to match a new result.
   `OpenWALDOByteTokenizer` custom code, not a Hugging Face `tokenizer.json`, so the load-support
   check says `unsupported_tokenizer` and the AIEN, trace and effect links are labelled missing.
 - `fixtures/real-waldo-tokenizer-json`: REAL bytes. WALDO CPU smoke run exported by the patched exporter
-  (aien-dev/waldo `export-tokenizer-json` 09f262c, writes a Hugging Face `tokenizer.json`), then
+  (aien-spark/waldo `export-tokenizer-json` 09f262c, writes a Hugging Face `tokenizer.json`), then
   really loaded by aien-cli (sovereign-core PR #248 head 8e7b14d, debug build, CPU). The `aien` link
   is present with `candidate_id: null` (no frozen candidate, no `candidate_manifest` record); the
   daemon log is retained in full, including its warm-up refusal (plain base model, no chat
   template). Effect and INTERPLANE links are labelled missing.
 - `fixtures/real-waldo-aien-chain`: REAL bytes from ONE run (CPU evidence), see `REAL-CHAIN.md`. A tiny
   WALDO `chatml-v1` model, supervised-fine-tuned on tool-call conversations we wrote and exported with
-  `tokenizer.json` and the standard ChatML template (fork aien-dev/waldo `export-tokenizer-json` 4c407d7), is
+  `tokenizer.json` and the standard ChatML template (fork aien-spark/waldo `export-tokenizer-json` 4c407d7), is
   loaded by the AIEN daemon (aien-cli, sovereign-core main 12c1a5f, release build, CPU-reference backend).
   AIEN's own generation path (`StreamTurn`) on that loaded model produces the tool-call text; the INTERPLANE
   `aien_legacy` dialect parses it; the adapter drives one approved `write_file`; the daemon's ledger records

@@ -1,6 +1,6 @@
 # INTERPLANE 0.3 trust report (2026-10-05)
 
-Repository: https://github.com/aien-dev/interplane. Format follows `docs/REPORT-0.2.md`. Every
+Repository: https://github.com/aien-spark/interplane. Format follows `docs/REPORT-0.2.md`. Every
 number below comes from a file on main (path cited). Nothing planned is described as done.
 
 **Headline: every offline gate of the pre-registered 0.3 protocol PASSED** (P, X, I, E, A, N;

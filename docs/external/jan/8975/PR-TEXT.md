@@ -1,6 +1,6 @@
 Title: fix(agent): advertise one definition per MCP tool name
 
-Target: janhq/jan, base `main`, head aien-dev/jan `fix/mcp-duplicate-tool-names-8975`.
+Target: janhq/jan, base `main`, head aien-spark/jan `fix/mcp-duplicate-tool-names-8975`.
 
 ## Describe Your Changes
 

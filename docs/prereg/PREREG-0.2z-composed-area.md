@@ -12,7 +12,7 @@ read_file`) always exposed in condition B5**, with the R1 receipt fields (`PRERE
 measured it: in three authoring attempts the independent author wrote 6, 3 and 3 of the 24 everyday requests that
 had to name a non-file area, and amendment 4 item 16 ended 0.2y.
 
-The base text is `docs/prereg/PREREG-0.2y-base-set-discovery.md` at aien-dev/interplane `9129936`
+The base text is `docs/prereg/PREREG-0.2y-base-set-discovery.md` at aien-spark/interplane `9129936`
 (sha256 `3c8a6964c4b4b79e37f6c2c6fc858faf8e53afba9d5404ce79cfa201a1a56148`) and
 `bench/heldout-0.2y/AUTHORING.md` at the same commit (sha256
 `2273124bf22226aa43d71ec76b6ed89499e37f2b03ebe62f0a3abb22cfdb5726`). Sections 1 to 10 of that prereg and all of that

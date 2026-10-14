@@ -2,7 +2,7 @@
 
 Project: janhq/jan, default branch pinned at 14a720628f9592c8e60f7e081ef733076db8a6a9 (2026-10-02).
 Issue: https://github.com/janhq/jan/issues/8975 (open, no assignee, no linked PR or branch as of 2026-10-04).
-Fork branch: aien-dev/jan `fix/mcp-duplicate-tool-names-8975` (test 27a66f0, fix c13dfa0, tidy 40b96aa).
+Fork branch: aien-spark/jan `fix/mcp-duplicate-tool-names-8975` (test 27a66f0, fix c13dfa0, tidy 40b96aa).
 Evidence level: reproduced (unit level), fixed, tested. Not submitted. Drake is the submitter.
 
 ## Observed

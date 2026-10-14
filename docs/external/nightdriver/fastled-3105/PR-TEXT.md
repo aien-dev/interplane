@@ -1,6 +1,6 @@
 # Upstream PR text (NOT submitted; Drake's button)
 
-Branch: aien-dev/NightDriverStrip `fix/pin-fastled-3103` (one commit `a837953e` on top of upstream main `4d79c290`). Target: `main`.
+Branch: aien-spark/NightDriverStrip `fix/pin-fastled-3103` (one commit `a837953e` on top of upstream main `4d79c290`). Target: `main`.
 
 ## Title
 Pin FastLED to 3.10.3: 3.10.5 breaks the build

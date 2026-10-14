@@ -51,7 +51,7 @@ Not proven. What is established (observed, from source): the project sizes its L
 
 ## Fix
 
-Branch `fix/565-buffer-budget-8bit` on `aien-dev/NightDriverStrip` (fork), commit `8e3d3515c36bebea464467b7834c8ca95afe8925`, based on `4d79c290`. Two files: new `include/heapbudget.h` (`FreeInternalBytes8Bit()`, one `heap_caps_get_free_size(INTERNAL|8BIT)` call) and a 3-line change in `SystemContainer::SetupBufferManagers` for the non-PSRAM branch. PSRAM builds unchanged.
+Branch `fix/565-buffer-budget-8bit` on `aien-spark/NightDriverStrip` (fork), commit `8e3d3515c36bebea464467b7834c8ca95afe8925`, based on `4d79c290`. Two files: new `include/heapbudget.h` (`FreeInternalBytes8Bit()`, one `heap_caps_get_free_size(INTERNAL|8BIT)` call) and a 3-line change in `SystemContainer::SetupBufferManagers` for the non-PSRAM branch. PSRAM builds unchanged.
 - [tested, model-level; not fixed on a device] The invariant above holds for the new query in the model.
 - [not tested] Not compiled for an ESP32 target (no PlatformIO toolchain here); not run on a device. Behaviour change: on classic ESP32 without PSRAM the buffer count can drop by about (IRAM free / bytes per set), so a few boards may need MAX_BUFFERS or MIN_BUFFERS review. That cost is the point: the old count was too high by that amount.
 - It does not claim to fix #565. See `upstream-pr-draft.md` for the wording.

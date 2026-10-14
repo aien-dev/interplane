@@ -141,7 +141,7 @@ The remaining choices (C, R, V) are all safe. They differ in cost, not in safety
 
 That was a product call (how much usability is worth a new protocol field and a new adapter duty).
 It was made for C. R and V are kept as a revision candidate in
-https://github.com/aien-dev/interplane/issues/80 with the trigger "real usability cost observed in a
+https://github.com/aien-spark/interplane/issues/80 with the trigger "real usability cost observed in a
 host". The tests below pin what must hold under C, R and V alike, and pin today's behaviour.
 
 ## 7. Tests added (no behaviour change)

@@ -1,6 +1,6 @@
 # INTERPLANE 0.2 capability report (2026-10-04)
 
-Repository: https://github.com/aien-dev/interplane. Format follows `docs/REPORT-0.1.md`. Every
+Repository: https://github.com/aien-spark/interplane. Format follows `docs/REPORT-0.1.md`. Every
 number below comes from a file on main (path cited). Nothing planned is described as done.
 
 **Headline: the pre-registered CrossAxis gate FAILED.** The thresholds were fixed in

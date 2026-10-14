@@ -1,6 +1,6 @@
 # Upstream PR draft (NOT SENT: Drake's button). Targets PlummersSoftwareLLC/NightDriverStrip main.
 
-Branch: aien-dev/NightDriverStrip `fix/565-buffer-budget-8bit` (8e3d3515), based on main `4d79c290`.
+Branch: aien-spark/NightDriverStrip `fix/565-buffer-budget-8bit` (8e3d3515), based on main `4d79c290`.
 CONTRIBUTING.md exists on main and has no AI-assistance disclosure requirement (grep for AI, LLM, assisted, generated: no hits). Disclosure is still recommended by courtesy: "Drafted with AI assistance (Claude); reviewed and tested by the submitter." Add only if Drake agrees.
 Nothing in this text may mention INTERPLANE or AIEN.
 

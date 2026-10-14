@@ -1,7 +1,7 @@
 # NightDriverStrip: a fresh FastLED resolve breaks the build (lane D3)
 
 External proving-ground lane D3. Upstream: PlummersSoftwareLLC/NightDriverStrip, main `4d79c290`.
-Nothing here was sent upstream. Fork branch: aien-dev/NightDriverStrip `fix/pin-fastled-3103` (`a837953e`). PR text: `PR-TEXT.md`.
+Nothing here was sent upstream. Fork branch: aien-spark/NightDriverStrip `fix/pin-fastled-3103` (`a837953e`). PR text: `PR-TEXT.md`.
 
 **Outcome:** the originally suspected one-file source fix is not enough. Fix shipped on the fork is a one-line library pin to FastLED 3.10.3. Evidence tags: observed, reproduced, fixed, tested.
 

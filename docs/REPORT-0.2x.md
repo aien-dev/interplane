@@ -1,6 +1,6 @@
 # INTERPLANE 0.2x campaign report (2026-10-05)
 
-Repository: https://github.com/aien-dev/interplane. Format follows `docs/REPORT-0.2.md`. Every
+Repository: https://github.com/aien-spark/interplane. Format follows `docs/REPORT-0.2.md`. Every
 number below comes from a file under `bench/runs/heldout-0.2x-20261005T0102Z/` (path cited).
 Nothing planned is described as done.
 

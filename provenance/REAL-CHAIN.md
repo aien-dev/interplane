@@ -27,7 +27,7 @@ from the same model and execution. So:
 
 1. Chat template. The AIEN loader (`aien-inference-abi`, `tokenizer.rs`) accepts a template only if its text
    equals a known one. The WALDO `chatml-v1` export used a whitespace-controlled spelling, so it was not
-   recognised. Fix on the fork (aien-dev/waldo `export-tokenizer-json`, commit
+   recognised. Fix on the fork (aien-spark/waldo `export-tokenizer-json`, commit
    4c407d7f5ed33feaf234dd8ebed34ac197cfc0ef): ship the exact Hugging Face ChatML text; a Go test pins it. The
    template is recorded in the export (`chat_template.jinja`, `tokenizer_config.json`) and in the manifest.
 2. KV pool. The daemon sizes its KV pool from the model context and needs the 643-token warm-up prompt plus a

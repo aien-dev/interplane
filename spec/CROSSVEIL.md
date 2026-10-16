@@ -55,7 +55,7 @@ read as a grant. The normative contract is in `CORE.md` (Approval continuation);
    decision, and `execute` runs at most once per request.
 
 Evidence: cases A01 to A14 of `bench/PROTOCOL-0.3.md` (`conformance/fixtures/approval/`), identical
-verdicts in Rust and Python.
+verdicts in the Rust reference runner and the retired Python one.
 
 ## State record
 

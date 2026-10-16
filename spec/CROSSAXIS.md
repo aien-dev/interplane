@@ -88,8 +88,7 @@ model, system and user messages; the second adds the rendered tools and nothing 
 counters; live counters (model-reported, endpoint tokenizer) are implemented by the bench runner
 against this interface and Core only assembles the receipt.
 
-- Python: `TokenCounter` protocol with `unit`, `source`, `count_prompt(messages, tools_or_None) -> int`.
-  Rust: `trait TokenCounter { unit(), source(), count_prompt(&Value, Option<&Value>) -> u64 }`.
+- Rust: `trait TokenCounter { unit(), source(), count_prompt(&Value, Option<&Value>) -> u64 }`.
 - `BytesOnly`: `len(jcs(messages)) + len(jcs(tools))` in UTF-8 bytes (tools term absent for `None`).
 - `EstimatedTokens` (estimator v1): for a JSON value `v`, `est(v) = ceil(len(utf8(jcs(v))) / 4)`;
   `count_prompt = est(messages) + est(tools)` (second term absent for `None`).
@@ -150,9 +149,9 @@ output. `select` never writes a digest.
 Receipt normalization (every implementation): optional fields are omitted when empty (`always_include`,
 `selected[].domains`, `selector.max_capabilities` when null).
 
-Reference API. Python (`interplane.crossaxis`): `measure(full, selected, renderer, counter=None,
-messages=None, all_rounds_prompt=None, completion=None)`, `token_block(...)`,
-`BytesOnly()`, `EstimatedTokens()`, `discover(catalog, selection, query, limit=8)`,
-`expand(selection, catalog, evidence, max_expansions=None, max_added_per_expansion=None)`,
-`selection_digest(selection)`. Rust (`interplane_crossaxis`): `measure`, `measure_tokens`,
-`openai_tools_renderer`, `discover`, `expand`, `selection_digest`.
+Reference API (Rust, `interplane_crossaxis`): `measure(selection, catalog, selected, render)`,
+`measure_tokens(selection, catalog, selected, render, counted)` (`counted`: a `TokenCounter`, the
+messages and `BenchTotals`), `BytesOnly`, `EstimatedTokens`, `openai_tools_renderer`,
+`discover(catalog, selection, query, limit)`,
+`expand(selection, catalog, evidence, max_expansions, max_added_per_expansion)` (`None` takes the
+defaults), `selection_digest(selection)`.

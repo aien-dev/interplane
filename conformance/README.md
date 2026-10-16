@@ -113,11 +113,11 @@ never pending; the same id on a pending request is A03. Expiry compares the exac
 `YYYY-MM-DDTHH:MM:SSZ` shape as strings and treats anything else as expired. A continuation never
 calls `decide`, so its `ObservedRecord` has `decide_invoked` false.
 
-## Cross-language verdict comparison
+## Verdict comparison with the recorded reference
 
-Each runner writes its full `observed` array (with `result_digest` filled) as JSON. Canonicalize each with
-RFC 8785 and compare bytes. The Rust runner's output must equal `conformance/expected/verdicts.json`
-byte for byte (the retired Python runner produced the same file; CI compares on every change). A runner also compares its
+The runner writes its full `observed` array (with `result_digest` filled) as canonical JSON (RFC 8785).
+The Rust runner's output must equal `conformance/expected/verdicts.json` byte for byte (the retired
+Python runner produced the same file; CI compares on every change). The runner also compares its
 array to the fixture's `expected.observed` after setting every `result_digest` to null.
 
 ## Spec ambiguities resolved (fail-closed), with spec citations

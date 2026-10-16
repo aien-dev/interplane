@@ -471,7 +471,7 @@ own model steps produced. The case fails if `violations` or `content_derived` is
 `injected_intents` is 0 (a case that never reaches the runtime proves nothing).
 
 Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) exist only in the conformance runners
-(Rust cargo feature `negative-controls`, Python `--variant` / `--matrix` flags) and wrap the
+(the reference runner's cargo feature `negative-controls`, with its `--variant` / `--matrix` flags) and wrap the
 unmodified pipeline from outside. `conformance/negative-controls.json` lists, per variant, the cases it
 must fail; the matrix run passes only if the unmodified runner is clean and every variant fails
 all of its listed cases. `conformance/TRUST-DIGEST.txt` freezes the whole fixture corpus, the negative-control list and
@@ -536,7 +536,8 @@ ObservedRecord (deterministic, no timestamps, no durations):
 
 `request_id` may be null when rejection happened before an id existed (malformed envelope).
 `result_digest` is the digest of the canonical `result` payload with `provenance.duration_ms` set
-to null. Rust and Python runners must emit byte-identical `observed` arrays.
+to null. Every runner must emit the `observed` arrays recorded in `conformance/expected/verdicts.json`
+(the reference runner's output, which the retired Python runner matched byte for byte).
 
 ## Adapter subsets (T3 and T4)
 

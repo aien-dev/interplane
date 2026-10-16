@@ -148,8 +148,9 @@ they were published with the 0.2 run. The 0.2x gate uses only the held-out set i
 
 ## Adding or changing a task
 
-1. Write `tasks/<category>-NNN.json` against the schema. Set `requested_domains` to the output of
-   `python3 bench/tools/validate.py --derive "<user_request>"`. Never edit `domains.json` to make a
+1. Write `tasks/<category>-NNN.json` against the schema. Set `requested_domains` by the rule in `domains.json`. The
+   tool that derived it (`tools/validate.py --derive`) was removed on 2026-10-15 and is in git history; a
+   new task needs a Rust port of it first. Never edit `domains.json` to make a
    task fit. Reword the request or change its category instead.
 2. Every capability name must be in `adapters/odysseus/catalog.odysseus-2992bf6.json` (the frozen corpus catalog, 71 tools; the adapter itself now loads `catalog.odysseus-a8c147b.json`, #95).
 3. Coverage:

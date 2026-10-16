@@ -11,7 +11,12 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: no Python file is tracked
         run: |
-          found=$(git ls-files -- ':(glob)**/*.py' ':(glob)**/*.ipynb' ':(glob)**/pyproject.toml' ':(glob)**/requirements*.txt' ':(glob)**/setup.py')
+          found=$(git ls-files -- ':(glob)**/*.py' ':(glob)**/*.pyi' ':(glob)**/*.pyx' ':(glob)**/*.ipynb' \
+            ':(glob)**/pyproject.toml' ':(glob)**/requirements*.txt' ':(glob)**/setup.py' ':(glob)**/setup.cfg' \
+            ':(glob)**/Pipfile' ':(glob)**/Pipfile.lock')
+          # Scripts without a .py ending: a first line that runs Python.
+          shebang=$(git ls-files -z | xargs -0 -r awk 'FNR == 1 { if ($0 ~ /^#!.*python/) print FILENAME; nextfile }')
+          found=$(printf '%s\n%s\n' "$found" "$shebang" | sed '/^$/d')
           if [ -n "$found" ]; then
             printf 'Python files are tracked; this repository ships no Python:\n%s\n' "$found"
             exit 1
@@ -46,7 +51,7 @@ jobs:
           cargo run -q -p interplane-crossveil --example todo_adapter
       - name: conformance verdicts equal the recorded reference (106 cases; the retired Python SDK gave the same bytes)
         run: |
-          cargo run -q -p interplane-conformance --bin interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
+          cargo run -q --locked -p interplane-conformance --bin interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
           cmp ../rust-verdicts.json ../conformance/expected/verdicts.json
           test "$(jq length ../rust-verdicts.json)" = 106
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

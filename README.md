@@ -9,13 +9,13 @@ Model side:        Qwen3.5      Ajax (when published)      other local or hosted
                         \            |             /
                          ----- INTERPLANE -----
                         /            |             \
-Runtime side:      Odysseus        AIEN         other runtimes
+Runtime side:           AIEN          other runtimes
 ```
 
-INTERPLANE belongs to neither side. Odysseus and AIEN are the first two reference runtimes; Qwen3.5
-is the first qualified model dialect. A third adapter connects Motus agents (see below). Each runtime
-keeps its own tools, policy, approvals, memory and execution. INTERPLANE only standardizes what
-crosses between them and makes it measurable.
+INTERPLANE belongs to neither side. AIEN is the reference runtime (Odysseus was the first, through an
+adapter removed on 2026-10-15; see "Removed adapters" below); Qwen3.5 is the first qualified model
+dialect. Each runtime keeps its own tools, policy, approvals, memory and execution. INTERPLANE only
+standardizes what crosses between them and makes it measurable.
 
 ## Try it offline (no model, no GPU, no network)
 
@@ -63,9 +63,9 @@ rust/            Cargo workspace: interplane-core, -lenshift, -crossaxis, -cross
 python/          interplane package (stdlib only at runtime)
 dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
-adapters/        aien/, odysseus/, motus/ reference adapters (depend on their hosts; Core never does)
+adapters/        aien/ reference adapter (depends on its host; Core never does); odysseus/ keeps catalog records only
 examples/        offline/ (scripted model, mock runtime), adapter/ (to-do host), receipt/ (before/after receipt)
-bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), runner tools, published runs
+bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), published runs (records only)
 qualification/   real-model probe captures, evidence and reports
 provenance/      companion manifest verifier, outside Core (ADR 0004)
 docs/            reports (REPORT-*.md), WRITING-AN-ADAPTER.md, plans, analysis
@@ -75,11 +75,20 @@ ROADMAP.md       the layers and where each stands
 CURRENT_STATE.md what the host projects' live code actually contained when this started
 ```
 
-## Motus adapter
+## Removed adapters
 
-`adapters/motus/` lets a Lithos AI Motus agent send its tool calls through INTERPLANE and exports an
-evidence bundle that anyone can verify. Motus is optional, the authority stays outside the adapter,
-and Core is untouched. Install, demo and verification steps: [`adapters/motus/README.md`](adapters/motus/README.md).
+Two Python adapters were removed on 2026-10-15 under the project rule that no Python ships here:
+
+- `adapters/odysseus`: ran the Odysseus agent runtime as an INTERPLANE authority. It was the T3 runner
+  of the closed 0.3 trust gate and the runtime of the 0.2 and 0.2x bench campaigns. Odysseus is a
+  Python program, so the adapter could not move to Rust; its catalog records stay in
+  `adapters/odysseus/` because the bench corpus and recorded runs cite them.
+- `adapters/motus`: let a Lithos AI Motus agent (a Python framework) send its tool calls through
+  INTERPLANE, using the AIEN authority through the `aien-authority-bridge` binary, which stays in
+  `adapters/aien`.
+
+The Rust AIEN adapter (`adapters/aien`) is the reference adapter. Both removed adapters remain in git
+history (present through commit `43ec8f8`).
 
 ## Security in one paragraph
 
@@ -90,6 +99,6 @@ carries the decision and refuses to upgrade it. Denied never becomes authorized 
 
 ## License
 
-Apache-2.0 for the protocol, schemas, fixtures and reference SDKs. `adapters/aien` and
-`adapters/odysseus` depend on AGPL host projects and are AGPL-3.0-or-later, each with its own
-`LICENSE`; see `docs/adr/0002-licensing.md`. `adapters/motus` is Apache-2.0, like Core.
+Apache-2.0 for the protocol, schemas, fixtures and reference SDKs. `adapters/aien` depends on AGPL host
+projects and is AGPL-3.0-or-later, with its own `LICENSE`, as are the Odysseus catalog records in
+`adapters/odysseus`; see `docs/adr/0002-licensing.md`.

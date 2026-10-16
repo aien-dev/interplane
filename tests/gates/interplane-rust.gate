@@ -1,0 +1,27 @@
+# tests/gates/interplane-rust.gate
+# Mirrors hosted: ci.yml job rust (fmt, clippy -D warnings, test --all, negative-controls feature tests, both examples, 106 conformance verdicts == conformance/expected/verdicts.json)
+gate: INTERPLANE-RUST
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - rust/
+  - provenance/
+  - conformance/
+  - spec/
+  - dialects/
+  - bench/
+  - examples/
+  - adapters/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["rust"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 60m
+exactness: EXACT
+cache_scope: machine

@@ -1,0 +1,27 @@
+# tests/gates/interplane-package.gate
+# Mirrors hosted: ci.yml job package (cargo package --workspace --locked in rust/)
+gate: INTERPLANE-PACKAGE
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - rust/
+  - provenance/
+  - conformance/
+  - spec/
+  - dialects/
+  - bench/
+  - examples/
+  - adapters/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["package"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 60m
+exactness: EXACT
+cache_scope: machine

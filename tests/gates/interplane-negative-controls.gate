@@ -1,0 +1,27 @@
+# tests/gates/interplane-negative-controls.gate
+# Mirrors hosted: ci.yml job negative-controls (trust-digest --check, no negctl in pipeline libraries, default build refuses a variant, matrix == conformance/expected/negative-control-matrix.json)
+gate: INTERPLANE-NEGATIVE-CONTROLS
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - rust/
+  - provenance/
+  - conformance/
+  - spec/
+  - dialects/
+  - bench/
+  - examples/
+  - adapters/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["negative-controls"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 30m
+exactness: EXACT
+cache_scope: machine

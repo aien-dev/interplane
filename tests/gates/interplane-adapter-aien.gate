@@ -1,0 +1,27 @@
+# tests/gates/interplane-adapter-aien.gate
+# Mirrors hosted: ci.yml job adapter-aien (setup-siblings.sh at adapters/aien/PINS, fmt, clippy -D warnings, test, T4 subset). Host: needs siblings ../aegis-runtime and ../aien-protocols
+gate: INTERPLANE-ADAPTER-AIEN
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - rust/
+  - provenance/
+  - conformance/
+  - spec/
+  - dialects/
+  - bench/
+  - examples/
+  - adapters/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["adapter-aien"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 60m
+exactness: EXACT
+cache_scope: machine

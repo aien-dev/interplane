@@ -9,13 +9,13 @@ Model side:        Qwen3.5      Ajax (when published)      other local or hosted
                         \            |             /
                          ----- INTERPLANE -----
                         /            |             \
-Runtime side:      Odysseus        AIEN         other runtimes
+Runtime side:           AIEN          other runtimes
 ```
 
-INTERPLANE belongs to neither side. Odysseus and AIEN are the first two reference runtimes; Qwen3.5
-is the first qualified model dialect. A third adapter connects Motus agents (see below). Each runtime
-keeps its own tools, policy, approvals, memory and execution. INTERPLANE only standardizes what
-crosses between them and makes it measurable.
+INTERPLANE belongs to neither side. AIEN is the reference runtime (Odysseus was the first, through an
+adapter removed on 2026-10-15; see "Removed adapters" below); Qwen3.5 is the first qualified model
+dialect. Each runtime keeps its own tools, policy, approvals, memory and execution. INTERPLANE only
+standardizes what crosses between them and makes it measurable.
 
 ## Try it offline (no model, no GPU, no network)
 
@@ -65,7 +65,7 @@ dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
 adapters/        aien/ reference adapter (depends on its host; Core never does); odysseus/ keeps catalog records only
 examples/        offline/ (scripted model, mock runtime), adapter/ (to-do host), receipt/ (before/after receipt)
-bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), runner tools, published runs
+bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), published runs (records only)
 qualification/   real-model probe captures, evidence and reports
 provenance/      companion manifest verifier, outside Core (ADR 0004)
 docs/            reports (REPORT-*.md), WRITING-AN-ADAPTER.md, plans, analysis
@@ -88,7 +88,7 @@ Two Python adapters were removed on 2026-10-15 under the project rule that no Py
   `adapters/aien`.
 
 The Rust AIEN adapter (`adapters/aien`) is the reference adapter. Both removed adapters remain in git
-history (last commit with them: `43ec8f8`).
+history (present through commit `43ec8f8`).
 
 ## Security in one paragraph
 

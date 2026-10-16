@@ -48,5 +48,5 @@ separates what must reproduce (`deterministic_digest`) from what happened to.
 
 The receipts were produced by `run_receipt.py` with the Python Odysseus adapter, against the real
 Odysseus code at `2992bf6`. Both were removed on 2026-10-15 under the project rule that no Python
-ships here (see `adapters/odysseus/README.md`); the script is in git history at commit `43ec8f8`.
+ships here (see `adapters/odysseus/README.md`); the script is in git history (present through commit `43ec8f8`).
 The two receipts stay as the record of this demonstration.

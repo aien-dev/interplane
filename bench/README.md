@@ -7,6 +7,19 @@ The corpus, its judge and its statistics are fixed here **before** any model is 
 runner is a separate lane; this directory is everything it needs. The protocol is
 `PROTOCOL-0.2.md`.
 
+## Status (2026-10-15): records only
+
+The campaigns this corpus served are closed: 0.2 and 0.2x qualified FAIL, 0.2y authoring ended, and
+the 0.3 trust gate qualified PASS (see `STATUS.md`). The Python tooling that built, ran, validated
+and analysed them (`tools/`, with `sim_backends.py`, `validate.py`, `run_bench.py`, `stats.py`,
+`live_injection.py`, `trust_run.py`, the 0.2y authoring tools, their tests and `tools/testdata/`, and
+`heldout-0.2y/attempt-*/drive.py`) was removed on 2026-10-15 under the project rule that no Python
+ships here. Most of it drove the Odysseus runtime, whose adapter was removed the same day; the
+hand-curated Odysseus tool-domain map it read (`TOOL_DOMAINS`) went with that adapter. All of it is
+in git history (present through commit `43ec8f8`). The corpus, protocols, digests and run records
+stay unchanged as the evidence for those results; CI no longer recomputes the bench digests, and
+the commands below that name these tools describe how the records were made.
+
 ## Layout
 
 | Path | What it is |

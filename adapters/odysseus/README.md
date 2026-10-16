@@ -8,9 +8,9 @@ the 0.2 and 0.2x bench campaigns and of `examples/receipt`.
 
 It was removed on 2026-10-15 under the project rule that no Python ships in this repository. Odysseus
 is a Python program, so an adapter that imports it cannot be rewritten in Rust; INTERPLANE's
-reference adapter is now the Rust AIEN adapter (`adapters/aien`), and the Rust to-do host
-(`rust/crates/interplane-crossveil/examples/todo_adapter.rs`) shows how to write a new one. The last
-commit with the adapter is `43ec8f8`; its code and tests remain in git history.
+reference adapter is now the Rust AIEN adapter (`adapters/aien`); `docs/WRITING-AN-ADAPTER.md` shows how
+to write a new one. The adapter's code and tests remain in git history (present through commit
+`43ec8f8`).
 
 What stays here is data that the recorded runs and the bench corpus cite, unchanged:
 

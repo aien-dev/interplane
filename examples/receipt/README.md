@@ -44,16 +44,9 @@ byte-identical: totals across all rounds differed slightly (selected path: 7 077
 tokens, 150 vs 152 completion tokens) and request ids and timings differ by nature. The receipt
 separates what must reproduce (`deterministic_digest`) from what happened to.
 
-## Run it
+## How the receipts were made
 
-```
-ODYSSEUS_SRC=~/workspace/odysseus PYTHONPATH=python:adapters/odysseus \
-  <odysseus-venv>/bin/python examples/receipt/run_receipt.py \
-  --endpoint http://127.0.0.1:11434/v1 --model qwen3.5:9b \
-  --probe qualification/reports/qwen35-9b-ollama-0.34.0.probe.json \
-  --out examples/receipt/receipts/my-run.json \
-  [--verify examples/receipt/receipts/qwen35-9b-ollama-run1.json]
-```
-
-The Odysseus checkout and venv are described in `adapters/odysseus/README.md`. The script needs
-the real Odysseus code: without it `decide()` fails closed and nothing executes.
+The receipts were produced by `run_receipt.py` with the Python Odysseus adapter, against the real
+Odysseus code at `2992bf6`. Both were removed on 2026-10-15 under the project rule that no Python
+ships here (see `adapters/odysseus/README.md`); the script is in git history at commit `43ec8f8`.
+The two receipts stay as the record of this demonstration.

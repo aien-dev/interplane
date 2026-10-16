@@ -481,4 +481,5 @@ writes one JSON line per request on stdout. Every call goes straight to `AienAut
 the serde JSON of `interplane-core`'s `Catalog`, `Decision` and `ToolResult`. Unknown ops, malformed
 JSON or a wrong shape return `{"ok":false,"error":...}` and never a decision. `approve` is the host-only
 approver channel (AIEN's desk issues one single-use grant, the bridge allows one approve per request id).
-The Python consumer is `adapters/motus` (`AienBridgeAuthority`). Test: `cargo test --test bridge`.
+Its first consumer was the Python Motus adapter (`adapters/motus`, removed 2026-10-15); any host that
+can speak JSON lines can use it. Test: `cargo test --test bridge`.

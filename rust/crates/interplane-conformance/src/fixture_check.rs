@@ -13,6 +13,11 @@
 //!
 //! [`run`] returns the summary lines and every failure; the `interplane-corpus validate` command
 //! prints them and exits non-zero on any failure.
+//!
+//! Its report is byte-identical to the retired Python validator's when the corpus passes and when a
+//! check other than a schema check fails. Schema failures differ in wording: the error text comes
+//! from the `jsonschema` crate, not the Python `jsonschema` package. Malformed names and a case 15
+//! without a tool call are reported as errors where the Python validator raised.
 use std::collections::{BTreeSet, HashSet};
 use std::path::{Path, PathBuf};
 
@@ -120,25 +125,66 @@ impl Ctx {
     /// Validate `inst`; record at most three schema errors, ordered by instance path.
     fn check(&mut self, v: &Validator, inst: &OJson, where_: &str) -> bool {
         let value = inst.to_value();
-        let mut errs: Vec<(Vec<String>, String)> = v
+        let mut errs: Vec<(Vec<Seg>, String)> = v
             .iter_errors(&value)
             .map(|e| {
-                let path: Vec<String> = e
-                    .instance_path
-                    .to_string()
-                    .split('/')
-                    .filter(|s| !s.is_empty())
-                    .map(String::from)
-                    .collect();
+                let path = segments(&value, &e.instance_path.to_string());
                 (path, e.to_string())
             })
             .collect();
+        // Python sorted by `list(e.absolute_path)`: indices as numbers, keys as text.
         errs.sort_by(|a, b| a.0.cmp(&b.0));
         for (path, msg) in errs.iter().take(3) {
             let msg: String = msg.chars().take(200).collect();
-            self.fail(format!("{where_}: {msg} at /{}", path.join("/")));
+            let shown: Vec<String> = path.iter().map(Seg::to_string).collect();
+            self.fail(format!("{where_}: {msg} at /{}", shown.join("/")));
         }
         errs.is_empty()
+    }
+}
+
+/// One step of an instance path, typed by the value it steps into (an array index or an object key).
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
+enum Seg {
+    Index(usize),
+    Key(String),
+}
+
+impl std::fmt::Display for Seg {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Seg::Index(i) => write!(f, "{i}"),
+            Seg::Key(k) => f.write_str(k),
+        }
+    }
+}
+
+/// Split a JSON pointer into typed steps by walking `root`, so index `10` sorts after index `2` and
+/// a numeric-looking object key stays a key.
+fn segments(root: &serde_json::Value, pointer: &str) -> Vec<Seg> {
+    let mut at = Some(root);
+    let mut out = Vec::new();
+    for raw in pointer.split('/').skip(1) {
+        let key = raw.replace("~1", "/").replace("~0", "~");
+        let seg = match (at, key.parse::<usize>()) {
+            (Some(serde_json::Value::Array(_)), Ok(i)) => Seg::Index(i),
+            _ => Seg::Key(key),
+        };
+        at = at.and_then(|v| match &seg {
+            Seg::Index(i) => v.get(*i),
+            Seg::Key(k) => v.get(k.as_str()),
+        });
+        out.push(seg);
+    }
+    out
+}
+
+/// Python `s[start:end]` on code points: clamps to the string and never panics.
+fn py_slice(s: &str, start: usize, end: Option<usize>) -> String {
+    let rest = s.chars().skip(start);
+    match end {
+        Some(e) => rest.take(e.saturating_sub(start)).collect(),
+        None => rest.collect(),
     }
 }
 
@@ -161,6 +207,8 @@ fn py_repr(v: &OJson) -> String {
         OJson::Bool(true) => "True".into(),
         OJson::Bool(false) => "False".into(),
         OJson::Str(s) => py_repr_str(s),
+        OJson::Arr(a) => format!("[{}]", a.iter().map(py_repr).collect::<Vec<_>>().join(", ")),
+        OJson::Obj(_) => py_dict_repr(v),
         other => dumps(other, Style::PLAIN),
     }
 }
@@ -594,7 +642,8 @@ pub fn run(root: &Path) -> Result<Report, String> {
                 ));
             }
         }
-        let pre = &name[..2.min(name.len())];
+        let pre_owned = py_slice(&name, 0, Some(2));
+        let pre = pre_owned.as_str();
         if f.has("selection") != matches!(pre, "24" | "25") {
             cx.fail(format!("{name}: selection block only in cases 24-25"));
         }
@@ -761,16 +810,18 @@ pub fn run(root: &Path) -> Result<Report, String> {
         }
         // size checks for the oversized case
         if name.starts_with("15") {
-            let text = f.get("steps").as_arr()[0]
-                .get("input")
-                .get("tool_calls")
-                .as_arr()[0]
-                .get("function")
-                .get("arguments")
-                .as_str()
-                .unwrap_or("")
-                .to_string();
-            let a = OJson::parse(&text)?;
+            // The Python validator raised here when the first step had no tool call; this names it.
+            let args = f
+                .get("steps")
+                .as_arr()
+                .first()
+                .and_then(|s| s.get("input").get("tool_calls").as_arr().first())
+                .and_then(|c| c.get("function").get("arguments").as_str());
+            let Some(text) = args else {
+                cx.fail("15: first step must carry a tool call with string arguments".into());
+                continue;
+            };
+            let a = OJson::parse(text)?;
             let content = a.get("content").as_str().unwrap_or("");
             if content.chars().count() != 70000 || content.chars().any(|c| c != 'a') {
                 cx.fail("15: content must be 70000 x 'a'".into());
@@ -1012,10 +1063,17 @@ pub fn run(root: &Path) -> Result<Report, String> {
         let f = OJson::read(p)?;
         let aname = stem(p);
         n_app += 1;
-        aseen.insert(aname[..2].to_string());
+        aseen.insert(py_slice(&aname, 0, Some(2)));
         let w = format!("approval/{aname}");
         if f.get("case").as_str()
-            != Some(format!("approval-A{}-{}", &aname[..2], &aname[3..]).as_str())
+            != Some(
+                format!(
+                    "approval-A{}-{}",
+                    py_slice(&aname, 0, Some(2)),
+                    py_slice(&aname, 3, None)
+                )
+                .as_str(),
+            )
         {
             cx.fail(format!("{w}: case slug {}", py_repr(f.get("case"))));
         }
@@ -1144,7 +1202,11 @@ pub fn run(root: &Path) -> Result<Report, String> {
     }
     let approval_case = |p: &PathBuf| {
         let n = stem(p);
-        format!("approval-A{}-{}", &n[..2], &n[3..])
+        format!(
+            "approval-A{}-{}",
+            py_slice(&n, 0, Some(2)),
+            py_slice(&n, 3, None)
+        )
     };
     let negctl_path = root.join("conformance/negative-controls.json");
     let nc = if negctl_path.exists() {

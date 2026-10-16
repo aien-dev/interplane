@@ -87,10 +87,47 @@ fn strs(v: &OJson) -> Vec<&str> {
 }
 
 fn adapter_entry<'a>(table: &'a OJson, adapter: &str) -> Result<&'a OJson, String> {
-    table
+    let ad = table
         .get("adapters")
         .get_opt(adapter)
-        .ok_or_else(|| format!("{adapter} is not in the translation table"))
+        .ok_or_else(|| format!("{adapter} is not in the translation table"))?;
+    check_entry(adapter, ad)?;
+    Ok(ad)
+}
+
+/// Refuse a malformed table entry by name instead of reading it as empty: the effect-class maps
+/// must be objects, and every argument mapping's `from` a list of strings, `as` and `prefix` strings.
+fn check_entry(adapter: &str, ad: &OJson) -> Result<(), String> {
+    for key in ["effects", "approval_effects", "provider_failure_effects"] {
+        let Some(classes) = ad.get_opt(key) else {
+            continue;
+        };
+        let OJson::Obj(classes) = classes else {
+            return Err(format!("{adapter}: {key} must be an object"));
+        };
+        for (cap, spec) in classes {
+            for (arg, m) in spec.get("args").entries() {
+                let at = format!("{adapter}: {key}.{cap}.args.{arg}");
+                if m.get_opt("from").is_some_and(
+                    |f| !matches!(f, OJson::Arr(a) if a.iter().all(|x| x.as_str().is_some())),
+                ) {
+                    return Err(format!("{at}.from must be a list of strings"));
+                }
+                for k in ["as", "prefix"] {
+                    if m.get_opt(k).is_some_and(|v| v.as_str().is_none()) {
+                        return Err(format!("{at}.{k} must be a string"));
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+/// `ad[key]`, or the error Python's `KeyError` raised.
+fn class_map<'a>(adapter: &str, ad: &'a OJson, key: &str) -> Result<&'a OJson, String> {
+    ad.get_opt(key)
+        .ok_or_else(|| format!("{adapter}: table entry has no {key}"))
 }
 
 /// `[(capability, shape)]` a step calls, or `None` when the step is not an openai, qwen35 or
@@ -166,11 +203,15 @@ pub fn decide_subset(
         if !is_pf && !(first <= num && num <= last) {
             return no("not a protocol approval case (A01 to A14)".into());
         }
-        ad.get(if is_pf {
-            "provider_failure_effects"
-        } else {
-            "approval_effects"
-        })
+        class_map(
+            adapter,
+            ad,
+            if is_pf {
+                "provider_failure_effects"
+            } else {
+                "approval_effects"
+            },
+        )?
     } else {
         let target = case
             .get("injection")
@@ -178,12 +219,13 @@ pub fn decide_subset(
             .get("capability")
             .as_str()
             .unwrap_or("");
-        if !ad.get("effects").has(target) {
+        let effects = class_map(adapter, ad, "effects")?;
+        if !effects.has(target) {
             return no(format!(
                 "target capability class {target} not in the adapter catalog"
             ));
         }
-        ad.get("effects")
+        effects
     };
     let mock_only = strs(table.get("mock_only_capabilities"));
     for s in case.get("steps").as_arr() {
@@ -374,7 +416,11 @@ fn xlate_step(
             if is_delivered(&cap, ad, classes, table) {
                 let id = c.get("id");
                 let rid = if id.truthy() {
-                    id.as_str().map(String::from).unwrap_or_default()
+                    id.as_str()
+                        .ok_or_else(|| {
+                            format!("tool call id must be a string, not {}", py_str(id))
+                        })?
+                        .to_string()
                 } else {
                     format!("t{turn}c{i}")
                 };
@@ -470,14 +516,18 @@ fn py_str(v: &OJson) -> String {
     }
 }
 
-fn approval_id(a: &OJson) -> OJson {
-    let id = a.get("approval_id").as_str().unwrap_or("").to_string();
-    match id.strip_prefix("mock-approval-") {
+fn approval_id(a: &OJson) -> Result<OJson, String> {
+    let id = match a.get("approval_id") {
+        OJson::Str(s) => s.clone(),
+        v if !v.truthy() => String::new(),
+        v => return Err(format!("approval_id must be a string, not {}", py_str(v))),
+    };
+    Ok(match id.strip_prefix("mock-approval-") {
         Some(rest) if !rest.is_empty() && !rest.contains('\n') => {
             obj([("minted_for", rest.to_string().into())])
         }
         _ => obj([("literal", id.into())]),
-    }
+    })
 }
 
 /// The plan of one fixture for `adapter`.
@@ -485,11 +535,11 @@ pub fn translate(name: &str, case: &OJson, adapter: &str, table: &OJson) -> Resu
     let ad = adapter_entry(table, adapter)?;
     let is_approval = name.starts_with("approval/");
     let classes = if strs(table.get("provider_failure_cases")).contains(&name) {
-        ad.get("provider_failure_effects")
+        class_map(adapter, ad, "provider_failure_effects")?
     } else if is_approval {
-        ad.get("approval_effects")
+        class_map(adapter, ad, "approval_effects")?
     } else {
-        ad.get("effects")
+        class_map(adapter, ad, "effects")?
     };
     let mut plan = vec![];
     for step in case.get("steps").as_arr() {
@@ -501,7 +551,7 @@ pub fn translate(name: &str, case: &OJson, adapter: &str, table: &OJson) -> Resu
             };
             let mut a = step.get(kind).clone();
             if kind == "approve" {
-                a.set("approval_id", approval_id(&a));
+                a.set("approval_id", approval_id(&a)?);
                 if a.has("arguments") {
                     let spec = classes
                         .get_opt("delete_file")

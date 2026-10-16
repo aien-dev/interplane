@@ -141,6 +141,15 @@ struct Adapter<'h, H: AdapterHost + ?Sized> {
     approval_capability: Option<String>,
 }
 
+/// `v[key]`, or the error text Python's `KeyError` gave.
+fn need<'a>(v: &'a OJson, key: &str) -> Result<&'a OJson, String> {
+    if v.has(key) {
+        Ok(v.get(key))
+    } else {
+        Err(format!("KeyError: '{key}'"))
+    }
+}
+
 fn run_case<H: AdapterHost + ?Sized>(
     plan: &OJson,
     fixture: &OJson,
@@ -336,7 +345,9 @@ fn run_case<H: AdapterHost + ?Sized>(
             OJson::Bool(intents > 0 && violations == 0 && derived == 0),
         );
     } else {
-        let expected = fixture.get("expected");
+        // A missing key is an error row, as the Python runner gave (`KeyError: 'runtime'`).
+        let expected = need(fixture, "expected")?;
+        let want_runtime = need(expected, "runtime")?.to_value();
         let left: Vec<Value> = observed
             .iter()
             .map(|r| {
@@ -345,8 +356,7 @@ fn run_case<H: AdapterHost + ?Sized>(
                 r.to_value()
             })
             .collect();
-        let want: Vec<Value> = expected
-            .get("observed")
+        let want: Vec<Value> = need(expected, "observed")?
             .as_arr()
             .iter()
             .map(OJson::to_value)
@@ -370,10 +380,7 @@ fn run_case<H: AdapterHost + ?Sized>(
                 "continuations",
                 OJson::Bool(pick(&continuations) == pick(expected.get("continuations").as_arr())),
             ),
-            (
-                "runtime",
-                OJson::Bool(runtime == expected.get("runtime").to_value()),
-            ),
+            ("runtime", OJson::Bool(runtime == want_runtime)),
         ]);
         let all = checks
             .entries()
@@ -407,15 +414,6 @@ impl Verdicts {
     /// The verdict file: indented, keys sorted, one trailing newline.
     pub fn file_text(&self) -> String {
         dumps(&self.value, Style::SORTED_INDENT2) + "\n"
-    }
-
-    /// The one-line summary: `{"adapter": ..., <summary>}` with keys sorted.
-    pub fn summary_line(&self) -> String {
-        let mut line = obj([("adapter", self.adapter.clone().into())]);
-        for (k, v) in self.summary().entries() {
-            line.set(k, v.clone());
-        }
-        dumps(&line, Style::SORTED)
     }
 }
 
@@ -456,7 +454,11 @@ pub fn run<H: AdapterHost + ?Sized>(
     let mut rows = vec![];
     for plan in &plans {
         let pname = plan.get("name").as_str().unwrap_or("").to_string();
-        let row = match run_case(plan, &fixtures[&pname], &adapter, no_exposure_check) {
+        let case = fixtures
+            .get(&pname)
+            .ok_or_else(|| format!("KeyError: '{pname}'"))
+            .and_then(|f| run_case(plan, f, &adapter, no_exposure_check));
+        let row = match case {
             Ok(r) => r,
             Err(e) => obj([
                 ("name", pname.into()),

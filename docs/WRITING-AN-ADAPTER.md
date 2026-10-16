@@ -10,8 +10,9 @@ This guide walks through it.
 
 The Rust names used here are all public: `interplane_lenshift::DialectRegistry`,
 `interplane_crossaxis::MappingTable`, from `interplane_crossveil`: `Pipeline`, `RuntimeAuthority`,
-`CallContext`, `Refusal`, and from `interplane_core`: `Catalog`, `CapabilityRequest`, `Decision`,
-`ToolResult`, `ResultProvenance`, `TrustLevel`, `InputRecord`, `Limits`, `RequestLedger`.
+`CallContext`, `Refusal`, and from `interplane_core`: `Catalog`, `CapabilityDescriptor`,
+`CapabilityRequest`, `Decision`, `ToolResult`, `ResultProvenance`, `TrustLevel`, `InputRecord`, `Limits`,
+`RequestLedger`.
 
 ## 1. The authority: three methods
 
@@ -98,7 +99,8 @@ Dialects: `DialectRegistry::names()` lists them (`openai`, `openai_stream`, `qwe
 When a person approves a held request, the host continues it:
 
 ```rust
-let pending = pipe.pending_approval(trace_id, request_id);       // host-only view
+let pending = pipe.pending_approval(trace_id, request_id)  // host-only view: None when nothing is held
+    .expect("a held request");
 // answer: a Decision "authorized" with approval {"approval_id": pending.approval_id}
 let (result, record) = pipe.continue_approval(trace_id, request_id, &answer, &pending.request_digest, now)?;
 ```

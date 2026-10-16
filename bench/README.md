@@ -69,7 +69,8 @@ The two recorded adapter hosts (`runs/adapter-repro-20261005T1215Z/toy/authority
    `domain_match` v1 over `requested_domains` with `always_include = ["ask_user"]`, plus bounded
    expansion.
 4. Every model turn goes through the INTERPLANE pipeline (Lenshift -> Core -> CrossAxis ->
-   Crossveil with Odysseus deciding), exactly like `examples/receipt/run_receipt.py`.
+   Crossveil with Odysseus deciding), exactly like the receipt example (`examples/receipt/README.md`;
+   its Python driver was removed on 2026-10-15 and is in git history).
    - `stub_results`: when Odysseus authorizes a call to that capability, return the stub as an
      `ok` result instead of the adapter's "not executed" error. The decision is never stubbed.
    - `fault_injection`: when Odysseus authorizes call number k of that capability and k is in

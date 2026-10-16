@@ -96,7 +96,7 @@ fn main() {
 
     let floor = serde_json::to_value(pipe.exposure_for(TRACE).floor).unwrap_or_default();
     println!(
-        "\nexposure floor before turn 2: {}",
+        "\nexposure floor after turn 2: {}",
         floor.as_str().unwrap_or("?")
     );
 

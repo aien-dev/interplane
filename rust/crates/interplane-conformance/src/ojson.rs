@@ -6,6 +6,11 @@
 //! order of the translation table) and the exact text `json.dumps` produces (ASCII escapes,
 //! `", "` and `": "` separators, Python float spelling). [`OJson`] keeps the order as read, and
 //! [`dumps`] reproduces that text, so the frozen files those tools wrote stay byte-identical.
+//!
+//! Parsing is `serde_json` with `float_roundtrip`, so decimals parse to the nearest double as
+//! Python's do. One known limit: an integer outside the 64-bit range parses as a float, where
+//! Python kept it exact. No corpus file holds one. `serde_json`'s `arbitrary_precision` would lift
+//! the limit but changes `serde_json::Number` for every crate in the workspace, so it is not used.
 use std::fmt;
 
 use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};

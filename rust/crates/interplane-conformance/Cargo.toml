@@ -30,11 +30,11 @@ interplane-lenshift.workspace = true
 interplane-crossaxis.workspace = true
 interplane-crossveil.workspace = true
 serde.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["float_roundtrip"] }
 sha2.workspace = true
 regex.workspace = true
 jsonschema = { workspace = true, optional = true }
 
 [dev-dependencies]
 jsonschema.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["float_roundtrip"] }

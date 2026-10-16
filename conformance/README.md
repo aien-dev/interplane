@@ -33,7 +33,7 @@ was taken and is listed below.
    for the result of `request_id`. With `"round_trip": true` the value is read after the payload is
    serialized to JCS and parsed back into the SDK's own result type, as a receiver sees it.
 4. `result_digest` is `null` in fixtures: implementations compute it (digest of the canonical result payload
-   with `provenance.duration_ms` null) and the cross-language comparison covers it.
+   with `provenance.duration_ms` null) and the comparison with `conformance/expected/verdicts.json` covers it.
 
 ## Selection and expansion fixtures (cases 24, 25)
 
@@ -68,7 +68,7 @@ Trust is two axes (CROSSVEIL.md, `common.schema.json`): `provenance.trust` (Trus
 ## Lifecycle fixtures (approval continuation)
 
 The cases under `fixtures/lifecycle/` exercise the REQUIRES_APPROVAL transition on the lifecycle
-state machine itself, in both SDKs (no pipeline, no mock runtime). Both runners load them after the
+state machine itself (no pipeline, no mock runtime). The runner loads them after the
 `NN-slug` and injection cases and write one verdict row each, keyed `lifecycle/<slug>`.
 
 ## Approval fixtures (cases A01 to A14)
@@ -116,7 +116,8 @@ calls `decide`, so its `ObservedRecord` has `decide_invoked` false.
 ## Cross-language verdict comparison
 
 Each runner writes its full `observed` array (with `result_digest` filled) as JSON. Canonicalize each with
-RFC 8785 and compare bytes: Rust and Python outputs must be byte-identical. A runner also compares its
+RFC 8785 and compare bytes. The Rust runner's output must equal `conformance/expected/verdicts.json`
+byte for byte (the retired Python runner produced the same file; CI compares on every change). A runner also compares its
 array to the fixture's `expected.observed` after setting every `result_digest` to null.
 
 ## Spec ambiguities resolved (fail-closed), with spec citations

@@ -1,10 +1,13 @@
 # STATUS (updated by hand with every merge; the readiness report cites this)
 
 Statuses: `specified` (normative text/schema exists) · `implemented` (code exists) · `tested`
-(unit tests pass) · `conformant` (passes the canonical fixtures in both languages, verdicts
-byte-identical) · `qualified` (measured against a real model/backend).
+(unit tests pass) · `conformant` (passes the canonical fixtures, verdicts
+byte-identical to `conformance/expected/verdicts.json`) · `qualified` (measured against a real model/backend).
 
-| Component | Rust | Python | Fixtures | Notes |
+The Python column records the Python SDK as it stood when it was removed on 2026-10-15 (no Python
+ships here). It is history and is no longer updated; the Rust column is the current state.
+
+| Component | Rust | Python (removed 2026-10-15; last state) | Fixtures | Notes |
 |---|---|---|---|---|
 | Core schemas | specified | specified | validated | 10 schemas under spec/schemas, JSON Schema 2020-12 |
 | Core types + validation + JCS | conformant | conformant | 27 cases + digest/jcs-01 | verdict files byte-identical |
@@ -24,7 +27,7 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Reproducibility pins | - | - | - | see docs/RUN-MANIFEST-COMMITS.md (toolchain, pip constraints, action SHAs, AIEN sibling pins) |
 | Pipeline input ledger and exposure (0.3 cut P3) | conformant | conformant | cases 28-30 | per-trace ledger of rendered results plus host `register_input`; every `tool_request` and `CallContext` gets a computed `exposure`; forged exposure overwritten; fails closed |
 | Source-class coverage (0.3 cut P4) | conformant | conformant | cases 31-40 | one fixture per source class asserting every InputRecord field; mock gains `read_document`, `load_skill`, `call_provider`; skills and tool descriptions are `external_untrusted`; host registers model_generated input |
-| Conformance runner | implemented | implemented | 106/106 both (verdicts byte-identical; CI requires exactly 106) | `--dump` writes canonical results per case; CI compares the Rust and Python verdict for every case |
+| Conformance runner | implemented | implemented | 106/106 (verdicts byte-identical to `conformance/expected/verdicts.json`, which the Python runner also produced; CI requires exactly 106) | `--dump` writes canonical results per case; CI compares the Rust verdict file with the recorded one byte for byte |
 | Interplane Probe | qualified | qualified | - | both run live against Qwen3.5-9B/Ollama 0.34.0 with identical verdicts (reports under qualification/reports) |
 | AIEN adapter | tested (fix-the-test slice: adapters/aien/scripts/test-fix-the-test.sh, verdict PASS_LABELLED_INCOMPLETE, evidence/fix-the-test-2026-10-08; on the real EffectAuthority path; approved writes through the authenticated daemon ledger route; pinned sovereign-core 9b5e6e8 (live gate: adapters/aien/scripts/test-live-daemon.sh; earlier 4d4dfd4: #296 daemon-minted grants only, #295 signed requirements goal; #262, #260); was 10 pipeline tests in 0.1) | - | - | ADR 0003; real aien-mcp SpeculativeLane + aegis gate; aien-cli SafetyEngine not linkable (private); AGPL |
 | Odysseus adapter | - | removed 2026-10-15 (was tested: 118 tests vs odysseus@a8c147b) | - | executes read_file/ls/glob/grep via Odysseus handlers; approval continuation unsupported, every continuation refused (cut A4); AGPL |
@@ -47,4 +50,4 @@ byte-identical) · `qualified` (measured against a real model/backend).
 | Shared adapter runner | tested | - | rust/crates/interplane-conformance/tests/adapter_runner.rs (2) | `interplane_conformance::adapter_runner`: `AdapterHost` + table entry outside the shared table, computed subset, A-AIEN approval rule, `--no-exposure-check` negative control; reproduces the smart-home (43) run byte for byte and the to-do (38) run with digests masked (its Python host left `runtime_id` unset; byte for byte against the retired Python runner with it set), both modes |
 | Provenance companion manifest v0 (ADR 0004, outside Core) | tested | - | 5 fixtures (3 real, 2 synthetic) + 84 tests | `provenance/`: corpus BOM and licenses -> WALDO run -> export -> load-support check -> AIEN load line -> trace -> effect. Effect binding `aien-ledger-slice/1` (strong; daemon ledger records, approval key recomputed, process identity) vs `record_effect_receipt/1` (weaker); byte forms in BINDING.md. A verdict says `complete` only when every link is verified from retained bytes: a scripted model turn gives `PASS_LABELLED_INCOMPLETE missing=link:model_turn`. First real chain `real-waldo-aien-chain` (CPU evidence, one run): tiny WALDO tool-call model -> AIEN daemon load -> AIEN own generation (StreamTurn) -> the daemon's own generation record (sc#301, sovereign-core 12c1a5f) -> `aien_legacy` parse -> one approved write via the adapter -> ledger records; verdict `PASS complete effect=aien-ledger-slice/1:strong proposal=model_generation/2 candidate=none`. Limits: digests are of files read at load time (hash-then-load swap not detected), the record is unsigned (a same-user process could append one), the model is a tiny memoriser (no capability claim), CPU only, adapter is the merged one (interplane main c982fd3). Evidence, never authority |
 | Refusals and the exposure floor (issue #57) | conformant | conformant | - | resolved as option C: a non-executed result is recorded `unknown` and counts as `external_untrusted`, on purpose; stated in CORE.md and CROSSVEIL rule 6 (clarification, no fixture or version change); analysis `docs/analysis/ISSUE-57-refusal-exposure.md`; 9 tests per SDK (11 outcome rows: denied, held, not_found, runtime invalid, unknown decision, decide fault, execute fault, error, timed_out, rejected), red check with refusals patched to `trusted_runtime` fails 7 of 9 in each; options R and V are issue #80 |
-| CI | running | running | - | github.com/aien-spark/interplane: schemas, rust, python, cross-language identity, both adapters |
+| CI | running | - | - | github.com/aien-spark/interplane: schemas and fixtures, rust (verdicts equal the recorded reference), package, negative controls, provenance, AIEN adapter, no tracked Python |

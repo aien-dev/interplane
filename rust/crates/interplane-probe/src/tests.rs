@@ -397,8 +397,8 @@ impl Transport for Recorder {
     }
 }
 
-/// Both reference probes send identical request bodies per probe id (spec/PROBE.md). The Python twin
-/// is `test_chat_basic_request_body_is_pinned` in python/tests/test_probe_request_bodies.py.
+/// The request bodies are pinned per probe id (spec/PROBE.md). The retired Python probe had the same
+/// test, `test_chat_basic_request_body_is_pinned`.
 #[test]
 fn chat_basic_request_body_is_pinned() {
     let rec = Recorder(Default::default());

@@ -61,7 +61,7 @@ from the same model and execution. So:
 ### The corpus generator (kept outside the repository)
 
 `conversations.jsonl` (46 conversations, bytes retained in `run-inputs/`) was written by a scratch script,
-`gen_corpus.py`. This repository takes no Python outside `python/`, so the script is not in the branch. Its exact
+`gen_corpus.py`. This repository takes no Python, so the script is not in the branch. Its exact
 bytes are kept here by name and digest, and in a durable directory outside the repo:
 
 - file: `gen_corpus.py`, 1908 bytes, sha256 `cae40fda46f5a876c0b93dee9bc0dadd5323b5f6f891f73fc3130720e7c9adcb`

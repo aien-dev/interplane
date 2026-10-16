@@ -21,7 +21,8 @@ Probes (version 0.1.0), each a real request:
 | `context.8k` / `context.16k` / `context.32k` | a prompt of that size returns a correct needle answer (DEGRADED when it answers but wrong; FAIL on error) |
 | `models.list` | `/v1/models` lists the model |
 
-Both reference probes send identical request bodies per probe id; verdict agreement is required.
+Every probe implementation sends the request bodies the reference probe pins per probe id (its tests
+fix them); verdict agreement is required.
 
 Verdicts: PASS (supported), FAIL, DEGRADED, UNSUPPORTED (ran, feature absent), UNKNOWN (ran, could not determine; never reported as false), SKIPPED (did not run). The report's `environment` block records hardware, OS, endpoint type, INTERPLANE version, fixture revision and model revision so the probe is reproducible.
 

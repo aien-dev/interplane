@@ -147,7 +147,7 @@ order) and removed from `excluded`; the stale `measure` is dropped (the caller m
 removed; `expand` sets `parent_digest` to that digest of its input and `selection_digest` on its
 output. `select` never writes a digest.
 
-Receipt normalization (both languages): optional fields are omitted when empty (`always_include`,
+Receipt normalization (every implementation): optional fields are omitted when empty (`always_include`,
 `selected[].domains`, `selector.max_capabilities` when null).
 
 Reference API. Python (`interplane.crossaxis`): `measure(full, selected, renderer, counter=None,

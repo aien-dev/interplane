@@ -36,7 +36,8 @@ policy, an approval a person grants and one they decline.
 
 ## What is in the repository (version 0.3.0)
 
-The Rust workspace and the Python package are at version 0.3.0. The base is 0.1, the Reality Layer.
+The Rust workspace is at version 0.3.0. The Python package that shipped beside it was removed on
+2026-10-15 (see "Removed Python" below). The base is 0.1, the Reality Layer.
 0.2 (Capability) is closed with its pre-registered gate failed and the failure published
 (`docs/REPORT-0.2.md`). 0.3 (Trust) is closed with its gate passed (`docs/REPORT-0.3.md`). 0.4 and 0.5
 are planned, not built (`ROADMAP.md`).
@@ -48,7 +49,7 @@ are planned, not built (`ROADMAP.md`).
 | **Crossveil** | the authority-boundary contract: two runtime callbacks, a lifecycle with fail-closed invariants, trust classes | see `STATUS.md` |
 | **CrossAxis** | explicit, versioned capability mapping; a deterministic domain selector with a before/after receipt; bounded expansion | see `STATUS.md` |
 | **Interplane Probe** | measured capability qualification of an OpenAI-compatible endpoint | see `STATUS.md` |
-| **Conformance** | 106 conformance cases plus 56 dialect fixtures; Rust and Python runners must agree byte for byte | see `STATUS.md` |
+| **Conformance** | 106 conformance cases plus 56 dialect fixtures; the Rust runner must reproduce the recorded verdicts byte for byte | see `STATUS.md` |
 | Vectorveil | the envelope and canonical JSON; no transport framework | envelope only |
 | RelayLine | the event vocabulary for multi-round exchanges | contract only |
 
@@ -60,7 +61,6 @@ elsewhere in this repository claims more than `STATUS.md` does.
 ```
 spec/            normative Markdown + spec/schemas/*.schema.json
 rust/            Cargo workspace: interplane-core, -lenshift, -crossaxis, -crossveil, -conformance, -probe
-python/          interplane package (stdlib only at runtime)
 dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
 adapters/        aien/ reference adapter (depends on its host; Core never does); odysseus/ keeps catalog records only
@@ -90,6 +90,14 @@ Two Python adapters were removed on 2026-10-15 under the project rule that no Py
 The Rust AIEN adapter (`adapters/aien`) is the reference adapter. Both removed adapters remain in git
 history (present through commit `43ec8f8`).
 
+## Removed Python
+
+No Python ships in this repository (project rule, 2026-10-15); CI fails if a Python file is tracked.
+The Python SDK (`python/`, package `interplane`) was a second implementation of every SDK module,
+kept byte-identical to Rust by CI. It was removed on 2026-10-15 and is in git history. Its last
+conformance verdicts and negative-control matrix were byte-identical to the Rust ones and are kept as
+`conformance/expected/`; CI now compares the Rust output against those files.
+
 ## Security in one paragraph
 
 The model side is untrusted. Lenshift never executes. CrossAxis never grants. A valid envelope
@@ -99,6 +107,6 @@ carries the decision and refuses to upgrade it. Denied never becomes authorized 
 
 ## License
 
-Apache-2.0 for the protocol, schemas, fixtures and reference SDKs. `adapters/aien` depends on AGPL host
+Apache-2.0 for the protocol, schemas, fixtures and the Rust reference SDK. `adapters/aien` depends on AGPL host
 projects and is AGPL-3.0-or-later, with its own `LICENSE`, as are the Odysseus catalog records in
 `adapters/odysseus`; see `docs/adr/0002-licensing.md`.

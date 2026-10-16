@@ -1385,7 +1385,7 @@ mod tests {
     use super::RetiredFilter;
 
     /// Filter positions at 1009 bits, computed from the CORE.md rule with sha256sum, outside both
-    /// SDKs (same literals as python/tests/test_session_limits.py).
+    /// SDKs (the retired Python SDK tested the same literals).
     const RETIRED_FILTER_POSITIONS_1009: [(&str, [usize; 4]); 3] = [
         ("r0", [20, 106, 629, 750]),
         ("f6", [278, 703, 321, 847]),

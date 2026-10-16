@@ -112,10 +112,8 @@ truncated stream.
   Ollama fixture is recorded (from the repo's own qualification capture).
 - Observed gaps pinned as goldens, not endorsed: schema drift in `tool_calls` yields no call and
   no rejection; `finish_reason: length` on plain text is not flagged `partial`.
-- Rust only, by design. There is no Python mirror of the replay runner or scanner: the repository
-  forbids new Python in AIEN-owned code, the replay needs only the Rust parsers it already feeds,
-  and the existing Python parser mirror keeps its own fixtures. The Rust-Python byte-for-byte
-  invariant is therefore NOT extended to `dialects/replay`.
+- Rust only. The repository ships no Python (the Python SDK was removed on 2026-10-15), and the
+  replay needs only the Rust parsers it already feeds.
 - Chunk strings are UTF-8: splits inside a multi-byte character cannot be represented.
 - Timing is recorded but not exercised; no retry, backoff or timeout logic is replayed.
 - The scanner is regex based and can both miss novel secret shapes and flag long identifiers.

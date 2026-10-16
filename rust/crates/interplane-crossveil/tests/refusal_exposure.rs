@@ -1,7 +1,7 @@
 //! Refused and held calls and the exposure floor (issue #57;
 //! docs/analysis/ISSUE-57-refusal-exposure.md).
 //!
-//! The same scenarios, strings and expectations are in python/tests/test_refusal_exposure.py.
+//! The retired Python SDK tested the same scenarios, strings and expectations.
 //! What must hold under every safe policy: a refusal never raises the floor, an empty ledger
 //! stays `external_untrusted`, echoed text keeps its taint, a refusal never weakens a later
 //! check. Two tests pin the policy as it stands (a refusal is recorded `unknown` and lowers the

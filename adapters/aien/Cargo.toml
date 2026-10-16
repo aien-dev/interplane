@@ -34,4 +34,5 @@ aegis = { path = "../../../interplane-audit/aegis-runtime", optional = true }
 [dev-dependencies]
 interplane-provenance = { path = "../../provenance" }
 interplane-lenshift = { path = "../../rust/crates/interplane-lenshift" }
+interplane-conformance = { path = "../../rust/crates/interplane-conformance", default-features = false }
 tempfile = "3"

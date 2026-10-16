@@ -475,7 +475,7 @@ Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) exist only in the c
 unmodified pipeline from outside. `conformance/negative-controls.json` lists, per variant, the cases it
 must fail; the matrix run passes only if the unmodified runner is clean and every variant fails
 all of its listed cases. `conformance/TRUST-DIGEST.txt` freezes the whole fixture corpus, the negative-control list and
-`bench/PROTOCOL-0.3.md` by sha256 (`conformance/runners/trust_digest.py --check` in CI).
+`bench/PROTOCOL-0.3.md` by sha256 (`interplane-corpus trust-digest --check` in CI).
 
 Lifecycle fixtures live under `conformance/fixtures/lifecycle/NN-slug.json` and drive the
 lifecycle state machine directly, with no pipeline and no mock runtime:
@@ -543,7 +543,7 @@ to null. Rust and Python runners must emit byte-identical `observed` arrays.
 bench/PROTOCOL-0.3.md section 2 runs, on each adapter, every fixture whose target capability class
 exists in the adapter's catalog. This section is the normative rule. It reads only fixture metadata
 and `conformance/adapter-translation.json` (frozen by `TRUST-DIGEST.txt`), never a result;
-`conformance/runners/adapter_subset.py` implements it and writes `t3_subset` (Odysseus) and
+`interplane-corpus subset` (`rust/crates/interplane-conformance`) implements it and writes `t3_subset` (Odysseus) and
 `t4_subset` (AIEN) into `TRUST-DIGEST.txt`.
 
 **Membership.** An `injection/` or `approval/` fixture is in an adapter's subset when none of the
@@ -612,9 +612,9 @@ paragraph states what a new adapter does where the text above speaks only of Ody
 
 - *Table entry.* The adapter adds an entry under `adapters` in `adapter-translation.json`, keyed by its
   name, with the same fields as `aien` (`effects`, `approval_effects`, `native_reads`, optionally
-  `provider_failure_effects`). `adapter_subset.py --subset <name>` and `--plans <name>` accept any name
-  in the table, and `adapter_runner.py --entry` runs and judges an adapter from an entry kept outside
-  it (docs/WRITING-AN-ADAPTER.md section 7). Changing the table changes `adapter_translation_sha256`, so adding an adapter to the
+  `provider_failure_effects`). `interplane-corpus subset --subset <name>` and `--plans <name>` accept any name
+  in the table, and `interplane_conformance::adapter_runner::run` runs and judges an adapter from an
+  entry kept outside it (docs/WRITING-AN-ADAPTER.md section 7). Changing the table changes `adapter_translation_sha256`, so adding an adapter to the
   shared table is a `TRUST-DIGEST.txt` revision; until a protocol freezes a list for it, its subset is
   computed, not frozen, and a report must say so.
 - *Effect classes.* The mock's targets stand for classes, not literal file and mail operations:

@@ -1,5 +1,9 @@
 # Smart-home maintainer check, 2026-10-05
 
+> **2026-10-15:** `authority.py` and `run_subset.py` were removed (no Python ships here). The host is
+> ported to Rust in `rust/crates/interplane-conformance/tests/hosts/` (`Home`), and
+> `tests/adapter_runner.rs` reproduces this run byte for byte. The originals are in git history.
+
 **Not independent.** The maintainer who wrote CORE.md "Adding an adapter" (#56) and
 `docs/WRITING-AN-ADAPTER.md` (#58) built this adapter. A second independent run (Gemini) was started
 and stopped on the project owner's call. This checks that the new rules and guide carry a second,

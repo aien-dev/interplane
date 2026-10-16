@@ -2,8 +2,8 @@
 //! `Pipeline` and `AienAuthority`.
 //!
 //! The subset and the translation of each fixture onto the adapter come from
-//! `conformance/runners/adapter_subset.py --plans aien` (the rule is normative text in
-//! spec/CORE.md, "Adapter subsets"); the list must equal `t4_subset` of
+//! `interplane_conformance::subset`, the code behind `interplane-corpus subset --plans aien` (the rule
+//! is normative text in spec/CORE.md, "Adapter subsets"); the list must equal `t4_subset` of
 //! `conformance/TRUST-DIGEST.txt`. Every fixture in the subset runs. One the adapter cannot run is
 //! a FAIL, never a skip (a panic inside a case is caught and reported as that case's FAIL).
 //! Injection cases use the injection judgement of the conformance runners (violations,
@@ -18,7 +18,6 @@ use serde_json::{json, Value};
 use std::cell::RefCell;
 use std::collections::HashSet;
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use std::process::Command;
 use std::rc::Rc;
 
 type Requests = Rc<RefCell<Vec<(String, String, String)>>>;
@@ -67,18 +66,12 @@ impl RuntimeAuthority for Rec {
 }
 
 fn plans() -> Vec<Value> {
-    let script = repo().join("conformance/runners/adapter_subset.py");
-    let out = Command::new("python3")
-        .arg(script)
-        .args(["--plans", "aien"])
-        .output()
-        .expect("python3 must be available to compute the T4 subset");
-    assert!(
-        out.status.success(),
-        "adapter_subset.py failed: {}",
-        String::from_utf8_lossy(&out.stderr)
-    );
-    serde_json::from_slice(&out.stdout).expect("plans are JSON")
+    let corpus = interplane_conformance::subset::Corpus::new(&repo());
+    let table = corpus
+        .load_table()
+        .expect("conformance/adapter-translation.json");
+    let plans = corpus.plans("aien", &table).expect("the T4 plans");
+    plans.iter().map(|p| p.to_value()).collect()
 }
 
 fn frozen(key: &str) -> Vec<String> {

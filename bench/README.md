@@ -19,6 +19,9 @@ hand-curated Odysseus tool-domain map it read (`TOOL_DOMAINS`) went with that ad
 in git history (present through commit `43ec8f8`). The corpus, protocols, digests and run records
 stay unchanged as the evidence for those results; CI no longer recomputes the bench digests, and
 the commands below that name these tools describe how the records were made.
+The two recorded adapter hosts (`runs/adapter-repro-20261005T1215Z/toy/authority.py` and
+`runs/home-check-20261005T1320Z/authority.py`, with their `run_subset.py`) were ported to Rust in
+`rust/crates/interplane-conformance/tests/hosts/`, where CI still reproduces their verdict files.
 
 ## Layout
 
@@ -66,7 +69,8 @@ the commands below that name these tools describe how the records were made.
    `domain_match` v1 over `requested_domains` with `always_include = ["ask_user"]`, plus bounded
    expansion.
 4. Every model turn goes through the INTERPLANE pipeline (Lenshift -> Core -> CrossAxis ->
-   Crossveil with Odysseus deciding), exactly like `examples/receipt/run_receipt.py`.
+   Crossveil with Odysseus deciding), exactly like the receipt example (`examples/receipt/README.md`;
+   its Python driver was removed on 2026-10-15 and is in git history).
    - `stub_results`: when Odysseus authorizes a call to that capability, return the stub as an
      `ok` result instead of the adapter's "not executed" error. The decision is never stubbed.
    - `fault_injection`: when Odysseus authorizes call number k of that capability and k is in

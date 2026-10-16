@@ -1,5 +1,10 @@
 # Independent adapter reproduction, 2026-10-05
 
+> **2026-10-15:** `toy/authority.py` and `toy/run_subset.py` were removed (no Python ships here). The
+> host is ported to Rust in `rust/crates/interplane-conformance/tests/hosts/` (`Toy`), and
+> `tests/adapter_runner.rs` reproduces this run (see its notes on `result_digest`). The originals are
+> in git history.
+
 Plan 19.7 item 8, second half. Report: `docs/REPORT-adapter-repro.md`.
 
 ## What is here

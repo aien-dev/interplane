@@ -4,39 +4,43 @@ An adapter connects INTERPLANE to a host: the program that owns the tools, the p
 INTERPLANE parses the model's tool calls, maps names, records what the model has seen (exposure) and
 enforces approvals. It never decides. Every decision is the host's.
 
-Working example: `examples/adapter/todo_adapter.py` (a to-do list host, about 150 lines, self-checking).
-Run it with `python3 examples/adapter/todo_adapter.py`. This guide walks through it.
+Working example: `rust/crates/interplane-crossveil/examples/todo_adapter.rs` (a to-do list host,
+self-checking). Run it from `rust/` with `cargo run -q -p interplane-crossveil --example todo_adapter`.
+This guide walks through it.
 
-The Python names used here are all public: `interplane.lenshift`, `interplane.crossaxis.MappingTable`
-and `Rule`, and from `interplane.crossveil`: `Pipeline`, `Catalog`, `CapabilityDescriptor`, `ToolRef`,
-`Decision`, `make_result`, `ContinuationRefused`.
+The Rust names used here are all public: `interplane_lenshift::DialectRegistry`,
+`interplane_crossaxis::MappingTable`, from `interplane_crossveil`: `Pipeline`, `RuntimeAuthority`,
+`CallContext`, `Refusal`, and from `interplane_core`: `Catalog`, `CapabilityDescriptor`,
+`CapabilityRequest`, `Decision`, `ToolResult`, `ResultProvenance`, `TrustLevel`, `InputRecord`, `Limits`,
+`RequestLedger`.
 
 ## 1. The authority: three methods
 
-The host object needs a `runtime_id` and three methods (`RuntimeAuthority` in `crossveil`):
+The host implements `RuntimeAuthority` (in `interplane-crossveil`): a `runtime_id()` and three methods.
 
 | Method | Called | Returns |
 |---|---|---|
 | `catalog()` | before `decide`, to check the mapping's catalog digest and look up the capability (also on continuation) | a `Catalog` of `CapabilityDescriptor`s |
 | `decide(req, ctx)` | once per admitted request, before anything runs | a `Decision` |
-| `execute(req, decision, ctx)` | only after `authorized` (or an approved continuation) | a `ToolResult` from `make_result` |
+| `execute(req, decision, ctx)` | only after `authorized` (or an approved continuation) | a `ToolResult` |
 
-`req` is a `CapabilityRequest` (`request_id`, `capability`, `arguments`). `ctx` is a plain `dict` with
-`trace_id`, `message_id`, `parent_id`, `model`, `runtime_session` (`None` unless the host attaches one)
-and `exposure`, where `exposure` is
-`{"floor": <trust level>, "inputs": [<input_id>...]}`. INTERPLANE passes it through untouched
-(CROSSVEIL.md, the authority boundary contract).
+`req` is a `CapabilityRequest` (`request_id`, `capability`, `arguments`). `ctx` is a `CallContext` with
+`trace_id`, `message_id`, `parent_id`, `model`, `session` (`None` unless the host attaches one) and
+`exposure`, an `Option<Exposure>` with `floor` (a trust level) and `inputs` (input ids). INTERPLANE
+passes it through untouched (CROSSVEIL.md, the authority boundary contract).
 
-A `decide` or `execute` that raises does not crash the turn. A raising `decide` is a denial
-(`runtime_unavailable`), a raising `execute` a failed request (`execution_error`). See CORE.md,
+A `decide` or `execute` that panics does not crash the turn. A panicking `decide` is a denial
+(`runtime_unavailable`), a panicking `execute` a failed request (`execution_error`). See CORE.md,
 "Adapter and catalog integrity".
 
 ## 2. Decisions
 
-`Decision(request_id, decision, authority=..., capability=..., reason=..., approval=...)`. The values
-are `authorized`, `denied`, `requires_approval`, `not_found` and `invalid`. For `requires_approval`,
-set `approval={"approval_id": ..., "scope": "single_action", "expires_at": ...}`. The host mints the
-id. The pipeline holds the request and returns a refusal to the model.
+A `Decision` carries `request_id`, `decision`, `authority` (`runtime`, `policy_engine`, optional
+`decision_id`), `capability`, `reason` and `approval`. The values are `authorized`, `denied`,
+`requires_approval`, `not_found` and `invalid`. For `requires_approval`, set
+`approval` to `{"approval_id": ..., "scope": "single_action", "expires_at": ...}`. The host mints the
+id. The pipeline holds the request and returns a refusal to the model. The example builds its
+decisions from JSON with `serde_json::from_value`, which keeps them close to the wire form.
 
 Policy is entirely the host's. The example authorizes reads, always holds deletes, and holds adds
 when the exposure floor is below `user_supplied` (anything untrusted is in view). INTERPLANE does not
@@ -45,9 +49,10 @@ pattern.
 
 ## 3. Results and labels
 
-`make_result(request_id, "ok", runtime=..., capability=..., data=..., content_kind=..., trust=...)`
-builds a result with the canonical shape. The host labels every executed result. The label decides
-what later turns are exposed to:
+`ToolResult::ok(request_id, data)` builds a result with the canonical shape; the host then sets its
+`provenance` (`capability`, `runtime`, `content_kind`, `trust`, and `trusted` from
+`TrustLevel::trusted_flag`). The host labels every executed result. The label decides what later
+turns are exposed to:
 
 - `trust` is one of `trusted_runtime`, `user_supplied`, `workspace_untrusted`, `external_untrusted`.
   The ordering is the reverse, from least to most trusted: `external_untrusted` <
@@ -61,8 +66,8 @@ what later turns are exposed to:
 
 The pipeline records every result it renders back to the model. Inputs it never sees, such as the
 user's message, a file the host pasted in, or a system prompt, the host registers before the turn
-with `pipe.register_input({...})`, an InputRecord (`spec/schemas/input.schema.json`). With an empty
-ledger the floor is `external_untrusted`, so register the user's request first if your policy
+with `pipe.register_input(record)`, an `InputRecord` (`spec/schemas/input.schema.json`). With an
+empty ledger the floor is `external_untrusted`, so register the user's request first if your policy
 trusts it.
 
 One behaviour to know about: when a request is refused or held, the pipeline's reply to the model
@@ -73,60 +78,63 @@ step 5. It is the spec as written and fails safe; whether it should change is
 
 ## 5. Wiring the pipeline
 
-```python
-pipe = Pipeline(registry=lenshift, mapping_table=mapping_for(host.catalog()), runtime=host)
-outcome = pipe.run_turn("openai", "my-model", assistant_message, trace_id, turn_number)
+```rust
+let mut pipe = Pipeline::new(DialectRegistry::with_defaults(), table, &mut host,
+                             Limits::default(), RequestLedger::new());
+let outcome = pipe.run_turn("openai", "my-model", &assistant_message, trace_id, turn_number);
 ```
 
-The mapping table names how model-facing tool names reach catalog capabilities. A one-to-one
-`Rule("passthrough:<name>", "passthrough", None, name, name)` per capability is enough to start. Bind
-the table to the catalog with `catalog_digest=catalog.computed_digest()`, so a catalog change is
-detected as stale. `outcome.observed` holds one `ObservedRecord` per call, with `request_id`, `stage`,
-`decision`, `decide_invoked`, `execute_invoked` and more.
+The mapping table names how model-facing tool names reach catalog capabilities. One `passthrough`
+rule per capability (`{"id": "passthrough:<name>", "kind": "passthrough", "from": {"namespace":
+null, "name": <name>}, "to": <name>}`) is enough to start. Bind the table to the catalog with
+`catalog_digest: catalog.compute_digest()`, so a catalog change is detected as stale.
+`outcome.records` holds one `ObservedRecord` per call, with `request_id`, `stage`, `decision`,
+`decide_invoked`, `execute_invoked` and more.
 
-Dialects: `lenshift.names()` lists them (`openai`, `openai_stream`, `qwen35`, `aien_legacy`). `openai`
-takes the assistant message with `tool_calls`; `qwen35` takes Qwen 3.5's XML tool-call text.
+Dialects: `DialectRegistry::names()` lists them (`openai`, `openai_stream`, `qwen35`, `aien_legacy`).
+`openai` takes the assistant message with `tool_calls`; `qwen35` takes Qwen 3.5's XML tool-call text.
 
 ## 6. Approvals
 
 When a person approves a held request, the host continues it:
 
-```python
-pending = pipe.pending_approval(trace_id, request_id)          # host-only view
-answer = Decision(request_id, "authorized", authority=..., approval={"approval_id": pending.approval_id})
-result, record = pipe.continue_approval(trace_id, request_id, answer, pending.request_digest, now)
+```rust
+let pending = pipe.pending_approval(trace_id, request_id)  // host-only view: None when nothing is held
+    .expect("a held request");
+// answer: a Decision "authorized" with approval {"approval_id": pending.approval_id}
+let (result, record) = pipe.continue_approval(trace_id, request_id, &answer, &pending.request_digest, now)?;
 ```
 
 The pipeline checks the request id, the approval id, the request digest, expiry and the catalog
 digest, in the order pinned in CORE.md ("Approval continuation"). It executes at most once. A
-`denied` answer, or any failed check, ends the request for good. A second continuation raises
-`ContinuationRefused`. `continue_approval` never calls `decide` again.
+`denied` answer, or any failed check, ends the request for good. A second continuation returns
+`Err(Refusal::NoPendingApproval)`. `continue_approval` never calls `decide` again.
 
 ## 7. Checking an adapter against the conformance corpus
 
 `spec/CORE.md`, "Adapter subsets" and its "Adding an adapter" paragraph, say which fixtures an
-adapter must run and how they are judged. `conformance/runners/adapter_runner.py` runs them and
-judges them, so an adapter author writes two files and no runner:
+adapter must run and how they are judged. `interplane_conformance::adapter_runner` runs them and
+judges them, so an adapter author writes a host and a table entry, and no runner:
 
-- `authority.py` defines `RUNTIME`, `POLICY`, `make_authority(*, no_exposure_check, expires_at)` and
-  `make_pipeline(authority)`. The authority counts its calls in `decide_calls` and `execute_calls`,
-  mints approval ids with the given `expires_at`, and when `no_exposure_check` is true drops its
-  exposure floor check (the negative control).
-- `entry.json` is `{"<name>": <table entry>}`, with the fields of the `aien` entry in
+- An `AdapterHost`: `runtime()`, `policy()`, `make_authority(no_exposure_check, expires_at)` (a fresh
+  authority per case that mints approval ids with the given `expires_at`, and drops its exposure
+  floor check when `no_exposure_check` is true: the negative control) and `make_pipeline(authority)`.
+- An entry `{"<name>": <table entry>}`, with the fields of the `aien` entry in
   `conformance/adapter-translation.json` and the effect classes of "Adding an adapter".
 
-```sh
-python3 conformance/runners/adapter_runner.py --module authority.py --entry entry.json --out verdicts.json
-python3 conformance/runners/adapter_runner.py --module authority.py --entry entry.json --no-exposure-check
+```rust
+let v = adapter_runner::run(repo_root, "<name>", Some(&entry), &host, false)?;  // must pass
+let n = adapter_runner::run(repo_root, "<name>", Some(&entry), &host, true)?;   // must fail
 ```
 
-The first should exit 0 with `violations` 0 and `content_derived` 0. The second should exit 1 with
-the injection cases failing; if it passes, the policy is not what stops the injections. The entry is
+The first should pass with `violations` 0 and `content_derived` 0. The second should fail with the
+injection cases failing; if it passes, the policy is not what stops the injections. The entry is
 added to an in-memory copy of the table, so the shared table and `TRUST-DIGEST.txt` stay unchanged
 and the subset is computed, not frozen (say so in any report). Approval cases are judged by the
-A-AIEN rule, so the runner expects approval continuation. `adapter_subset.py --plans <name>` prints
-the translated plans of an adapter already in the table.
+A-AIEN rule, so the runner expects approval continuation. `interplane-corpus subset --plans <name>`
+prints the translated plans of an adapter already in the table.
 
 Two runs of this process are recorded: an independent one (`docs/REPORT-adapter-repro.md`) and a
-maintainer check on a smart-home host (its addendum). The shared runner reproduces both byte for
-byte (`python/tests/test_adapter_runner.py`).
+maintainer check on a smart-home host (its addendum). Both hosts are ported to Rust in
+`rust/crates/interplane-conformance/tests/hosts/`, and `tests/adapter_runner.rs` reproduces both
+recorded runs.

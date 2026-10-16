@@ -20,19 +20,19 @@ standardizes what crosses between them and makes it measurable.
 ## Try it offline (no model, no GPU, no network)
 
 ```
-python3 examples/offline/run_offline.py
+cd rust && cargo run -q -p interplane-crossveil --example offline
 ```
 
 A scripted model fetches a web page that carries an injected instruction, then "obeys" it by
 asking to send an email, write a file and append a note. The reference pipeline with its mock
 runtime denies the email and the write, holds the note for a person's approval (untrusted content
-is in view) and executes none of them. The script checks this and exits 1 on any difference. It
-uses only the Python standard library. CI runs it against the built wheel installed in a clean
-environment (job `package`).
+is in view) and executes none of them. The example checks this and exits 1 on any difference. CI
+runs it (job `rust`).
 
 To connect your own program, see `docs/WRITING-AN-ADAPTER.md` and its runnable example
-`examples/adapter/todo_adapter.py`: a to-do list host with its own policy, an approval a person
-grants and one they decline.
+`rust/crates/interplane-crossveil/examples/todo_adapter.rs` (run it with
+`cargo run -q -p interplane-crossveil --example todo_adapter`): a to-do list host with its own
+policy, an approval a person grants and one they decline.
 
 ## What is in the repository (version 0.3.0)
 
@@ -64,7 +64,7 @@ python/          interplane package (stdlib only at runtime)
 dialects/        per-dialect fixtures
 conformance/     canonical fixtures + runner contract
 adapters/        aien/ reference adapter (depends on its host; Core never does); odysseus/ keeps catalog records only
-examples/        offline/ (scripted model, mock runtime), adapter/ (to-do host), receipt/ (before/after receipt)
+examples/        receipt/ (before/after receipt); the offline and to-do examples are in rust/crates/interplane-crossveil/examples/
 bench/           CrossAxis benchmark corpora, pre-registered protocols (0.2, 0.2x, 0.3), published runs (records only)
 qualification/   real-model probe captures, evidence and reports
 provenance/      companion manifest verifier, outside Core (ADR 0004)

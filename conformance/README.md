@@ -9,9 +9,11 @@ was taken and is listed below.
 
 - `fixtures/NN-slug.json`: the 27 required cases (01-18 core; 19 valid write, 20 missing required argument, 21 stale capability mapping, 22 untrusted tool result, 23 untrusted memory result; 24 expansion by requested_excluded, 25 expansion refused by bound; 26 unrecognized content_kind, 27 absent, null and unrecognized trust). `fixtures/injection/NN-slug.json`: injection cases (0.3 cut I1: scripted obedient model, judged for effects and content-derived intents; seed cases 01 workspace, 02 tool output, 03 forged approval; cut I2 cases 04-19 for C01 to C05, fixture-level `mock_data`; cut I3 cases 20-34 for C06 to C09 and C11 (20-22 C06, 23-25 C07, 26-28 C08, 29-31 C09, 32-34 C11); cut I4 cases 35-42 for C12 (35-38) and C13 (39-42), fixture-level `mock_fault`). `negative-controls.json` and `TRUST-DIGEST.txt`: the negative-control expectations (V1 to V8) and the corpus freeze file. `fixtures/digest/jcs-01.json`: the JCS digest check. `fixtures/lifecycle/NN-slug.json`: approval continuation cases driven against the lifecycle directly (01 forged id, 02 empty or missing id, 03 id minted for another request, 04 the runtime-minted id, 05 non-`authorized` continuation values); format in `spec/CORE.md`. `fixtures/approval/NN-slug.json`: approval cases A01 to A14 of bench/PROTOCOL-0.3.md plus SDK follow-ups 15 (explicit `denied` continuation value) and 16 (continuation decision citing another request_id), and 17, the protocol's A15 (`protocol_case: "A15"`: the approved effect fails at the provider after the approval was spent; mock `execute_raises`) driven through the pipeline with host-side `approve`, `cancel`, `restart` and `mock` steps (case name `approval-ANN-slug`); format in `spec/CORE.md` (Approval continuation).
 - `../dialects/fixtures/{openai,qwen35}/*.json`: Lenshift parse fixtures.
-- `runners/validate_fixtures.py`: checks every envelope and intent against `spec/schemas/`, fixture shape,
-  runtime-count consistency, the JCS fixture, plus negative controls. Exit status is non-zero on failure.
-  Run: `python3 conformance/runners/validate_fixtures.py`.
+- `interplane-corpus validate` (`rust/crates/interplane-conformance`, module `fixture_check`): checks
+  every envelope and intent against `spec/schemas/`, fixture shape, runtime-count consistency, the JCS
+  fixture, plus negative controls. Exit status is non-zero on failure. Run from `rust/`:
+  `cargo run -q -p interplane-conformance --bin interplane-corpus -- validate`. The same binary has
+  `schemas` (schema self-check), `trust-digest --check|--write` and `subset --subset|--plans <adapter>`.
 
 ## How a runner consumes a conformance fixture
 
@@ -94,7 +96,7 @@ REPORT-0.3 counts gates P1, P2 and P4 over them (bench/PROTOCOL-0.3.md section 9
 
 ## Corpus accounting (gate I)
 
-`validate_fixtures.py` counts the corpus from fixture metadata and fails below the minimum of
+`interplane-corpus validate` counts the corpus from fixture metadata and fails below the minimum of
 bench/PROTOCOL-0.3.md 3.2. C01 to C09 and C11 to C13 are the `injection.category` of the injection
 fixtures. **C10 (approval manipulation) is supplied by lane A:** every approval fixture except
 A01 (the one legitimate approval) counts, 16 cases (A02 to A17) against a minimum of 10. It also
@@ -143,14 +145,14 @@ array to the fixture's `expected.observed` after setting every `result_digest` t
 22. Error messages are now pinned by CORE.md ("Canonical result payload shape"); cases 20 and 21 assert them with `result_checks`. `missing tool name` (item 13) is confirmed by that table.
 23. Case 20: the runtime is asked and answers `invalid`, so stage `REJECTED`, decision `invalid`, decide true (CORE.md case table row 20). Case 21: nothing reaches the runtime, so decision null, decide false.
 24. Case 22/23 `provenance.trusted` is asserted false (CORE.md: false for the two untrusted levels); case 19 true.
-25. Cases 24-25 (CROSSAXIS.md, Bounded expansion): the selection receipt after each expansion is compared exactly; `validate_fixtures.py` also recomputes `selection_digest` and the `parent_digest` chain independently and validates each receipt against `selection.schema.json`.
+25. Cases 24-25 (CROSSAXIS.md, Bounded expansion): the selection receipt after each expansion is compared exactly; `interplane-corpus validate` also recomputes `selection_digest` and the `parent_digest` chain independently and validates each receipt against `selection.schema.json`.
 
 ## Adapter subsets (T3 Odysseus, T4 AIEN)
 
 `adapter-translation.json` is the data of the normative rule in `spec/CORE.md` (Adapter subsets);
-`runners/adapter_subset.py` computes each adapter's subset from fixture metadata
+`interplane-corpus subset` (module `subset`) computes each adapter's subset from fixture metadata
 (`--subset odysseus|aien`) and the translated plans (`--plans odysseus|aien`), and
-`runners/trust_digest.py` freezes both lists (`t3_subset`, `t4_subset`) and the table's sha256 in
+`interplane-corpus trust-digest` freezes both lists (`t3_subset`, `t4_subset`) and the table's sha256 in
 `TRUST-DIGEST.txt`. Current subsets: T3 43 fixtures (30 injection, 13 approval), T4 32 (18
 injection, 14 approval).
 
@@ -158,7 +160,7 @@ injection, 14 approval).
   Odysseus adapter was removed on 2026-10-15 (no Python ships here; see `adapters/odysseus/README.md`),
   so T3 no longer runs; its frozen subset stays in `TRUST-DIGEST.txt` as the record of the closed gate.
 - T4: `cd adapters/aien && T4_OUT=t4-verdicts.json cargo test --test t4_corpus -- --nocapture`
-  (real `Pipeline` + `AienAuthority`; needs `python3` for the plans and the sibling checkouts of `adapters/aien/README.md`).
+  (real `Pipeline` + `AienAuthority`; the plans come from `interplane_conformance::subset`; needs the sibling checkouts of `adapters/aien/README.md`).
 
 Both fail on any subset member they cannot run, and T4 also fails when its computed subset differs
 from the frozen list (T3 likewise). The verdict JSON has one row per fixture plus a summary with

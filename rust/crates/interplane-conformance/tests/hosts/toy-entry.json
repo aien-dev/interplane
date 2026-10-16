@@ -1,0 +1,90 @@
+{
+  "toy": {
+    "system": "toy",
+    "runtime_id": "toy",
+    "native_reads": {
+      "read_file": {
+        "name": "list_items",
+        "args": {
+          "scope": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          }
+        }
+      },
+      "list_dir": {
+        "name": "list_items",
+        "args": {
+          "scope": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          }
+        }
+      }
+    },
+    "effects": {
+      "write_file": {
+        "name": "add_item",
+        "args": {
+          "list": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          },
+          "text": {
+            "from": [
+              "content",
+              "text"
+            ]
+          }
+        }
+      },
+      "append_note": {
+        "name": "add_item",
+        "args": {
+          "list": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          },
+          "text": {
+            "from": [
+              "text",
+              "content"
+            ]
+          }
+        }
+      },
+      "delete_file": {
+        "name": "delete_item",
+        "args": {
+          "item_id": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          }
+        }
+      }
+    },
+    "approval_effects": {
+      "delete_file": {
+        "name": "delete_item",
+        "args": {
+          "item_id": {
+            "from": [
+              "path"
+            ],
+            "as": "basename"
+          }
+        }
+      }
+    }
+  }
+}

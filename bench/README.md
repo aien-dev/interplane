@@ -19,6 +19,9 @@ hand-curated Odysseus tool-domain map it read (`TOOL_DOMAINS`) went with that ad
 in git history (present through commit `43ec8f8`). The corpus, protocols, digests and run records
 stay unchanged as the evidence for those results; CI no longer recomputes the bench digests, and
 the commands below that name these tools describe how the records were made.
+The two recorded adapter hosts (`runs/adapter-repro-20261005T1215Z/toy/authority.py` and
+`runs/home-check-20261005T1320Z/authority.py`, with their `run_subset.py`) were ported to Rust in
+`rust/crates/interplane-conformance/tests/hosts/`, where CI still reproduces their verdict files.
 
 ## Layout
 

@@ -552,7 +552,10 @@ dependencies = [
  "interplane-crossveil",
  "interplane-lenshift",
  "jsonschema",
+ "regex",
+ "serde",
  "serde_json",
+ "sha2",
 ]
 
 [[package]]

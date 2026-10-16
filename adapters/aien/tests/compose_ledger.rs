@@ -893,20 +893,19 @@ impl RuntimeAuthority for Rec {
     }
 }
 
-/// The injection plans of the frozen T4 subset, from the same existing runner t4_corpus.rs uses.
+/// The injection plans of the frozen T4 subset, from the same subset rule t4_corpus.rs uses.
 fn injection_plans() -> Vec<Value> {
     let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let out = Command::new("python3")
-        .arg(repo.join("conformance/runners/adapter_subset.py"))
-        .args(["--plans", "aien"])
-        .output()
-        .expect("python3 (existing T4 harness) must be available");
-    assert!(
-        out.status.success(),
-        "{}",
-        String::from_utf8_lossy(&out.stderr)
-    );
-    let plans: Vec<Value> = serde_json::from_slice(&out.stdout).unwrap();
+    let corpus = interplane_conformance::subset::Corpus::new(&repo);
+    let table = corpus
+        .load_table()
+        .expect("conformance/adapter-translation.json");
+    let plans: Vec<Value> = corpus
+        .plans("aien", &table)
+        .expect("the T4 plans")
+        .iter()
+        .map(|p| p.to_value())
+        .collect();
     plans
         .into_iter()
         .filter(|p| p["kind"] == "injection")

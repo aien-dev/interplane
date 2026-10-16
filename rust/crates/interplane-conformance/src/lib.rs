@@ -17,8 +17,14 @@ use interplane_crossveil::{
 use interplane_lenshift::DialectRegistry;
 use serde_json::{json, Map, Value};
 
+pub mod adapter_runner;
+#[cfg(feature = "schema-check")]
+pub mod fixture_check;
 #[cfg(feature = "negative-controls")]
 pub mod negctl;
+pub mod ojson;
+pub mod subset;
+pub mod trust_digest;
 
 /// Which negative control (if any) a run applies. Without the `negative-controls` feature there
 /// is none, and nothing below can name one.

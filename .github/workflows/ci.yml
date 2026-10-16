@@ -8,19 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
-        with: {python-version: "3.12.14"}
-      - run: pip install -c constraints/ci-python.txt jsonschema
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # branch stable at pin time; version comes from toolchain:
+        with: {toolchain: "1.99.0"}
       - name: schema self-check
-        run: |
-          python - <<'PY'
-          import json,glob
-          from jsonschema import Draft202012Validator
-          for f in sorted(glob.glob('spec/schemas/*.json')):
-              Draft202012Validator.check_schema(json.load(open(f))); print('ok', f)
-          PY
+        working-directory: rust
+        run: cargo run -q --locked -p interplane-conformance --bin interplane-corpus -- schemas
       - name: fixture validation
-        run: python conformance/runners/validate_fixtures.py
+        working-directory: rust
+        run: cargo run -q --locked -p interplane-conformance --bin interplane-corpus -- validate
   rust:
     runs-on: ubuntu-latest
     defaults: {run: {working-directory: rust}}
@@ -33,8 +28,12 @@ jobs:
       - run: cargo test --all
       - name: negative controls (test-only feature) detect their defects
         run: cargo test -p interplane-conformance --features negative-controls
+      - name: both examples run offline and check their own story (exit 1 on any difference)
+        run: |
+          cargo run -q -p interplane-crossveil --example offline
+          cargo run -q -p interplane-crossveil --example todo_adapter
       - name: conformance (rust)
-        run: cargo run -q -p interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
+        run: cargo run -q -p interplane-conformance --bin interplane-conformance -- ../conformance/fixtures --out ../rust-verdicts.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with: {name: rust-verdicts, path: rust-verdicts.json}
   python:
@@ -61,28 +60,15 @@ jobs:
         with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
       - name: build the python wheel
         run: pip wheel --no-deps -w dist ./python
-      - name: install the wheel into a clean venv and run both examples from outside the checkout
+      - name: install the wheel into a clean venv
         run: |
           python -m venv "$RUNNER_TEMP/v"
           "$RUNNER_TEMP/v/bin/pip" install dist/interplane-*.whl
-          cd "$RUNNER_TEMP"
-          INTERPLANE_REQUIRE_INSTALLED=1 "$RUNNER_TEMP/v/bin/python" "$GITHUB_WORKSPACE/examples/offline/run_offline.py"
-          INTERPLANE_REQUIRE_INSTALLED=1 "$RUNNER_TEMP/v/bin/python" "$GITHUB_WORKSPACE/examples/adapter/todo_adapter.py"
       - name: conformance from the installed wheel equals conformance from the checkout
         run: |
           (cd "$RUNNER_TEMP" && "$RUNNER_TEMP/v/bin/interplane-conformance" "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/wheel-verdicts.json")
           PYTHONPATH=python python -m interplane.conformance "$GITHUB_WORKSPACE/conformance/fixtures" --out "$RUNNER_TEMP/checkout-verdicts.json"
           cmp "$RUNNER_TEMP/wheel-verdicts.json" "$RUNNER_TEMP/checkout-verdicts.json"
-      - name: the shared adapter runner judges a recorded adapter against the installed wheel
-        run: |
-          H="$GITHUB_WORKSPACE/bench/runs/home-check-20261005T1320Z"
-          mkdir "$RUNNER_TEMP/home" && cp "$H/authority.py" "$H/table-entry.json" "$RUNNER_TEMP/home/"
-          printf 'from authority import RUNTIME, POLICY, make_pipeline, HomeAuthority\n\n\ndef make_authority(**kw):\n    return HomeAuthority(**kw)\n' > "$RUNNER_TEMP/home/shim.py"
-          cd "$RUNNER_TEMP"
-          R="$RUNNER_TEMP/v/bin/python $GITHUB_WORKSPACE/conformance/runners/adapter_runner.py --module home/shim.py --entry home/table-entry.json"
-          $R --out home/verdicts.json && cmp home/verdicts.json "$H/verdicts.json"
-          if $R --no-exposure-check --out home/negctl.json; then echo "negative control passed"; exit 1; fi
-          cmp home/negctl.json "$H/verdicts-negctl.json"
       - name: package every Rust crate and build each from its .crate alone
         working-directory: rust
         run: cargo package --workspace --locked
@@ -96,7 +82,8 @@ jobs:
         with: {toolchain: "1.99.0", components: "rustfmt, clippy"}
       - run: pip install -c constraints/ci-python.txt -e python
       - name: trust corpus and protocol digests match conformance/TRUST-DIGEST.txt
-        run: python conformance/runners/trust_digest.py --check
+        working-directory: rust
+        run: cargo run -q --locked -p interplane-conformance --bin interplane-corpus -- trust-digest --check
       - name: pipeline libraries never mention the negative controls
         run: |
           ! grep -rIl -E 'negctl|negative-controls|NEGCTL' rust/crates/interplane-core rust/crates/interplane-crossveil rust/crates/interplane-crossaxis rust/crates/interplane-lenshift python/interplane/core.py python/interplane/crossveil.py python/interplane/crossaxis.py python/interplane/lenshift
@@ -109,7 +96,7 @@ jobs:
           test "$rc" = 2
       - name: negative-control matrix, offline, both languages (every variant must be detected)
         run: |
-          (cd rust && cargo run -q -p interplane-conformance --features negative-controls -- ../conformance/fixtures --matrix ../rust-matrix.json)
+          (cd rust && cargo run -q -p interplane-conformance --bin interplane-conformance --features negative-controls -- ../conformance/fixtures --matrix ../rust-matrix.json)
           python -m interplane.conformance conformance/fixtures --matrix py-matrix.json
           cmp rust-matrix.json py-matrix.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

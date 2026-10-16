@@ -30,7 +30,7 @@ claims, fake tool calls in prose) arriving through a stream.
 ## Fixture format (`interplane-replay/1`)
 
 Files live in `dialects/replay/*.json`. They are deliberately NOT under `dialects/fixtures/`:
-`dialect_fixtures.rs` and `conformance/runners/validate_fixtures.py` glob that tree and expect
+`dialect_fixtures.rs` and `interplane-corpus validate` glob that tree and expect
 the dialect-fixture shape.
 
 | Field | Meaning |

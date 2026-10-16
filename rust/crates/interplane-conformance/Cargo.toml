@@ -9,7 +9,17 @@ description = "INTERPLANE reference implementation: conformance"
 name = "interplane-conformance"
 path = "src/main.rs"
 
+[[bin]]
+# Corpus tools: schema self-check, fixture validator, TRUST-DIGEST freeze, adapter subset rule.
+name = "interplane-corpus"
+path = "src/bin/interplane-corpus.rs"
+required-features = ["schema-check"]
+
 [features]
+default = ["schema-check"]
+# The fixture validator and schema self-check (JSON Schema 2020-12). An adapter that only needs
+# the subset rule or the shared adapter runner turns default features off.
+schema-check = ["dep:jsonschema"]
 # Test-only: deliberately vulnerable variants V1 to V6 (bench/PROTOCOL-0.3.md section 6). Never
 # enabled by a pipeline library, adapter or default build.
 negative-controls = []
@@ -19,7 +29,11 @@ interplane-core.workspace = true
 interplane-lenshift.workspace = true
 interplane-crossaxis.workspace = true
 interplane-crossveil.workspace = true
+serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
+regex.workspace = true
+jsonschema = { workspace = true, optional = true }
 
 [dev-dependencies]
 jsonschema.workspace = true

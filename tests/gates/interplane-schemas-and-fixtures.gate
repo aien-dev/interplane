@@ -1,0 +1,27 @@
+# tests/gates/interplane-schemas-and-fixtures.gate
+# Mirrors hosted: ci.yml job schemas-and-fixtures (interplane-corpus schemas, then validate; Rust 1.99.0 from rust-toolchain.toml)
+gate: INTERPLANE-SCHEMAS-AND-FIXTURES
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - rust/
+  - provenance/
+  - conformance/
+  - spec/
+  - dialects/
+  - bench/
+  - examples/
+  - adapters/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["schemas-and-fixtures"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 30m
+exactness: EXACT
+cache_scope: machine

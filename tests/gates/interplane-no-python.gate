@@ -1,0 +1,19 @@
+# tests/gates/interplane-no-python.gate
+# Mirrors hosted: ci.yml job no-python (no Python file is tracked; Drake's rule 2026-10-15). Portable: reads the tree only (always-run)
+gate: INTERPLANE-NO-PYTHON
+manifest_version: 2
+owner: interplane
+requires:
+  - portable
+inputs:
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["no-python"]
+expects:
+  exit: 0
+  observe: ["python_files_found == false"]
+  verdict: PASS
+timeout: 2m
+exactness: EXACT
+cache_scope: portable

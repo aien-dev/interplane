@@ -1,0 +1,21 @@
+# tests/gates/interplane-provenance.gate
+# Mirrors hosted: ci.yml job provenance (fmt, clippy --locked -D warnings, test --locked, six CLI fixture verdicts)
+gate: INTERPLANE-PROVENANCE
+manifest_version: 2
+owner: interplane
+requires:
+  - host
+inputs:
+  - provenance/
+  - rust/
+  - rust-toolchain.toml
+  - tests/gates/
+run:
+  exec: tests/gates/run.sh
+  args: ["provenance"]
+expects:
+  exit: 0
+  verdict: PASS
+timeout: 30m
+exactness: EXACT
+cache_scope: machine

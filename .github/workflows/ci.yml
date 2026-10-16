@@ -1,8 +1,9 @@
 name: ci
 on:
-  push:
-    branches: [main]
-  pull_request:
+  # Retired from pull requests and pushes on 2026-10-16 (ADR 0033 Decision 11, phase 3): the Spark
+  # runs these jobs (tests/gates/, one gate per job) and the required AIEN Verification check verifies
+  # its signed bundle. Kept as a manual trigger so a hosted run is still possible when needed.
+  workflow_dispatch:
 jobs:
   no-python:
     # Project rule (Drake, 2026-10-15): no Python ships in this repository.

@@ -1,9 +1,8 @@
 # The Spark pipeline: how a pull request gets tested and merged
 
 Since 2026-10-16 the DGX Spark is the only test judge for this repository (ADR 0033 Decision 11,
-phase 3, agreed by Drake on 2026-10-15). Enrollment comes first (step 1:
-the gates and trust anchors); the hosted `ci` workflow keeps running on pull requests and pushes
-until step 2 retires it to a manual trigger. Each of its jobs is a Spark gate in `tests/gates/` (one `.gate` per job,
+phase 3, agreed by Drake on 2026-10-15). The hosted `ci` workflow no longer runs on pull requests or
+pushes (manual trigger only); each of its jobs is a Spark gate in `tests/gates/` (one `.gate` per job,
 same commands, dispatched by `tests/gates/run.sh`). The `qualification` workflow was already manual
 (it needs a live model endpoint) and is not a gate.
 

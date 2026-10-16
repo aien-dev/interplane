@@ -466,7 +466,7 @@ impl RuntimeAuthority for MockRuntime {
                     }),
                     description: format!("mock capability {}", s.cap),
                     // `required` is omitted when empty: the same parameters object as the
-                    // Python mock, so both languages derive the same catalog digest.
+                    // retired Python mock, so the catalog digest is unchanged.
                     parameters: if req.is_empty() {
                         json!({"type": "object", "properties": props})
                     } else {

@@ -4,7 +4,10 @@ use std::path::PathBuf;
 
 use interplane_conformance::{load_fixtures, run_case};
 use interplane_core::*;
-use interplane_crossaxis::{coerce_arguments, select};
+use interplane_crossaxis::{
+    coerce_arguments, expand, measure_tokens, openai_tools_renderer, select, BenchTotals,
+    EstimatedTokens,
+};
 use interplane_crossveil::{mock_mapping_table, MockRuntime, RuntimeAuthority};
 use interplane_lenshift::{DialectRegistry, ParseContext};
 use jsonschema::{Resource, Validator};
@@ -176,4 +179,68 @@ fn catalog_selection_and_events_validate() {
         !validator("result").is_valid(&bad),
         "non-ok result without error must fail"
     );
+}
+
+/// Selection receipts with a token `measure` block and with expansions validate, and the schema
+/// refuses a malformed refusal entry and an unknown token unit (ported from the retired Python
+/// test `test_expansion_receipts_and_measure_validate`).
+#[test]
+fn expansion_receipts_and_measure_validate() {
+    let v = validator("selection");
+    let errors = |inst: &Value| v.iter_errors(inst).count();
+    let catalog = MockRuntime::new().catalog();
+    let (mut sel, caps) = select(
+        &catalog,
+        &["email".to_string()],
+        Some(3),
+        &["fail_tool".to_string()],
+    );
+    check(&v, "selection", &serde_json::to_value(&sel).unwrap());
+    let msgs = json!([{"role": "user", "content": "hi"}]);
+    measure_tokens(
+        &mut sel,
+        &catalog,
+        &caps,
+        openai_tools_renderer,
+        Some((&EstimatedTokens, &msgs, BenchTotals::default())),
+    );
+    let measured = serde_json::to_value(&sel).unwrap();
+    assert!(measured["measure"]["tokens"].is_object(), "{measured}");
+    check(&v, "measured selection", &measured);
+    let out = expand(
+        &sel,
+        &catalog,
+        &json!({"kind": "requested_excluded", "name": "read_file"}),
+        None,
+        None,
+    )
+    .unwrap();
+    let out = expand(
+        &out,
+        &catalog,
+        &json!({"kind": "discovery_hit", "names": ["web_fetch", "nope"]}),
+        None,
+        None,
+    )
+    .unwrap();
+    let expanded = serde_json::to_value(&out).unwrap();
+    check(&v, "expanded selection", &expanded);
+    let fixtures = root().join("conformance/fixtures");
+    for e in std::fs::read_dir(&fixtures).unwrap() {
+        let p = e.unwrap().path();
+        let name = p.file_name().unwrap().to_string_lossy().to_string();
+        if !(name.starts_with("24-") || name.starts_with("25-")) {
+            continue;
+        }
+        let f: Value = serde_json::from_str(&std::fs::read_to_string(&p).unwrap()).unwrap();
+        for s in f["expected"]["selections"].as_array().unwrap() {
+            check(&v, &name, s);
+        }
+    }
+    let mut bad = expanded.clone();
+    bad["expansions"][0]["refused"] = json!([{"name": "x"}]);
+    assert!(errors(&bad) > 0, "malformed refused entry accepted");
+    let mut bad = measured;
+    bad["measure"]["tokens"]["unit"] = json!("tokens");
+    assert!(errors(&bad) > 0, "unknown token unit accepted");
 }

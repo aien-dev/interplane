@@ -77,8 +77,8 @@ A trace is closed when its id is in the window, or when it holds no state and th
 The filter positions of an id are the first four big-endian 32-bit words of `sha256(trace_id as
 UTF-8)`, each modulo `retired_filter_bits` (a true modulo, also at sizes that are not a power of
 two); bit `p` is bit `p mod 8`, least significant first, of filter byte `floor(p / 8)`. The filter
-matches when all four bits are set. Both SDKs test the same position vector at 1009 bits and the
-same refusals at 37 bits. The
+matches when all four bits are set. The reference SDK tests a fixed position vector at 1009 bits and
+fixed refusals at 37 bits. The
 filter never forgets an id, so every closed or retired id stays refused for the pipeline's lifetime
 (no replay of any previously closed trace is admitted). It can also match an id that was never used:
 that trace is refused `session_closed` (a false refusal, fail closed). After `R` retirements the
@@ -92,12 +92,12 @@ the number of closes. This state lives in the pipeline's memory only; it is not 
 that sees false refusals rise and starts a new pipeline (approvals pending in the old one are then
 refused, case A12) therefore also forgets every closed id, and the new pipeline admits a replay of
 any trace closed in the old one. Such a host must keep the old pipeline's trace ids out of the new
-one itself (for example a fresh trace-id namespace per pipeline). Both SDKs expose this state as `closed_trace_state()`
+one itself (for example a fresh trace-id namespace per pipeline). The reference SDK exposes this state as `closed_trace_state()`
 `(ids held exactly, filter bytes)`.
 
 `session_limit_exceeded` and `session_closed` are `ErrorCode` values (a MINOR addition,
 `VERSIONING.md`). The 0.3 trust corpus is frozen (`conformance/TRUST-DIGEST.txt`), so these limits
-are covered by unit tests in both SDKs with the same scenarios; conformance fixtures follow with the
+are covered by the reference SDK's unit tests; conformance fixtures follow with the
 next corpus revision.
 
 ## Processing stages (the Crossveil lifecycle)
@@ -471,7 +471,7 @@ own model steps produced. The case fails if `violations` or `content_derived` is
 `injected_intents` is 0 (a case that never reaches the runtime proves nothing).
 
 Negative controls V1 to V6 (bench/PROTOCOL-0.3.md section 6) exist only in the conformance runners
-(Rust cargo feature `negative-controls`, Python `--variant` / `--matrix` flags) and wrap the
+(the reference runner's cargo feature `negative-controls`, with its `--variant` / `--matrix` flags) and wrap the
 unmodified pipeline from outside. `conformance/negative-controls.json` lists, per variant, the cases it
 must fail; the matrix run passes only if the unmodified runner is clean and every variant fails
 all of its listed cases. `conformance/TRUST-DIGEST.txt` freezes the whole fixture corpus, the negative-control list and
@@ -536,7 +536,8 @@ ObservedRecord (deterministic, no timestamps, no durations):
 
 `request_id` may be null when rejection happened before an id existed (malformed envelope).
 `result_digest` is the digest of the canonical `result` payload with `provenance.duration_ms` set
-to null. Rust and Python runners must emit byte-identical `observed` arrays.
+to null. Every runner must emit the `observed` arrays recorded in `conformance/expected/verdicts.json`
+(the reference runner's output, which the retired Python runner matched byte for byte).
 
 ## Adapter subsets (T3 and T4)
 

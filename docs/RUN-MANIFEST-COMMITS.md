@@ -16,8 +16,7 @@ Source for the manifest value: `bench/runs/qual-20261004T2207Z/manifest.json`. B
 ## Toolchain and dependency pins (added with the pin lane)
 
 - Rust: `rust-toolchain.toml` (1.99.0, the compiler CI used on 2026-10-04); CI passes the same `toolchain:` value.
-- Python CI packages: `constraints/ci-python.txt`, used with `pip install -c`. Python is `3.12.14`.
 - GitHub Actions: pinned to full commit SHAs, tag in a comment.
 - AIEN adapter siblings: `adapters/aien/PINS`, read by `adapters/aien/setup-siblings.sh`.
-- Odysseus itself stays pinned at `a8c147b` in CI (#95); its own `requirements.txt` is unversioned upstream, so
-  `constraints/ci-python.txt` fixes the versions it resolves to.
+- Removed 2026-10-15 with the Python code: the Python CI package pins (`constraints/ci-python.txt`, Python
+  `3.12.14`) and the Odysseus pin for CI (`a8c147b`, #95). Both stay in git history.

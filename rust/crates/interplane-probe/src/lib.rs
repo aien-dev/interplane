@@ -426,8 +426,8 @@ struct Runner<'a> {
     results: Vec<ProbeResult>,
 }
 
-/// Tool fixtures and prompts below mirror `python/interplane/probe.py` exactly; both reference probes
-/// must send identical request bodies per probe id (spec/PROBE.md).
+/// Tool fixtures and prompts below are pinned (spec/PROBE.md: every probe sends these bodies); the
+/// retired Python probe sent the same.
 fn user_msg(s: &str) -> Value {
     json!([{"role": "user", "content": s}])
 }

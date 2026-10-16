@@ -1,7 +1,6 @@
 //! Session state limits and close_trace (spec/CORE.md, "Session state limits").
 //!
-//! The same scenarios, code strings and message strings are tested in
-//! python/tests/test_session_limits.py.
+//! The retired Python SDK tested the same scenarios, code strings and message strings.
 use interplane_core::*;
 use interplane_crossveil::*;
 use interplane_lenshift::DialectRegistry;
@@ -278,7 +277,7 @@ fn close_trace() {
 }
 
 /// A malformed call's result cites its request id, so no later call in the trace may reuse it
-/// (same in both SDKs).
+/// (the retired Python SDK agreed).
 #[test]
 fn refused_call_uses_its_request_id() {
     let mut rt = MockRuntime::new();
@@ -299,7 +298,7 @@ fn refused_call_uses_its_request_id() {
 }
 
 // -- closed-trace retirement (spec/CORE.md, "Closing a trace") ------------------------------------
-// Same scenarios and literals in python/tests/test_session_limits.py.
+// The retired Python SDK tested the same scenarios and literals.
 
 const CYCLES: usize = 100_000;
 /// Fresh ids f0..f39 a 32-bit filter holding r0..r7 refuses (sha256 positions, CORE.md).
@@ -419,7 +418,7 @@ fn zero_filter_bits_refuses_every_new_trace_after_a_retirement() {
     assert_eq!(admit(&mut p, "held", "m2", "r2"), ok()); // held traces keep working
 }
 
-/// A 32-bit filter makes false refusals frequent; both SDKs refuse exactly the same fresh ids.
+/// A 32-bit filter makes false refusals frequent; the retired Python SDK refused exactly the same fresh ids.
 #[test]
 fn retirement_filter_is_identical_across_sdks() {
     let mut rt = MockRuntime::new();
@@ -474,7 +473,7 @@ fn open_close_cycles_stay_within_the_bound_and_replays_stay_refused() {
     assert_eq!(p.closed_trace_state(), bound);
 }
 
-/// Before the fix both SDKs recorded the id of an unknown trace on close: its first message was
+/// Before the fix both SDKs (Rust and the retired Python one) recorded the id of an unknown trace on close: its first message was
 /// then refused `session_closed`.
 #[test]
 fn unknown_close_does_not_poison_the_trace() {

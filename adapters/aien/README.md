@@ -8,7 +8,7 @@ could mistake for its own decision: no `AuthorizedEffect`, no `DoctrineDecision`
 `SafetyDecision`. `authorized` appears only when AIEN's own gate returned `Ok` for a read, or when AIEN's
 `EffectLane::authorize` minted an `AuthorizedEffect` after AIEN's `EffectClassAuthority` said Allow.
 `requires_approval` and `denied` carry AIEN's reason. The approval id on `requires_approval` is an adapter handle with no authority: grants come only from AIEN's `ApprovalDesk` and are
-spent only by AIEN. Nothing under `rust/`, `spec/`, `python/` or
+spent only by AIEN. Nothing under `rust/`, `spec/` or
 `conformance/` and no AIEN repository is modified.
 
 ## Pinned AIEN sources

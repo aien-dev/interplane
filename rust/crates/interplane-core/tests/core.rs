@@ -388,7 +388,7 @@ fn lifecycle_approval_needs_new_decision_with_approval_id() {
 }
 #[test]
 fn lifecycle_continuation_must_cite_the_minted_approval_id() {
-    // Mirrors python/tests/test_core.py test_requires_approval_needs_new_decision_citing_id.
+    // Ported from the retired Python test test_requires_approval_needs_new_decision_citing_id.
     let mut l = Lifecycle::new("r1");
     l.map().unwrap();
     l.apply_decision(&decision("requires_approval", Some("A1")))
